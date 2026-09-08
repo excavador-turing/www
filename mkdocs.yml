@@ -15,6 +15,7 @@ nav:
   - Home: index.md
   - Upstream vs this fork: comparison.md
   - Install: install.md
+  - Command line: cli.md
   - Developing: development.md
   - Contributing: contributing.md
 
