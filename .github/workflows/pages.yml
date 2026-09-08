@@ -7,6 +7,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Re-publishing without a commit: setting a custom domain does not itself
+  # redeploy, and a deployment is what re-binds the domain at GitHub's edges.
+  workflow_dispatch:
 
 concurrency:
   # Not cancel-in-progress: cancelling a half-finished Pages deployment
