@@ -54,11 +54,26 @@ four hours later: its kernel still replied to ping, nothing listened on 22, 80
 or 443, and recovery took a power cycle. The four compute modules were
 unaffected throughout and kept running.
 
-Two contributing mechanisms have been closed — a refresh flag that could stick
-and leave the page polling every two seconds for ever, and an unbounded poll
-in the interface — and the daemon now reports its own resident set so the next
-occurrence can be attributed rather than inferred. The underlying leak is not
-yet proven.
+Two contributing mechanisms have been closed: a refresh flag that could stick
+and leave the page polling every two seconds for ever, and an unbounded poll in
+the interface.
+
+What the retained metrics say, queried afterwards: memory fell about **0.95 MB
+a minute** from 01:15, and **recovered at each daemon restart** — by 3.4 MB,
+then by 10.7 MB. So the memory was the daemon's own and was returned when it
+exited. The board's load average also stepped from about 0.1 to 1.04 at exactly
+01:15 and stayed two to three times its baseline afterwards, so something began
+then rather than accumulating all evening.
+
+It is **not driven by requests**. 183,702 requests across every read endpoint,
+at 765 a second, grew the daemon's resident set by 276 KB — about 1.5 bytes a
+request. At the board's rate of roughly one request every two seconds, a
+per-request leak of the observed size would have to be 33 KB. The rate is
+constant per unit time, not per request, which points at something periodic
+rather than at anything the interface asked for.
+
+The daemon now reports its own resident set and its thread count, which
+distinguishes a heap leak from a leaked task. The cause is still not proven.
 
 Until it is: do not leave a browser sitting on the interface, and prefer `tpi`
 or `curl` for anything you are watching.

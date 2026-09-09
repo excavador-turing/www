@@ -103,9 +103,13 @@ free of 116 MB. The board-level series could show that memory was being
 consumed and **not by what**, so the diagnosis had to be argued from timing
 rather than measured. One number closes that gap.
 
-That fault is still open — it is [SQU-172](../reference/known-faults.md), and
-the leak is not yet proven. If you run this fork unattended, this is the panel
-to alert on.
+Beside it is **Threads**, and the pairing is what makes either useful: a heap
+leak grows the resident set while the thread count stays flat, whereas a leaked
+task or an unreaped worker grows both, because every thread carries a stack.
+During the outage neither series existed, so the two could not be told apart.
+
+That fault is still open — it is [SQU-172](../reference/known-faults.md). If you
+run this fork unattended, these are the panels to alert on.
 
 ### The gate's record
 

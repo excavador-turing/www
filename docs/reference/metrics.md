@@ -1,6 +1,6 @@
 # Metrics
 
-Upstream's firmware exposes no metrics. This fork serves **32 families**
+Upstream's firmware exposes no metrics. This fork serves **34 families**
 at `/metrics`, in Prometheus text format.
 
 This page is generated from the daemon's source, so it cannot describe a metric
@@ -61,6 +61,16 @@ scrape_configs:
 
 ## The families
 
+### The daemon
+
+| metric | type | what it is |
+|---|---|---|
+| `bmcd_build_info` | gauge | Version of the daemon that produced these metrics. Always `1`; the answer is in the `version` label. |
+
+Read this one first when a number looks wrong. Every other family below is
+produced by the daemon this names, and a metric that does not exist in an older
+build is simply absent rather than zero.
+
 ## Temperature and cooling
 
 | metric | type | what it is |
@@ -99,6 +109,7 @@ scrape_configs:
 | `bmcd_memory_free_bytes` | gauge | Free memory of the BMC. |
 | `bmcd_memory_total_bytes` | gauge | Total memory of the BMC. |
 | `bmcd_process_resident_bytes` | gauge | This daemon's own resident set. Board memory says the board is being consumed; only this says by whom. |
+| `bmcd_process_threads` | gauge | Threads this daemon has. Read beside the resident set: a heap leak grows memory with this flat, while a leaked task or an unreaped blocking thread grows both, because every thread carries a stack. |
 | `bmcd_uptime_seconds` | gauge | Seconds since the BMC booted. |
 
 ## NAND
@@ -132,5 +143,6 @@ scrape_configs:
     Several of these are omitted rather than sent as `0` when the board cannot
     answer: `bmcd_clock_synchronised` on a board with no chrony,
     `bmcd_firmware_update_staged` when the boot environment cannot be read,
-    `bmcd_process_resident_bytes` on a kernel without `/proc/self/statm`.
+    `bmcd_process_resident_bytes` on a kernel without `/proc/self/statm`,
+    `bmcd_process_threads` on one without `/proc/self/status`.
     An absent series means *not known*; a zero would be a claim.
