@@ -6,13 +6,21 @@ what the screen is for.
 
 <div class="grid" markdown>
 
-[Download the dashboard :material-download:](../assets/turingpi-bmc-dashboard.json){ .md-button .md-button--primary download="turingpi-bmc-dashboard.json" }
+[Download the dashboard :material-download:](https://raw.githubusercontent.com/excavador-turing/BMC-Firmware/hive/dashboards/turingpi-bmc.json){ .md-button .md-button--primary }
 
 </div>
 
-It is also attached to [every firmware release](https://github.com/excavador-turing/BMC-Firmware/releases)
-as `turingpi-bmc-dashboard.json`, so the dashboard and the firmware it reads
-are versioned together.
+That link is the file itself, in the firmware repository. It is also attached
+to [every release](https://github.com/excavador-turing/BMC-Firmware/releases)
+as `turingpi-bmc-dashboard.json` and checksummed in `SHA256SUMS`, so a
+dashboard and the firmware whose metrics it reads are versioned together. Take
+the release copy if you pin firmware versions; take the link above for the
+current one.
+
+This page deliberately does not host its own copy. A dashboard duplicated into
+a docs site is a dashboard that drifts from the daemon it describes, and the
+drift is invisible: every panel still renders, just against metrics that have
+moved.
 
 ## 1. Get the scrape credential
 
