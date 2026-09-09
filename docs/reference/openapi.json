@@ -1,0 +1,2546 @@
+{
+  "components": {
+    "schemas": {
+      "ChannelState": {
+        "description": "What one channel resolves to, straight from `tpi-selfupdate --json`.",
+        "properties": {
+          "channel": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "running": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "update_available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "channel",
+          "repo",
+          "running",
+          "target",
+          "update_available"
+        ],
+        "type": "object"
+      },
+      "Clock": {
+        "description": "Whether the board knows what time it is, and how well.",
+        "properties": {
+          "measured_by": {
+            "description": "How the three fields above were obtained, because it is not a file\nread like everything else here.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "offset_seconds": {
+            "description": "System clock minus true time: negative when the board is behind.",
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "rtc": {
+            "description": "Every RTC the kernel has. An empty list is a board with none, which\nis a board whose clock starts at the epoch on every cold boot.",
+            "items": {
+              "$ref": "#/components/schemas/Rtc"
+            },
+            "type": "array"
+          },
+          "source": {
+            "description": "What it is synchronised to, as chrony names it.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stratum": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "synchronised": {
+            "description": "Whether the system clock is disciplined. `null` when chrony's state\ncould not be read at all.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "rtc"
+        ],
+        "type": "object"
+      },
+      "Cooler": {
+        "description": "One cooling device: something the thermal framework can turn up, in whole\nsteps, to cool a zone. On this board that is the fan.\n\nThis is deliberately not [`crate::app::cooling_device::CoolingDevice`],\nwhich is the shape `opt=get&type=cooling` has served for years and which\nthe fan control in the web UI writes back to. That one renames `pwm-fan`\nto the platform node behind it and reports the raw steps as `speed` and\n`max_speed`. This one passes the kernel's own names and numbers through.",
+        "properties": {
+          "cur_state": {
+            "description": "Which step the device is on right now. Steps are an index, not a\npercentage and not an RPM: `4` of `6` is the fifth of seven settings.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "levels": {
+            "description": "What each step does, indexed by step: `levels[cur_state]` is the PWM\nduty the fan is being driven at, out of the 255 the pwm-fan binding\ncounts in. Read out of the board's own device tree, so it is a fact\nabout this board and not a table copied into a client. `None` on a\nboard that does not describe one, which is not the same as a fan that\nruns flat out -- see [`cooling_levels`].",
+            "items": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "max_level": {
+            "description": "The duty at `max_state`, which is the last entry of `levels`: the\ndenominator for turning a step into a percentage. 254 here, not 255 --\nthis board's top step is not quite full duty, and saying 255 would be\ninventing the difference.",
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "max_state": {
+            "description": "The highest step it has.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "name": {
+            "description": "The device's `type`, as the driver spells it: `pwm-fan`. Falls back to\nthe directory name.",
+            "type": "string"
+          },
+          "present": {
+            "description": "Whether both states were read.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "present"
+        ],
+        "type": "object"
+      },
+      "CoolingDevice": {
+        "properties": {
+          "device": {
+            "type": "string"
+          },
+          "max_speed": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "overridden": {
+            "description": "Whether that zone's governor is paused, which is the only condition\nunder which a step written here is a step that holds.\n\nWith the governor running, `step_wise` returns the fan to the trip the\nboard is above within a poll, so a written step is a request the\nkernel is about to overrule. Reported so a client can say which of\nthose two things is happening, rather than leaving a person to watch a\nslider spring back and draw their own conclusion.",
+            "type": "boolean"
+          },
+          "speed": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "zone": {
+            "description": "The thermal zone whose governor drives this device, when one binds it.\n\nA zone binds a cooling device once per trip it should react to, so\nthis board's single fan is `cdev0` through `cdev3` of the one zone.\nEvery one of those links is the same answer.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "device",
+          "speed",
+          "max_speed",
+          "overridden"
+        ],
+        "type": "object"
+      },
+      "FirmwareSlots": {
+        "description": "The A/B slot state of the board.",
+        "properties": {
+          "last_promotion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Promotion"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The last line the promotion script wrote, when there is a log."
+          },
+          "nextboot": {
+            "description": "The raw `nextboot` variable when it is set, so a caller can see what\nis staged and not merely that something is.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "present": {
+            "description": "Whether the UBI device is there at all. False on a board that boots\nfrom something else, and on any kernel without UBI: the rest of the\nfields are then empty because there is nothing to read, not because\nsomething failed.",
+            "type": "boolean"
+          },
+          "promotion_history": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PromotionHistory"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How the gate has decided over this board's life. `None` on a board\nwith no log, which is a board that has never taken an OTA update."
+          },
+          "rollback": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Slot"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The slot a rollback would land on, when one can be named without\nguessing."
+          },
+          "running": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Slot"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The slot the board booted from, identified by which volume has an\nattached `ubiblock` device."
+          },
+          "staged": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StagedImage"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Which image is staged, when whatever staged it left a note. `None`\nmeans no note was found -- on a board where `update_staged` is true\nthat means the image was staged by something that does not write one,\nnot that nothing is staged."
+          },
+          "update_staged": {
+            "description": "Whether an update is staged for the next boot. `null` means the\nU-Boot environment could not be read at all -- no `fw_printenv` on the\nboard -- which is not the same as \"no update is staged\".",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "present"
+        ],
+        "type": "object"
+      },
+      "Health": {
+        "description": "The board's own condition.",
+        "properties": {
+          "clock": {
+            "$ref": "#/components/schemas/Clock"
+          },
+          "load": {
+            "$ref": "#/components/schemas/Load"
+          },
+          "memory": {
+            "$ref": "#/components/schemas/Memory"
+          },
+          "nand": {
+            "$ref": "#/components/schemas/Nand"
+          },
+          "uptime_seconds": {
+            "description": "Seconds since the BMC booted, as `/proc/uptime` gives it. Not the\nuptime of any compute module.",
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "load",
+          "memory",
+          "nand",
+          "clock"
+        ],
+        "type": "object"
+      },
+      "Load": {
+        "description": "The one-, five- and fifteen-minute load averages.",
+        "properties": {
+          "fifteen_minutes": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "five_minutes": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "one_minute": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "present": {
+            "description": "Whether `/proc/loadavg` could be read.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "present"
+        ],
+        "type": "object"
+      },
+      "Memory": {
+        "description": "Memory, in bytes rather than the kibibytes `/proc/meminfo` speaks.\n\nThis is not an academic number on this board. It has 116 MB in total, and\na firmware image being uploaded into `/tmp` is competing with the daemon\nfor it.",
+        "properties": {
+          "available_bytes": {
+            "description": "`MemAvailable`: what a new allocation can actually get, reclaim\nincluded. Absent on kernels older than 3.14, which is why it is not\nderived from the other two.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "free_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "present": {
+            "description": "Whether `/proc/meminfo` could be read.",
+            "type": "boolean"
+          },
+          "self_resident_bytes": {
+            "description": "This daemon's own resident set, from `/proc/self/statm`.\n\nBoard-level memory says the board is being consumed; it cannot say by\nwhat. On 2026-09-09 the board wedged after losing 1 MB a minute under\npolling and the metrics could only show the total falling, so the\ndiagnosis had to be argued from timing rather than read off\n(SQU-172). One number closes that gap.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "self_threads": {
+            "description": "How many threads this daemon has, from `/proc/self/status`.\n\nThe companion to the resident set, and the one that says *which kind*\nof growth is happening. A heap leak grows the resident set with a flat\nthread count; a leaked task or an unreaped blocking thread grows both\ntogether, because every thread carries a stack.\n\nWithout it the two are indistinguishable from the outside, which is\nthe position SQU-172 left us in: memory falling about a megabyte a\nminute with no way to say whether it was allocations or threads.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "total_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "present"
+        ],
+        "type": "object"
+      },
+      "Nand": {
+        "description": "What is left of the NAND, as UBI counts it.",
+        "properties": {
+          "available_bytes": {
+            "description": "`available_eraseblocks` in bytes, for callers that would otherwise\nmultiply the two themselves.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "available_eraseblocks": {
+            "description": "Logical eraseblocks not yet handed to a volume. This is the number\nthat says whether the next firmware upgrade has room.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "bad_eraseblocks": {
+            "description": "Physical eraseblocks the flash has retired.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "eraseblock_size_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "present": {
+            "description": "Whether the UBI device is there at all.",
+            "type": "boolean"
+          },
+          "reserved_eraseblocks": {
+            "description": "Physical eraseblocks held back to replace bad ones. When this reaches\nzero the next bad block is a failure rather than a substitution.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "total_eraseblocks": {
+            "description": "Logical eraseblocks on the device.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "present"
+        ],
+        "type": "object"
+      },
+      "PortKind": {
+        "description": "What sits on the other side of a switch port.",
+        "oneOf": [
+          {
+            "const": "node",
+            "description": "Faces a compute module slot.",
+            "type": "string"
+          },
+          {
+            "const": "uplink",
+            "description": "Leaves the board.",
+            "type": "string"
+          }
+        ]
+      },
+      "Problem": {
+        "description": "RFC 9457. `detail` is the same message the legacy form puts in `result`.",
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "status"
+        ],
+        "type": "object"
+      },
+      "Promotion": {
+        "description": "What the promotion script last said it did.",
+        "properties": {
+          "message": {
+            "description": "Everything the script said after its marker. Not classified into\nsuccess or failure here, because the vocabulary of that log belongs to\nthe firmware and not to this daemon.",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "The date the script itself printed, passed through verbatim rather\nthan reformatted: it is the board's own idea of the time, which on a\nBMC that has just come up may be well before the real one.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "timestamp",
+          "message"
+        ],
+        "type": "object"
+      },
+      "PromotionHistory": {
+        "description": "How the health gate has decided, over the life of this board.\n\nThe gate's history lived only in `/mnt/overlay/postupdate.log`, so\n\"nineteen consecutive clean promotions\" was a number somebody counted by\nhand and wrote on a website, where it went stale the next day.",
+        "properties": {
+          "attempts": {
+            "description": "Boots that ran the gate at all: one per \"tentative boot\" line.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "promoted": {
+            "description": "The rest. Derived rather than counted, because the gate has no single\nline that means \"kept\": it can finish through the metrics check, or by\nskipping it on a board with no `curl`, or by promoting anyway when\nthere is no volume to fall back to. Deriving covers all three; the one\ninaccuracy is a board cut mid-gate, whose unfinished attempt counts\nhere. That is rare and errs towards over-reporting success, which is\nworth saying out loud in the metric's help text.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rolled_back": {
+            "description": "Of those, the ones the gate refused.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "attempts",
+          "rolled_back",
+          "promoted"
+        ],
+        "type": "object"
+      },
+      "Rtc": {
+        "description": "One real-time clock the kernel has.",
+        "properties": {
+          "device": {
+            "description": "`rtc0`, `rtc1`.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The driver's own name for it. Which of the two has a battery behind\nit is not something the kernel exposes, so it is not claimed here.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "device"
+        ],
+        "type": "object"
+      },
+      "Slot": {
+        "description": "One firmware slot.",
+        "properties": {
+          "size_bytes": {
+            "description": "`data_bytes` of the volume: how much firmware is in it, not how much\nspace it was given.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "version": {
+            "description": "Firmware version, and only ever for the running slot. The rollback\nvolume is not mounted -- nothing on this board reads a squashfs that\nis not the root filesystem -- so its `/etc/os-release` is not\nreachable, and a version is not guessed from a volume name.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "volume": {
+            "description": "UBI volume name, as the volume itself spells it.",
+            "type": "string"
+          },
+          "volume_id": {
+            "description": "Volume id within the UBI device, the `N` of `ubi0_N`.",
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volume",
+          "volume_id"
+        ],
+        "type": "object"
+      },
+      "Source": {
+        "properties": {
+          "enabled": {
+            "default": true,
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Stable identifier, used by the install call. Not the label: renaming a\nsource in the interface must not change what an install refers to.",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/SourceKind"
+          },
+          "label": {
+            "description": "What a human calls it.",
+            "type": "string"
+          },
+          "location": {
+            "description": "`owner/repo` for github, a URL prefix for http, a path for local.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "location"
+        ],
+        "type": "object"
+      },
+      "SourceKind": {
+        "description": "Where a source's images come from.",
+        "oneOf": [
+          {
+            "const": "github",
+            "description": "A GitHub repository, `owner/repo`. Checksums are published and checked.",
+            "type": "string"
+          },
+          {
+            "const": "http",
+            "description": "An HTTP directory of `<prefix>/<version>/<image>.tpu`. Checksums are\nused when the publisher ships them; upstream's does not.",
+            "type": "string"
+          },
+          {
+            "const": "local",
+            "description": "A directory on the SD card. This is also where uploads land, so an\nuploaded image becomes a candidate like any other.",
+            "type": "string"
+          }
+        ]
+      },
+      "Sources": {
+        "properties": {
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sources"
+        ],
+        "type": "object"
+      },
+      "StagedImage": {
+        "description": "What is waiting in the staging volume, according to whatever put it there.\n\nEvery field is optional because this file is written by something else --\n`tpi-selfupdate`, or the daemon's own upgrade worker -- and a marker from\nan older writer should degrade to \"less is known\", never to no answer.",
+        "properties": {
+          "file": {
+            "description": "The file it came from, when the stager knew a name but not a tag --\nan uploaded image whose filename does not follow the release naming\nhas a file and no version, and saying so beats inventing a version.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha256": {
+            "description": "The checksum the stager verified before writing the volume, so a\ncaller can tell two builds of one tag apart.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "description": "What staged it -- `tpi-selfupdate`, `upload`. Useful when a board has\na staged image nobody remembers arming.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "staged_at": {
+            "description": "When it was staged, in the board's own idea of the time.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "description": "The release tag, as the stager spelled it: `v2.4.0`.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "SwitchPort": {
+        "description": "One port of the switch. Every field the kernel would not give us is\n`None` rather than a stand-in value: a port that is down has no speed and\nno duplex, and saying `0` there would read as a working port running at\nnothing.",
+        "properties": {
+          "duplex": {
+            "description": "`full` or `half`. The kernel reports `unknown` for a port with no\nlink, which becomes `None` here.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "$ref": "#/components/schemas/PortKind"
+          },
+          "link": {
+            "description": "`carrier`: a peer is electrically there and has trained.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "name": {
+            "description": "Interface name, as the kernel spells it.",
+            "type": "string"
+          },
+          "operstate": {
+            "description": "`operstate`: `up`, `down`, `lowerlayerdown`, `unknown`. Passed through\nverbatim, because the distinction between `down` (nobody asked for the\nport) and `lowerlayerdown` (asked for, nothing on the wire) is the\nwhole point of reading it.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "present": {
+            "description": "Whether the kernel has a netdev for this port at all. False means the\nswitch driver did not register it -- on a board where the driver fails\nto probe, all six read false while the BMC itself stays reachable over\nits own interface.",
+            "type": "boolean"
+          },
+          "rx_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "rx_errors": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "speed_mbps": {
+            "description": "Megabit per second. The kernel reports `-1` for a port with no link,\nwhich becomes `None` here.",
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "tx_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "tx_errors": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "present"
+        ],
+        "type": "object"
+      },
+      "Thermal": {
+        "description": "Everything `/sys/class/thermal` has to say.",
+        "properties": {
+          "cooling": {
+            "items": {
+              "$ref": "#/components/schemas/Cooler"
+            },
+            "type": "array"
+          },
+          "sensors": {
+            "items": {
+              "$ref": "#/components/schemas/ThermalSensor"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sensors",
+          "cooling"
+        ],
+        "type": "object"
+      },
+      "ThermalSensor": {
+        "description": "One thermal zone: a sensor the kernel can read a temperature from.",
+        "properties": {
+          "name": {
+            "description": "The zone's `type`, which is the name its driver registered -- ours is\n`bmc-thermal`, from the device tree node. Falls back to the directory\nname if the kernel will not answer, so a sensor is never nameless.",
+            "type": "string"
+          },
+          "present": {
+            "description": "Whether a temperature was actually read. False is \"the zone exists and\nthe kernel would not tell us\", which is not the same as a reading of\nzero, and not the same as the zone not existing -- a zone that does not\nexist is not in the list at all.",
+            "type": "boolean"
+          },
+          "temperature_c": {
+            "description": "Degrees Celsius to one decimal, converted from the millidegrees sysfs\nreports. `None` when the zone is there but would not give a reading.",
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "trips": {
+            "description": "The zone's trip points, in the order the kernel numbers them.\n\nThis is what makes the fan's step explicable rather than mysterious.\nThe governor is `step_wise`, so the step is a consequence of which\ntrips the board has crossed -- and \"the fan is on step 4\" with no\nreason attached is the question this fork was asked to investigate.\nRead from sysfs for the same reason as the cooling levels: it is a\nfact about this board, not a table copied into a client.",
+            "items": {
+              "$ref": "#/components/schemas/Trip"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "present",
+          "trips"
+        ],
+        "type": "object"
+      },
+      "Trip": {
+        "description": "One trip point: a temperature and what crossing it means.",
+        "properties": {
+          "index": {
+            "description": "The kernel's index for it, which is also its order.",
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "kind": {
+            "description": "`active` drives a cooling device; `hot` and `critical` are the\nkernel's own escalations. Passed through as the kernel spells it\nrather than mapped, because a client that meets an unfamiliar type\nshould show it, not swallow it.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "temperature_c": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "index"
+        ],
+        "type": "object"
+      },
+      "UpdateCheck": {
+        "description": "The answer the API returns.",
+        "properties": {
+          "checked_at": {
+            "description": "When this was last resolved, in the board's own idea of the time.",
+            "type": "string"
+          },
+          "edge": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelState"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The edge channel: the newest release including pre-releases."
+          },
+          "error": {
+            "description": "Why a channel is missing, when one is. Present WITH a channel too,\nwhen only one of the two could be resolved.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stable": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelState"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The stable channel: what GitHub marks Latest, pre-releases excluded."
+          }
+        },
+        "required": [
+          "checked_at"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basic": {
+        "description": "The board's root credentials. Loopback on the board itself needs neither.",
+        "scheme": "basic",
+        "type": "http"
+      },
+      "bearer": {
+        "description": "A token from POST /api/bmc/authenticate.",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "name": "excavador-turing",
+      "url": "https://github.com/excavador-turing"
+    },
+    "description": "The board management controller of a Turing Pi 2, as built by the excavador-turing fork. Every operation here is also reachable in the legacy form `GET /api/bmc?opt=&type=`, which older clients speak and which is not going away.",
+    "license": {
+      "name": "Apache-2.0"
+    },
+    "title": "Turing Pi 2 BMC",
+    "version": "2.26.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/bmc/about": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=about` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getAbout",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Firmware, daemon, kernel and board identity"
+      }
+    },
+    "/api/bmc/config": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=config` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "description": "`1` includes the metrics token, which makes the document a credential",
+            "in": "query",
+            "name": "secrets",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Everything configured on this board, as one document; `secrets=1` includes the metrics token"
+      },
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=config` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postConfig",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "config": {
+                    "description": "the exported document; a JSON body that is the document itself is accepted as-is",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "config": {
+                    "description": "the exported document; a JSON body that is the document itself is accepted as-is",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Apply an exported configuration; reports per field"
+      }
+    },
+    "/api/bmc/cooling": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=cooling` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getCooling",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CoolingDevice"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Cooling devices with their setpoints"
+      },
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=cooling` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postCooling",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "device": {
+                    "description": "as reported by GET /cooling",
+                    "type": "string"
+                  },
+                  "speed": {
+                    "description": "a step, 0 to max_speed",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "device": {
+                    "description": "as reported by GET /cooling",
+                    "type": "string"
+                  },
+                  "speed": {
+                    "description": "a step, 0 to max_speed",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Set a cooling device's step"
+      }
+    },
+    "/api/bmc/firmware/available": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=firmware_available` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getFirmwareAvailable",
+        "parameters": [
+          {
+            "description": "`1` starts a re-poll of every source behind the answer; the answer itself is what was cached",
+            "in": "query",
+            "name": "refresh",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Every enabled source's candidates; `refresh=1` re-polls behind the answer"
+      }
+    },
+    "/api/bmc/firmware/check": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=update_check` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getFirmwareCheck",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCheck"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Whether a newer release exists, per channel"
+      }
+    },
+    "/api/bmc/firmware/install": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=firmware_install` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postFirmwareInstall",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "allow_downgrade": {
+                    "description": "`1` for a version that is not newer than the running one",
+                    "type": "string"
+                  },
+                  "force": {
+                    "description": "`1` replaces an image that is already staged",
+                    "type": "string"
+                  },
+                  "source": {
+                    "description": "a source id from GET /firmware/sources",
+                    "type": "string"
+                  },
+                  "version": {
+                    "description": "a version that source offers",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "allow_downgrade": {
+                    "description": "`1` for a version that is not newer than the running one",
+                    "type": "string"
+                  },
+                  "force": {
+                    "description": "`1` replaces an image that is already staged",
+                    "type": "string"
+                  },
+                  "source": {
+                    "description": "a source id from GET /firmware/sources",
+                    "type": "string"
+                  },
+                  "version": {
+                    "description": "a version that source offers",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Stage a version from a source for the next boot"
+      }
+    },
+    "/api/bmc/firmware/slots": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=firmware_slots` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getFirmwareSlots",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirmwareSlots"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "The A/B slots: running, rollback, what is staged, the last promotion"
+      }
+    },
+    "/api/bmc/firmware/sources": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=firmware_sources` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getFirmwareSources",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sources"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Where the board looks for firmware"
+      },
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=firmware_sources` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postFirmwareSources",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "sources": {
+                    "description": "the sources document; a JSON body that is the document itself is accepted as-is",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "sources": {
+                    "description": "the sources document; a JSON body that is the document itself is accepted as-is",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Replace the firmware sources"
+      }
+    },
+    "/api/bmc/health": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=health` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "The board's own condition: uptime, load, memory, NAND, clock"
+      }
+    },
+    "/api/bmc/hostname": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=hostname` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getHostname",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "The board's name, live and after the next boot"
+      },
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=hostname` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postHostname",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "description": "one DNS label: letters, digits, hyphens; no dots",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "description": "one DNS label: letters, digits, hyphens; no dots",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Rename the board; the metrics instance label changes with it"
+      }
+    },
+    "/api/bmc/info": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=info` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getInfo",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Storage and interfaces, as the Overview page reads them"
+      }
+    },
+    "/api/bmc/metrics-token": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=metrics_token` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getMetricsToken",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "The read-only credential the metrics endpoint accepts"
+      }
+    },
+    "/api/bmc/metrics-token/rotate": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=metrics_token` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postMetricsTokenRotate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Replace the metrics token; the old one stops working at once"
+      }
+    },
+    "/api/bmc/network": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=network` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getNetwork",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ports": {
+                      "items": {
+                        "$ref": "#/components/schemas/SwitchPort"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ports"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Interfaces and switch ports"
+      }
+    },
+    "/api/bmc/network/reset": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=network` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postNetworkReset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Reset the network configuration"
+      }
+    },
+    "/api/bmc/node-to-msd": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=node_to_msd` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postNodeToMsd",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node": {
+                    "description": "1-4",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node": {
+                    "description": "1-4",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Expose a node's storage as a mass-storage device"
+      }
+    },
+    "/api/bmc/nodes": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=node_info` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getNodes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Node names, module names and power-on times"
+      }
+    },
+    "/api/bmc/ntp": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=ntp` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getNtp",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Time sources and the clock's state"
+      },
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=ntp` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postNtp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "servers": {
+                    "description": "comma-separated, in preference order; empty restores the image's pool",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "servers": {
+                    "description": "comma-separated, in preference order; empty restores the image's pool",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Replace the time sources and reload chrony"
+      }
+    },
+    "/api/bmc/power": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=power` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getPower",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Which nodes are powered"
+      },
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=power` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postPower",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node1": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  },
+                  "node2": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  },
+                  "node3": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  },
+                  "node4": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node1": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  },
+                  "node2": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  },
+                  "node3": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  },
+                  "node4": {
+                    "description": "0 or 1",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Power nodes on or off"
+      }
+    },
+    "/api/bmc/reboot": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=reboot` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postReboot",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Reboot the BMC; the compute modules keep running"
+      }
+    },
+    "/api/bmc/reload": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=reload` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postReload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Restart the daemon"
+      }
+    },
+    "/api/bmc/reset": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=reset` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postReset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node": {
+                    "description": "1-4",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node": {
+                    "description": "1-4",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Restart one node"
+      }
+    },
+    "/api/bmc/sdcard": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=sdcard` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getSdcard",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "SD card capacity and use"
+      }
+    },
+    "/api/bmc/sdcard/format": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=sdcard` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postSdcardFormat",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Format the SD card"
+      }
+    },
+    "/api/bmc/thermal": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=thermal` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getThermal",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thermal"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Temperature sensors with their trip points, and the fan's step"
+      }
+    },
+    "/api/bmc/usb": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=usb` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getUsb",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "The USB bus: which node holds it, in which mode"
+      },
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=usb` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postUsb",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "mode": {
+                    "description": "0 host, 1 device, 2 flash",
+                    "type": "string"
+                  },
+                  "node": {
+                    "description": "1-4: which node the bus is routed to",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "mode": {
+                    "description": "0 host, 1 device, 2 flash",
+                    "type": "string"
+                  },
+                  "node": {
+                    "description": "1-4: which node the bus is routed to",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Route the USB bus to a node, in a mode"
+      }
+    },
+    "/api/bmc/usb-boot": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=usb_boot` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postUsbBoot",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node": {
+                    "description": "1-4",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {
+                  "node": {
+                    "description": "1-4",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Hold a node's usbboot pin for the next power-on"
+      }
+    },
+    "/api/bmc/usb-boot/clear": {
+      "post": {
+        "description": "Legacy form: `GET /api/bmc?opt=set&type=clear_usb_boot` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "postUsbBootClear",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "additionalProperties": true,
+                "properties": {},
+                "type": "object"
+              }
+            }
+          },
+          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "The result. Its shape is not described in this document."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "Release the usbboot pin"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    },
+    {
+      "basic": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "This board",
+      "url": "/"
+    }
+  ]
+}

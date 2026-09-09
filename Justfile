@@ -11,6 +11,27 @@ default:
 build:
     mkdocs build --strict
 
+# Refresh the API document from a bmcd release. `just refresh-api v2.26.0`
+#
+# The spec is committed rather than fetched at build time, so the site builds
+# offline and reproducibly, and so a change to the API arrives as a reviewable
+# diff instead of appearing silently the next time CI runs.
+refresh-api version:
+    gh release download {{version}} --repo excavador-turing/bmcd \
+        --pattern openapi.json --output docs/reference/openapi.json --clobber
+    @just _describe-api
+
+# What the committed document says about itself. Its own version is the thing
+# to read: a spec that reports a different release than the one you fetched
+# means the download did not land.
+_describe-api:
+    #!/usr/bin/env python3
+    import json
+    doc = json.load(open("docs/reference/openapi.json"))
+    print("openapi {} from bmcd {}: {} paths, {} schemas".format(
+        doc["openapi"], doc["info"]["version"],
+        len(doc["paths"]), len(doc["components"]["schemas"])))
+
 # Serve with live reload
 serve:
     mkdocs serve

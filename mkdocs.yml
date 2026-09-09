@@ -31,6 +31,7 @@ nav:
       - Upstream vs this fork: reference/comparison.md
       - Command line: reference/cli.md
       - Metrics: reference/metrics.md
+      - API: reference/api.md
       - The gate's record: reference/gate-history.md
       - What is and isn't fixed: reference/known-faults.md
   - Contributing: contributing.md
@@ -72,6 +73,10 @@ markdown_extensions:
 
 plugins:
   - search
+  # [OAD(...)] embeds the BMC's OpenAPI document as static HTML. A plugin,
+  # not a markdown extension, whatever the name suggests. Chosen over Scalar
+  # because the output is real HTML that Material's search indexes.
+  - neoteroi.mkdocsoad
   # Every page says when it was last touched. These sites describe a moving
   # target -- repositories that release often -- and a doc page with no date
   # invites the reader to assume it is current.
