@@ -10,12 +10,11 @@ what the screen is for.
 
 </div>
 
-That link is the file itself, in the firmware repository. It is also attached
-to [every release](https://github.com/excavador-turing/BMC-Firmware/releases)
-as `turingpi-bmc-dashboard.json` and checksummed in `SHA256SUMS`, so a
-dashboard and the firmware whose metrics it reads are versioned together. Take
-the release copy if you pin firmware versions; take the link above for the
-current one.
+That link is the file itself, in the firmware repository. Releases from
+**v2.12.0** onward also carry it as `turingpi-bmc-dashboard.json`, checksummed
+in `SHA256SUMS`, so a dashboard and the firmware whose metrics it reads are
+versioned together. Take the release copy if you pin firmware versions; take
+the link above for the current one.
 
 This page deliberately does not host its own copy. A dashboard duplicated into
 a docs site is a dashboard that drifts from the daemon it describes, and the
