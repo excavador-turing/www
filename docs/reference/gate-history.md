@@ -9,7 +9,7 @@ at scrape time. As of **2026-09-09**:
 
 | result | count |
 |---|---|
-| promoted | 17 |
+| promoted | 18 |
 | rolled back | 1 |
 
 The one rollback was deliberate: a `v2.8.1-rc1` image with its staged note
@@ -36,7 +36,7 @@ If you are running this firmware, your own board answers the same question:
 
 ```console
 $ curl -s http://<board>:9110/metrics | grep promotion_total
-bmcd_firmware_promotion_total{result="promoted"} 17
+bmcd_firmware_promotion_total{result="promoted"} 18
 bmcd_firmware_promotion_total{result="rolled_back"} 1
 ```
 
