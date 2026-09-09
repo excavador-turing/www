@@ -36,19 +36,30 @@ three formatters that got this wrong.
 Every operation is described: its path, its method, its parameters, which
 ones are refused if omitted, and both security schemes.
 
-**Response bodies are described for seven operations** — thermal, health,
-cooling, network, and three of the firmware ones. Those schemas are derived
+**Every read operation describes its response body.** The schemas are derived
 from the Rust types the daemon serialises, so they cannot drift from what it
-sends, and a test holds a realistic response against each of them.
+sends, and contract tests hold a realistic response against each of them.
 
-**Eleven read operations describe no response body**, and say so where the
-body would be. Their handlers assemble an answer out of several sources
-rather than serialising one type, so there is nothing to derive from. They are
-listed in the daemon's source, and a test refuses to let a new one join them
-silently.
+Ten of those operations built their answer inline until v2.15.0, and had no
+type to derive from. They have one now — reconstructed from what the handler
+already sent, not redesigned. A rename would have broken `tpi` and the web
+interface for nothing.
 
-That distinction is deliberate. A schema invented to fill a gap is worse than
-an admitted gap, because a generated client believes it.
+Three shapes are odd, and the document describes the oddity rather than
+correcting it:
+
+- **`power`, `usb` and `sdcard` answer a one-element array.** That is
+  upstream's convention. A schema claiming an object would be a lie that
+  compiles, and a client has to index it either way.
+- **`sdcard`'s used-bytes field is called `use`.** Upstream's spelling. It is
+  also a Rust keyword, so the daemon renames it on the way out, and a test
+  asserts the name on the wire rather than the one in the source.
+- **`power` reports strings, not booleans.** A rail the daemon cannot read is
+  `"Unknown"`, and a boolean would leave a generated client unable to say so.
+
+The daemon still keeps a list of operations that describe nothing, and a test
+refuses to let one join it silently. The list is empty, and that is the point
+of keeping it.
 
 ## Authentication
 
@@ -63,8 +74,8 @@ leaves an audit line saying so.
 [its own credential](metrics.md), which cannot touch this API.
 
 !!! note "Which version this is"
-    Rendered from **bmcd 2.27.0**, fetched from that release rather than
-    written here. Refresh it with `just refresh-api v2.27.0` in the `www`
+    Rendered from **bmcd 2.28.0**, fetched from that release rather than
+    written here. Refresh it with `just refresh-api v2.28.0` in the `www`
     repository; the diff is then the API change, which is the point of
     committing it rather than fetching at build time.
 

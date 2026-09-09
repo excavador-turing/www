@@ -1,6 +1,160 @@
 {
   "components": {
     "schemas": {
+      "About": {
+        "description": "`GET /api/bmc/about` -- what this board and this daemon are.",
+        "properties": {
+          "api": {
+            "description": "The `/api/bmc` contract version, not a release of anything.",
+            "type": "string"
+          },
+          "bmcd_version": {
+            "type": "string"
+          },
+          "board_model": {
+            "description": "From the board's EEPROM. Empty on a board that cannot be read, rather\nthan absent: upstream's shape, and the interface renders the blank.",
+            "type": "string"
+          },
+          "board_revision": {
+            "type": "string"
+          },
+          "board_serial": {
+            "description": "`None` when the EEPROM field is missing or blank after trimming.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "build_version": {
+            "description": "The same value as `bmcd_version`. The web interface reads this key for\nits \"Build version\" field and renders `vundefined` without it, so it\nis duplicated deliberately rather than left for the client to alias.",
+            "type": "string"
+          },
+          "buildroot": {
+            "type": "string"
+          },
+          "buildtime": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "kernel": {
+            "description": "The running kernel. `\"unknown\"` when `uname` cannot be read; the one\nfield an operator wants after a kernel bump.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The firmware, from `/etc/os-release`. `\"unknown\"` when it cannot be\nread -- a string, because an About page with a gap is still worth\nrendering and this field has never been nullable.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "board_model",
+          "board_revision",
+          "hostname",
+          "api",
+          "version",
+          "bmcd_version",
+          "build_version",
+          "buildtime",
+          "buildroot",
+          "kernel"
+        ],
+        "type": "object"
+      },
+      "BoardInfo": {
+        "description": "`GET /api/bmc/info` -- what the Overview page reads.\n\nBoth halves are already typed elsewhere; this names the object that wraps\nthem so the document has one schema rather than an inline shape.",
+        "properties": {
+          "ip": {
+            "items": {
+              "$ref": "#/components/schemas/NetInfo"
+            },
+            "type": "array"
+          },
+          "storage": {
+            "items": {
+              "$ref": "#/components/schemas/StorageInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "ip",
+          "storage"
+        ],
+        "type": "object"
+      },
+      "Candidate": {
+        "properties": {
+          "file": {
+            "description": "For a local candidate, the file it came from.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prerelease": {
+            "type": "boolean"
+          },
+          "relation": {
+            "$ref": "#/components/schemas/Relation"
+          },
+          "size_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "trust": {
+            "$ref": "#/components/schemas/Trust"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "relation",
+          "prerelease",
+          "trust"
+        ],
+        "type": "object"
+      },
+      "Catalog": {
+        "properties": {
+          "age_seconds": {
+            "description": "How old these answers are. A caller that needs to say \"as of a minute\nago\" should not have to parse `checked_at` and trust two clocks.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "checked_at": {
+            "type": "string"
+          },
+          "refreshing": {
+            "description": "These are the previous answers and a refresh is running behind them.\n\nThe page draws a spinner on its \"check now\" control and leaves the\nlist underneath readable, rather than blanking or freezing. Skipped\nwhen false so a settled catalogue serialises as it always did.",
+            "type": "boolean"
+          },
+          "running": {
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceCatalog"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "checked_at",
+          "running",
+          "sources",
+          "refreshing",
+          "age_seconds"
+        ],
+        "type": "object"
+      },
       "ChannelState": {
         "description": "What one channel resolves to, straight from `tpi-selfupdate --json`.",
         "properties": {
@@ -79,6 +233,62 @@
         },
         "required": [
           "rtc"
+        ],
+        "type": "object"
+      },
+      "ConfigExport": {
+        "properties": {
+          "exported_at": {
+            "description": "When and from what. Not read back on import; it is what makes a file\nfound on a workstation six months later identifiable.",
+            "type": "string"
+          },
+          "exported_from": {
+            "$ref": "#/components/schemas/ExportOrigin"
+          },
+          "firmware_sources": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Sources"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "format_version": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "hostname": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/NodeSettings"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "ntp_servers": {
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "format_version",
+          "exported_at",
+          "exported_from"
         ],
         "type": "object"
       },
@@ -172,6 +382,29 @@
           "max_speed",
           "overridden"
         ],
+        "type": "object"
+      },
+      "ExportOrigin": {
+        "properties": {
+          "board_serial": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "firmware": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hostname": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
         "type": "object"
       },
       "FirmwareSlots": {
@@ -286,6 +519,26 @@
           "nand",
           "clock"
         ],
+        "type": "object"
+      },
+      "Hostname": {
+        "description": "`GET /api/bmc/hostname` -- live, and after the next boot.\n\nThe two differ between a rename and the reboot that settles it, which is\nthe whole reason both are reported.",
+        "properties": {
+          "hostname": {
+            "description": "What `sethostname(2)` currently says. `None` if it cannot be read.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "on_next_boot": {
+            "description": "What `/etc/hostname` holds. `None` when the file is absent.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
         "type": "object"
       },
       "Load": {
@@ -444,6 +697,140 @@
         ],
         "type": "object"
       },
+      "NetInfo": {
+        "properties": {
+          "device": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "device",
+          "ip",
+          "mac"
+        ],
+        "type": "object"
+      },
+      "NodeInfo": {
+        "properties": {
+          "module_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "power_on_time": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "uart_baud": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "NodePower": {
+        "description": "`GET /api/bmc/power` -- one element, four nodes.\n\nEach value is a **string**, not a boolean: `\"0\"`, `\"1\"`, or `\"Unknown\"`\nwhen the daemon could not read the rail. Upstream's shape; a client that\nwants a boolean has to handle the third case anyway.",
+        "properties": {
+          "node1": {
+            "type": "string"
+          },
+          "node2": {
+            "type": "string"
+          },
+          "node3": {
+            "type": "string"
+          },
+          "node4": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "node1",
+          "node2",
+          "node3",
+          "node4"
+        ],
+        "type": "object"
+      },
+      "NodeSettings": {
+        "properties": {
+          "id": {
+            "format": "uint8",
+            "maximum": 255,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "module_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "uart_baud": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "Ntp": {
+        "description": "`GET /api/bmc/ntp` -- the time sources, and how the clock is doing.",
+        "properties": {
+          "clock": {
+            "$ref": "#/components/schemas/Clock"
+          },
+          "configurable": {
+            "description": "False on an image whose `chrony.conf` predates the `sourcedir` line.\nWithout it a saved list is written and silently never read, so the\ninterface must be able to say the setting does nothing.",
+            "type": "boolean"
+          },
+          "servers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "servers",
+          "configurable",
+          "clock"
+        ],
+        "type": "object"
+      },
       "PortKind": {
         "description": "What sits on the other side of a switch port.",
         "oneOf": [
@@ -528,6 +915,16 @@
         ],
         "type": "object"
       },
+      "Relation": {
+        "description": "How a candidate relates to what is running.\n\n`Unknown` is not a failure. A board built from a working tree reports\n`VERSION=local`, and ordering that against real tags is meaningless --\nmeasured on hardware, `sort -V` put `local` first and every release,\nincluding genuinely older code, came out as an upgrade. Saying \"unknown\" is\nthe honest answer and lets the page say so rather than implying an order.",
+        "enum": [
+          "current",
+          "newer",
+          "older",
+          "unknown"
+        ],
+        "type": "string"
+      },
       "Rtc": {
         "description": "One real-time clock the kernel has.",
         "properties": {
@@ -545,6 +942,33 @@
         },
         "required": [
           "device"
+        ],
+        "type": "object"
+      },
+      "SdCard": {
+        "description": "`GET /api/bmc/sdcard` -- bytes, from `statvfs` on the mount point.",
+        "properties": {
+          "free": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "total": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "use": {
+            "description": "Named `use`, not `used`. Upstream's spelling, and a Rust keyword,\nwhich is why the field is renamed rather than called what it means.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "use",
+          "free"
         ],
         "type": "object"
       },
@@ -611,6 +1035,43 @@
           "kind",
           "label",
           "location"
+        ],
+        "type": "object"
+      },
+      "SourceCatalog": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "type": "array"
+          },
+          "error": {
+            "description": "Why this source produced nothing, when it produced nothing for a\nreason. An empty list with no error means the source genuinely offers\nnothing; an empty list WITH an error means it could not be read. The\npage must not collapse those two into \"up to date\".",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/SourceKind"
+          },
+          "label": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "kind",
+          "location",
+          "candidates"
         ],
         "type": "object"
       },
@@ -687,6 +1148,29 @@
             ]
           }
         },
+        "type": "object"
+      },
+      "StorageInfo": {
+        "properties": {
+          "bytes_free": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "total_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "total_bytes",
+          "bytes_free"
+        ],
         "type": "object"
       },
       "SwitchPort": {
@@ -858,6 +1342,15 @@
         ],
         "type": "object"
       },
+      "Trust": {
+        "description": "How much is known about an image's integrity.\n\nThree genuinely different things that a page must not render alike: a\nchecksum published by the release and verified on download; TLS only,\nbecause the publisher ships no checksums at all (upstream's server does\nnot); and a local file whose provenance is whatever put it there.",
+        "enum": [
+          "verified",
+          "tls",
+          "unverified"
+        ],
+        "type": "string"
+      },
       "UpdateCheck": {
         "description": "The answer the API returns.",
         "properties": {
@@ -899,6 +1392,49 @@
           "checked_at"
         ],
         "type": "object"
+      },
+      "UsbMode": {
+        "enum": [
+          "Host",
+          "Device",
+          "Flash"
+        ],
+        "type": "string"
+      },
+      "UsbRoute": {
+        "enum": [
+          "Bmc",
+          "AlternativePort"
+        ],
+        "type": "string"
+      },
+      "UsbState": {
+        "description": "`GET /api/bmc/usb` -- which node holds the bus, in which mode.",
+        "properties": {
+          "bus_type": {
+            "description": "What the hardware is: which of the board's USB controllers is in play.",
+            "type": "string"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/UsbMode",
+            "description": "`Host`, `Device` or `Flash`."
+          },
+          "node": {
+            "description": "The node, as a display string such as `Node 1`.",
+            "type": "string"
+          },
+          "route": {
+            "$ref": "#/components/schemas/UsbRoute",
+            "description": "Where the bus is routed: the alternative port, the BMC, or a node."
+          }
+        },
+        "required": [
+          "mode",
+          "node",
+          "route",
+          "bus_type"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -924,7 +1460,7 @@
       "name": "Apache-2.0"
     },
     "title": "Turing Pi 2 BMC",
-    "version": "2.27.0"
+    "version": "2.28.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -936,10 +1472,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/About"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -966,10 +1504,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigExport"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1027,7 +1567,7 @@
                 "schema": {}
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result. Its shape is not described in this document."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1166,10 +1706,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1466,10 +2008,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Hostname"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1527,7 +2071,7 @@
                 "schema": {}
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result. Its shape is not described in this document."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1554,10 +2098,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BoardInfo"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1737,10 +2283,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NodeInfo"
+                  },
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "type": "array"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1767,10 +2320,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Ntp"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1828,7 +2383,7 @@
                 "schema": {}
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result. Its shape is not described in this document."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1855,10 +2410,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NodePower"
+                  },
+                  "maxItems": 1,
+                  "minItems": 1,
+                  "type": "array"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -1940,7 +2502,7 @@
                 "schema": {}
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result. Its shape is not described in this document."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -2127,10 +2689,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SdCard"
+                  },
+                  "maxItems": 1,
+                  "minItems": 1,
+                  "type": "array"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -2239,10 +2808,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UsbState"
+                  },
+                  "maxItems": 1,
+                  "minItems": 1,
+                  "type": "array"
+                }
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result."
           },
           "204": {
             "description": "Done, with nothing to report."
@@ -2308,7 +2884,7 @@
                 "schema": {}
               }
             },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
+            "description": "The result. Its shape is not described in this document."
           },
           "204": {
             "description": "Done, with nothing to report."
