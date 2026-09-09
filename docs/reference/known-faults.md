@@ -63,6 +63,10 @@ yet proven.
 Until it is: do not leave a browser sitting on the interface, and prefer `tpi`
 or `curl` for anything you are watching.
 
+The [dashboard](../guides/monitor-it.md) plots that resident set beside the
+board's free memory, and carries a `predict_linear` rule that would have paged
+before the board went quiet rather than after.
+
 *Tracked as SQU-172.*
 
 ### There is no watchdog

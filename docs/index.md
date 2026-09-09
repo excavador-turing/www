@@ -44,8 +44,10 @@ when it goes wrong, and the sensors the board always had but never exposed.
     ---
 
     [Every family the board exposes](reference/metrics.md), scraped with a
-    token that **cannot touch `/api/bmc`**. Upstream had no metrics; adding
-    them with the root password would have been worse than none.
+    token that **cannot touch `/api/bmc`**, and
+    [a dashboard over all of them](guides/monitor-it.md). Upstream had no
+    metrics; adding them with the root password would have been worse than
+    none.
 
 -   __A console to every module__
 

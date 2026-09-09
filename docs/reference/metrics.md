@@ -33,6 +33,9 @@ API should have and does not — see
 Rotate it with `tpi metrics rotate`; the previous token stops working
 immediately, which is the entire point of rotation.
 
+A Grafana dashboard over every family below ships with each release; see
+[monitor it](../guides/monitor-it.md).
+
 ## Scraping it
 
 ```yaml

@@ -24,6 +24,7 @@ nav:
   - Guides:
       - Install: guides/install.md
       - Recover a bad flash: guides/recover-a-bad-flash.md
+      - Monitor it: guides/monitor-it.md
       - Developing: guides/development.md
   - Reference:
       - Upstream vs this fork: reference/comparison.md
