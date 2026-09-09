@@ -101,10 +101,10 @@ temperatures and the cooling state, per-port switch traffic and errors, node
 power and uptime, NAND wear, memory and load, the clock's discipline and
 offset, the firmware slots, and the health gate's own record.
 
-They are scraped with **a token that cannot touch `/api/bmc`**. Adding metrics
-behind the root password would have been worse than having none — a scrape
-config is a file on another machine, and it should not be able to power off a
-node.
+They are served on **a port that reaches nothing else** — `9110`, plain HTTP,
+no credential. Adding metrics behind the root password would have been worse
+than having none — a scrape config is a file on another machine, and it should
+not be able to power off a node.
 
 !!! note "One of these is about this fork's own mistakes"
     `bmcd_process_resident_bytes` was added on 2026-09-09, the night a board

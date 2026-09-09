@@ -1,7 +1,8 @@
 # Upstream, and this fork
 
 Every number here was measured on a running board or read from a live server,
-on **2026-09-08**. Where a claim could not be checked, it says so.
+on **2026-09-08**, and re-measured on 2026-09-09 where it says so. Where a
+claim could not be checked, it says so.
 
 ## The two upstreams disagree with each other
 
@@ -31,7 +32,7 @@ visible on one page rather than discovered later.
 | Kernel | 6.8 — not a longterm release | **6.12.109 LTS** |
 | Buildroot | 2024.05.1 (EOL) | **2025.02.17 LTS** |
 | Rust | 1.85.0 | **1.98.1** |
-| Image size | — | 38.1 MB, 81 % of the UBI slot; build fails at 90 % |
+| Image size | — | 37.8 MB (v2.15.0), 80 % of the UBI slot; build fails at 90 % |
 
 ## Updating
 
@@ -57,11 +58,12 @@ a metric existed to check them. That is why the number now lives in one place
 and is generated.*
 
 !!! warning "What the gate cannot see"
-    It checks that the daemon answers and that the switch ports exist. An image
-    whose *new feature* is broken passes both. This fork's own metrics
-    endpoint could have shipped completely broken and been promoted happily —
-    which is why release verification is explicit and written down, not left
-    to the gate.
+    It checks that the daemon answers, that the switch ports exist, that the
+    image is the one that was staged and that `/metrics` answers. An image
+    whose *new feature* is broken passes all four. This fork's own metrics
+    endpoint could once have shipped completely broken and been promoted
+    happily — that check was added afterwards — which is why release
+    verification is explicit and written down, not left to the gate.
 
 ## Hardware the board could not see
 
@@ -80,9 +82,11 @@ device tree is what made both work.
 ## Monitoring
 
 A [catalogue of metric families](metrics.md), none of which existed
-upstream. The credential
-is the part worth noting: `/metrics` takes a **token that returns 401 against
-`/api/bmc`**, so a scrape config cannot power-cycle a module or flash the board.
+upstream. Where it is served is the part worth noting: since v2.15.0
+`/metrics` is on **its own listener, port 9110**, plain HTTP and no credential
+— a port that reaches nothing else, so a scrape config cannot power-cycle a
+module or flash the board. Earlier releases bought the same property with a
+token; the port gives it without a secret to keep.
 
 Upstream has no metrics endpoint, so it has no equivalent question.
 

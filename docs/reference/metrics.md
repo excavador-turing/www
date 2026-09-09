@@ -7,7 +7,7 @@ This page is generated from the daemon's source, so it cannot describe a metric
 the daemon does not emit. The authority is always the board:
 
 ```console
-$ curl -sk -u metrics:$TOKEN https://<board>/metrics
+$ curl -s http://<board>:9110/metrics
 ```
 
 ## Its own port, and no credential

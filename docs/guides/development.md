@@ -20,6 +20,11 @@ So a bmcd change reaches a board only after the firmware re-pins its commit —
 and re-pinning means recomputing a hash. That is the slow path, and most of
 this page is about not taking it.
 
+Why it is arranged this way — one daemon, one bundle, which listener serves
+what, and what was declined — is written down in the firmware repository's
+[architecture note](https://github.com/excavador-turing/BMC-Firmware/blob/hive/docs/architecture.md),
+with the board measurements the decisions rest on.
+
 ## The full build
 
 The firmware builds inside a pinned container. Nothing outside it is used, so
@@ -100,22 +105,25 @@ published and checked on download.
 a **one-shot** `nextboot`. On the next boot `S99postupdate` decides whether to
 keep it.
 
-The gate is two questions:
+The gate is four questions:
 
 - does bmcd answer `https://127.0.0.1/`?
 - do all four node switch ports exist?
+- is the running version the one the staged note recorded?
+- does `/metrics` answer on `127.0.0.1:9110`?
 
-Both pass, and the volumes are renamed — the new image becomes permanent. Either
+All pass, and the volumes are renamed — the new image becomes permanent. Any
 fails, and the board reverts.
 
 **Rollback is a plain reboot.** There is no recovery menu and nothing to press:
 the one-shot flag is already spent, so booting again lands on the old image.
 
 !!! warning "The gate cannot see a regression"
-    It checks that the daemon is *alive*, not that it is *correct*. A build with
-    a broken `/metrics`, a wrong version string, or a mangled page passes both
-    checks and gets promoted. Health gating protects against a brick, not
-    against a bug.
+    It checks that the daemon is *alive*, that the image is the one that was
+    staged and that its metrics answer — not that any of it is *correct*. A
+    build whose fan control is wrong or whose page is mangled passes all four
+    and gets promoted. Health gating protects against a brick, not against a
+    bug.
 
 The log survives at `/mnt/overlay/postupdate.log` — read it after any upgrade
 that behaved oddly.
