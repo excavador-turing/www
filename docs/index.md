@@ -109,9 +109,9 @@ row, including the ones where upstream is ahead.
 !!! warning "Read the fault list before you rely on this"
     The certificate on the board is expired. Anything running locally on the
     BMC is trusted without a credential. Flashing a module on a v2.5 board may
-    target a different module than the one you chose. And on 2026-09-09 a board
-    left with a browser open on the interface ran out of memory and had to be
-    power-cycled by hand.
+    target a different module than the one you chose. And the mDNS responder
+    leaks about a megabyte a minute, which kills a 116 MB board in ninety
+    minutes unless you restart it.
 
     All four are [written down with their tickets](reference/known-faults.md).
     A fork that lists only its improvements is advertising.

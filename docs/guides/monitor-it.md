@@ -97,19 +97,24 @@ Three series come from the board — total, available, free. The fourth,
 `bmcd (resident)`, is the daemon's own resident set, and it exists because of
 a specific failure.
 
-On **2026-09-09** a board left with a browser open on the firmware page lost
-roughly 1 MB per minute and stopped answering four hours later, at about 70 MB
-free of 116 MB. The board-level series could show that memory was being
-consumed and **not by what**, so the diagnosis had to be argued from timing
-rather than measured. One number closes that gap.
+On **2026-09-09** a board lost roughly 1 MB a minute twice and had to be
+power-cycled by hand both times. The board-level series could show that memory
+was going and **not where**, so two outages produced no diagnosis at all.
+
+This series ended it on the third occasion, in about fifteen minutes. Board
+memory fell 0.88 MB a minute while the daemon's own resident set sat at 18.7 MB
+and did not move. That flat line ruled out `bmcd`, which five separate
+reproductions had failed to convict, and the process table then gave up the
+answer immediately: the mDNS responder, at 33.8 MB and climbing. See
+[what is and isn't fixed](../reference/known-faults.md).
 
 Beside it is **Threads**, and the pairing is what makes either useful: a heap
 leak grows the resident set while the thread count stays flat, whereas a leaked
 task or an unreaped worker grows both, because every thread carries a stack.
 During the outage neither series existed, so the two could not be told apart.
 
-That fault is still open — it is [SQU-172](../reference/known-faults.md). If you
-run this fork unattended, these are the panels to alert on.
+If you run this fork unattended, these are the panels to alert on, and the
+alert below would have paged before either outage rather than after.
 
 ### The gate's record
 

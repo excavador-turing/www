@@ -46,43 +46,48 @@ into maskrom before installing.
 
 *Tracked as SQU-105.*
 
-### The board can run out of memory under sustained polling
+### mDNS eats the board
 
-The BMC has **116 MB of RAM**. On 2026-09-09 a board left with a browser open
-on the firmware page lost roughly **1 MB per minute** and stopped answering
-four hours later: its kernel still replied to ping, nothing listened on 22, 80
-or 443, and recovery took a power cycle. The four compute modules were
-unaffected throughout and kept running.
+**Affects v2.9.0 through v2.12.0.** The `mdnsd` that advertises
+`turingpi.local` leaks about **0.85 MB a minute** and does not stop. On a board
+with 116 MB of RAM that is fatal in roughly ninety minutes: userspace stops
+answering, the kernel keeps replying to ping for a while, and only cutting the
+power brings it back. It happened twice on 2026-09-09.
 
-Two contributing mechanisms have been closed: a refresh flag that could stick
-and leave the page polling every two seconds for ever, and an unbounded poll in
-the interface.
+The rate follows mDNS traffic rather than time, so a quiet network hides it
+entirely and a busy one kills the board before lunch. That is why it reads as
+intermittent.
 
-What the retained metrics say, queried afterwards: memory fell about **0.95 MB
-a minute** from 01:15, and **recovered at each daemon restart** — by 3.4 MB,
-then by 10.7 MB. So the memory was the daemon's own and was returned when it
-exited. The board's load average also stepped from about 0.1 to 1.04 at exactly
-01:15 and stayed two to three times its baseline afterwards, so something began
-then rather than accumulating all evening.
+**Restarting the daemon is a complete, instant remedy** and costs nothing —
+mDNS keeps working across it:
 
-It is **not driven by requests**. 183,702 requests across every read endpoint,
-at 765 a second, grew the daemon's resident set by 276 KB — about 1.5 bytes a
-request. At the board's rate of roughly one request every two seconds, a
-per-request leak of the observed size would have to be 33 KB. The rate is
-constant per unit time, not per request, which points at something periodic
-rather than at anything the interface asked for.
+```console
+$ ssh root@<bmc> /etc/init.d/S50mdnsd restart
+```
 
-The daemon now reports its own resident set and its thread count, which
-distinguishes a heap leak from a leaked task. The cause is still not proven.
+Measured on a board that had been up 36 minutes: available memory went from
+54.4 MB back to 88.5 MB, and `mdnsd` from 36.0 MB back to 1.9 MB.
 
-Until it is: do not leave a browser sitting on the interface, and prefer `tpi`
-or `curl` for anything you are watching.
+We introduced this. `turingpi.local` stopped resolving when avahi was dropped
+for rootfs headroom, and `mdnsd` was chosen as the small replacement. We
+compared the two on size alone. On a board with no swap and no watchdog, how a
+long-running daemon behaves over hours deserved a look as well, and did not get
+one.
 
-The [dashboard](../guides/monitor-it.md) plots that resident set beside the
-board's free memory, and carries a `predict_linear` rule that would have paged
-before the board went quiet rather than after.
+!!! note "How it was found, and why it took two outages"
+    The daemon was the obvious suspect and the wrong one. Five reproductions
+    drove `bmcd` on a workstation — 183,702 requests across every endpoint,
+    278,000 metrics scrapes, forced catalogue refreshes — and every one came
+    back clean, because `bmcd` was innocent.
 
-*Tracked as SQU-172.*
+    What settled it was
+    [`bmcd_process_resident_bytes`](../guides/monitor-it.md), added the night
+    before for exactly this. Board memory fell 0.88 MB a minute while the
+    daemon's own resident set sat at 18.7 MB and never moved. One flat line
+    ended the search, and the process table then took about a minute to
+    read.
+
+*Tracked as SQU-175, with the outage itself as SQU-172.*
 
 ### There is no watchdog
 
