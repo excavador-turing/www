@@ -134,7 +134,20 @@ upgrade the firmware first (`tpi firmware check`)
 ## Installing
 
 Release binaries are built for five targets — Linux (x86-64, aarch64), macOS
-(Intel and Apple silicon) and Windows — on the
+(Intel and Apple silicon) and Windows — plus Debian packages for both Linux
+architectures, on the
 [releases page](https://github.com/excavador-turing/tpi/releases).
 
 The copy on the board needs nothing: it arrives with the firmware.
+
+!!! warning "Nothing before 1.2.3 has binaries"
+    The release job was inherited from upstream, where it ran on a push to the
+    default branch: read the version, and abort if a tag for it already exists.
+    This fork made the tag the trigger, so the job ran *because* the tag was
+    pushed, found it, and skipped every step that publishes anything — while
+    reporting success.
+
+    **1.1.0, 1.1.1, 1.2.0, 1.2.1 and 1.2.2 have no release page and no
+    binaries.** Five green runs that shipped nothing, on the tool this page
+    tells you to install. Fixed in 1.2.3, which now refuses to publish a
+    release with no artifacts in it.
