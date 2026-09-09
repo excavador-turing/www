@@ -50,12 +50,13 @@ when it goes wrong, and the sensors the board always had but never exposed.
     metrics; adding them with the root password would have been worse than
     none.
 
--   __A console to every module__
+-   __[A console to every module](features/a-console-to-every-module.md)__
 
     ---
 
     Four serial consoles in the browser, one per compute module, without the
-    header on the board and without a USB adapter on the desk.
+    header on the board and without a USB adapter on the desk. Each opens on
+    the module's recent output rather than on a blank screen.
 
 -   __[And from a shell](reference/cli.md)__
 
