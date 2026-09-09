@@ -60,11 +60,12 @@ staged.
 Two details the board taught while that check was being written, both of which
 would have made it worse than useless:
 
-**`/metrics` has no loopback exception.** Only `/api/bmc` does. The first
-draft read the scrape token from a file on the overlay — which would have
-**rolled back every good image on a board that had never minted one**. The
-gate asks the daemon for the token instead, on the path that *is*
-loopback-exempt, and the daemon mints one if none exists.
+**The gate may depend on nothing the board might not have.** When `/metrics`
+still took a token, the first draft read that token from a file on the overlay
+— which would have **rolled back every good image on a board that had never
+minted one**. Since v2.15.0 `/metrics` is on its own listener and takes no
+credential, so the check is one request to `127.0.0.1:9110`; the lesson
+outlived the token.
 
 **A staged note need not carry a version.** A hand-built image yields no tag,
 and treating that as a mismatch would reject exactly the images most worth

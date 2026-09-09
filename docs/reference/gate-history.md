@@ -28,7 +28,7 @@ from a counter.
 If you are running this firmware, your own board answers the same question:
 
 ```console
-$ curl -sk -u metrics:$TOKEN https://<board>/metrics | grep promotion_total
+$ curl -s http://<board>:9110/metrics | grep promotion_total
 bmcd_firmware_promotion_total{result="promoted"} 14
 bmcd_firmware_promotion_total{result="rolled_back"} 1
 ```
