@@ -40,14 +40,14 @@ when it goes wrong, and the sensors the board always had but never exposed.
     with how it compares to what is running and how much is known about its
     integrity.
 
--   __Metrics, behind their own credential__
+-   __Metrics, on a port that reaches nothing else__
 
     ---
 
-    [Every family the board exposes](reference/metrics.md), scraped with a
-    token that **cannot touch `/api/bmc`**, and
+    [Every family the board exposes](reference/metrics.md), on its own
+    listener that serves nothing but `/metrics`, and
     [a dashboard over all of them](guides/monitor-it.md). Upstream had no
-    metrics; adding them with the root password would have been worse than
+    metrics; adding them behind the root password would have been worse than
     none.
 
 -   __[A console to every module](features/a-console-to-every-module.md)__
@@ -91,7 +91,7 @@ to the rack.
 | Board temperature | none — no sensor in the device tree | **read, with its trip points** |
 | Fan | fixed persisted speed | **kernel-driven, and it says why** |
 | Metrics | none | **[a documented catalogue](reference/metrics.md)** |
-| Scrape credential | — | **a token that cannot touch `/api/bmc`** |
+| Scrape endpoint | — | **its own port, which cannot reach `/api/bmc`** |
 | Published checksums | none | **`SHA256SUMS` per release, verified on download** |
 | Serial console | serial header on the board | **per module, in the browser** |
 | Firmware sources | one, hard-coded | **configurable; GitHub, HTTP, or SD card** |

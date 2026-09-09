@@ -10,28 +10,32 @@ the daemon does not emit. The authority is always the board:
 $ curl -sk -u metrics:$TOKEN https://<board>/metrics
 ```
 
-## The credential
+## Its own port, and no credential
 
-`/metrics` takes a token of its own — **not** the root password:
+`/metrics` is served on **port 9110**, plain HTTP, and takes no credential.
 
-```console
-$ tpi metrics show
-username  metrics
-token     <32 hex characters>
-```
+That is a change from earlier releases, which put it on `:443` beside the API
+behind a token of its own. The token existed for one reason: so that a
+credential sitting in a scrape config could not also reach `/api/bmc` and
+power four compute modules off. On a listener that serves nothing but
+`/metrics` there is nothing else to reach, so the property survives and the
+mechanism is a port instead of a secret — one fewer thing to mint, store,
+rotate and leak.
 
-That token answers `/metrics` with 200 and `/api/bmc` with **401**, verified
-from off-board. The distinction is the point: a scrape config is a file on
-another machine, and it should not be able to power off a node or stage
-firmware.
+The TLS went with it. It was always scraped with verification disabled,
+because the board's certificate is expired and carries no subject-alternative
+name, so nothing could verify it. Unverified TLS is a handshake per scrape on
+a Cortex-A7 in exchange for nothing.
 
-Unlike `/api/bmc`, `/metrics` has **no loopback exception**. It demands the
-credential even from the board itself, which is the behaviour the rest of the
-API should have and does not — see
-[what is and isn't fixed](known-faults.md).
+What protects the endpoint is the network. It binds the same address as the
+API, so restricting the daemon to a management network restricts both. And
+there is nothing secret in it: temperatures, fan steps, port counters, power
+state, NAND wear and slot versions.
 
-Rotate it with `tpi metrics rotate`; the previous token stops working
-immediately, which is the entire point of rotation.
+!!! note "On a board older than v2.15.0"
+    `/metrics` is on `:443` and wants a token, which `tpi metrics show`
+    printed. That command is gone, along with the token; if you are scraping
+    an older board, keep the old config until you update it.
 
 A Grafana dashboard over every family below ships with each release; see
 [monitor it](../guides/monitor-it.md).
@@ -41,14 +45,8 @@ A Grafana dashboard over every family below ships with each release; see
 ```yaml
 scrape_configs:
   - job_name: turingpi-bmc
-    scheme: https
-    tls_config:
-      insecure_skip_verify: true   # until the certificate is real; see known-faults
-    basic_auth:
-      username: metrics
-      password: <the token>
     static_configs:
-      - targets: ["<board>:443"]
+      - targets: ["<board>:9110"]
         labels:
           instance: <the board's hostname>
 ```

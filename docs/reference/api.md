@@ -63,8 +63,8 @@ leaves an audit line saying so.
 [its own credential](metrics.md), which cannot touch this API.
 
 !!! note "Which version this is"
-    Rendered from **bmcd 2.26.0**, fetched from that release rather than
-    written here. Refresh it with `just refresh-api v2.26.0` in the `www`
+    Rendered from **bmcd 2.27.0**, fetched from that release rather than
+    written here. Refresh it with `just refresh-api v2.27.0` in the `www`
     repository; the diff is then the API change, which is the point of
     committing it rather than fetching at build time.
 

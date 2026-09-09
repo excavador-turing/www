@@ -21,17 +21,15 @@ a docs site is a dashboard that drifts from the daemon it describes, and the
 drift is invisible: every panel still renders, just against metrics that have
 moved.
 
-## 1. Get the scrape credential
+## 1. Point a scrape at port 9110
 
-```console
-$ tpi metrics show
-username  metrics
-token     <32 hex characters>
-```
+There is no credential to fetch. `/metrics` is served on its own listener,
+plain HTTP, and that listener serves nothing else — so a scrape config
+pointed at it cannot reach `/api/bmc` and cannot power off a node, which is
+the property the old token was there to provide.
 
-That token answers `/metrics` and is **rejected by `/api/bmc`**. Use it, not
-the root password — a scrape config is a file on another machine, and it
-should not be able to power off a node.
+On a board older than **v2.15.0** the endpoint is on `:443` and wants a token
+from `tpi metrics show`. Both are gone.
 
 ## 2. Scrape the board
 

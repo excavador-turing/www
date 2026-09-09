@@ -24,12 +24,14 @@ minted.*
 ### Anything local is trusted
 
 `/api/bmc` skips authentication entirely for requests from `127.0.0.1`. That
-is how the on-board `tpi` works without credentials and how the promotion gate
-obtains its metrics token. It also means **any process on the board can power
-off a node or stage firmware**, with no credential and no audit line.
+is how the on-board `tpi` works without credentials. It also means **any
+process on the board can power off a node or stage firmware**, with no
+credential and no audit line.
 
-`/metrics` has no such exception and demands its token even on loopback, which
-is the behaviour the rest of the API should have.
+Since **v2.15.0** the on-board `tpi` is the *only* thing that relies on it.
+The promotion gate used to need the bypass as well, to mint itself a metrics
+token; `/metrics` moved to its own listener and takes no credential, so the
+gate now makes one plain request and needs nothing.
 
 Since **v2.14.0** the bypass at least leaves a trace: every mutating call
 writes an audit line, and one that skipped authentication says so in plain

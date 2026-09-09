@@ -19,7 +19,6 @@ shipping it to the half of the workflow that cannot be automated.
 | `tpi firmware sources` | where the board looks |
 | `tpi about` | firmware, bmcd, kernel, board identity |
 | `tpi thermal` | temperatures |
-| `tpi metrics show \| rotate` | the read-only scrape credential |
 | `tpi hostname [<name>]` | the board's name, live and after the next boot |
 | `tpi ntp show \| set <servers…>` | the time sources, and how the clock is doing |
 | `tpi config export \| import` | every setting on the board, as one file |

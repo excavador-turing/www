@@ -924,7 +924,7 @@
       "name": "Apache-2.0"
     },
     "title": "Turing Pi 2 BMC",
-    "version": "2.26.0"
+    "version": "2.27.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -962,17 +962,6 @@
       "get": {
         "description": "Legacy form: `GET /api/bmc?opt=get&type=config` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
         "operationId": "getConfig",
-        "parameters": [
-          {
-            "description": "`1` includes the metrics token, which makes the document a credential",
-            "in": "query",
-            "name": "secrets",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -996,7 +985,7 @@
             "description": "A refusal, RFC 9457."
           }
         },
-        "summary": "Everything configured on this board, as one document; `secrets=1` includes the metrics token"
+        "summary": "Everything configured on this board, as one document"
       },
       "post": {
         "description": "Legacy form: `GET /api/bmc?opt=set&type=config` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
@@ -1585,86 +1574,6 @@
           }
         },
         "summary": "Storage and interfaces, as the Overview page reads them"
-      }
-    },
-    "/api/bmc/metrics-token": {
-      "get": {
-        "description": "Legacy form: `GET /api/bmc?opt=get&type=metrics_token` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
-        "operationId": "getMetricsToken",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "The result. Its shape is not described here: this handler assembles its answer from several sources rather than serialising one type."
-          },
-          "204": {
-            "description": "Done, with nothing to report."
-          },
-          "default": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "A refusal, RFC 9457."
-          }
-        },
-        "summary": "The read-only credential the metrics endpoint accepts"
-      }
-    },
-    "/api/bmc/metrics-token/rotate": {
-      "post": {
-        "description": "Legacy form: `GET /api/bmc?opt=set&type=metrics_token` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
-        "operationId": "postMetricsTokenRotate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "additionalProperties": true,
-                "properties": {},
-                "type": "object"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "additionalProperties": true,
-                "properties": {},
-                "type": "object"
-              }
-            }
-          },
-          "description": "Parameters may also be given in the query string; the query string wins on a clash.",
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "The result. Its shape is not described in this document."
-          },
-          "204": {
-            "description": "Done, with nothing to report."
-          },
-          "default": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "A refusal, RFC 9457."
-          }
-        },
-        "summary": "Replace the metrics token; the old one stops working at once"
       }
     },
     "/api/bmc/network": {
