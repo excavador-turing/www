@@ -43,9 +43,9 @@ when it goes wrong, and the sensors the board always had but never exposed.
 
     ---
 
-    31 Prometheus families, scraped with a token that **cannot touch
-    `/api/bmc`**. Upstream had no metrics; adding them with the root password
-    would have been worse than none.
+    [Every family the board exposes](reference/metrics.md), scraped with a
+    token that **cannot touch `/api/bmc`**. Upstream had no metrics; adding
+    them with the root password would have been worse than none.
 
 -   __A console to every module__
 
@@ -86,7 +86,7 @@ to the rack.
 | Firmware update vs modules | power-cycles them | **rails untouched** |
 | Board temperature | none — no sensor in the device tree | **read, with its trip points** |
 | Fan | fixed persisted speed | **kernel-driven, and it says why** |
-| Metrics | none | **31 Prometheus families** |
+| Metrics | none | **[a documented catalogue](reference/metrics.md)** |
 | Scrape credential | — | **a token that cannot touch `/api/bmc`** |
 | Published checksums | none | **`SHA256SUMS` per release, verified on download** |
 | Serial console | serial header on the board | **per module, in the browser** |

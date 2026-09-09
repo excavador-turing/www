@@ -55,9 +55,10 @@ the numbers cannot go stale relative to the board they describe. A table
 copied into a client is correct until someone changes the device tree, and
 then it is a confident lie.
 
-## Thirty-one families
+## A catalogue, not a number
 
-Upstream exposes no metrics at all. This fork serves 31 Prometheus families:
+Upstream exposes no metrics at all. This fork serves
+[a catalogue of them](../reference/metrics.md):
 temperatures and the cooling state, per-port switch traffic and errors, node
 power and uptime, NAND wear, memory and load, the clock's discipline and
 offset, the firmware slots, and the health gate's own record.

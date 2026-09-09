@@ -79,7 +79,8 @@ device tree is what made both work.
 
 ## Monitoring
 
-31 Prometheus metric families, none of which existed upstream. The credential
+A [catalogue of metric families](metrics.md), none of which existed
+upstream. The credential
 is the part worth noting: `/metrics` takes a **token that returns 401 against
 `/api/bmc`**, so a scrape config cannot power-cycle a module or flash the board.
 

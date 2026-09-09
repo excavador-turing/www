@@ -28,6 +28,7 @@ nav:
   - Reference:
       - Upstream vs this fork: reference/comparison.md
       - Command line: reference/cli.md
+      - Metrics: reference/metrics.md
       - The gate's record: reference/gate-history.md
       - What is and isn't fixed: reference/known-faults.md
   - Contributing: contributing.md
