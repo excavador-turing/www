@@ -131,6 +131,21 @@ that behaved oddly.
 - There is **no `jq`, no `python3`, no `strings`**. Shell tooling is awk and
   sed. Scripts that ship on the board are written to that constraint.
 
+## The interface's API types come from the daemon
+
+`BMC-UI` does not hand-write the types for what the board sends. They are
+generated from the OpenAPI document a bmcd release publishes, committed as
+`src/lib/api/schema.d.ts`, and refreshed with `npm run api:refresh` after
+moving the version in `bmcd-release.txt`. CI regenerates and fails on any
+difference.
+
+That pin should name the same bmcd release the firmware pins. If they diverge,
+the interface is typed against an API the board does not serve — which
+compiles, and is exactly the failure the generation exists to prevent.
+
+Only the types are generated. The query hooks are written by hand, because
+which endpoint may throw into a suspense boundary is a decision, not a detail.
+
 ## The command line
 
 `tpi` ships both inside the firmware and as a workstation binary, from one
