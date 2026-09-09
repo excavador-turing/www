@@ -77,6 +77,7 @@ build is simply absent rather than zero.
 |---|---|---|
 | `bmcd_cooling_state` | gauge | Step a cooling device is currently at. |
 | `bmcd_cooling_state_max` | gauge | Highest step a cooling device accepts. |
+| `bmcd_cooling_overridden` | gauge | 1 while a fan is held at a step and its zone's governor is paused. |
 | `bmcd_temperature_celsius` | gauge | Temperature reported by a kernel thermal zone. |
 
 ## The switch

@@ -28,8 +28,9 @@ when it goes wrong, and the sensors the board always had but never exposed.
     ---
 
     The board ships a temperature sensor upstream's device tree never
-    described. The fan is now driven from it, and the interface says *which
-    trip point* put the fan where it is.
+    described. The fan is now driven from it, the interface says *which trip
+    point* put the fan where it is, and an Override switch can hold it
+    somewhere else.
 
 -   __[Pick a version, from anywhere](features/pick-a-version.md)__
 
@@ -108,10 +109,13 @@ row, including the ones where upstream is ahead.
 
 !!! warning "Read the fault list before you rely on this"
     The certificate on the board is expired. Anything running locally on the
-    BMC is trusted without a credential. Flashing a module on a v2.5 board may
-    target a different module than the one you chose. And the mDNS responder
-    leaks about a megabyte a minute, which kills a 116 MB board in ninety
-    minutes unless you restart it.
+    BMC is trusted without a credential, though since v2.14.0 it at least
+    leaves an audit line saying so. Nothing shuts the board down if it
+    overheats — there is no `critical` trip. And flashing a module on a v2.5
+    board now refuses rather than guessing, but the port mapping behind that
+    has not been proven against two modules in maskrom.
 
-    All four are [written down with their tickets](reference/known-faults.md).
-    A fork that lists only its improvements is advertising.
+    All of them are [written down with their tickets](reference/known-faults.md),
+    along with the mDNS responder that killed this board twice in one day
+    before v2.13.0 fixed it. A fork that lists only its improvements is
+    advertising.

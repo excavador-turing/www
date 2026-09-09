@@ -31,6 +31,18 @@ off a node or stage firmware**, with no credential and no audit line.
 `/metrics` has no such exception and demands its token even on loopback, which
 is the behaviour the rest of the API should have.
 
+Since **v2.14.0** the bypass at least leaves a trace: every mutating call
+writes an audit line, and one that skipped authentication says so in plain
+words rather than being folded in with a real credential.
+
+```
+Sep  9 15:12:41 hive-bmc authpriv.info bmcd[812]: power by loopback (unauthenticated) from 127.0.0.1: ok
+```
+
+That is a smaller thing than removing the bypass, and it is not a substitute
+for it. It means an unauthenticated power-off can be found afterwards, not
+that it can be prevented.
+
 *Tracked as SQU-165 (a Unix socket authenticated by peer credentials, so the
 bypass can be removed rather than merely narrowed) and SQU-113.*
 
@@ -41,25 +53,78 @@ whichever module is in maskrom *first* and report success — whatever was
 selected. With one module in maskrom this is correct; with two it is a
 coin toss, and the cost is a module that no longer boots.
 
-The interface shows a red warning on v2.5 boards. Put only the target module
+**v2.14.0 changes the mechanism and has not yet been proven on hardware.** The
+daemon now accepts a module only on the hub port the board's own device tree
+says that node is wired to, and refuses anything on another port instead of
+writing to it:
+
+```
+node 3 requested on 1-1.3; found Rockusb on 1-1.1 instead
+```
+
+What is proven is that the device tree says node N is port N — it is read at
+runtime, and a unit test builds a tree wired the other way round and requires
+the other answer. What is **not** proven is that the device tree agrees with
+the physical wiring, which needs two modules in maskrom at once to test. Until
+that is done, the interface keeps its red warning: put only the target module
 into maskrom before installing.
 
 *Tracked as SQU-105.*
 
-### mDNS eats the board
+### Nothing shuts the board down if it overheats
 
-**Affects v2.9.0 through v2.12.0.** The `mdnsd` that advertises
-`turingpi.local` leaks about **0.85 MB a minute** and does not stop. On a board
-with 116 MB of RAM that is fatal in roughly ninety minutes: userspace stops
-answering, the kernel keeps replying to ping for a while, and only cutting the
-power brings it back. It happened twice on 2026-09-09.
+The thermal zone declares four `active` trips — 20, 45, 60 and 70 °C, each
+driving the fan a step harder — and `hot` at 95 °C. There is no `critical`
+trip, and `hot` notifies without acting. So if the fan fails, or is held low,
+the board climbs with nothing to stop it.
 
-The rate follows mDNS traffic rather than time, so a quiet network hides it
-entirely and a busy one kills the board before lunch. That is why it reads as
+This is not a regression and not something this fork introduced; it is what the
+device tree has always declared. It is written down here because the fan can
+now be **held** at a step from the interface, and a person doing that should
+know what is and is not underneath them. The daemon takes a held fan back above
+70 °C for exactly this reason — but that is a daemon that has to be running,
+which is a weaker guarantee than a kernel trip.
+
+*No ticket yet. A `critical` trip is a device-tree change and wants a decision
+about what it should do at what temperature, not a number picked here.*
+
+### There is no watchdog
+
+Everything above has the same last resort: a person walking to the rack. The
+SoC has a hardware watchdog and this firmware does not arm it, so a BMC whose
+userspace dies stays dead until someone cuts its power.
+
+*Tracked as SQU-106, and it is the most valuable unbuilt thing on the list.*
+
+## Fixed, and worth knowing about
+
+### mDNS ate the board
+
+**Affected v2.9.0 through v2.12.0; fixed in v2.13.0.** The `mdnsd` that
+advertised `turingpi.local` leaked about **0.85 MB a minute** and did not
+stop. On a board with 116 MB of RAM that was fatal in roughly ninety minutes:
+userspace stopped answering, the kernel kept replying to ping for a while, and
+only cutting the power brought it back. It happened twice on 2026-09-09.
+
+The rate followed mDNS traffic rather than time, so a quiet network hid it
+entirely and a busy one killed the board before lunch. That is why it read as
 intermittent.
 
-**Restarting the daemon is a complete, instant remedy** and costs nothing —
-mDNS keeps working across it:
+**The cause was the switch ports.** Every DSA port on this board — `node1`
+through `node4`, `ge0`, `ge1`, `dsa` — carries the same MAC address, and
+`mdnsd` bound all of them. It saw its own advertisement arrive from what looked
+like another host with its name, declared a conflict, and reloaded its
+configuration: **825 times in twelve seconds**, leaking on each one.
+
+The fix is one line, binding it to the bridge instead:
+
+```sh
+MDNSD_ARGS="-i br0"
+```
+
+Measured after: **0 reloads in 90 seconds and 8 kB of growth**, against
+956 kB/minute before. On an affected release, restarting the daemon is still a
+complete and instant remedy:
 
 ```console
 $ ssh root@<bmc> /etc/init.d/S50mdnsd restart
@@ -88,16 +153,6 @@ one.
     read.
 
 *Tracked as SQU-175, with the outage itself as SQU-172.*
-
-### There is no watchdog
-
-Everything above has the same last resort: a person walking to the rack. The
-SoC has a hardware watchdog and this firmware does not arm it, so a BMC whose
-userspace dies stays dead until someone cuts its power.
-
-*Tracked as SQU-106, and it is the most valuable unbuilt thing on the list.*
-
-## Fixed, and worth knowing about
 
 ### `turingpi.local` stopped resolving
 

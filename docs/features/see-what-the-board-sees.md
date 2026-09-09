@@ -44,6 +44,44 @@ commands, read from the board's own `cooling-levels` table — which is
 4 by 6 and said 67% would be inventing a number about hardware it had not
 looked at.
 
+## And when you want the fan somewhere else
+
+Reading the governor's mind is most of the answer. The rest is being able to
+overrule it — and until v2.14.0 the interface offered a slider that could not.
+Dragging it wrote a step the kernel took back within a poll, so the control
+appeared to work, sprang back, and taught the operator not to trust the page.
+
+The slider now sits behind an explicit **Override** switch, which pauses the
+zone's governor for as long as it is on:
+
+```console
+$ tpi cooling set "system fan" 6 --hold
+$ tpi cooling status
+|----Device-----|-Speed-|-Max Speed-|-Governor-|
+|system fan     |      6|          6|    paused|
+
+$ tpi cooling set "system fan" --auto
+```
+
+Turning it on does not move the fan. Whatever step the governor has it on
+becomes the step it is held at, so the only thing that changes is who is
+deciding.
+
+The switch appears **only where a step would actually hold** — where the daemon
+reports both a governor it can pause and the state of that governor. On an
+older daemon there is no switch and the plain slider stays, under its note
+admitting the governor undoes it. A control that visibly fails is worse than
+one that admits it cannot.
+
+!!! warning "What is not underneath you"
+    This board declares no `critical` trip. Nothing shuts it down if it gets
+    hot — with the governor running or paused. So a held fan is taken back
+    automatically above the zone's hottest `active` trip, 70 °C here, read
+    from the trips rather than written down as a number.
+
+    That is a daemon doing it, not a kernel, which is a weaker guarantee than
+    it sounds. See [what is and isn't fixed](../reference/known-faults.md).
+
 ## Read from the board, never written into a client
 
 Every figure above is read at runtime: the trips from `/sys/class/thermal`,

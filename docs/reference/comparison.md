@@ -68,7 +68,7 @@ and is generated.*
 | | upstream | fork |
 |---|---|---|
 | SoC temperature | **none** — no thermal node in any device tree | reads through `thermal_zone0` |
-| Fan | fixed persisted speed | **kernel-driven** from that sensor |
+| Fan | fixed persisted speed | **kernel-driven** from that sensor, and holdable |
 | Switch port state | not exposed | per-port link, speed, counters |
 | Module power-on time | one shared bit, correct only for node 1 | **per node, as a duration** |
 

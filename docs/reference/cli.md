@@ -28,6 +28,30 @@ shipping it to the half of the workflow that cannot be automated.
 documented spelling and is already in people's scripts, so `firmware` grew
 subcommands *around* it rather than replacing it.
 
+## What 1.3.0 adds
+
+`tpi cooling` is upstream's command; **1.3.0** gives it the two flags that make
+it mean something on a board whose fan is governed by the kernel.
+
+| flag | what it does |
+|---|---|
+| `cooling set <device> <step> --hold` | pause the zone's governor so the step stays |
+| `cooling set <device> --auto` | hand the fan back to the governor |
+
+Without `--hold` the command means what it always did: write the step and let
+the governor overrule it a few seconds later.
+
+```console
+$ tpi cooling set "system fan" 6 --hold
+$ tpi cooling status
+|----Device-----|-Speed-|-Max Speed-|-Governor-|
+|system fan     |      6|          6|    paused|
+```
+
+The Governor column reads `-`, not `running`, against a daemon older than
+bmcd 2.21 — that daemon does not report the field, and "the governor is
+running" is the one thing the column exists to say.
+
 ## Listing and installing
 
 ```console
