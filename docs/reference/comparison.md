@@ -43,9 +43,18 @@ visible on one page rather than discovered later.
 | Newer release available? | mirror that stops at v2.0.5 | **from any configured source** |
 | Install a chosen version | — | **from the web interface** |
 
-**The gate has promoted cleanly fifteen consecutive times**, over the air, with
-all four modules running. Each time the modules' uptimes advanced by exactly
-the wall-clock duration of the flash — the evidence that nothing was reset.
+**The gate's record is a counter the board keeps**, not a number written here:
+`bmcd_firmware_promotion_total{result}`, currently 14 promoted and 1 rolled
+back — and the rollback was deliberate, to prove it could refuse. See
+[the gate's record](gate-history.md).
+
+Every time, each module's uptime advanced by exactly the wall-clock duration
+of the flash, which is the evidence that nothing was reset.
+
+*This paragraph used to say "fifteen consecutive times", and elsewhere this
+site said nineteen. Both were counted by hand and both had drifted by the time
+a metric existed to check them. That is why the number now lives in one place
+and is generated.*
 
 !!! warning "What the gate cannot see"
     It checks that the daemon answers and that the switch ports exist. An image
@@ -82,9 +91,14 @@ Honest gaps, not roadmap:
 
 - **A hardware watchdog.** The gate cannot save an image that hangs before it
   runs. That still needs physical access.
-- **An EC certificate.** The daemon mints an RSA-4096 self-signed certificate
-  at every boot, so every browser calls it insecure and there is no path to
+- **A usable TLS certificate.** The daemon mints a self-signed one only when
+  the files are *missing*; if it finds an expired one it uses it. The
+  certificate on the reference board was issued June 2025 and **expired in
+  July 2025** — RSA, no subject-alternative name, and on the overlay, so it
+  has survived every upgrade this fork has shipped. There is no path to
   install a real one but `scp`.
-- **USB flashing of a module** is built and has never been exercised on this
-  kernel.
+- **A flash that targets the module you chose.** On v2.5 boards the daemon
+  writes to whichever module is in maskrom *first* and reports success,
+  whatever was selected. With one module in maskrom this is correct; with two
+  it is a coin toss, and the interface now says so in red.
 - **VLAN filtering and STP** on the switch: `br0` bridges all six ports flat.

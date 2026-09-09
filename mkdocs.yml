@@ -11,12 +11,25 @@ edit_uri: ""
 docs_dir: docs
 site_dir: site
 
+# A Feature argues, a Guide instructs, a Reference lists. The numbers live in
+# Reference so the articles link to evidence rather than restating it -- an
+# earlier draft carried a hand-counted promotion total in three places and all
+# three had drifted apart by the time a metric could check them.
 nav:
   - Home: index.md
-  - Upstream vs this fork: comparison.md
-  - Install: install.md
-  - Command line: cli.md
-  - Developing: development.md
+  - Features:
+      - Updates that undo themselves: features/updates-that-undo-themselves.md
+      - See what the board sees: features/see-what-the-board-sees.md
+      - Pick a version, from anywhere: features/pick-a-version.md
+  - Guides:
+      - Install: guides/install.md
+      - Recover a bad flash: guides/recover-a-bad-flash.md
+      - Developing: guides/development.md
+  - Reference:
+      - Upstream vs this fork: reference/comparison.md
+      - Command line: reference/cli.md
+      - The gate's record: reference/gate-history.md
+      - What is and isn't fixed: reference/known-faults.md
   - Contributing: contributing.md
 
 theme:

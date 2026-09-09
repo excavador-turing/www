@@ -2,7 +2,8 @@
 
 !!! danger "Read this part"
     This is unofficial firmware for hardware you own. It has run on exactly one
-    board — mine — across fifteen over-the-air upgrades.
+    board — mine — across the upgrades
+    [its own counter records](../reference/gate-history.md).
 
     The A/B health gate makes it **safer than upstream's update path**: a bad
     image reboots back onto the previous one by itself. But it cannot save an

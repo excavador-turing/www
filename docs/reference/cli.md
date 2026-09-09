@@ -19,7 +19,10 @@ shipping it to the half of the workflow that cannot be automated.
 | `tpi firmware sources` | where the board looks |
 | `tpi about` | firmware, bmcd, kernel, board identity |
 | `tpi thermal` | temperatures |
-| `tpi metrics token show \| rotate` | the read-only scrape credential |
+| `tpi metrics show \| rotate` | the read-only scrape credential |
+| `tpi hostname [<name>]` | the board's name, live and after the next boot |
+| `tpi ntp show \| set <servers…>` | the time sources, and how the clock is doing |
+| `tpi config export \| import` | every setting on the board, as one file |
 
 `tpi firmware --file X` still works and still means upload. It is upstream's
 documented spelling and is already in people's scripts, so `firmware` grew
@@ -29,13 +32,13 @@ subcommands *around* it rather than replacing it.
 
 ```console
 $ tpi firmware list
-running v2.7.0
+running v2.9.0
 
-VERSION     SOURCE         TRUST       SIZE
-^ v2.8.0    fork           verified    36.3 MB
-= v2.7.0    fork           verified    36.3 MB
-
-3 older or unrelated version(s) hidden; pass --all to see them
+VERSION    SOURCE    TRUST       SIZE
+= v2.9.0   fork      verified
+v v2.8.1   fork      verified
+v v2.8.0   fork      verified
+^ v2.9.2   local     unverified  37.2 MB
 
 ^ newer   = running   v older   ? not comparable
 ```
@@ -48,10 +51,13 @@ different things, and rendering them alike would be worse than omitting the
 column.
 
 ```console
-$ tpi firmware install v2.8.0
-upgrade v2.7.0 -> v2.8.0 from fork (verified)
-continue? [y/N] y
-staged v2.8.0; reboot to take it
+$ tpi firmware install v2.9.2 --yes
+Done
+staged v2.9.2; reboot to take it
+
+$ tpi firmware list
+running v2.9.0
+staged  v2.9.2  (reboot to take it)
 ```
 
 The version is resolved **against the catalogue** before anything is posted, so
@@ -63,16 +69,29 @@ than guessing.
 
 ```console
 $ tpi firmware check
-v2.8.0 is available; this board runs v2.7.0
-install it with: tpi firmware install v2.8.0
+v2.9.0 is current
 
 $ echo $?
-10
+0
 ```
+
+When there is something newer it names it and exits **10** instead:
 
 **10** means an upgrade exists, so `tpi firmware check || notify-me` works from
 cron without parsing output. It is deliberately not `1`, which stays "the
 command failed".
+
+!!! danger "Every one of these was broken until 1.2.2"
+    The commands on this page were written, documented and released **without
+    ever being run against a board**. The response unwrapper returned the API's
+    wrapper array instead of the result inside it, and since every command
+    begins by reading `about` to check the daemon's version, every command
+    failed.
+
+    The examples above are now output captured from a real board. The ones that
+    were here before were not, and one of them described a command
+    (`firmware install`) that had never worked in any release. See
+    [what is and isn't fixed](known-faults.md).
 
 ## Two builds, one source
 
