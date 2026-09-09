@@ -9,7 +9,7 @@ at scrape time. As of **2026-09-09**:
 
 | result | count |
 |---|---|
-| promoted | 14 |
+| promoted | 17 |
 | rolled back | 1 |
 
 The one rollback was deliberate: a `v2.8.1-rc1` image with its staged note
@@ -22,14 +22,21 @@ An earlier draft of this site said *"fifteen consecutive clean promotions"*,
 and a later one said nineteen. Both were counted by hand across working
 sessions and written into prose, and by the time the metric existed to check
 them the true figure was **fourteen**. A number that a person maintains is a
-number that drifts; the articles now link here, and this page is generated
-from a counter.
+number that drifts.
+
+This page then said it was generated from a counter while still being typed by
+hand, and drifted from 14 to 17 within a day of being written — the same
+failure, one level up. `just refresh-gate-history <board>` now reads the
+board's `/metrics` and rewrites the date, the table and the example below. It
+refuses rather than guesses if any of the three moves, so a silent no-op
+cannot masquerade as a refresh. The articles link here; only this page carries
+the figures.
 
 If you are running this firmware, your own board answers the same question:
 
 ```console
 $ curl -s http://<board>:9110/metrics | grep promotion_total
-bmcd_firmware_promotion_total{result="promoted"} 14
+bmcd_firmware_promotion_total{result="promoted"} 17
 bmcd_firmware_promotion_total{result="rolled_back"} 1
 ```
 

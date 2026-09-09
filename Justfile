@@ -32,6 +32,16 @@ _describe-api:
         doc["openapi"], doc["info"]["version"],
         len(doc["paths"]), len(doc["components"]["schemas"])))
 
+# Rewrite the gate's record from a board. `just refresh-gate-history 192.168.77.20`
+#
+# The page says every count on this site comes from the board. It did not:
+# the numbers were typed in, and had drifted from 14 to 17 within a day of
+# being written. This is what makes the claim true. It needs a route to a
+# board, so it runs here and the result is committed -- CI has no such route
+# and must never be the thing that notices.
+refresh-gate-history board:
+    ./scripts/refresh-gate-history.py {{board}}
+
 # Serve with live reload
 serve:
     mkdocs serve

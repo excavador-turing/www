@@ -45,8 +45,8 @@ visible on one page rather than discovered later.
 | Install a chosen version | — | **from the web interface** |
 
 **The gate's record is a counter the board keeps**, not a number written here:
-`bmcd_firmware_promotion_total{result}`, currently 14 promoted and 1 rolled
-back — and the rollback was deliberate, to prove it could refuse. See
+`bmcd_firmware_promotion_total{result}`. One rollback in that record was
+deliberate, to prove the gate could refuse. The figures are on
 [the gate's record](gate-history.md).
 
 Every time, each module's uptime advanced by exactly the wall-clock duration
@@ -54,8 +54,9 @@ of the flash, which is the evidence that nothing was reset.
 
 *This paragraph used to say "fifteen consecutive times", and elsewhere this
 site said nineteen. Both were counted by hand and both had drifted by the time
-a metric existed to check them. That is why the number now lives in one place
-and is generated.*
+a metric existed to check them. Then this paragraph quoted the counter's value
+in prose and drifted too, from 14 to 17 in a day. The number now appears in
+exactly one place, written there from the board by `just refresh-gate-history`.*
 
 !!! warning "What the gate cannot see"
     It checks that the daemon answers, that the switch ports exist, that the
