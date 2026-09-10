@@ -5,6 +5,11 @@ itself. Its firmware mirror stops at **v2.0.5** while its GitHub releases reach
 **v2.1.0** — the same publisher, two catalogues, and following the documented
 update path would *downgrade* a board running anything newer.
 
+<figure markdown>
+![Every configured source, side by side: this fork, upstream's two catalogues, and the SD card — with each candidate's checksum state, and an honest error where a source had nothing.](../assets/cards/card-versions.png)
+<figcaption>Every configured source, side by side: this fork, upstream's two catalogues, and the SD card — with each candidate's checksum state, and an honest error where a source had nothing.</figcaption>
+</figure>
+
 This fork makes the sources a setting, and shows you what each one offers.
 
 ## Every source, with what it is worth

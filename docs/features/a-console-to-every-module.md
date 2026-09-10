@@ -4,6 +4,11 @@ Every compute module on a Turing Pi 2 has a serial console, and reaching it
 used to mean a USB adapter and three jumper wires onto the board's header. The
 BMC is already wired to all four. This fork puts them in the browser.
 
+<figure markdown>
+![Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.](../assets/fork/07-console.png)
+<figcaption>Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.</figcaption>
+</figure>
+
 Four tabs, one per module. No adapter, no header, nothing on the desk.
 
 ## It shows you what happened before you opened it
