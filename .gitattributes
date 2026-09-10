@@ -1,0 +1,18 @@
+# Media goes to Git LFS, and it has to be set up BEFORE the first image lands.
+#
+# A png committed normally is a blob in the history forever: every clone pays
+# for it, and taking it out again means rewriting history that other checkouts
+# have already pulled. This file is cheap insurance against that, and it is
+# only insurance if it precedes the media.
+#
+# The site's media is screenshots of the interface and a console recording
+# (SQU-148), and the demo's assets (SQU-183). Text stays in git: Markdown,
+# JSON fixtures, the OpenAPI document and SVG, which is text and diffs.
+*.png  filter=lfs diff=lfs merge=lfs -text
+*.jpg  filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.gif  filter=lfs diff=lfs merge=lfs -text
+*.webp filter=lfs diff=lfs merge=lfs -text
+*.mp4  filter=lfs diff=lfs merge=lfs -text
+*.webm filter=lfs diff=lfs merge=lfs -text
+*.cast filter=lfs diff=lfs merge=lfs -text
