@@ -8,7 +8,7 @@ hide:
 
 <div class="tp-bar">
 <nav class="tp-seg tp-switch" aria-label="View">
-<a href="#" data-view="home">Overview</a>
+<a href="#overview" data-view="home">Overview</a>
 <a href="#demo/fork" data-view="demo">Live demo</a>
 </nav>
 <nav class="tp-seg tp-panes" aria-label="Which interface" hidden="hidden">
@@ -78,6 +78,20 @@ hide:
       if (on && el.tagName === 'IFRAME' && !el.getAttribute('src')) el.setAttribute('src', el.dataset.src);
     });
   }
+  // Material's instant loading owns every click on the page. A same-page
+  // hash link must stay a hash change, not become a fetch of the page it is
+  // already on -- which is what "#" alone turned into once the page had been
+  // opened with a hash. Capture phase, so this runs before Material's
+  // listener on the body and the click never reaches it.
+  root.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var u = new URL(a.getAttribute('href'), location.href);
+    if (u.origin !== location.origin || u.pathname !== location.pathname || !u.hash) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (location.hash !== u.hash) location.hash = u.hash; else apply();
+  }, true);
   window.addEventListener('hashchange', apply);
   apply();
 })();
