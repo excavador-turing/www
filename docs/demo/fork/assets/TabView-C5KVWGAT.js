@@ -1,0 +1,1 @@
+import{H as e}from"./fileRoute-ClCqzZ4s.js";var t=e();function n({title:e,children:n}){return(0,t.jsxs)(`section`,{children:[e&&(0,t.jsx)(`h2`,{className:`mb-8 text-lg font-bold`,children:e}),(0,t.jsx)(`div`,{className:`space-y-8`,children:n})]})}export{n as t};

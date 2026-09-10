@@ -16,3 +16,10 @@
 *.mp4  filter=lfs diff=lfs merge=lfs -text
 *.webm filter=lfs diff=lfs merge=lfs -text
 *.cast filter=lfs diff=lfs merge=lfs -text
+# The demo ships two built interfaces under docs/demo/, and each carries its
+# webfonts. Fonts are binary and never diff; they belong with the images. The
+# built JavaScript stays in git as text -- it is large but it diffs, and a
+# demo rebuilt from a new tag should arrive as a reviewable change.
+*.woff  filter=lfs diff=lfs merge=lfs -text
+*.woff2 filter=lfs diff=lfs merge=lfs -text
+*.ttf   filter=lfs diff=lfs merge=lfs -text

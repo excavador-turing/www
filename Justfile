@@ -64,3 +64,25 @@ clean:
 # runs. Needs `gh` authenticated; it reads public releases and writes nothing.
 refresh-changelog *COMPONENTS:
     ./scripts/refresh-changelog.py {{COMPONENTS}}
+
+# Rebuild the fork pane of the demo from a BMC-UI checkout at a tag.
+#   just refresh-demo ../BMC-UI v3.19.0
+#
+# The pane is the real interface -- the same bundle a board serves -- built
+# with VITE_DEMO=1 so it answers from its captured fixtures, and with the
+# site's subpath as its base. Committed rather than built in CI, like the
+# API document and the changelog: the site builds offline, and a new demo
+# arrives as a reviewable diff. The tag is what the firmware pins; check
+# `docs/changelog/firmware.md` if unsure.
+refresh-demo checkout tag:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    src="{{checkout}}"
+    test -f "$src/package.json" || { echo "not a BMC-UI checkout: $src" >&2; exit 1; }
+    git -C "$src" fetch --tags -q origin
+    git -C "$src" checkout -q "{{tag}}"
+    ( cd "$src" && npm ci --no-audit --no-fund >/dev/null && \
+      VITE_DEMO=1 VITE_BASE=/demo/fork/ BMC_UI_VERSION="{{tag}}" npm run build >/dev/null )
+    rm -rf docs/demo/fork && mkdir -p docs/demo/fork
+    cp -a "$src/dist/." docs/demo/fork/
+    echo "demo fork pane: {{tag}} ($(find docs/demo/fork -type f | wc -l) files)"

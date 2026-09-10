@@ -17,6 +17,7 @@ site_dir: site
 # three had drifted apart by the time a metric could check them.
 nav:
   - Home: index.md
+  - Try it: demo/index.md
   - Features:
       - Updates that undo themselves: features/updates-that-undo-themselves.md
       - See what the board sees: features/see-what-the-board-sees.md

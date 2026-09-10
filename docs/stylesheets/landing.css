@@ -116,3 +116,12 @@
 
 /* Hide Material's "edit this page" on the landing page: nothing to edit by hand. */
 .tp-landing .md-content__button { display: none; }
+
+/* ---- the demo page: panes side by side ---------------------------------- */
+.tp-demo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; margin: 1rem 0 2rem 0; }
+@media (max-width: 1100px) { .tp-demo { grid-template-columns: 1fr; } }
+.tp-pane { border: 1px solid var(--tp-line); border-radius: 0.6rem; padding: 0.9rem 0.9rem 0.6rem; display: flex; flex-direction: column; }
+.tp-pane h3 { margin: 0 0 0.3rem 0; font-size: 1rem; color: var(--tp-ink); }
+.tp-pane p { margin: 0 0 0.6rem 0; font-size: 0.78rem; line-height: 1.45; color: var(--tp-muted); }
+.tp-pane iframe { width: 100%; aspect-ratio: 4 / 3; border: 1px solid var(--tp-line); border-radius: 0.4rem; background: #fff; }
+.tp-pane--soon { justify-content: center; align-items: flex-start; background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(0,0,0,0.025) 10px 20px); }
