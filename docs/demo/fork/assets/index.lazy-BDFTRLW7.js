@@ -1,0 +1,1 @@
+import{r as e}from"./rolldown-runtime-hePW80VL.js";import{B as t,H as n,W as r,a as i,n as a}from"./fileRoute-ClCqzZ4s.js";var o=e(r(),1),s=n(),c=a(`/`)({component:l});function l(){let{isAuthenticated:e}=t(),n=i();return(0,o.useEffect)(()=>{n(e?{to:`/info`}:{to:`/login`})},[e,n]),(0,s.jsx)(s.Fragment,{})}export{c as Route};

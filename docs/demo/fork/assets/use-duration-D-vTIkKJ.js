@@ -1,0 +1,1 @@
+import{B as e}from"./get-B5BrNHI8.js";import{t}from"./format-CO5Y8HtW.js";var n={d:`ui.durationDays`,h:`ui.durationHours`,m:`ui.durationMinutes`,s:`ui.durationSeconds`};function r(){let{t:r}=e();return e=>{let i=t(e);return i.length===0?null:i.map(e=>r(n[e.unit],{value:e.value})).join(` `)}}export{r as t};
