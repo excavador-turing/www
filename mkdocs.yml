@@ -67,12 +67,21 @@ theme:
   palette:
     - media: "(prefers-color-scheme)"
       toggle: {icon: material/brightness-auto, name: follow the system}
+    # The board's own palette: near-black chrome, a lime accent. Indigo is
+    # Material's default and matches nothing the reader will see on the board.
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: black
+      accent: lime
       toggle: {icon: material/brightness-7, name: dark}
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: black
+      accent: lime
       toggle: {icon: material/brightness-4, name: light}
+
+extra_css:
+  - stylesheets/landing.css
 
 markdown_extensions:
   - admonition
