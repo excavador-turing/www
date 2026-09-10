@@ -29,6 +29,11 @@ jobs:
           # The revision-date plugin reads git history; a shallow clone makes
           # every page claim it was written at build time.
           fetch-depth: 0
+          # Media is in LFS (.gitattributes). Without this, checkout leaves
+          # 130-byte pointer files and the site publishes those AS the images
+          # -- a build that succeeds and a page that is broken, which is the
+          # worst combination. It costs nothing while no media exists yet.
+          lfs: true
 
       - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
 
