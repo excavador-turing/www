@@ -5,6 +5,11 @@ boot proves the kernel started and that init got that far — it says nothing
 about whether the machine is usable. Two images this fork built would have
 passed that bar while being broken.
 
+<figure markdown>
+![The Firmware tab on board B, minutes after its first upgrade: the running slot, and the stock image it can fall back to sitting in the previous one.](../assets/fork/06-firmware-upgrade.png)
+<figcaption>The Firmware tab on board B, minutes after its first upgrade: the running slot, and the stock image it can fall back to sitting in the previous one.</figcaption>
+</figure>
+
 The first could not link `bmcd`, so the web interface never came up. The second
 silently lost the DSA switch driver from its kernel config, which leaves the
 BMC perfectly reachable and **all four compute modules cut off the network**.

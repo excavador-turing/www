@@ -4,6 +4,11 @@ The Turing Pi 2 has a temperature sensor. Upstream's device tree never
 described it, so nothing could read it — and the fan, having nothing to
 regulate against, ran at a fixed speed somebody had once written down.
 
+<figure markdown>
+![The Overview on board B: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.](../assets/fork/02-info.png)
+<figcaption>The Overview on board B: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.</figcaption>
+</figure>
+
 This fork adds the sensor to the device tree and lets the kernel's thermal
 governor drive the fan from it. That is a two-line change with a consequence
 worth an article: the board became explicable.
