@@ -24,6 +24,7 @@ nav:
       - A console to every module: features/a-console-to-every-module.md
   - Guides:
       - Install: guides/install.md
+      - Upgrading from stock: guides/upgrade-from-stock.md
       - Recover a bad flash: guides/recover-a-bad-flash.md
       - Monitor it: guides/monitor-it.md
       - Developing: guides/development.md

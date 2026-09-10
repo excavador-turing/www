@@ -17,7 +17,7 @@ comparison.
 
 | | value |
 |---|---|
-| Board model | Turing Pi 2 (v2.5.1) |
+| Board model | Turing Pi 2 (v2.5.1) — **stock's answer, and it is wrong**; see below |
 | Daemon (`bmcd`) | 2.3.2 |
 | BMC UI | 3.3.3 |
 | API | 1.1 |
@@ -32,6 +32,25 @@ comparison.
     release, not the firmware's. The
     [install guide](../guides/install.md) mentions this leak; the screenshot
     above is the board doing it.
+
+!!! warning "Stock names the wrong board revision"
+    The screenshot says **v2.5.1**. The board is a **v2.5.2**.
+
+    This was only visible because the same board was read twice. Stock
+    firmware reported `v2.5.1`; after the upgrade, on the same hardware
+    minutes later, this fork reported `v2.5.2`. Hardware settles it: a
+    v2.5.1 has no PCF8563 real-time clock, and this board's answers a
+    register read on `/dev/rtc1`. The chip is fitted, so the board is not a
+    v2.5.1.
+
+    The likely cause is ordinary and worth knowing: stock `bmcd` 2.3.2 was
+    built on 2024-09-03, and it appears to report the newest revision it has
+    heard of rather than admitting an unknown one. A board newer than the
+    firmware gets silently aged down.
+
+    It matters because board revision is what a person checks before
+    believing a compatibility note. If your stock board says v2.5.1, that is
+    a claim about your firmware's vintage as much as your hardware.
 
 ## The interface, tab by tab
 
