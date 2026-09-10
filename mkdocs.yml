@@ -29,6 +29,7 @@ nav:
       - Developing: guides/development.md
   - Reference:
       - Upstream vs this fork: reference/comparison.md
+      - The factory firmware: reference/factory-firmware.md
       - Command line: reference/cli.md
       - Metrics: reference/metrics.md
       - API: reference/api.md
