@@ -86,3 +86,4 @@ refresh-demo checkout tag:
     rm -rf docs/demo/fork && mkdir -p docs/demo/fork
     cp -a "$src/dist/." docs/demo/fork/
     echo "demo fork pane: {{tag}} ($(find docs/demo/fork -type f | wc -l) files)"
+    python3 scripts/demo-ribbon.py

@@ -19,11 +19,13 @@ nav:
   - Home: index.md
   - Try it: demo/index.md
   - Features:
+      - Overview: features/index.md
       - Updates that undo themselves: features/updates-that-undo-themselves.md
       - See what the board sees: features/see-what-the-board-sees.md
       - Pick a version, from anywhere: features/pick-a-version.md
       - A console to every module: features/a-console-to-every-module.md
   - Guides:
+      - Overview: guides/index.md
       - Install: guides/install.md
       - Upgrading from stock: guides/upgrade-from-stock.md
       - Recover a bad flash: guides/recover-a-bad-flash.md
@@ -51,6 +53,7 @@ nav:
       - bmcd: changelog/bmcd.md
       - BMC-UI: changelog/bmc-ui.md
       - tpi: changelog/tpi.md
+  - About: about.md
   - Contributing: contributing.md
 
 theme:
