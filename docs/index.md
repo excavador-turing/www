@@ -1,10 +1,30 @@
-# A fork of the Turing Pi 2 BMC firmware
+---
+hide:
+  - toc
+---
 
-The Turing Pi 2 is a mini-ITX board that carries four compute modules. The
-small SoC that powers them on, routes their USB and serves the web interface is
-the **BMC**, and it runs its own Linux. This is a fork of that firmware — a
-kernel and Buildroot that are still supported, an update that undoes itself
-when it goes wrong, and the sensors the board always had but never exposed.
+# Firmware for the Turing Pi 2 that undoes its own mistakes
+
+Upstream's firmware stopped. The last release was **v2.1.0, in February 2025**;
+the maintainer said in June 2026 that he had moved on. Meanwhile a bad flash
+still meant a trip to the rack, a firmware update still power-cycled all four
+compute modules, and the board's own temperature sensor was not in the device
+tree at all.
+
+This fork picks it up: a kernel and a Buildroot that are still supported, an
+update that boots *tentatively* and reverts itself if the board does not come
+back right, and the sensors the hardware always had.
+
+[Install it](guides/install.md){ .md-button .md-button--primary }
+[Coming from stock firmware?](guides/upgrade-from-stock.md){ .md-button }
+[What changed, row by row](reference/comparison.md){ .md-button }
+
+!!! quote "**18 promotions. 1 rollback.**"
+    That rollback is the point. A firmware that has never had to undo itself
+    has not been shown to be able to. The counter is
+    [read off the board](reference/gate-history.md), not typed here, and the
+    [known-fault list](reference/known-faults.md) is on this page too — a fork
+    that publishes only its improvements is advertising.
 
 !!! info "Not a Turing Pi project"
     This is an independent fork by [excavador](https://github.com/excavador-turing),
@@ -14,7 +34,9 @@ when it goes wrong, and the sensors the board always had but never exposed.
 
 <div class="grid cards" markdown>
 
--   __[A bad image undoes itself](features/updates-that-undo-themselves.md)__
+-   [![Firmware slots: what is running, what it can fall back to](assets/cards/card-firmware.png)](features/updates-that-undo-themselves.md)
+
+    __[A bad image undoes itself](features/updates-that-undo-themselves.md)__
 
     ---
 
@@ -23,14 +45,38 @@ when it goes wrong, and the sensors the board always had but never exposed.
     staged. Otherwise the board reboots onto what it had — as it has done,
     on purpose, to prove it can.
 
--   __[See what the board sees](features/see-what-the-board-sees.md)__
+-   [![Board health: uptime, memory, NAND erase blocks, clock sources](assets/cards/card-thermal.png)](features/see-what-the-board-sees.md)
+
+    __[See what the board sees](features/see-what-the-board-sees.md)__
 
     ---
 
-    The board ships a temperature sensor upstream's device tree never
-    described. The fan is now driven from it, the interface says *which trip
-    point* put the fan where it is, and an Override switch can hold it
-    somewhere else.
+    A temperature sensor upstream's device tree never described, the fan driven
+    from it, and the interface saying *which trip point* put it there. Plus the
+    things a board should admit: erase blocks left in its NAND, whether its
+    clock is actually synchronised, and to what.
+
+-   [![A serial console in the browser, showing a module's live kernel output](assets/cards/card-console.png)](features/a-console-to-every-module.md)
+
+    __[A console to every module](features/a-console-to-every-module.md)__
+
+    ---
+
+    Four serial consoles in the browser, one per compute module, without the
+    header on the board and without a USB adapter on the desk. Each opens on
+    the module's recent output rather than on a blank screen — the screenshot
+    is a real node booting.
+
+-   [![Per-module power and USB routing](assets/cards/card-nodes.png)](reference/cli.md)
+
+    __Every module, from either end__
+
+    ---
+
+    Power, reset, USB routing and flashing, per module — and
+    [`tpi`](reference/cli.md) reaches all of it from a shell, so none of it is
+    click-only. A flash now refuses a module it cannot positively identify
+    instead of guessing.
 
 -   __[Pick a version, from anywhere](features/pick-a-version.md)__
 
@@ -49,22 +95,6 @@ when it goes wrong, and the sensors the board always had but never exposed.
     [a dashboard over all of them](guides/monitor-it.md). Upstream had no
     metrics; adding them behind the root password would have been worse than
     none.
-
--   __[A console to every module](features/a-console-to-every-module.md)__
-
-    ---
-
-    Four serial consoles in the browser, one per compute module, without the
-    header on the board and without a USB adapter on the desk. Each opens on
-    the module's recent output rather than on a blank screen.
-
--   __[And from a shell](reference/cli.md)__
-
-    ---
-
-    `tpi` reaches all of it from the command line — list versions, install
-    one, set the board's name and its clock, export its configuration — so
-    none of it is click-only.
 
 </div>
 
