@@ -54,3 +54,13 @@ check: build
 
 clean:
     rm -rf site
+
+# Rebuild the changelog pages from the GitHub release notes.
+# `just refresh-changelog` for all four, or name one: `just refresh-changelog bmcd`.
+#
+# Committed rather than fetched at build time, for the same reason the OpenAPI
+# document is: the site builds offline and reproducibly, and a change to the
+# history arrives as a reviewable diff instead of appearing the next time CI
+# runs. Needs `gh` authenticated; it reads public releases and writes nothing.
+refresh-changelog *COMPONENTS:
+    ./scripts/refresh-changelog.py {{COMPONENTS}}
