@@ -44,6 +44,12 @@ nav:
           - Cooling and thermals: reference/api/thermal.md
       - The gate's record: reference/gate-history.md
       - What is and isn't fixed: reference/known-faults.md
+  - Changelog:
+      - Overview: changelog/index.md
+      - BMC-Firmware: changelog/firmware.md
+      - bmcd: changelog/bmcd.md
+      - BMC-UI: changelog/bmc-ui.md
+      - tpi: changelog/tpi.md
   - Contributing: contributing.md
 
 theme:
