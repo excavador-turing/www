@@ -70,8 +70,9 @@ Requests from the board itself skip authentication entirely. That is a
 [known fault](known-faults.md), not a feature, and since v2.14.0 it at least
 leaves an audit line saying so.
 
-`/metrics` is separate and has no such exception: it takes
-[its own credential](metrics.md), which cannot touch this API.
+`/metrics` is separate: since v2.15.0 it is served on
+[its own port with no credential at all](metrics.md), and that listener
+serves nothing else — so nothing that scrapes it can reach this API.
 
 !!! note "Which version this is"
     Rendered from **bmcd 2.28.0**, fetched from that release rather than
