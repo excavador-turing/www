@@ -33,7 +33,15 @@ nav:
       - The factory firmware: reference/factory-firmware.md
       - Command line: reference/cli.md
       - Metrics: reference/metrics.md
-      - API: reference/api.md
+      - API:
+          - The API: reference/api.md
+          - Every operation: reference/api/index.md
+          - The board: reference/api/board.md
+          - The nodes: reference/api/nodes.md
+          - Firmware: reference/api/firmware.md
+          - Storage: reference/api/storage.md
+          - Network and time: reference/api/network.md
+          - Cooling and thermals: reference/api/thermal.md
       - The gate's record: reference/gate-history.md
       - What is and isn't fixed: reference/known-faults.md
   - Contributing: contributing.md
@@ -75,10 +83,16 @@ markdown_extensions:
 
 plugins:
   - search
-  # [OAD(...)] embeds the BMC's OpenAPI document as static HTML. A plugin,
-  # not a markdown extension, whatever the name suggests. Chosen over Scalar
-  # because the output is real HTML that Material's search indexes.
-  - neoteroi.mkdocsoad
+  # neoteroi.mkdocsoad is GONE (2026-09-10). It was chosen over Scalar for a
+  # good reason -- it emitted real HTML that search could index, where Scalar
+  # is one un-indexable widget -- and that reason still stands. What it could
+  # not do is be navigated: it renders HTML after MkDocs has built the table
+  # of contents, so its 176 headings never entered it. The result was one
+  # 106,000-pixel page whose contents listed three entries.
+  #
+  # scripts/generate-api-pages.py now emits Markdown instead, which keeps the
+  # indexability and adds the navigation: real headings, real nav, one page
+  # per group. Same document, same generator-owns-it rule.
   # Every page says when it was last touched. These sites describe a moving
   # target -- repositories that release often -- and a doc page with no date
   # invites the reader to assume it is current.
