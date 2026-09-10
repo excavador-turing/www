@@ -1,4 +1,4 @@
-# One site: turing.excavador.xyz.
+# One site: turingpi.xyz (moved from turing.excavador.xyz, SQU-189).
 #
 # MkDocs is the only Python in this estate -- everything else is Node 24 or
 # Rust. That was a deliberate trade for Material's docs UX; devbox contains the

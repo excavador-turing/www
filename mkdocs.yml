@@ -1,11 +1,11 @@
 # One site, one repository: GitHub Pages binds a custom domain per repo, so
-# excavador.xyz, homelab.excavador.xyz and turing.excavador.xyz cannot share
+# excavador.xyz, homelab.excavador.xyz and turingpi.xyz cannot share
 # one. INHERIT worked across directories and cannot work across repositories;
 # the block below is generated into each of the three and drifts if edited in
 # only one.
 site_name: Turing Pi 2 BMC
 site_description: A fork of the Turing Pi 2 BMC firmware, and what it changes
-site_url: https://turing.excavador.xyz
+site_url: https://turingpi.xyz
 repo_url: https://github.com/excavador-turing/BMC-Firmware
 edit_uri: ""
 docs_dir: docs
