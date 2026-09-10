@@ -9,7 +9,3 @@ mkdocs-material-extensions==1.3.1
 mkdocs-git-revision-date-localized-plugin==1.5.4
 mkdocs-redirects==1.2.3
 pymdown-extensions==11.0.2
-# Renders the BMC's OpenAPI document as a page Material's search can index.
-# Scalar is prettier and produces a single un-indexable widget, which on a
-# reference site is the wrong trade.
-neoteroi-mkdocs==1.2.0

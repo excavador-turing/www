@@ -20,6 +20,7 @@ refresh-api version:
     gh release download {{version}} --repo excavador-turing/bmcd \
         --pattern openapi.json --output docs/reference/openapi.json --clobber
     @just _describe-api
+    ./scripts/generate-api-pages.py
 
 # What the committed document says about itself. Its own version is the thing
 # to read: a spec that reports a different release than the one you fetched

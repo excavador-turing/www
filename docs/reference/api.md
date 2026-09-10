@@ -82,4 +82,15 @@ leaves an audit line saying so.
     A board running something else serves its own document at
     `GET /api/bmc/openapi.json`, and that one is authoritative for that board.
 
-[OAD(./docs/reference/openapi.json)]
+## The operations
+
+Every operation is on its own page, grouped by what it acts on, and every one
+is in the site's search:
+
+- **[Every operation](api/index.md)** — one row per operation, the fastest way in
+- [The board](api/board.md) · [The nodes](api/nodes.md) · [Firmware](api/firmware.md)
+- [Storage](api/storage.md) · [Network and time](api/network.md) · [Cooling and thermals](api/thermal.md)
+
+These pages are generated from the committed document by
+`scripts/generate-api-pages.py`, which `just refresh-api` runs. They are not
+edited by hand, so they cannot drift from the document the daemon emits.
