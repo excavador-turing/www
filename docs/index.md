@@ -1,102 +1,81 @@
 ---
 hide:
+  - navigation
   - toc
 ---
 
+<div class="tp-hero" markdown>
+
 # Firmware for the Turing Pi 2 that undoes its own mistakes
 
-Upstream's firmware stopped. The last release was **v2.1.0, in February 2025**;
-the maintainer said in June 2026 that he had moved on. Meanwhile a bad flash
-still meant a trip to the rack, a firmware update still power-cycled all four
-compute modules, and the board's own temperature sensor was not in the device
-tree at all.
+<p class="lede">Upstream's last release was <strong>February 2025</strong> and the maintainer moved on. A bad flash still meant a trip to the rack, an update still power-cycled all four compute modules, and the board's own temperature sensor was not in the device tree. This fork picks it up on a kernel that is still supported.</p>
 
-This fork picks it up: a kernel and a Buildroot that are still supported, an
-update that boots *tentatively* and reverts itself if the board does not come
-back right, and the sensors the hardware always had.
-
+<div class="tp-actions" markdown>
 [Install it](guides/install.md){ .md-button .md-button--primary }
 [Coming from stock firmware?](guides/upgrade-from-stock.md){ .md-button }
 [What changed, row by row](reference/comparison.md){ .md-button }
+</div>
 
-!!! quote "**18 promotions. 1 rollback.**"
-    That rollback is the point. A firmware that has never had to undo itself
-    has not been shown to be able to. The counter is
-    [read off the board](reference/gate-history.md), not typed here, and the
-    [known-fault list](reference/known-faults.md) is on this page too — a fork
-    that publishes only its improvements is advertising.
+</div>
 
-!!! info "Not a Turing Pi project"
-    This is an independent fork by [excavador](https://github.com/excavador-turing),
-    not affiliated with or endorsed by Turing Machines Inc. It runs on one
-    person's hardware. Everything here was measured on that board, and where a
-    measurement contradicted something written here, the writing changed.
+<div class="tp-proof" markdown>
+<div markdown><b>18 / 1</b><span>promotions / rollbacks — [read off the board](reference/gate-history.md). The rollback is the point: a firmware that has never had to undo itself has not been shown able to.</span></div>
+<div markdown><b>6.12 LTS</b><span>kernel, on Buildroot 2025.02 LTS. Upstream ships 6.8 on an end-of-life Buildroot.</span></div>
+<div markdown><b>0 modules</b><span>power-cycled by a firmware update. Upstream cuts all four.</span></div>
+</div>
 
-<div class="grid cards" markdown>
+<div class="tp-plates grid cards" markdown>
 
--   [![Firmware slots: what is running, what it can fall back to](assets/cards/card-firmware.png)](features/updates-that-undo-themselves.md)
+-   [![Firmware slots: what is running and what it falls back to](assets/cards/card-firmware.png)](features/updates-that-undo-themselves.md)
 
-    __[A bad image undoes itself](features/updates-that-undo-themselves.md)__
+    [A bad image undoes itself](features/updates-that-undo-themselves.md)
 
-    ---
+    Boots the new image *tentatively*; keeps it only if the daemon answers and every module's port is present.
 
-    A new firmware boots *tentatively*. It is kept only if the daemon answers,
-    every module's switch port is there, and the image is the one that was
-    staged. Otherwise the board reboots onto what it had — as it has done,
-    on purpose, to prove it can.
+-   [![Every candidate version, from every configured source, with its checksum state](assets/cards/card-versions.png)](features/pick-a-version.md)
 
--   [![Board health: uptime, memory, NAND erase blocks, clock sources](assets/cards/card-thermal.png)](features/see-what-the-board-sees.md)
+    [Pick a version, from anywhere](features/pick-a-version.md)
 
-    __[See what the board sees](features/see-what-the-board-sees.md)__
+    This fork, upstream's two catalogues, or the SD card — side by side, each checksum-verified or marked as not.
 
-    ---
+-   [![Board health: memory, NAND erase blocks, clock sources](assets/cards/card-thermal.png)](features/see-what-the-board-sees.md)
 
-    A temperature sensor upstream's device tree never described, the fan driven
-    from it, and the interface saying *which trip point* put it there. Plus the
-    things a board should admit: erase blocks left in its NAND, whether its
-    clock is actually synchronised, and to what.
+    [See what the board sees](features/see-what-the-board-sees.md)
 
--   [![A serial console in the browser, showing a module's live kernel output](assets/cards/card-console.png)](features/a-console-to-every-module.md)
+    The temperature sensor upstream never described, which trip point set the fan, NAND wear, and what the clock is synced to.
 
-    __[A console to every module](features/a-console-to-every-module.md)__
+-   [![A serial console in the browser showing a module's live kernel output](assets/cards/card-console.png)](features/a-console-to-every-module.md)
 
-    ---
+    [A console to every module](features/a-console-to-every-module.md)
 
-    Four serial consoles in the browser, one per compute module, without the
-    header on the board and without a USB adapter on the desk. Each opens on
-    the module's recent output rather than on a blank screen — the screenshot
-    is a real node booting.
+    Four serial consoles in the browser, no header, no adapter — each opens on the module's recent output.
 
 -   [![Per-module power and USB routing](assets/cards/card-nodes.png)](reference/cli.md)
 
-    __Every module, from either end__
+    [Power and USB, per module](reference/cli.md)
 
-    ---
+    Power, reset, USB routing and flashing — and a flash that refuses a module it cannot positively identify.
 
-    Power, reset, USB routing and flashing, per module — and
-    [`tpi`](reference/cli.md) reaches all of it from a shell, so none of it is
-    click-only. A flash now refuses a module it cannot positively identify
-    instead of guessing.
+-   [![The raw /metrics exposition, as a scraper sees it](assets/cards/card-metrics.png)](reference/metrics.md)
 
--   __[Pick a version, from anywhere](features/pick-a-version.md)__
+    [Metrics, on their own port](reference/metrics.md)
 
-    ---
+    Every family the board exposes, on a listener that serves nothing else — so a scraper never holds the root password.
 
-    GitHub releases, an HTTP directory, or the SD card. Every candidate listed
-    with how it compares to what is running and how much is known about its
-    integrity.
+-   [![Network interfaces and time](assets/cards/card-network.png)](reference/api/network.md)
 
--   __Metrics, on a port that reaches nothing else__
+    [Network and time](reference/api/network.md)
 
-    ---
+    Interfaces, addresses, and an NTP source you can set — and see whether it is actually synchronised.
 
-    [Every family the board exposes](reference/metrics.md), on its own
-    listener that serves nothing but `/metrics`, and
-    [a dashboard over all of them](guides/monitor-it.md). Upstream had no
-    metrics; adding them behind the root password would have been worse than
-    none.
+-   [![Settings: hostname, configuration export](assets/cards/card-settings.png)](reference/api/board.md)
+
+    [Name it, export it](reference/api/board.md)
+
+    Hostname, clock and configuration are controls, not files on a shell — and `tpi` reaches every one from a terminal.
 
 </div>
+
 
 ## Why fork it
 

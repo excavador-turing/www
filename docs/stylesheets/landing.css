@@ -1,0 +1,118 @@
+/* The site wears the board's own palette: near-black type, a lime accent
+   (#dcfe8e is the interface's button colour, sampled from a screenshot rather
+   than guessed), and a lot of white. Material's defaults are indigo on white,
+   which reads as "documentation template" and matches nothing on the board. */
+
+:root {
+  --tp-ink: #171717;
+  --tp-lime: #dcfe8e;
+  --tp-lime-ink: #2d3a00;
+  --tp-muted: #6b6b6b;
+  --tp-line: #e4e4e4;
+}
+[data-md-color-scheme="slate"] {
+  --tp-ink: #f2f2f2;
+  --tp-muted: #a3a3a3;
+  --tp-line: #2e2e2e;
+}
+
+/* ---- landing page (index.md sets hide: navigation, toc) ---------------- */
+
+.tp-hero {
+  margin: 0 0 1.6rem 0;
+  padding: 2.4rem 0 1.2rem 0;
+  border-bottom: 1px solid var(--tp-line);
+}
+.tp-hero h1 {
+  font-size: clamp(1.9rem, 4.2vw, 3.1rem);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tp-ink);
+  margin: 0 0 0.9rem 0;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+.tp-hero p.lede {
+  font-size: 1.05rem;
+  line-height: 1.55;
+  max-width: 60ch;
+  color: var(--tp-ink);
+  margin: 0 0 1.2rem 0;
+}
+.tp-hero .tp-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0 0 1.4rem 0; }
+.tp-hero .md-button {
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  font-weight: 600;
+  border: 2px solid var(--tp-ink);
+  color: var(--tp-ink);
+}
+.tp-hero .md-button--primary {
+  background: var(--tp-lime);
+  border-color: var(--tp-lime);
+  color: var(--tp-lime-ink);
+}
+.tp-hero .md-button--primary:hover { filter: brightness(0.96); }
+
+/* The proof strip: three measured facts, not adjectives. */
+.tp-proof {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0 0 2rem 0;
+}
+.tp-proof > div {
+  border: 1px solid var(--tp-line);
+  border-radius: 0.6rem;
+  padding: 0.9rem 1rem;
+}
+.tp-proof b {
+  display: block;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  color: var(--tp-ink);
+  font-variant-numeric: tabular-nums;
+}
+.tp-proof span { color: var(--tp-muted); font-size: 0.8rem; }
+
+/* Eight plates, four across. Material's grid cards default to two wide
+   columns with generous padding, which is where "the plates are too big"
+   came from. */
+/* The grid is the DIV, not the list: Material gives the <ul> display:contents
+   so its <li>s become grid items of the wrapper. A column rule on the <ul>
+   is accepted and ignored, and the wrapper's own auto-fit at 16rem -- with
+   Material's 22px root font -- lands on three. Pixel breakpoints for the
+   same reason: an em here is not the em you wrote. */
+.md-typeset .tp-plates.grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+@media (max-width: 1400px) { .md-typeset .tp-plates.grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px)  { .md-typeset .tp-plates.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px)  { .md-typeset .tp-plates.grid { grid-template-columns: 1fr; } }
+
+.tp-plates.grid.cards > ul > li {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0.6rem;
+  border: 1px solid var(--tp-line);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.tp-plates.grid.cards > ul > li:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+.tp-plates.grid.cards > ul > li > p:first-child { margin: 0; }
+.tp-plates.grid.cards > ul > li img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: top;
+  border-bottom: 1px solid var(--tp-line);
+}
+.tp-plates.grid.cards > ul > li > p:nth-child(2) { margin: 0.7rem 0.9rem 0.15rem 0.9rem; }
+.tp-plates.grid.cards > ul > li > p:nth-child(2) a { color: var(--tp-ink); font-weight: 700; font-size: 0.9rem; }
+.tp-plates.grid.cards > ul > li > p:last-child { margin: 0 0.9rem 0.85rem 0.9rem; font-size: 0.74rem; line-height: 1.45; color: var(--tp-muted); }
+.tp-plates.grid.cards > ul > li hr { display: none; }
+
+/* Hide Material's "edit this page" on the landing page: nothing to edit by hand. */
+.tp-landing .md-content__button { display: none; }
