@@ -87,9 +87,9 @@ hide:
 
 -   [![](../assets/icons/name.svg)](../reference/api/board.md)
 
-    [Name it, export it](../reference/api/board.md)
+    [Name it, back it up](../reference/api/board.md)
 
-    The hostname and the clock are controls, the configuration exports, and `tpi` reaches every one of them.
+    The hostname and the clock are controls, the whole configuration backs up and restores, and `tpi` reaches every one of them.
 
 </div>
 
