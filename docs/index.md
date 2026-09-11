@@ -8,7 +8,7 @@ hide:
 
 <div class="tp-bar" hidden="hidden">
 <a class="tp-back" href="#overview">← Overview</a>
-<span class="tp-bar__note">Readings are real, captured off a board; controls refuse and say why; the console replays a recording. <a href="about/#the-demo">What is and isn't real</a> · <a href="demo/fork/" target="_blank" rel="noopener">full size</a></span>
+<span class="tp-bar__note">Readings are real, captured off a board; controls refuse and say why; the console replays a recording. <a href="about/">What is and isn't real</a> · <a href="demo/fork/" target="_blank" rel="noopener">full size</a></span>
 <nav class="tp-seg tp-panes" aria-label="Which interface">
 <a href="#demo/stock" data-pane="stock">Stock firmware</a>
 <a href="#demo/fork" data-pane="fork">This fork</a>
