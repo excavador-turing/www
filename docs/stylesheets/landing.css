@@ -57,11 +57,12 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    size below is in vh or clamped so the whole thing lands on one screen from
    about 800px tall up; below that it scrolls, honestly. */
 .tp-view--home {
-  height: calc(100vh - var(--tp-header) - 0.4rem);
+  height: calc(100vh - var(--tp-header) - 0.4rem);   /* older browsers */
+  height: calc(100svh - var(--tp-header) - 0.4rem);
   box-sizing: border-box;
   display: grid; grid-template-rows: auto auto auto minmax(0, 1fr);
-  gap: clamp(0.7rem, 2.2vh, 1.4rem);
-  padding: clamp(0.8rem, 3vh, 2rem) 0 0.3rem;
+  gap: clamp(0.7rem, 2.2svh, 1.4rem);
+  padding: clamp(0.8rem, 3svh, 2rem) 0 0.3rem;
 }
 .tp-hero { text-align: center; }
 .md-typeset .tp-hero h1 {
@@ -80,7 +81,7 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    from the maker, one paragraph, one link out. The whole strip is the link. */
 .md-typeset .tp-what { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: center; color: inherit; border: 1px solid var(--tp-line); border-radius: 0.6rem; padding: 0.5rem 0.9rem 0.5rem 0.5rem; }
 .md-typeset .tp-what:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-.md-typeset .tp-what img { display: block; height: clamp(72px, 11vh, 120px); width: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 0.4rem; margin: 0; }
+.md-typeset .tp-what img { display: block; height: clamp(72px, 11svh, 120px); width: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 0.4rem; margin: 0; }
 .md-typeset .tp-what__text { font-size: 0.74rem; line-height: 1.5; color: var(--tp-muted); }
 .md-typeset .tp-what__text b { color: var(--tp-ink); font-size: 0.86rem; margin-right: 0.3rem; }
 .md-typeset .tp-what__link { color: var(--tp-ink); font-weight: 600; white-space: nowrap; }
@@ -112,7 +113,7 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 /* The demo view: one interface at a time, as large as the screen allows.
    Side by side is what made them too small to use. */
 .tp-stage iframe,
-.tp-stage__soon { display: block; width: 100%; height: calc(100vh - var(--tp-header) - var(--tp-bar) - 0.5rem); border: 1px solid var(--tp-line); border-radius: 0.5rem; background: #fff; }
+.tp-stage__soon { display: block; width: 100%; height: calc(100svh - var(--tp-header) - var(--tp-bar) - 0.5rem); border: 1px solid var(--tp-line); border-radius: 0.5rem; background: #fff; }
 .tp-stage__soon { display: flex; align-items: center; justify-content: center; text-align: center; border-style: dashed; padding: 2rem; background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(0,0,0,0.025) 10px 20px); }
 .tp-stage__soon > div { max-width: 40ch; }
 .md-typeset .tp-stage__soon h2 { margin: 0 0 0.4rem; font-size: 1.3rem; color: var(--tp-ink); }
@@ -169,7 +170,7 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 .md-main:has(.tp-hero-band) .md-content__inner::before { display: none; }
 .md-main:has(.tp-hero-band) .md-content__button { display: none; }
 
-.tp-hero-band { padding: clamp(1.6rem, 5vh, 3.2rem) 0 1.2rem; border-bottom: 1px solid var(--tp-line); margin-bottom: 1.8rem; }
+.tp-hero-band { padding: clamp(1.6rem, 5svh, 3.2rem) 0 1.2rem; border-bottom: 1px solid var(--tp-line); margin-bottom: 1.8rem; }
 .md-typeset .tp-hero-band h1 { font-size: clamp(1.6rem, 3.4vw, 2.7rem); line-height: 1.06; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); margin: 0 0 0.6rem; max-width: 20ch; text-wrap: balance; }
 .md-typeset .tp-hero-band p { font-size: clamp(0.85rem, 1.05vw, 1rem); line-height: 1.55; max-width: var(--tp-measure); color: var(--tp-muted); margin: 0; }
 .md-typeset .tp-hero-band .tp-eyebrow { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tp-lime-ink); background: var(--tp-lime); padding: 0.25rem 0.6rem; border-radius: 999px; margin-bottom: 0.8rem; }
@@ -246,7 +247,7 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    phone is the binding constraint by a wide margin, which is why almost
    everything below sits in the narrow media query.
    -------------------------------------------------------------------------- */
-.md-main:has(.tp-one-screen) .tp-hero-band { padding: clamp(1rem, 3vh, 2rem) 0 0.8rem; margin-bottom: 1.1rem; }
+.md-main:has(.tp-one-screen) .tp-hero-band { padding: clamp(1rem, 3svh, 2rem) 0 0.8rem; margin-bottom: 1.1rem; }
 .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band .tp-eyebrow { margin-bottom: 0.5rem; }
 .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band h1 { margin-bottom: 0.45rem; }
 .md-main:has(.tp-one-screen) .tp-proof { margin-bottom: 1.1rem; }
@@ -333,7 +334,7 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 
 /* Same argument on the other axis: a 1366x768 laptop is a wide screen and a
    short one, and it was 24px over while a 1440x900 one had room. The hero's
-   own padding is the give here -- `clamp(1rem, 3vh, 2rem)` already shrinks
+   own padding is the give here -- `clamp(1rem, 3svh, 2rem)` already shrinks
    with the viewport, just not far enough. */
 @media (min-width: 601px) and (max-height: 830px) {
   .md-main:has(.tp-one-screen) .tp-hero-band { padding-top: 0.7rem; padding-bottom: 0.6rem; margin-bottom: 0.9rem; }
@@ -429,12 +430,15 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    says 57, and the demo overflowed by exactly that difference on every
    handset while looking right on every laptop.
    A constant cannot know that, so nothing is measured here any more: the
-   demo view is a flex column and the frame takes what is left. `dvh` rather
-   than `vh` for the same class of reason -- a phone's address bar is not a
-   constant either. */
+   demo view is a flex column and the frame takes what is left. `svh` rather than `vh` throughout, for the
+   same class of reason: `vh` is the viewport a phone has once its address bar
+   has RETRACTED, and a page measured against that scrolls while the bar is
+   still showing. `svh` is the smallest the viewport gets, so fitting it fits
+   always. */
 .tp-landing:has(.tp-view--demo:not([hidden])) {
   display: flex; flex-direction: column;
-  height: calc(100dvh - var(--tp-header) - 0.4rem);
+  height: calc(100vh - var(--tp-header) - 0.4rem);   /* older browsers */
+  height: calc(100svh - var(--tp-header) - 0.4rem);
 }
 .tp-view--demo:not([hidden]) { flex: 1 1 auto; min-height: 0; display: flex; }
 .tp-view--demo .tp-stage { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
@@ -603,4 +607,159 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
   .md-main:has(.tp-one-screen) .md-typeset .tp-next a { padding: 0.55rem 0.8rem; }
   .md-main:has(.tp-one-screen) .md-typeset .tp-next b { line-height: 1.2; }
   .md-main:has(.tp-one-screen) .md-typeset .tp-next span { -webkit-line-clamp: 1; line-height: 1.35; }
+}
+
+/* ---- the features index has no headline ------------------------------- */
+/* Owner's call, 2026-09-11, looking at the published page: an index is a
+   menu, and "Fourteen things this board does that it did not before" was
+   250px of prose in front of the fourteen things themselves. The chip says
+   FEATURES; the plates say the rest.
+   The heading and its sentence stay in the MARKUP and leave only the screen:
+   the page still has one h1 for assistive technology, the site search still
+   indexes both, and the browser tab still has a name. `clip-path` rather
+   than `display: none`, which would take them out of all three. */
+.tp-hero-band--plates h1,
+.tp-hero-band--plates p {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.tp-hero-band--plates { padding-bottom: 0.6rem; margin-bottom: 1rem; }
+
+/* The room that buys back: a phone gets the one-line summaries and the three
+   destinations that the headline had crowded out. */
+@media (max-width: 560px) {
+  .md-main:has(.tp-hero-band--plates) .md-typeset .tp-plates--compact.grid.cards > ul > li { grid-template-rows: auto auto; }
+  .md-main:has(.tp-hero-band--plates) .md-typeset .tp-plates--compact.grid.cards > ul > li > p:first-child { grid-area: 1 / 1 / 3 / 2; }
+  .md-main:has(.tp-hero-band--plates) .md-typeset .tp-plates--compact.grid.cards > ul > li > p:last-child { display: -webkit-box; font-size: 0.56rem; line-height: 1.25; }
+  .md-main:has(.tp-hero-band--plates) .tp-next { display: grid; }
+}
+
+/* ---- a feature page is a picture and some text ------------------------- */
+/* Owner's call, 2026-09-11, looking at the published pages: a feature page
+   had a column of text against an empty right half, and behind its one door
+   was a documentation page complete with headings. So the argument moved to
+   docs/why/, where documentation belongs and where it keeps its table of
+   contents, and the feature page became what it should have been -- the
+   claim, its numbers, ONE picture of the thing working, and where to go next.
+   The picture is the right half. That is what the free space was for. */
+.md-main:has(.tp-feature) .md-grid { max-width: 100%; }
+.md-main:has(.tp-feature) .md-content__inner { margin: 0 auto; padding: clamp(0.8rem, 3svh, 2rem) clamp(1rem, 2.5vw, 2.4rem) 1rem; max-width: 1600px; }
+.md-main:has(.tp-feature) .md-content__inner::before { display: none; }
+.md-main:has(.tp-feature) .md-content__button,
+.md-main:has(.tp-feature) .md-source-file { display: none; }
+
+.tp-feature { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: clamp(1.2rem, 3vw, 3rem); align-items: center; }
+.tp-feature__say { min-width: 0; }
+.md-typeset .tp-feature__say h1 { font-size: clamp(1.5rem, 2.9vw, 2.5rem); line-height: 1.06; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); margin: 0 0 0.5rem; text-wrap: balance; }
+.md-typeset .tp-feature__say > p { font-size: clamp(0.82rem, 1vw, 0.95rem); line-height: 1.55; color: var(--tp-muted); margin: 0 0 0.7rem; }
+.md-typeset .tp-feature__say .tp-eyebrow { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tp-lime-ink); background: var(--tp-lime); padding: 0.25rem 0.6rem; border-radius: 999px; margin-bottom: 0.7rem; }
+[data-md-color-scheme="slate"] .md-typeset .tp-feature__say .tp-eyebrow { color: #2d3a00; }
+
+/* The one link off this page that is not a destination card: the argument,
+   which used to be the rest of the page. */
+.md-typeset a.tp-why { display: inline-block; font-size: 0.76rem; font-weight: 600; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); padding-bottom: 0.1rem; margin-bottom: 1rem; }
+.md-typeset a.tp-why:hover { border-bottom-color: var(--tp-ink); }
+
+.md-typeset .tp-feature .tp-proof { margin: 0 0 1rem; max-width: none; }
+.md-typeset .tp-feature .tp-next { margin: 0; padding-top: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* The picture carries the page, so it gets the height the viewport can spare
+   and never more -- a screenshot that pushes the numbers off the bottom has
+   stopped being evidence and become decoration. */
+.md-typeset figure.tp-feature__show { margin: 0; max-width: none; width: 100%; }
+/* `cover`, not `contain`. These are full-page captures: contained in a
+   column they scale to something nobody can read, which is a picture of a
+   screenshot rather than a screenshot. Cropped from the top they arrive at
+   the scale they were taken, and the top of each one is the part the caption
+   is about. */
+.md-typeset figure.tp-feature__show img { display: block; width: 100%; height: clamp(300px, 56svh, 620px); object-fit: cover; object-position: top center; border: 1px solid var(--tp-line); border-radius: 0.6rem; background: var(--tp-plate); }
+.md-typeset figure.tp-feature__show figcaption { font-size: 0.68rem; line-height: 1.4; color: var(--tp-muted); margin-top: 0.5rem; text-align: left; }
+
+/* One column below a laptop, and the picture goes second: the claim is what
+   a reader needs first on a phone, and the screenshot is unreadable at 390px
+   anyway until they tap it. */
+@media (max-width: 1000px) {
+  .tp-feature { grid-template-columns: 1fr; gap: 1rem; }
+  .md-typeset figure.tp-feature__show img { height: 30svh; }
+}
+@media (max-width: 600px) {
+  .md-typeset .tp-feature .tp-next { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md-typeset figure.tp-feature__show img { height: 19svh; }
+  .md-typeset figure.tp-feature__show figcaption { display: none; }
+}
+
+/* A phone gets the claim, the numbers, a strip of the picture and the four
+   destinations, and every one of them has to give something up for that. */
+@media (max-width: 600px) {
+  .md-typeset .tp-feature__say h1 { font-size: 1.25rem; margin-bottom: 0.35rem; }
+  .md-typeset .tp-feature__say > p { font-size: 0.74rem; line-height: 1.45; margin-bottom: 0.5rem; }
+  .md-typeset .tp-feature__say .tp-eyebrow { font-size: 0.55rem; padding: 0.15rem 0.45rem; margin-bottom: 0.4rem; }
+  .md-typeset a.tp-why { font-size: 0.7rem; margin-bottom: 0.6rem; }
+  .md-typeset .tp-feature .tp-proof { margin-bottom: 0.6rem; }
+  .md-typeset .tp-feature .tp-next { padding-top: 0.6rem; }
+  .tp-feature { gap: 0.7rem; }
+}
+@media (max-width: 600px) and (max-height: 780px) {
+  .md-typeset figure.tp-feature__show img { height: 15svh; }
+  .md-typeset .tp-feature__say h1 { font-size: 1.1rem; }
+  .md-typeset .tp-feature__say > p { font-size: 0.68rem; }
+}
+
+/* A short laptop and a tablet each hold the picture to less of the screen:
+   at 1366x768 the picture alone was 430px of a 768px window, and on a tablet
+   the two halves stack so the picture is paid in full on top of the text. */
+@media (min-width: 601px) and (max-height: 830px) {
+  .md-typeset figure.tp-feature__show img { height: clamp(260px, 46svh, 420px); }
+  .md-typeset .tp-feature__say h1 { font-size: clamp(1.4rem, 2.4vw, 2rem); }
+  .md-typeset .tp-feature__say > p { font-size: 0.8rem; line-height: 1.5; }
+  .md-typeset a.tp-why { margin-bottom: 0.7rem; }
+}
+@media (min-width: 601px) and (max-width: 1000px) {
+  .md-typeset figure.tp-feature__show img { height: 22svh; }
+  .md-typeset .tp-feature__say h1 { font-size: 1.5rem; }
+  .md-typeset .tp-feature__say > p { font-size: 0.78rem; line-height: 1.5; }
+  .md-typeset .tp-feature .tp-next { padding-top: 0.7rem; }
+  .tp-feature { gap: 0.8rem; }
+}
+
+/* The last pass on the narrow end. Each cut is the least useful half of what
+   it touches: a phone loses the picture's caption and some of its crop, a
+   375x667 phone loses the subtitle under each destination as well. */
+@media (max-width: 1000px) {
+  .md-typeset .tp-feature .tp-next { padding-top: 0.6rem; }
+  .md-typeset .tp-feature .tp-proof { margin-bottom: 0.7rem; }
+}
+@media (min-width: 601px) and (max-width: 1000px) {
+  .md-typeset figure.tp-feature__show img { height: 19svh; }
+}
+@media (max-width: 600px) {
+  .md-typeset figure.tp-feature__show img { height: 16svh; }
+  .md-typeset .tp-feature__say .tp-eyebrow { margin-bottom: 0.3rem; }
+}
+@media (max-width: 600px) and (max-height: 780px) {
+  .md-typeset figure.tp-feature__show img { height: 13svh; }
+  .md-typeset .tp-feature .tp-next a { padding: 0.3rem 0.45rem; }
+  .md-typeset .tp-feature .tp-next b { font-size: 0.68rem; }
+  .md-typeset a.tp-why { font-size: 0.64rem; margin-bottom: 0.4rem; }
+}
+
+/* A 375x667 phone is the one screen where the picture becomes a strip rather
+   than a screenshot. It is still the right thing to keep: it says at a glance
+   that this is an interface and not a slide, and tapping it opens the page it
+   came from. */
+@media (max-width: 600px) and (max-height: 700px) {
+  .md-typeset figure.tp-feature__show img { height: 11svh; }
+  .md-typeset .tp-feature .tp-proof span { font-size: 0.55rem; line-height: 1.2; }
+  .md-typeset .tp-feature__say > p { font-size: 0.64rem; line-height: 1.4; margin-bottom: 0.4rem; }
+  .tp-feature { gap: 0.5rem; }
+}
+@media (max-width: 600px) and (max-height: 700px) {
+  .md-typeset .tp-feature__say h1 { font-size: 1rem; margin-bottom: 0.3rem; }
+  .md-typeset .tp-feature .tp-proof b { font-size: 0.95rem; }
+  .md-typeset .tp-feature .tp-next { padding-top: 0.45rem; gap: 0.3rem; }
+}
+@media (max-width: 600px) and (max-height: 700px) {
+  .md-typeset .tp-feature .tp-next a { padding: 0.25rem 0.4rem; }
+  .md-typeset .tp-feature .tp-next b { font-size: 0.64rem; line-height: 1.15; }
+  .md-typeset .tp-feature .tp-proof { margin-bottom: 0.45rem; }
 }
