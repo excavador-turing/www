@@ -6,7 +6,7 @@ hide:
 
 <div class="tp-hero-band" markdown>
 <span class="tp-eyebrow">Features</span>
-# Eleven things this board does that it did not before
+# Twelve things this board does that it did not before
 
 <p>Every one of them started as something that went wrong on a real board. The short version is on the plates; behind each is the argument, with the measurement that backs it and the date it was taken.</p>
 </div>
@@ -18,6 +18,12 @@ hide:
     [A bad image undoes itself](updates-that-undo-themselves.md)
 
     Boots on trial and reverts by itself if the board does not come back right. 18 updates, 1 automatic rollback, 0 trips to the rack.
+
+-   [![](../assets/icons/fleet.svg)](one-page-over-every-board.md)
+
+    [One page over every board](one-page-over-every-board.md)
+
+    A board that can reflash four computers should not face the internet. One page in the cluster reaches them all, and holds no credential of its own.
 
 -   [![](../assets/icons/rails.svg)](update-without-touching-your-nodes.md)
 

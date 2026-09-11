@@ -20,6 +20,7 @@ nav:
   - Try it: demo/index.md
   - Features:
       - Overview: features/index.md
+      - One page over every board: features/one-page-over-every-board.md
       - Fresh, and fixed: features/fresh-and-fixed.md
       - Update without touching your nodes: features/update-without-touching-your-nodes.md
       - Updates that undo themselves: features/updates-that-undo-themselves.md
