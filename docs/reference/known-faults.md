@@ -7,6 +7,38 @@ running board.
 
 ## Open
 
+### The serial console needs a certificate your browser trusts
+
+Every other tab works over a self-signed or internal-CA certificate once you
+accept the warning. **The console does not.** A browser will not open a
+WebSocket to a certificate it does not trust, and the exception you granted by
+clicking through on the page does not extend to that connection — so the
+console reports `not connected, close code 1006` while the rest of the
+interface is fine.
+
+Measured on 2026-09-12. What the browser reports:
+
+```
+webSocketCreated     wss://<board>/api/bmc/serial/ws?node=0
+webSocketFrameError  net::ERR_SSL_PROTOCOL_ERROR
+```
+
+The board is not at fault. The same endpoint, from a client with verification
+off and a valid token, answers `handshake: OK`.
+
+Two ways round it, both of which work today:
+
+* **Trust the authority that issued the board's certificate** in the browser's
+  own store. A click-through exception is not enough; the certificate has to
+  be trusted.
+* **Reach the board through a proxy that terminates TLS on a certificate your
+  browser already trusts.** That is what [one page over every
+  board](../features/one-page-over-every-board.md) does.
+
+*The interface says this now, in the panel under the console. It cannot detect
+the case — a browser reports no reason for a failed handshake — so it names
+the cause that is usually right rather than guessing.*
+
 ### Anything local is trusted
 
 `/api/bmc` skips authentication entirely for requests from `127.0.0.1`. That
@@ -85,6 +117,38 @@ userspace dies stays dead until someone cuts its power.
 *Tracked as SQU-106, and it is the most valuable unbuilt thing on the list.*
 
 ## Fixed, and worth knowing about
+
+### The board could stop checking for firmware, for ever
+
+**Affected every release up to bmcd 2.34.0; fixed in 2.35.0.** The Firmware
+page said *checking the sources now* and never stopped, with **Check now**
+disabled beside it, and the board could not have found a new release if one
+had appeared. Only restarting the daemon cleared it.
+
+Opening the Firmware tab on a board whose cached listing had aged out was
+enough to trigger it. bmc-2 sat in that state for **three and a half hours**
+on 2026-09-11 — `refreshing: true`, the timestamp frozen, and **no fan-out
+process running at all**:
+
+```
+{'age_seconds': 13004, 'checked_at': '2026-09-11T19:12:35Z', 'refreshing': True}
+# ps w — nothing
+```
+
+The claim that says "a refresh is running" was a flag taken before the work
+and released by a guard when it finished. That is correct for a crash and
+wrong for everything else: a task dropped before it starts constructs no
+guard, and a blocking call that never returns never drops one. Either way the
+flag stayed set and every later refresh returned early.
+
+It is a **deadline** now, and a deadline cannot be lost: the claim expires
+whether or not anything is left to release it.
+
+Worth knowing even now it is fixed, because the normal case is slower than it
+looks. A refresh asks four sources and takes between **75 and 230 seconds** on
+this hardware, and the control is disabled for all of it.
+
+*Tracked as SQU-201.*
 
 ### The TLS certificate was an expired fossil
 

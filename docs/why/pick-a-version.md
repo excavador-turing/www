@@ -80,3 +80,25 @@ $ tpi firmware check || echo "there is an upgrade"
 `firmware check` exits **10** when an upgrade exists, so it works from cron
 without parsing output. It is deliberately not `1`, which stays "the command
 failed".
+
+## The listing survives a reboot
+
+Asking four sources what they offer takes between 75 and 230 seconds on this
+board, and it spends GitHub's unauthenticated quota of sixty requests an hour
+four at a time. Until bmcd 2.35.0 that work was thrown away by every reboot,
+so the first person to open the Firmware page after an upgrade — the person
+most likely to be looking — paid for all of it.
+
+The listing is now kept at `/mnt/overlay/firmware-catalog.json`, beside the
+source list and on the overlay for the same reason: both firmware images mount
+it, so it survives an A/B promotion. The board answers from it immediately and
+refreshes behind the answer, and the age it reports is real, read from the
+timestamp inside the file rather than from the file's own modification time.
+
+**It is written only when the offering changes.** That is not tidiness. The
+overlay is NAND, and UBI reports five free eraseblocks of 2040 on this board;
+a listing rewritten every half hour would be thousands of writes a year to a
+flash that is already fully allocated, for bytes that change when somebody
+publishes a release. The stored copy is compared on what the sources offer,
+not on the whole record, because the timestamp moves every time and would make
+every refresh a change.

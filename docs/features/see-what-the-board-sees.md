@@ -30,8 +30,8 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![The Overview: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.](../assets/captures/info.png)
-<figcaption>The Overview: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.</figcaption>
+![The Overview: temperature and the trip that explains the fan's step, beside storage, load, memory and the clock.](../assets/captures/info.png)
+<figcaption>The Overview: temperature and the trip that explains the fan's step, beside storage, load, memory and the clock.</figcaption>
 </figure>
 
 </div>
