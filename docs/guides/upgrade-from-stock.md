@@ -23,8 +23,11 @@ page is the transition itself.
     ![The About tab after the upgrade](../assets/fork/10-about.png)
 
     Seven tabs — a console, a network tab and a settings tab that stock does
-    not have. bmcd 2.34.0, BMC UI 3.23.0, Buildroot 2025.02.17, kernel
-    **6.12.109 LTS**.
+    not have. This capture is firmware v2.20.0: bmcd 2.29.0, BMC UI 3.19.0,
+    Buildroot 2025.02.17, kernel **6.12.109 LTS**. The daemon and the
+    interface have moved on since — the
+    [changelog](../changelog/index.md) is the live answer — but the tabs and
+    the kernel are what this page is about.
 
 The full stock interface, tab by tab, is [its own
 page](../reference/factory-firmware.md), captured before this board was

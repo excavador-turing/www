@@ -140,6 +140,18 @@ jobs:
           rm -rf docs/demo/fleet
           mkdir -p docs/demo/fleet
           cp -a fleet-dist/. docs/demo/fleet/
+          echo "${{ steps.ui.outputs.tag }}" > docs/demo/fleet/VERSION
+          # The same proof the fork pane gets, and it only became
+          # possible when the fleet gained the console tab: the string
+          # lives inside `import.meta.env.VITE_DEMO === "1"`, which Vite
+          # replaces statically, so a build without demo mode
+          # eliminates it. Without this the fleet pane could publish as
+          # a demo while being a bundle that would try to reach real
+          # boards from a public page.
+          if ! grep -rqlF "a recording, not a live stream" docs/demo/fleet/assets; then
+            echo "${{ steps.ui.outputs.tag }} fleet built without its demo mode; refusing to publish it as one" >&2
+            exit 1
+          fi
           # The board list the demo shows. Both cards answer from ONE board's
           # capture, which the demo page says out loud -- inventing a second
           # board's readings would be the first thing on this site that was
@@ -150,7 +162,7 @@ jobs:
               { "id": "bmc-1", "name": "bmc-1 (board A)", "note": "hive-1 … hive-4" },
               { "id": "bmc-2", "name": "bmc-2 (board B)", "note": "hive-5 … hive-8" }
             ],
-            "supportedBmcd": { "min": "2.20.0", "max": "2.30.0" }
+            "supportedBmcd": { "min": "2.20.0", "max": "2.34.0" }
           }
           JSON
           python3 scripts/demo-ribbon.py
