@@ -14,7 +14,7 @@ hide:
 <div class="tp-proof">
 <div><b>13</b><span>rows where this fork differs, each one measured</span></div>
 <div><b>66</b><span>releases across four components</span></div>
-<div><b>5</b><span>faults still open, each with a ticket</span></div>
+<div><b>4</b><span>faults still open, each with a ticket</span></div>
 </div>
 
 ??? note "Why fork it at all"
@@ -57,8 +57,6 @@ hide:
     A fork that lists only its improvements is advertising. These are open, and
     each one has a ticket:
 
-    - **The certificate on the board is an expired fossil.** It has not been
-      reissued.
     - **Anything running locally on the BMC is trusted without a credential.**
       Since v2.14.0 it at least leaves an audit line saying so. The fix is a real
       local credential path, not a mitigation.
