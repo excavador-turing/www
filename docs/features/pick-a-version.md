@@ -1,9 +1,15 @@
+---
+hide:
+  - navigation
+  - toc
+---
+
+<div class="tp-hero-band" markdown>
+<span class="tp-eyebrow">Feature</span>
 # Pick a version, from anywhere
 
-Upstream's board has one firmware source, hard-coded, and it disagrees with
-itself. Its firmware mirror stops at **v2.0.5** while its GitHub releases reach
-**v2.1.0** — the same publisher, two catalogues, and following the documented
-update path would *downgrade* a board running anything newer.
+<p>Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release — so following the documented update path can walk a board backwards. Here the sources are a setting, and every candidate arrives with its checksum and its real ordering.</p>
+</div>
 
 <figure markdown>
 ![Every configured source, side by side: this fork, upstream's two catalogues, and the SD card — with each candidate's checksum state, and an honest error where a source had nothing.](../assets/cards/card-versions.png)
@@ -82,3 +88,9 @@ $ tpi firmware check || echo "there is an upgrade"
 `firmware check` exits **10** when an upgrade exists, so it works from cron
 without parsing output. It is deliberately not `1`, which stays "the command
 failed".
+
+<div class="tp-next">
+<a href="../updates-that-undo-themselves/"><b>And if it is a bad one →</b><span>The gate that boots it on trial and takes it back.</span></a>
+<a href="../../guides/upgrade-from-stock/"><b>Coming from stock →</b><span>The upgrade, measured, and the way back.</span></a>
+<a href="../../reference/comparison/"><b>The two upstreams →</b><span>The evidence for the disagreement, with dates.</span></a>
+</div>

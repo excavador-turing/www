@@ -1,8 +1,15 @@
+---
+hide:
+  - navigation
+  - toc
+---
+
+<div class="tp-hero-band" markdown>
+<span class="tp-eyebrow">Feature</span>
 # A console to every module
 
-Every compute module on a Turing Pi 2 has a serial console, and reaching it
-used to mean a USB adapter and three jumper wires onto the board's header. The
-BMC is already wired to all four. This fork puts them in the browser.
+<p>Every compute module has a serial console, and reaching it used to mean a USB adapter and three jumper wires on the board's header. The BMC is already wired to all four. This fork puts them in the browser, and each one replays what happened before you opened the tab.</p>
+</div>
 
 <figure markdown>
 ![Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.](../assets/fork/07-console.png)
@@ -67,3 +74,9 @@ line does not.
     UBI on a NAND with five free eraseblocks. Sending the lines off the board
     with `syslogd -R` is the answer that scales, and it is
     [one line of configuration](../reference/known-faults.md).
+
+<div class="tp-next">
+<a href="../the-board-describes-itself/"><b>The board describes its own API →</b><span>OpenAPI 3.1, and everything generated from it.</span></a>
+<a href="../../demo/fork/"><b>Open a console now →</b><span>The live demo replays a real recording.</span></a>
+<a href="../../reference/cli/"><b>From a shell instead →</b><span>`tpi` reaches the same consoles.</span></a>
+</div>

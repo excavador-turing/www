@@ -1,83 +1,91 @@
 ---
 hide:
+  - navigation
   - toc
 ---
 
-# About this fork
+<div class="tp-hero-band" markdown>
+<span class="tp-eyebrow">About</span>
+# Upstream stopped. The board did not.
 
-## Why fork it
+<p>Turing Pi's own firmware has not had a release since February 2025, and its two distribution catalogues disagree with each other by a whole version. This is a fork that keeps the board on a supported kernel and fixes the things that made it hard to run.</p>
+</div>
 
-Upstream is dormant. Its firmware mirror stops at **v2.0.5**, while its GitHub
-releases reach **v2.1.0** — the same publisher, two catalogues that disagree.
-Following the documented update path would *downgrade* a board running anything
-newer.
+## Why fork it at all
 
-That mattered because the board had real problems: a firmware update
-power-cycled the compute modules, there was no temperature sensor anywhere, the
-fan ran flat out with nothing to regulate against, and a bad image meant a trip
-to the rack.
+Upstream publishes firmware by two routes that do not agree. The mirror the
+stock interface follows stops at **v2.0.5**; the GitHub releases reach
+**v2.1.0**. Same publisher, two catalogues, and on a board running anything
+newer, following the documented update path walks it *backwards*. Neither
+route publishes a checksum.
+
+That would be survivable if the firmware were finished. It was not. A
+firmware update power-cycled the compute modules. There was no temperature
+sensor anywhere, so the fan ran flat out against nothing. And a bad image
+meant a trip to the rack, because an image was promoted as soon as it
+booted — which proves the kernel started and nothing else.
 
 ## What changed
 
-| | upstream | this fork |
-|---|---|---|
-| Kernel | 6.8, not a longterm release | **6.12.109 LTS** |
-| Buildroot | 2024.05.1 (EOL) | **2025.02.17 LTS** |
-| Bad image recovery | power cut | **health-gated A/B promotion** |
-| Firmware update vs modules | power-cycles them | **rails untouched** |
-| Board temperature | none — no sensor in the device tree | **read, with its trip points** |
-| Fan | fixed persisted speed | **kernel-driven, and it says why** |
-| Metrics | none | **[a documented catalogue](reference/metrics.md)** |
-| Scrape endpoint | — | **its own port, which cannot reach `/api/bmc`** |
-| Published checksums | none | **`SHA256SUMS` per release, verified on download** |
-| Serial console | serial header on the board | **per module, in the browser** |
-| Firmware sources | one, hard-coded | **configurable; GitHub, HTTP, or SD card** |
-| API description | a prose page | **OpenAPI 3.1, served by the board itself** |
-| Command line | upstream's `tpi`, unaware of any of this | **`tpi` reaches every endpoint above** |
+<div class="tp-vs">
+<div class="tp-vs__row"><div class="tp-vs__what">Kernel</div><div class="tp-vs__them">6.8, which is not a longterm release</div><div class="tp-vs__us"><b>6.12 LTS</b>, tracking the stable series</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Buildroot</div><div class="tp-vs__them">2024.05.1, end of life</div><div class="tp-vs__us"><b>2025.02 LTS</b></div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">A bad image</div><div class="tp-vs__them">promoted the moment it boots; recovering means a trip to the rack</div><div class="tp-vs__us"><b>boots on trial</b> and is taken back automatically if the board does not come back right</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Updating the BMC</div><div class="tp-vs__them">power-cycles all four compute modules</div><div class="tp-vs__us"><b>leaves their rails alone</b></div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Board temperature</div><div class="tp-vs__them">unreadable — the sensor exists but the device tree never described it</div><div class="tp-vs__us"><b>read, with its trip points</b>, so the fan can say why it is where it is</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">The fan</div><div class="tp-vs__them">a fixed speed somebody once wrote down</div><div class="tp-vs__us"><b>kernel-governed</b>, and overridable behind an explicit switch</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Metrics</div><div class="tp-vs__them">none</div><div class="tp-vs__us"><b>a documented catalogue</b>, on a listener that holds no credential and reaches nothing else</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Checksums</div><div class="tp-vs__them">none published, on either catalogue</div><div class="tp-vs__us"><b>SHA256SUMS per release</b>, verified on download</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Serial consoles</div><div class="tp-vs__them">a header on the board, and your own USB adapter</div><div class="tp-vs__us"><b>four, in the browser</b>, each replaying the scrollback you missed</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Firmware sources</div><div class="tp-vs__them">one, hard-coded — and its two catalogues disagree</div><div class="tp-vs__us"><b>a setting</b>: GitHub releases, an HTTP directory, or the SD card</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">The API</div><div class="tp-vs__them">described in prose on a web page</div><div class="tp-vs__us"><b>OpenAPI 3.1, served by the board</b>, and everything generated from it</div></div>
+<div class="tp-vs__row"><div class="tp-vs__what">Command line</div><div class="tp-vs__them">upstream's <code>tpi</code>, unaware of all of the above</div><div class="tp-vs__us"><b>reaches every endpoint</b> this fork added</div></div>
+</div>
 
-The [full comparison](reference/comparison.md) carries the evidence for each
-row, including the ones where upstream is ahead.
+Every row above is [backed by a measurement](../reference/comparison/), taken
+on a running board and dated, including the rows where upstream is ahead.
 
-## Start here
+## What is still not fixed
 
-- **[Install](guides/install.md)** — putting this on your own board
-- **[Recover a bad flash](guides/recover-a-bad-flash.md)** — what to do when it goes wrong
-- **[Developing](guides/development.md)** — build it, and iterate without cutting a release
-- **[What is and isn't fixed](reference/known-faults.md)** — the honest list, with tickets
+A fork that lists only its improvements is advertising. These are open, and
+each one has a ticket:
 
-!!! warning "Read the fault list before you rely on this"
-    The certificate on the board is expired. Anything running locally on the
-    BMC is trusted without a credential, though since v2.14.0 it at least
-    leaves an audit line saying so. Nothing shuts the board down if it
-    overheats — there is no `critical` trip. And flashing a module on a v2.5
-    board now refuses rather than guessing, but the port mapping behind that
-    has not been proven against two modules in maskrom.
+- **The certificate on the board is an expired fossil.** It has not been
+  reissued.
+- **Anything running locally on the BMC is trusted without a credential.**
+  Since v2.14.0 it at least leaves an audit line saying so. The fix is a real
+  local credential path, not a mitigation.
+- **Nothing shuts the board down if it overheats.** There is no `critical`
+  trip. A held fan is taken back by the daemon above the hottest active trip,
+  which is a weaker guarantee than a kernel doing it.
+- **Flashing a module on a v2.5 board refuses rather than guessing** when it
+  cannot tell which module it is about to write — but the port mapping behind
+  that has not been proven against two modules in maskrom at once.
 
-    All of them are [written down with their tickets](reference/known-faults.md),
-    along with the mDNS responder that killed this board twice in one day
-    before v2.13.0 fixed it. A fork that lists only its improvements is
-    advertising.
+The [full list](../reference/known-faults/) carries the tickets, and the
+mDNS responder that killed this board twice in one day before v2.13.0 fixed
+it.
 
-## The demo
+## The demo is real data
 
-The [front page's demo](/#demo/fork) is two interfaces answering from data
-captured off a real board. Nothing in it talks to hardware.
+The [live demo](../#demo/fork) is the actual interface, built from the latest
+release, answering from readings captured off a real board.
 
-- **Readings are real.** Temperatures, fan steps, NAND wear, slot versions,
-  uptimes — captured from the board by
+- **The readings are real** — temperatures, fan steps, NAND wear, slot
+  versions, uptimes. Captured by
   [a script](https://github.com/excavador-turing/BMC-UI/blob/hive/scripts/capture-fixtures.sh)
-  that also refuses to publish the board's identity. Addresses, MAC and serial
+  that also refuses to publish the board's identity: addresses, MAC and serial
   are replaced with documentation-range values.
-- **Controls do nothing, and say so.** Power, flash, reboot: each answers with
-  a message that this is a demo. A control that pretends to work is what this
+- **The controls do nothing, and say so.** Power, flash, reboot: each answers
+  that this is a demo. A control that pretends to work is exactly what this
   project keeps removing from the real interface.
-- **The console replays.** It shows a module's recorded scrollback rather than
-  a fake live stream, and the panel says it is a recording.
-- **Stock is stock.** The stock pane is the vendor's own interface, unmodified
-  apart from answering from fixtures — it is GPL-2.0, as is this fork, and its
-  copyright notice is intact.
+- **The console replays a recording** and the panel says it is one.
+- **Stock is stock** — the vendor's own interface, unmodified apart from
+  answering from fixtures. It is GPL-2.0, as is this fork, and its copyright
+  notice is intact.
 
-The fork pane is built at every deploy from the **latest BMC-UI release**,
-not from a copy kept on this site, and names its version on the About tab; a
-release of the interface is what updates it. The stock pane was captured once
-and does not change.
+<div class="tp-next">
+<a href="../features/"><b>What it does →</b><span>Nine features, each with the evidence behind it.</span></a>
+<a href="../guides/install/"><b>Put it on your board →</b><span>Install it, and what to read first.</span></a>
+<a href="../reference/comparison/"><b>The measurements →</b><span>Every claim above, with its date and method.</span></a>
+</div>

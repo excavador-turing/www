@@ -20,10 +20,13 @@ nav:
   - Try it: demo/index.md
   - Features:
       - Overview: features/index.md
+      - Fresh, and fixed: features/fresh-and-fixed.md
+      - Update without touching your nodes: features/update-without-touching-your-nodes.md
       - Updates that undo themselves: features/updates-that-undo-themselves.md
       - See what the board sees: features/see-what-the-board-sees.md
       - Pick a version, from anywhere: features/pick-a-version.md
       - A console to every module: features/a-console-to-every-module.md
+      - The board describes its own API: features/the-board-describes-itself.md
   - Guides:
       - Overview: guides/index.md
       - Install: guides/install.md

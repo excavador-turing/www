@@ -1,8 +1,15 @@
+---
+hide:
+  - navigation
+  - toc
+---
+
+<div class="tp-hero-band" markdown>
+<span class="tp-eyebrow">Feature</span>
 # See what the board sees
 
-The Turing Pi 2 has a temperature sensor. Upstream's device tree never
-described it, so nothing could read it — and the fan, having nothing to
-regulate against, ran at a fixed speed somebody had once written down.
+<p>The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing could read it, and the fan ran at a fixed speed somebody once wrote down. Adding two lines to the device tree made the board explicable.</p>
+</div>
 
 <figure markdown>
 ![The Overview on board B: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.](../assets/fork/02-info.png)
@@ -117,3 +124,9 @@ not be able to power off a node.
     could show *that* it was being consumed and not *by what*, so the
     diagnosis had to be argued from timing. One number closes that gap. See
     [what is and isn't fixed](../reference/known-faults.md).
+
+<div class="tp-next">
+<a href="../a-console-to-every-module/"><b>A console to every module →</b><span>Four serial consoles in the browser, replaying what you missed.</span></a>
+<a href="../../reference/metrics/"><b>The metrics catalogue →</b><span>Every family the board exposes, generated from the daemon.</span></a>
+<a href="../../guides/monitor-it/"><b>Scrape it →</b><span>A scrape config and the dashboard, both published.</span></a>
+</div>
