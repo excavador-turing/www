@@ -114,3 +114,21 @@ not be able to power off a node.
     could show *that* it was being consumed and not *by what*, so the
     diagnosis had to be argued from timing. One number closes that gap. See
     [what is and isn't fixed](../reference/known-faults.md).
+
+## Where the reading lives
+
+On Board Health, beside load and memory, since BMC-UI 3.26.0. Before that it
+was on the Settings tab inside the fan card — a reading filed with a control,
+so someone asking "is this board hot?" opened the tab called Board Health,
+found five other health numbers, and concluded the board could not tell them.
+
+It shows the temperature, the fan's step, and the trip point that explains the
+step, because a step with no reason beside it reads as arbitrary:
+
+```
+Temperature   53.8 °C   fan step 5 of 6   above the 45 °C trip
+```
+
+The slider that commands the fan stays on Settings. The control belongs there.
+The reading does not.
+
