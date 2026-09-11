@@ -107,12 +107,13 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 /* The demo view: one interface at a time, as large as the screen allows.
    Side by side is what made them too small to use. */
 .tp-stage iframe,
-.tp-stage__soon { display: block; width: 100%; height: calc(100vh - var(--tp-header) - var(--tp-bar) - 2.2rem); border: 1px solid var(--tp-line); border-radius: 0.5rem; background: #fff; }
+.tp-stage__soon { display: block; width: 100%; height: calc(100vh - var(--tp-header) - var(--tp-bar) - 0.5rem); border: 1px solid var(--tp-line); border-radius: 0.5rem; background: #fff; }
 .tp-stage__soon { display: flex; align-items: center; justify-content: center; text-align: center; border-style: dashed; padding: 2rem; background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(0,0,0,0.025) 10px 20px); }
 .tp-stage__soon > div { max-width: 40ch; }
 .md-typeset .tp-stage__soon h2 { margin: 0 0 0.4rem; font-size: 1.3rem; color: var(--tp-ink); }
 .md-typeset .tp-stage__soon p { margin: 0; color: var(--tp-muted); font-size: 0.8rem; }
-.md-typeset .tp-stage__note { margin: 0.35rem 0 0; font-size: 0.66rem; line-height: 1.5; color: var(--tp-muted); text-align: center; }
+.md-typeset .tp-bar__note { flex: 1 1 0; min-width: 0; font-size: 0.62rem; line-height: 1.35; color: var(--tp-muted); text-align: center; overflow: hidden; }
+@media (max-width: 1100px) { .md-typeset .tp-bar__note { display: none; } }
 
 /* Short or narrow screens scroll, honestly, with a fixed picture height. */
 @media (max-height: 700px), (max-width: 1100px) {

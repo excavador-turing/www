@@ -8,6 +8,7 @@ hide:
 
 <div class="tp-bar" hidden="hidden">
 <a class="tp-back" href="#overview">← Overview</a>
+<span class="tp-bar__note">Readings are real, captured off a board; controls refuse and say why; the console replays a recording. <a href="about/#the-demo">What is and isn't real</a> · <a href="demo/fork/" target="_blank" rel="noopener">full size</a></span>
 <nav class="tp-seg tp-panes" aria-label="Which interface">
 <a href="#demo/stock" data-pane="stock">Stock firmware</a>
 <a href="#demo/fork" data-pane="fork">This fork</a>
@@ -53,7 +54,6 @@ hide:
 <iframe data-pane="fork" data-src="demo/fork/" title="This fork's interface, demo" hidden="hidden"></iframe>
 <div class="tp-stage__soon" data-pane="fleet" hidden="hidden"><div><h2>turing-fleet</h2><p>One interface over every board. It is the next thing being built, and this space is honest about that rather than showing a mock-up.</p></div></div>
 </div>
-<p class="tp-stage__note">Every reading is the board's own, captured off real hardware. Controls refuse and say why. The console replays a recording. <a href="about/#the-demo">What is and isn't real</a> · <a href="demo/fork/" target="_blank" rel="noopener">open this fork full size</a> · <a href="demo/stock/" target="_blank" rel="noopener">open stock full size</a></p>
 </section>
 
 <script>
