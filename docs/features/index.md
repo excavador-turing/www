@@ -4,7 +4,7 @@ hide:
   - toc
 ---
 
-<div class="tp-hero-band tp-one-screen" markdown>
+<div class="tp-hero-band tp-one-screen tp-hero-band--plates" markdown>
 <span class="tp-eyebrow">Features</span>
 # Fourteen things this board does that it did not before
 
