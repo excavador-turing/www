@@ -1,9 +1,15 @@
+---
+hide:
+  - navigation
+  - toc
+---
+
+<div class="tp-hero-band" markdown>
+<span class="tp-eyebrow">Feature</span>
 # Updates that undo themselves
 
-Upstream's firmware update promotes unconditionally. Reaching the end of the
-boot proves the kernel started and that init got that far — it says nothing
-about whether the machine is usable. Two images this fork built would have
-passed that bar while being broken.
+<p>Upstream promotes a new firmware image the moment it boots. Two images this fork built would have passed that bar while being broken, and one of them cuts all four compute modules off the network. Here a new image is kept only if the board comes back right.</p>
+</div>
 
 <figure markdown>
 ![The Firmware tab on board B, minutes after its first upgrade: the running slot, and the stock image it can fall back to sitting in the previous one.](../assets/fork/06-firmware-upgrade.png)
@@ -91,3 +97,9 @@ watchdog is the fix and is not built yet.
 And it is a question about the first ninety seconds, not a warranty. A board
 that passed cleanly on 2026-09-09 went on to run out of memory four hours
 later; see [what is and isn't fixed](../reference/known-faults.md).
+
+<div class="tp-next">
+<a href="../see-what-the-board-sees/"><b>See what the board sees →</b><span>The sensor upstream never described, and a fan that explains itself.</span></a>
+<a href="../../reference/gate-history/"><b>The gate's record →</b><span>Every decision it has made on this board, read off the board.</span></a>
+<a href="../../guides/recover-a-bad-flash/"><b>When it goes wrong anyway →</b><span>The recovery path, and what is genuinely irreversible.</span></a>
+</div>

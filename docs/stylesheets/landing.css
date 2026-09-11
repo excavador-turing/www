@@ -10,6 +10,11 @@
   --tp-muted: #6b6b6b;
   --tp-line: #e4e4e4;
   --tp-plate: #fafafa;
+  /* One measure for prose and for the headings above it. In px on purpose:
+     ch is relative to the element's own font size, so 68ch on a 1.45rem
+     heading is far wider than 68ch of body text, and the rule under a
+     heading overshot its paragraph by most of the screen. */
+  --tp-measure: 740px;
   --tp-header: 2.4rem;   /* Material's header height */
   --tp-bar: 2.6rem;      /* the Overview / Live demo strip */
 }
@@ -153,3 +158,62 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 .tp-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; }
 @media (max-width: 900px) { .tp-cols { grid-template-columns: 1fr; } }
 .md-typeset .tp-cols h2 { margin-top: 0; }
+
+/* ---- marketing pages: Features, About, and each feature article --------- */
+/* Same family as the front page, different job. A page carrying a
+   .tp-hero-band opts in: full width, a stated opening, and prose set to be
+   read rather than referred to. The documentation keeps Material's chrome --
+   a reference page WANTS a sidebar and a table of contents. These do not. */
+.md-main:has(.tp-hero-band) .md-grid { max-width: 100%; }
+.md-main:has(.tp-hero-band) .md-content__inner { margin: 0 auto; padding: 0 clamp(1rem, 2.5vw, 2.4rem) 2rem; max-width: 1500px; }
+.md-main:has(.tp-hero-band) .md-content__inner::before { display: none; }
+.md-main:has(.tp-hero-band) .md-content__button { display: none; }
+
+.tp-hero-band { padding: clamp(1.6rem, 5vh, 3.2rem) 0 1.2rem; border-bottom: 1px solid var(--tp-line); margin-bottom: 1.8rem; }
+.md-typeset .tp-hero-band h1 { font-size: clamp(1.6rem, 3.4vw, 2.7rem); line-height: 1.06; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); margin: 0 0 0.6rem; max-width: 20ch; text-wrap: balance; }
+.md-typeset .tp-hero-band p { font-size: clamp(0.85rem, 1.05vw, 1rem); line-height: 1.55; max-width: var(--tp-measure); color: var(--tp-muted); margin: 0; }
+.md-typeset .tp-hero-band .tp-eyebrow { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tp-lime-ink); background: var(--tp-lime); padding: 0.25rem 0.6rem; border-radius: 999px; margin-bottom: 0.8rem; }
+[data-md-color-scheme="slate"] .md-typeset .tp-hero-band .tp-eyebrow { color: #2d3a00; }
+
+/* Prose on one of these pages is a column, not a full-width sprawl: about 68
+   characters, which is what a line is readable at. Figures, code and the
+   plate grid are exempt and stay wide -- which is why this selects direct
+   children rather than wrapping the page in a div the markdown would have to
+   nest inside. */
+.md-main:has(.tp-hero-band) .md-content__inner > *:not(figure):not(.highlight):not(pre):not(.tp-hero-band):not(.tp-next):not(.tp-plates):not(.tp-vs):not(.tp-dest) { max-width: var(--tp-measure); }
+.md-main:has(.tp-hero-band) .md-typeset h2 { font-size: 1.45rem; line-height: 1.15; letter-spacing: -0.015em; margin: 2.4rem 0 0.7rem; padding-top: 1.4rem; border-top: 3px solid var(--tp-lime); }
+.md-main:has(.tp-hero-band) .md-typeset h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; }
+.md-main:has(.tp-hero-band) .md-typeset p,
+.md-main:has(.tp-hero-band) .md-typeset li { font-size: 0.86rem; line-height: 1.72; }
+.md-main:has(.tp-hero-band) .md-typeset .tp-hero-band p { line-height: 1.55; }
+.md-main:has(.tp-hero-band) .md-typeset figure { max-width: 1100px; width: min(1100px, 92vw); margin: 1.8rem 0; }
+.md-main:has(.tp-hero-band) .md-typeset figure img { width: 100%; border: 1px solid var(--tp-line); border-radius: 0.5rem; }
+.md-main:has(.tp-hero-band) .md-typeset figcaption { font-size: 0.7rem; color: var(--tp-muted); margin-top: 0.5rem; text-align: left; }
+.md-main:has(.tp-hero-band) .md-typeset .highlight { max-width: 1100px; width: min(1100px, 92vw); }
+.md-main:has(.tp-hero-band) .md-typeset table:not([class]) { font-size: 0.76rem; }
+.md-main:has(.tp-hero-band) .md-typeset table:not([class]) th { background: var(--tp-plate); font-weight: 700; color: var(--tp-ink); }
+.md-main:has(.tp-hero-band) .md-typeset .admonition { font-size: 0.8rem; }
+
+/* Where next: every article ends somewhere on purpose. */
+.tp-next { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 0.8rem; margin: 3rem 0 0; padding-top: 1.6rem; border-top: 1px solid var(--tp-line); }
+.md-typeset .tp-next a { display: block; border: 1px solid var(--tp-line); border-radius: 0.6rem; padding: 0.8rem 0.95rem; color: inherit; transition: transform 120ms ease, box-shadow 120ms ease; }
+.md-typeset .tp-next a:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.md-typeset .tp-next b { display: block; font-size: 0.85rem; color: var(--tp-ink); margin-bottom: 0.15rem; }
+.md-typeset .tp-next span { font-size: 0.72rem; line-height: 1.45; color: var(--tp-muted); }
+
+/* ---- upstream against this fork, made readable -------------------------- */
+/* The same facts the reference table carries, laid out so the eye can take a
+   row in one movement: what is being compared, what upstream does, what this
+   does. A 3-column markdown table made the reader parse a grid instead. */
+.tp-vs { display: grid; gap: 0.5rem; margin: 1.4rem 0 2rem; max-width: 1100px; }
+.tp-vs__row { display: grid; grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem; align-items: start; border: 1px solid var(--tp-line); border-radius: 0.6rem; padding: 0.75rem 0.9rem; }
+.md-typeset .tp-vs__what { font-size: 0.78rem; font-weight: 700; color: var(--tp-ink); }
+.md-typeset .tp-vs__them, .md-typeset .tp-vs__us { font-size: 0.76rem; line-height: 1.5; }
+.md-typeset .tp-vs__them { color: var(--tp-muted); }
+.md-typeset .tp-vs__us { color: var(--tp-ink); }
+.md-typeset .tp-vs__them::before, .md-typeset .tp-vs__us::before { display: block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.2rem; color: var(--tp-muted); }
+.md-typeset .tp-vs__them::before { content: "upstream"; }
+.md-typeset .tp-vs__us::before { content: "this fork"; color: var(--tp-lime-ink); }
+[data-md-color-scheme="slate"] .md-typeset .tp-vs__us::before { color: var(--tp-lime); }
+.tp-vs__row .tp-vs__us { border-left: 3px solid var(--tp-lime); padding-left: 0.7rem; }
+@media (max-width: 800px) { .tp-vs__row { grid-template-columns: 1fr; gap: 0.5rem; } }

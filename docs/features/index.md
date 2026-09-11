@@ -1,104 +1,88 @@
-# Features
+---
+hide:
+  - navigation
+  - toc
+---
 
-Eight things the board does now that it did not before. Each section says
-what changed, why it mattered on a real board, and where the evidence is; the
-longer articles are linked where one exists. The
-[comparison](../reference/comparison.md) carries the same ground row by row,
-including the rows where upstream is ahead.
+<div class="tp-hero-band" markdown>
+<span class="tp-eyebrow">Features</span>
+# Eleven things this board does that it did not before
 
-## A bad image undoes itself
+<p>Every one of them started as something that went wrong on a real board. The short version is on the plates; behind each is the argument, with the measurement that backs it and the date it was taken.</p>
+</div>
 
-Upstream's firmware update promotes a new image unconditionally: reaching the
-end of boot is taken as proof that the board works. Two images this fork built
-would have passed that bar while being broken. One could not link the daemon,
-so the web interface never came up. The other had silently lost the switch
-driver from its kernel, which leaves the BMC perfectly reachable and **all four
-compute modules cut off the network**. Once promoted, either needs a trip to
-the rack.
+<div class="tp-plates grid cards" markdown>
 
-Here a new image boots *tentatively*, and is kept only if the board comes back
-right; otherwise the next boot is the previous image, with nobody's hands on
-it. On this board that has meant 18 updates, 1 automatic rollback, 0 trips.
+-   [![](../assets/icons/undo.svg)](updates-that-undo-themselves.md)
 
-[How the gate decides →](updates-that-undo-themselves.md) ·
-[what it has decided so far](../reference/gate-history.md) ·
-[recovering when it cannot](../guides/recover-a-bad-flash.md)
+    [A bad image undoes itself](updates-that-undo-themselves.md)
 
-## Pick a version, from anywhere
+    Boots on trial and reverts by itself if the board does not come back right. 18 updates, 1 automatic rollback, 0 trips to the rack.
 
-Upstream's board has one firmware source, hard-coded, and it disagrees with
-itself: the mirror stops at v2.0.5 while the GitHub releases reach v2.1.0, so
-following the documented update path can *downgrade* a board. This fork makes
-the sources a setting — GitHub releases, an HTTP directory, or a path on the
-SD card — and lists every candidate with two independent facts: how it
-compares to what is running (numerically, because `"2.10.0" < "2.9.0"` as
-text), and whether its published checksum was verified on download.
+-   [![](../assets/icons/rails.svg)](update-without-touching-your-nodes.md)
 
-[Sources, candidates and checksums →](pick-a-version.md) ·
-[upgrading from the stock firmware](../guides/upgrade-from-stock.md)
+    [Update without touching your nodes](update-without-touching-your-nodes.md)
 
-## See what the board sees
+    Upstream power-cycles all four compute modules to patch the BMC. Measured here on a live cluster: 0 modules cycled, 0 nodes lost.
 
-The Turing Pi 2 has a temperature sensor. Upstream's device tree never
-described it, so nothing could read it, and the fan — with nothing to regulate
-against — ran at a fixed speed somebody once wrote down. This fork adds the
-sensor to the device tree and lets the kernel's `step_wise` thermal governor
-drive the fan across five declared trip points. The interface shows the
-temperature, the trip the board is in, and therefore *why* the fan is where it
-is.
+-   [![](../assets/icons/fresh.svg)](fresh-and-fixed.md)
 
-[The sensor, the governor and the fan →](see-what-the-board-sees.md) ·
-[what is still not covered: no critical trip](../reference/known-faults.md)
+    [Fresh, and fixed](fresh-and-fixed.md)
 
-## A console to every module
+    A longterm kernel and a supported Buildroot, 66 releases, and six named faults taken out — including the one that killed the board twice in a day.
 
-Every compute module has a serial console, and reaching it used to mean a USB
-adapter and three jumper wires on the board's header. The BMC is already wired
-to all four; this fork puts them in the browser, one tab per module. The
-daemon keeps a 16 KiB ring buffer per module, so a console opened at nine
-still shows the panic from three in the morning, and the panel says whether
-what it shows is live.
+-   [![](../assets/icons/console.svg)](a-console-to-every-module.md)
 
-[Four consoles, and what they replay →](a-console-to-every-module.md)
+    [A console to every module](a-console-to-every-module.md)
 
-## Power and USB, per module
+    Four serial consoles in the browser, each replaying the 16 KiB the daemon kept before you opened the tab. No adapter, no header.
 
-Power, reset, USB routing and flashing, per module, from the interface, the
-API and the command line alike — `tpi` reaches every endpoint this fork added,
-which until 1.1.0 were reachable only from the browser. A flash that cannot
-tell which module it is about to write, as on a v2.5 board with two modules in
-maskrom, refuses rather than guesses.
+-   [![](../assets/icons/sensors.svg)](see-what-the-board-sees.md)
 
-[The command line →](../reference/cli.md) ·
-[the node operations](../reference/api/nodes.md)
+    [See what the board sees](see-what-the-board-sees.md)
 
-## Metrics, on their own port
+    The temperature sensor upstream never described, and a fan that can tell you which trip point put it where it is.
 
-Upstream exposes no metrics. This fork serves every family the board can
-measure in Prometheus text format, on a listener of its own that cannot reach
-the control API — so a scraper holds no credential, and a scraper's mistake
-cannot reboot anything. The catalogue on this site is generated from the
-daemon's source, so it cannot describe a metric the daemon does not emit.
+-   [![](../assets/icons/versions.svg)](pick-a-version.md)
 
-[The metrics catalogue →](../reference/metrics.md) ·
-[a scrape config and a dashboard](../guides/monitor-it.md)
+    [Pick a version, from anywhere](pick-a-version.md)
 
-## Network and time
+    This fork, upstream, or the SD card. Every candidate checksum-verified, and compared numerically so 2.10 is not older than 2.9.
 
-Interfaces and switch ports, per module, with link state and speed; an NTP
-source you can set; and whether the clock actually synchronised — the source,
-its stratum and the measured offset, not a checkbox. Upstream's interface shows
-an address and stops.
+-   [![](../assets/icons/describe.svg)](the-board-describes-itself.md)
 
-[Network and time in the API →](../reference/api/network.md)
+    [The board describes its own API](the-board-describes-itself.md)
 
-## Name it, export it
+    OpenAPI 3.1, served by the board. This site's reference and the interface's own types are both generated from it.
 
-The hostname is a control — API, `tpi hostname`, a card on the Settings tab —
-and so is the clock. The board's configuration exports and imports, so a
-second board starts from the first instead of from a checklist. All of it is
-described by an OpenAPI 3.1 document the board serves itself, which is what
-this site's API reference is generated from.
+-   [![](../assets/icons/metrics.svg)](../reference/metrics.md)
 
-[The board in the API →](../reference/api/board.md) ·
-[every operation on one page](../reference/api/index.md)
+    [Metrics, on their own port](../reference/metrics.md)
+
+    Every family the board can measure, on a listener that holds no credential and can reach nothing else.
+
+-   [![](../assets/icons/power.svg)](../reference/cli.md)
+
+    [Power and USB, per module](../reference/cli.md)
+
+    Power, reset, USB routing and flashing, from the browser, the API and the command line alike.
+
+-   [![](../assets/icons/network.svg)](../reference/api/network.md)
+
+    [Network and time](../reference/api/network.md)
+
+    Ports and link state per module, an NTP source you can set, and whether the clock actually synchronised.
+
+-   [![](../assets/icons/name.svg)](../reference/api/board.md)
+
+    [Name it, export it](../reference/api/board.md)
+
+    The hostname and the clock are controls, the configuration exports, and `tpi` reaches every one of them.
+
+</div>
+
+<div class="tp-next">
+<a href="../#demo/fork"><b>See it working →</b><span>Both interfaces, answering from data captured off a real board.</span></a>
+<a href="../about/"><b>Why this fork exists →</b><span>What upstream does, what changed, and what is still not fixed.</span></a>
+<a href="../guides/"><b>Put it on your board →</b><span>Install, upgrade from stock, and what to do when a flash goes wrong.</span></a>
+</div>
