@@ -10,7 +10,7 @@ hide:
 <span class="tp-eyebrow">Feature</span>
 # See what the board sees
 
-<p>The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing could read it, and the fan ran at a fixed speed somebody once wrote down. Adding two lines to the device tree made the board explicable.</p>
+<p>The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing could read it and the fan ran at a fixed speed.</p>
 
 <a class="tp-why" href="../../why/see-what-the-board-sees/">The argument, and the measurements behind it →</a>
 

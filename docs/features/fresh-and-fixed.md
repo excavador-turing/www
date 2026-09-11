@@ -10,7 +10,7 @@ hide:
 <span class="tp-eyebrow">Feature</span>
 # Fresh, and fixed
 
-<p>Upstream's last firmware release was February 2025, on a kernel that was never a longterm series and a Buildroot that has since gone end of life. This fork tracks the supported versions of both, and has spent 66 releases taking out faults that made the board hard to trust.</p>
+<p>Upstream's last release was February 2025, on a kernel that was never a longterm series. This fork tracks the supported versions and has spent 66 releases taking faults out.</p>
 
 <a class="tp-why" href="../../why/fresh-and-fixed/">The argument, and the measurements behind it →</a>
 

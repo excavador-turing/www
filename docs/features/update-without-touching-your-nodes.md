@@ -10,7 +10,7 @@ hide:
 <span class="tp-eyebrow">Feature</span>
 # Update the BMC without touching your nodes
 
-<p>On upstream's firmware, updating the management controller power-cycles all four compute modules. If those modules are a Kubernetes cluster, patching the BMC means an outage. Here the modules' rails are never touched, and the upgrade was measured on a live cluster to prove it.</p>
+<p>Upstream power-cycles all four compute modules to patch the management controller. Here their rails are never touched, measured on a live cluster.</p>
 
 <a class="tp-why" href="../../why/update-without-touching-your-nodes/">The argument, and the measurements behind it →</a>
 

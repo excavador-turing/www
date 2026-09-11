@@ -30,7 +30,7 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![The login page the certificate protects. On stock firmware no browser would accept the certificate in front of it.](../assets/fork/01-login.png)
+![The login page the certificate protects. On stock firmware no browser would accept the certificate in front of it.](../assets/captures/login.png)
 <figcaption>The login page the certificate protects. On stock firmware no browser would accept the certificate in front of it.</figcaption>
 </figure>
 

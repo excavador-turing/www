@@ -10,7 +10,7 @@ hide:
 <span class="tp-eyebrow">Feature</span>
 # Pick a version, from anywhere
 
-<p>Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release — so following the documented update path can walk a board backwards. Here the sources are a setting, and every candidate arrives with its checksum and its real ordering.</p>
+<p>Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release. Here the sources are a setting, and every candidate arrives with its checksum.</p>
 
 <a class="tp-why" href="../../why/pick-a-version/">The argument, and the measurements behind it →</a>
 
