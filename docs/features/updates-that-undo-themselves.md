@@ -105,6 +105,7 @@ that passed cleanly on 2026-09-09 went on to run out of memory four hours
 later; see [what is and isn't fixed](../reference/known-faults.md).
 
 <div class="tp-next">
+<a href="../../#demo/fork"><b>See the Firmware tab →</b><span>The slots, the rollback image, and what the gate last decided.</span></a>
 <a href="../see-what-the-board-sees/"><b>See what the board sees →</b><span>The sensor upstream never described, and a fan that explains itself.</span></a>
 <a href="../../reference/gate-history/"><b>The gate's record →</b><span>Every decision it has made on this board, read off the board.</span></a>
 <a href="../../guides/recover-a-bad-flash/"><b>When it goes wrong anyway →</b><span>The recovery path, and what is genuinely irreversible.</span></a>

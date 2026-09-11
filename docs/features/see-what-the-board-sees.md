@@ -132,6 +132,7 @@ not be able to power off a node.
     [what is and isn't fixed](../reference/known-faults.md).
 
 <div class="tp-next">
+<a href="../../#demo/fork"><b>See the readings →</b><span>Temperatures, the fan step, and the trip it is following.</span></a>
 <a href="../a-console-to-every-module/"><b>A console to every module →</b><span>Four serial consoles in the browser, replaying what you missed.</span></a>
 <a href="../../reference/metrics/"><b>The metrics catalogue →</b><span>Every family the board exposes, generated from the daemon.</span></a>
 <a href="../../guides/monitor-it/"><b>Scrape it →</b><span>A scrape config and the dashboard, both published.</span></a>

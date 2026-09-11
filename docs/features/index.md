@@ -88,7 +88,7 @@ hide:
 </div>
 
 <div class="tp-next">
-<a href="../#demo/fork"><b>See it working →</b><span>Both interfaces, answering from data captured off a real board.</span></a>
+<a href="../#demo/fork"><b>See it working →</b><span>Three interfaces — stock, this fork, and the page over every board — all answering from data captured off real hardware.</span></a>
 <a href="../about/"><b>Why this fork exists →</b><span>What upstream does, what changed, and what is still not fixed.</span></a>
 <a href="../guides/"><b>Put it on your board →</b><span>Install, upgrade from stock, and what to do when a flash goes wrong.</span></a>
 </div>

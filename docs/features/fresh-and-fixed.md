@@ -82,6 +82,7 @@ the releases cannot disagree.
     automatically are the same policy seen from two sides.
 
 <div class="tp-next">
+<a href="../../#demo/stock"><b>Compare with stock →</b><span>The firmware a board ships with, side by side.</span></a>
 <a href="../updates-that-undo-themselves/"><b>And if a release is bad →</b><span>The gate that boots it on trial and takes it back.</span></a>
 <a href="../../changelog/"><b>Every release →</b><span>All 66, per component, from the release notes themselves.</span></a>
 <a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>The honest list, with tickets.</span></a>
