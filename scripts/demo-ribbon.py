@@ -15,14 +15,24 @@ import sys
 from pathlib import Path
 
 RIBBON = (
-    '<a id="tp-demo-ribbon" href="/#demo/{pane}" style="position:fixed;top:0;left:0;right:0;'
-    'z-index:2147483647;display:block;font:600 12px/28px system-ui,-apple-system,sans-serif;'
-    'text-align:center;color:#2d3a00;background:#dcfe8e;text-decoration:none;'
-    'border-bottom:1px solid #b9dc5a">Demo of {what} — every reading is real, every control '
-    'refuses and says why. ← back to turingpi.xyz</a>'
-    '<div id="tp-demo-ribbon-space" style="height:28px"></div>'
-    '<script>if(top!==self){{for(const i of["tp-demo-ribbon","tp-demo-ribbon-space"])'
-    'document.getElementById(i).hidden=true}}</script>'
+    # A block in the normal flow, NOT position:fixed.
+    #
+    # It was fixed, with a 28px spacer below it to push the page down. That
+    # holds on a desktop and breaks on a phone: the sentence wraps to two or
+    # three lines, the ribbon grows to seventy pixels, the spacer stays at
+    # twenty-eight, and the difference covers the top of the interface
+    # underneath -- which on the stock firmware is exactly where its menu
+    # button lives. A banner that hides the navigation of the thing it is
+    # describing is worse than no banner.
+    #
+    # In the flow it occupies precisely its own height at every width, and
+    # there is no second number to keep in agreement with the first.
+    '<a id="tp-demo-ribbon" href="/#demo/{pane}" style="display:block;'
+    'font:600 12px/1.45 system-ui,-apple-system,sans-serif;text-align:center;'
+    'color:#2d3a00;background:#dcfe8e;text-decoration:none;padding:7px 12px;'
+    'border-bottom:1px solid #b9dc5a">Demo of {what} \u2014 every reading is real, '
+    'every control refuses and says why. \u2190 back to turingpi.xyz</a>'
+    '<script>if(top!==self){{document.getElementById("tp-demo-ribbon").hidden=true}}</script>'
 )
 
 WHAT = {
@@ -32,6 +42,16 @@ WHAT = {
 }
 
 
+
+def strip_ribbon(html: str) -> tuple[str, bool]:
+    """Remove a previously inserted ribbon, including the spacer older
+    versions added. Returns the html and whether anything was removed."""
+    before = html
+    html = re.sub(r'<a id="tp-demo-ribbon".*?</a>', "", html, flags=re.S)
+    html = re.sub(r'<div id="tp-demo-ribbon-space".*?</div>', "", html, flags=re.S)
+    html = re.sub(r'<script>if\(top!==self\).*?</script>', "", html, flags=re.S)
+    return html, html != before
+
 def main() -> int:
     for pane in ("fork", "stock", "fleet"):
         path = Path("docs/demo") / pane / "index.html"
@@ -39,9 +59,14 @@ def main() -> int:
             print(f"  {path}: missing, skipped")
             continue
         html = path.read_text()
-        if 'id="tp-demo-ribbon"' in html:
-            print(f"  {path}: already has the ribbon")
-            continue
+        # Replace an existing ribbon rather than skipping the file. Skipping
+        # is what "idempotent" looked like, and it meant a change to the
+        # ribbon could never reach a bundle that already carried one -- the
+        # stock pane is committed WITH its ribbon, so it would have kept the
+        # broken one forever.
+        html, removed = strip_ribbon(html)
+        if removed:
+            print(f"  {path}: replacing the ribbon it already had")
         new, n = re.subn(r"(<body[^>]*>)", lambda m: m.group(1) + RIBBON.format(pane=pane, what=WHAT[pane]), html, count=1)
         if n != 1:
             print(f"  {path}: no <body> tag found", file=sys.stderr)
