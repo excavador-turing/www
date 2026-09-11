@@ -79,6 +79,7 @@ breaking. The readings themselves come from
 page cannot ask for a field the daemon does not have.
 
 <div class="tp-next">
+<a href="../../#demo/fleet"><b>Open the fleet demo →</b><span>Two boards on one page, answering from a real capture.</span></a>
 <a href="../update-without-touching-your-nodes/"><b>Updating them →</b><span>The BMC updates without power-cycling your compute modules.</span></a>
 <a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>The honest list, with tickets.</span></a>
 <a href="../../about/"><b>Why this fork exists →</b><span>What upstream does, and what changed.</span></a>

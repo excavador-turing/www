@@ -70,6 +70,7 @@ claiming an isolation the hardware does not provide.
     anything.
 
 <div class="tp-next">
+<a href="../../#demo/fork"><b>See it in the interface →</b><span>The Firmware tab, on a board that took this upgrade.</span></a>
 <a href="../../guides/upgrade-from-stock/"><b>Do it on your board →</b><span>The upgrade from stock, step by step, and the way back.</span></a>
 <a href="../updates-that-undo-themselves/"><b>If the new image is bad →</b><span>It boots on trial and takes itself back.</span></a>
 <a href="../fresh-and-fixed/"><b>What you are updating to →</b><span>A longterm kernel, and the faults taken out.</span></a>

@@ -73,6 +73,7 @@ board and tell them nothing about what changed.
     have that one click away from a reader who is browsing.
 
 <div class="tp-next">
+<a href="../../#demo/fork"><b>See the interface →</b><span>Built from the types this document generates.</span></a>
 <a href="../../reference/api/"><b>Every operation →</b><span>The generated reference, one page per group.</span></a>
 <a href="../../reference/cli/"><b>The command line →</b><span><code>tpi</code> reaches every endpoint the document describes.</span></a>
 <a href="../pick-a-version/"><b>Pick a version →</b><span>The next feature: sources, candidates and checksums.</span></a>

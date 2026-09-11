@@ -98,6 +98,7 @@ without parsing output. It is deliberately not `1`, which stays "the command
 failed".
 
 <div class="tp-next">
+<a href="../../#demo/fork"><b>See the sources →</b><span>Every candidate, where it came from, and its checksum.</span></a>
 <a href="../updates-that-undo-themselves/"><b>And if it is a bad one →</b><span>The gate that boots it on trial and takes it back.</span></a>
 <a href="../../guides/upgrade-from-stock/"><b>Coming from stock →</b><span>The upgrade, measured, and the way back.</span></a>
 <a href="../../reference/comparison/"><b>The two upstreams →</b><span>The evidence for the disagreement, with dates.</span></a>

@@ -82,6 +82,7 @@ line does not.
     [one line of configuration](../reference/known-faults.md).
 
 <div class="tp-next">
+<a href="../../#demo/fork"><b>Open a console now →</b><span>The demo replays a real recording into a real terminal.</span></a>
 <a href="../the-board-describes-itself/"><b>The board describes its own API →</b><span>OpenAPI 3.1, and everything generated from it.</span></a>
 <a href="../../demo/fork/"><b>Open a console now →</b><span>The live demo replays a real recording.</span></a>
 <a href="../../reference/cli/"><b>From a shell instead →</b><span>`tpi` reaches the same consoles.</span></a>
