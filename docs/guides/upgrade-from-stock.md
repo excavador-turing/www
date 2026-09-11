@@ -23,7 +23,7 @@ page is the transition itself.
     ![The About tab after the upgrade](../assets/fork/10-about.png)
 
     Seven tabs — a console, a network tab and a settings tab that stock does
-    not have. bmcd 2.29.0, BMC UI 3.19.0, Buildroot 2025.02.17, kernel
+    not have. bmcd 2.34.0, BMC UI 3.23.0, Buildroot 2025.02.17, kernel
     **6.12.109 LTS**.
 
 The full stock interface, tab by tab, is [its own
@@ -37,7 +37,7 @@ page](https://github.com/excavador-turing/BMC-Firmware/releases). Verify it
 before it goes near the board:
 
 ```console
-$ sha256sum -c tp2-bmc-firmware-ota-v2.20.0.tpu.sha256
+$ sha256sum -c tp2-bmc-firmware-ota-v2.24.0.tpu.sha256
 ```
 
 Then either route below. **Both stage the image and neither applies it until
@@ -57,9 +57,9 @@ Stock has no `tpi-selfupdate` — that ships with this fork — but it does have
 `tpi firmware`:
 
 ```console
-$ scp tp2-bmc-firmware-ota-v2.20.0.tpu root@BMC:/mnt/sdcard/
-$ ssh root@BMC 'tpi firmware --file /mnt/sdcard/tp2-bmc-firmware-ota-v2.20.0.tpu \
-    --sha256 8380e98dffb1972da9c51ee06c31766a8d7cb8f22be05e1405bc1a629ec0cf17'
+$ scp tp2-bmc-firmware-ota-v2.24.0.tpu root@BMC:/mnt/sdcard/
+$ ssh root@BMC 'tpi firmware --file /mnt/sdcard/tp2-bmc-firmware-ota-v2.24.0.tpu \
+    --sha256 008beb0006b2179e2184043f0a8db86c26638bfacf75d65953f5fdecbdcf9717'
 started transfer of 36.12 MiB..
 Done
 ```

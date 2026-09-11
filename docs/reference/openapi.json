@@ -972,6 +972,55 @@
         ],
         "type": "object"
       },
+      "SdCardEntry": {
+        "description": "One entry in the listing.",
+        "properties": {
+          "directory": {
+            "description": "`true` for a directory, so a client can render a tree without a second\nrequest per row.",
+            "type": "boolean"
+          },
+          "flashable": {
+            "description": "Whether this could be written to a compute module.",
+            "type": "boolean"
+          },
+          "modified": {
+            "description": "Seconds since the epoch, or `None` where the filesystem will not say.",
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "description": "Path relative to the card's root, which is also what a later request\nsends back. Never absolute: the root is the daemon's to decide.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why not, when it is not. Present ONLY alongside `flashable: false`.\n\nA non-candidate is listed rather than hidden: an operator who cannot\nfind the file they just copied will not conclude \"it must be too\nsmall\", they will conclude the page is broken.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "size": {
+            "description": "Bytes. Meaningless for a directory and reported as 0 rather than\nomitted, because an absent field and a zero are the same thing to most\nclients and only one of them is true.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name",
+          "directory",
+          "size",
+          "flashable"
+        ],
+        "type": "object"
+      },
       "Slot": {
         "description": "One firmware slot.",
         "properties": {
@@ -1460,7 +1509,7 @@
       "name": "Apache-2.0"
     },
     "title": "Turing Pi 2 BMC",
-    "version": "2.28.0"
+    "version": "2.34.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -2087,7 +2136,7 @@
             "description": "A refusal, RFC 9457."
           }
         },
-        "summary": "Rename the board; the metrics instance label changes with it"
+        "summary": "Rename the board; its metrics carry no name, so none of them move"
       }
     },
     "/api/bmc/info": {
@@ -2716,6 +2765,41 @@
           }
         },
         "summary": "SD card capacity and use"
+      }
+    },
+    "/api/bmc/sdcard/files": {
+      "get": {
+        "description": "Legacy form: `GET /api/bmc?opt=get&type=sdcard_files` with the same parameters in the query string. That form answers `{\"response\":[{\"result\":…}]}` and puts a refusal's message in `result`; this path answers the bare result and a refusal as `application/problem+json`.",
+        "operationId": "getSdcardFiles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SdCardEntry"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "The result."
+          },
+          "204": {
+            "description": "Done, with nothing to report."
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "A refusal, RFC 9457."
+          }
+        },
+        "summary": "What is on the SD card, and which of it can be flashed to a node"
       }
     },
     "/api/bmc/sdcard/format": {
