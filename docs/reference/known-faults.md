@@ -7,20 +7,6 @@ running board.
 
 ## Open
 
-### The TLS certificate is an expired fossil
-
-`/etc/ssl/certs/bmcd_cert.pem` on the reference board was issued **June 2025**
-and **expired July 2025**. It is RSA, has no subject-alternative name, and
-lives on the overlay, so it survives firmware upgrades — including every one
-this fork has shipped.
-
-A `bmcd` that finds no certificate mints one. A `bmcd` that finds an expired
-one uses it. Every browser warning you see on this interface is that file, and
-clicking through it is not a workaround for anything.
-
-*Tracked as SQU-115. The replacement is issued by a real CA and renewed, not
-minted.*
-
 ### Anything local is trusted
 
 `/api/bmc` skips authentication entirely for requests from `127.0.0.1`. That
@@ -99,6 +85,33 @@ userspace dies stays dead until someone cuts its power.
 *Tracked as SQU-106, and it is the most valuable unbuilt thing on the list.*
 
 ## Fixed, and worth knowing about
+
+### The TLS certificate was an expired fossil
+
+**Fixed in v2.24.0 (SQU-115).** `/etc/ssl/certs/bmcd_cert.pem` on the reference
+board was issued **June 2025** and **expired July 2025**. It was RSA 4096, had
+no subject-alternative name — which no browser has accepted since 2017 — and
+lives on the overlay, so it survived every firmware upgrade this fork had
+shipped up to that point.
+
+Three things were wrong at once, and all three are covered by
+[a certificate that does not rot](../features/a-certificate-that-does-not-rot.md):
+the generation script now issues EC P-384 with real names and **825 days** of
+validity, reissues **30 days** before expiry rather than only when the file is
+missing, and refuses to touch a certificate it did not issue. Fifteen
+assertions cover it in CI.
+
+Measured on both boards on **2026-09-11**, after the fork's own certificates
+were replaced with ones from the estate's internal authority:
+
+```
+subject=CN=bmc-1.haarlem.lan   issuer=CN=hive-internal-ca-p384
+notBefore=Sep 11 10:55:09 2026 GMT   notAfter=Dec 10 10:55:09 2026 GMT
+```
+
+P-384, named, and inside its validity on both. The board also publishes
+`bmcd_tls_certificate_expiry_timestamp_seconds`, so the next expiry is
+something a scrape notices rather than a person.
 
 ### mDNS ate the board
 

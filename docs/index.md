@@ -30,7 +30,7 @@ hide:
 
 <a class="tp-what" href="https://turingpi.com/" rel="noopener">
 <img src="assets/turing-pi-2-hand.jpg" alt="A hand placing a compute module onto a Turing Pi 2 board that already carries three">
-<span class="tp-what__text"><b>What is a Turing Pi?</b> A mini-ITX board that carries four compute modules — Raspberry Pi CM4, Turing RK1 or Nvidia Jetson — with their network switch, power and a small management computer on the board itself. That computer, the BMC, is what this firmware runs on: it powers the modules, flashes them and hands you their consoles. Made by Turing Machines — <span class="tp-what__link">turingpi.com →</span></span>
+<span class="tp-what__text"><b>What is a Turing Pi?</b><span class="tp-what__body"> A mini-ITX board that carries four compute modules — Raspberry Pi CM4, Turing RK1 or Nvidia Jetson — with their network switch, power and a small management computer on the board itself. That computer, the BMC, is what this firmware runs on: it powers the modules, flashes them and hands you their consoles. Made by Turing Machines — </span><span class="tp-what__link">turingpi.com →</span></span>
 </a>
 
 <div class="tp-claims" markdown>

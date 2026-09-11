@@ -4,11 +4,11 @@ hide:
   - toc
 ---
 
-<div class="tp-hero-band" markdown>
+<div class="tp-hero-band tp-one-screen" markdown>
 <span class="tp-eyebrow">Feature</span>
 # A console to every module
 
-<p>Every compute module has a serial console, and reaching it used to mean a USB adapter and three jumper wires on the board's header. The BMC is already wired to all four. This fork puts them in the browser, and each one replays what happened before you opened the tab.</p>
+<p>Reaching a compute module's serial console used to mean a USB adapter and three jumper wires on the board's header. The BMC is already wired to all four. This fork puts them in the browser, with scrollback.</p>
 </div>
 
 <div class="tp-proof">
@@ -17,69 +17,71 @@ hide:
 <div><b>0</b><span>USB adapters and jumper wires</span></div>
 </div>
 
-<figure markdown>
-![Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.](../assets/fork/07-console.png)
-<figcaption>Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.</figcaption>
-</figure>
+??? note "The argument, and the measurements behind it"
 
-Four tabs, one per module. No adapter, no header, nothing on the desk.
+    <figure markdown>
+    ![Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.](../assets/fork/07-console.png)
+    <figcaption>Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.</figcaption>
+    </figure>
 
-## It shows you what happened before you opened it
+    Four tabs, one per module. No adapter, no header, nothing on the desk.
 
-A console that starts blank is almost useless for the thing consoles are for.
-A module panics at three in the morning; you open the tab at nine and the
-terminal is empty, because a WebSocket only carries what arrives after you
-join.
+    ## It shows you what happened before you opened it
 
-The daemon keeps a **16 KiB ring buffer per module**, and has all along. The
-console now asks for it on open and writes it into the terminal before
-attaching to the live stream, so the tab opens on the last few pages of that
-module's output rather than on nothing.
+    A console that starts blank is almost useless for the thing consoles are for.
+    A module panics at three in the morning; you open the tab at nine and the
+    terminal is empty, because a WebSocket only carries what arrives after you
+    join.
 
-From a shell the same buffer is one request:
+    The daemon keeps a **16 KiB ring buffer per module**, and has all along. The
+    console now asks for it on open and writes it into the terminal before
+    attaching to the live stream, so the tab opens on the last few pages of that
+    module's output rather than on nothing.
 
-```console
-$ tpi uart -n 2 get
-```
+    From a shell the same buffer is one request:
 
-## Two ways to type, and they are not the same
+    ```console
+    $ tpi uart -n 2 get
+    ```
 
-This is the distinction worth knowing, because picking the wrong one produces
-a console that appears broken.
+    ## Two ways to type, and they are not the same
 
-**The terminal** sends what you type, exactly as typed. Ctrl-C, tab
-completion and the arrow keys all reach the module. Click into it and it
-behaves like a terminal, because that is what it is.
+    This is the distinction worth knowing, because picking the wrong one produces
+    a console that appears broken.
 
-**The REST writer** — `tpi uart -n 2 set --cmd "…"`, or the same endpoint from
-a script — always appends CRLF. That makes it a fine way to send a command
-from a shell script and a bad way to answer a boot prompt: it cannot send a
-bare control character, so there is no Ctrl-C and no tab completion through it.
+    **The terminal** sends what you type, exactly as typed. Ctrl-C, tab
+    completion and the arrow keys all reach the module. Click into it and it
+    behaves like a terminal, because that is what it is.
 
-One is for a person at a prompt. The other is for a script sending whole
-lines. Neither is a worse version of the other.
+    **The REST writer** — `tpi uart -n 2 set --cmd "…"`, or the same endpoint from
+    a script — always appends CRLF. That makes it a fine way to send a command
+    from a shell script and a bad way to answer a boot prompt: it cannot send a
+    bare control character, so there is no Ctrl-C and no tab completion through it.
 
-## "Reader: running" is about the BMC, not the module
+    One is for a person at a prompt. The other is for a script sending whole
+    lines. Neither is a worse version of the other.
 
-The console reports the state of the daemon's own UART reader. It is easy to
-read that as a statement about the module, and it is not one.
+    ## "Reader: running" is about the BMC, not the module
 
-A module that is powered off, a module that booted and has gone quiet, and a
-module part-way through boot all leave the reader in exactly the same state.
-The reader is running; nothing is arriving. If you want to know whether the
-module is alive, the node's power state and its switch port say so, and this
-line does not.
+    The console reports the state of the daemon's own UART reader. It is easy to
+    read that as a statement about the module, and it is not one.
 
-!!! note "Why the buffer is 16 KiB and not larger"
-    It lives in the BMC's RAM, and the BMC has 116 MB of it with no swap. Four
-    modules at 16 KiB is 64 KiB, which is free; four at a megabyte is a
-    meaningful fraction of a board that has already died twice this year from
-    running out of memory.
+    A module that is powered off, a module that booted and has gone quiet, and a
+    module part-way through boot all leave the reader in exactly the same state.
+    The reader is running; nothing is arriving. If you want to know whether the
+    module is alive, the node's power state and its switch port say so, and this
+    line does not.
 
-    Keeping a longer history means writing it somewhere, and the overlay is
-    UBI on a NAND with five free eraseblocks. Sending the lines off the board
-    with `syslogd -R` is the answer that scales, and it is
-    [one line of configuration](../reference/known-faults.md).
+    !!! note "Why the buffer is 16 KiB and not larger"
+        It lives in the BMC's RAM, and the BMC has 116 MB of it with no swap. Four
+        modules at 16 KiB is 64 KiB, which is free; four at a megabyte is a
+        meaningful fraction of a board that has already died twice this year from
+        running out of memory.
+
+        Keeping a longer history means writing it somewhere, and the overlay is
+        UBI on a NAND with five free eraseblocks. Sending the lines off the board
+        with `syslogd -R` is the answer that scales, and it is
+        [one line of configuration](../reference/known-faults.md).
 
 <div class="tp-next">
 <a href="../../#demo/fork"><b>Open a console now →</b><span>The demo replays a real recording into a real terminal.</span></a>

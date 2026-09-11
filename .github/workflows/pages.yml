@@ -182,6 +182,14 @@ jobs:
         if: steps.ui.outputs.skip != 'true'
         run: .venv/bin/mkdocs build --strict
 
+      # Those pages promise they fit one screen. That is a layout
+      # property, so it is measured in a browser: five viewports, the
+      # shortest of them a 375x667 phone, which is the one that fails first.
+      # Chrome is preinstalled on the runner image.
+      - name: every one-screen page fits one screen
+        if: steps.ui.outputs.skip != 'true'
+        run: .venv/bin/python scripts/one-screen.py
+
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         if: steps.ui.outputs.skip != 'true'
         with:

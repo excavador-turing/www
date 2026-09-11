@@ -50,7 +50,15 @@ serve:
 # --strict fails on a broken internal link. This site points at repositories
 # that move; the link check is the only thing that notices when one of them
 # moves out from under a page.
-check: build
+check: build one-screen
+
+# Prove every page that promises one screen still fits on one.
+#
+# The promise those pages make is that you can see the claim, the numbers and
+# where to go next without scrolling. One added paragraph breaks it silently,
+# so it is measured in a browser rather than reviewed by eye.
+one-screen: build
+    ./scripts/one-screen.py
 
 clean:
     rm -rf site

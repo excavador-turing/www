@@ -4,14 +4,14 @@ hide:
   - toc
 ---
 
-<div class="tp-hero-band" markdown>
+<div class="tp-hero-band tp-one-screen" markdown>
 <span class="tp-eyebrow">Features</span>
 # Fourteen things this board does that it did not before
 
-<p>Every one of them started as something that went wrong on a real board. The short version is on the plates; behind each is the argument, with the measurement that backs it and the date it was taken.</p>
+<p>Every one of them started as something that went wrong on a real board. Behind each plate is the argument, with the measurement that backs it.</p>
 </div>
 
-<div class="tp-plates grid cards" markdown>
+<div class="tp-plates tp-plates--compact grid cards" markdown>
 
 -   [![](../assets/icons/undo.svg)](updates-that-undo-themselves.md)
 
