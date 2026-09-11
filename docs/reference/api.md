@@ -75,7 +75,7 @@ leaves an audit line saying so.
 serves nothing else — so nothing that scrapes it can reach this API.
 
 !!! note "Which version this is"
-    Rendered from **bmcd 2.28.0**, fetched from that release rather than
+    Rendered from **bmcd 2.34.0**, fetched from that release rather than
     written here. Refresh it with `just refresh-api v2.28.0` in the `www`
     repository; the diff is then the API change, which is the point of
     committing it rather than fetching at build time.

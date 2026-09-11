@@ -5,11 +5,11 @@ Every count on this site comes from here, and this page comes from the board.
 ## What the board reports
 
 `bmcd_firmware_promotion_total{result}` is read from the health gate's own log
-at scrape time. As of **2026-09-09**:
+at scrape time. As of **2026-09-11**:
 
 | result | count |
 |---|---|
-| promoted | 18 |
+| promoted | 24 |
 | rolled back | 1 |
 
 The one rollback was deliberate: a `v2.8.1-rc1` image with its staged note
@@ -36,7 +36,7 @@ If you are running this firmware, your own board answers the same question:
 
 ```console
 $ curl -s http://<board>:9110/metrics | grep promotion_total
-bmcd_firmware_promotion_total{result="promoted"} 18
+bmcd_firmware_promotion_total{result="promoted"} 24
 bmcd_firmware_promotion_total{result="rolled_back"} 1
 ```
 
