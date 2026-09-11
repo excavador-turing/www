@@ -51,11 +51,23 @@ scrape_configs:
           instance: <the board's hostname>
 ```
 
-!!! warning "The instance label follows the hostname"
-    Renaming the board changes the `instance` label on every series, so a
-    history does not follow it across the rename — and renaming back does not
-    rejoin them. Both `tpi hostname` and the Settings tab say so before they
-    do it.
+!!! note "The `instance` label is yours, not the board's"
+    The board's exposition carries **no** `instance` label and no hostname —
+    190 lines, and its own name appears in none of them. The labels it emits
+    are `device`, `kind`, `name`, `node`, `port`, `result`, `sensor`, `slot`,
+    `state`, `version` and `volume`.
+
+    So `instance` is whatever your scraper assigns, and the example above
+    assigns it deliberately. **Renaming a board moves no history**; editing
+    that label moves all of it. Both boards here were renamed on 2026-09-11
+    and not one series moved.
+
+    This page said the opposite until then, as did `tpi hostname` and the
+    API's own description of the endpoint (SQU-191). The claim was written
+    from a worry rather than from the exposition, and a confident wrong
+    warning is worse than none: it makes a safe rename look dangerous, and
+    implies that leaving the name alone protects a history that the scrape
+    config alone decides.
 
 ## The families
 
