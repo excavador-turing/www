@@ -604,3 +604,77 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
   .md-main:has(.tp-one-screen) .md-typeset .tp-next b { line-height: 1.2; }
   .md-main:has(.tp-one-screen) .md-typeset .tp-next span { -webkit-line-clamp: 1; line-height: 1.35; }
 }
+
+/* ---- the features index has no headline ------------------------------- */
+/* Owner's call, 2026-09-11, looking at the published page: an index is a
+   menu, and "Fourteen things this board does that it did not before" was
+   250px of prose in front of the fourteen things themselves. The chip says
+   FEATURES; the plates say the rest.
+   The heading and its sentence stay in the MARKUP and leave only the screen:
+   the page still has one h1 for assistive technology, the site search still
+   indexes both, and the browser tab still has a name. `clip-path` rather
+   than `display: none`, which would take them out of all three. */
+.tp-hero-band--plates h1,
+.tp-hero-band--plates p {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.tp-hero-band--plates { padding-bottom: 0.6rem; margin-bottom: 1rem; }
+
+/* The room that buys back: a phone gets the one-line summaries and the three
+   destinations that the headline had crowded out. */
+@media (max-width: 560px) {
+  .md-main:has(.tp-hero-band--plates) .md-typeset .tp-plates--compact.grid.cards > ul > li { grid-template-rows: auto auto; }
+  .md-main:has(.tp-hero-band--plates) .md-typeset .tp-plates--compact.grid.cards > ul > li > p:first-child { grid-area: 1 / 1 / 3 / 2; }
+  .md-main:has(.tp-hero-band--plates) .md-typeset .tp-plates--compact.grid.cards > ul > li > p:last-child { display: -webkit-box; font-size: 0.56rem; line-height: 1.25; }
+  .md-main:has(.tp-hero-band--plates) .tp-next { display: grid; }
+}
+
+/* ---- a feature page is a picture and some text ------------------------- */
+/* Owner's call, 2026-09-11, looking at the published pages: a feature page
+   had a column of text against an empty right half, and behind its one door
+   was a documentation page complete with headings. So the argument moved to
+   docs/why/, where documentation belongs and where it keeps its table of
+   contents, and the feature page became what it should have been -- the
+   claim, its numbers, ONE picture of the thing working, and where to go next.
+   The picture is the right half. That is what the free space was for. */
+.md-main:has(.tp-feature) .md-grid { max-width: 100%; }
+.md-main:has(.tp-feature) .md-content__inner { margin: 0 auto; padding: clamp(0.8rem, 3vh, 2rem) clamp(1rem, 2.5vw, 2.4rem) 1rem; max-width: 1600px; }
+.md-main:has(.tp-feature) .md-content__inner::before { display: none; }
+.md-main:has(.tp-feature) .md-content__button,
+.md-main:has(.tp-feature) .md-source-file { display: none; }
+
+.tp-feature { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: clamp(1.2rem, 3vw, 3rem); align-items: center; }
+.tp-feature__say { min-width: 0; }
+.md-typeset .tp-feature__say h1 { font-size: clamp(1.5rem, 2.9vw, 2.5rem); line-height: 1.06; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); margin: 0 0 0.5rem; text-wrap: balance; }
+.md-typeset .tp-feature__say > p { font-size: clamp(0.82rem, 1vw, 0.95rem); line-height: 1.55; color: var(--tp-muted); margin: 0 0 0.7rem; }
+.md-typeset .tp-feature__say .tp-eyebrow { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tp-lime-ink); background: var(--tp-lime); padding: 0.25rem 0.6rem; border-radius: 999px; margin-bottom: 0.7rem; }
+[data-md-color-scheme="slate"] .md-typeset .tp-feature__say .tp-eyebrow { color: #2d3a00; }
+
+/* The one link off this page that is not a destination card: the argument,
+   which used to be the rest of the page. */
+.md-typeset a.tp-why { display: inline-block; font-size: 0.76rem; font-weight: 600; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); padding-bottom: 0.1rem; margin-bottom: 1rem; }
+.md-typeset a.tp-why:hover { border-bottom-color: var(--tp-ink); }
+
+.md-typeset .tp-feature .tp-proof { margin: 0 0 1rem; max-width: none; }
+.md-typeset .tp-feature .tp-next { margin: 0; padding-top: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* The picture carries the page, so it gets the height the viewport can spare
+   and never more -- a screenshot that pushes the numbers off the bottom has
+   stopped being evidence and become decoration. */
+.md-typeset figure.tp-feature__show { margin: 0; max-width: none; width: 100%; }
+.md-typeset figure.tp-feature__show img { width: 100%; max-height: calc(100vh - 14rem); object-fit: contain; object-position: top; border: 1px solid var(--tp-line); border-radius: 0.6rem; background: var(--tp-plate); }
+.md-typeset figure.tp-feature__show figcaption { font-size: 0.68rem; line-height: 1.4; color: var(--tp-muted); margin-top: 0.5rem; text-align: left; }
+
+/* One column below a laptop, and the picture goes second: the claim is what
+   a reader needs first on a phone, and the screenshot is unreadable at 390px
+   anyway until they tap it. */
+@media (max-width: 1000px) {
+  .tp-feature { grid-template-columns: 1fr; gap: 1rem; }
+  .md-typeset figure.tp-feature__show img { max-height: 32vh; }
+}
+@media (max-width: 600px) {
+  .md-typeset .tp-feature .tp-next { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md-typeset figure.tp-feature__show img { max-height: 24vh; }
+  .md-typeset figure.tp-feature__show figcaption { display: none; }
+}

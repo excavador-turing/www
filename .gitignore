@@ -1,6 +1,6 @@
 .venv/
 .devbox/
-site/
+/site/
 __pycache__/
 
 # The fork demo pane is built at deploy from the latest BMC-UI release

@@ -29,6 +29,16 @@ nav:
       - A console to every module: features/a-console-to-every-module.md
       - A certificate that does not rot: features/a-certificate-that-does-not-rot.md
       - The board describes its own API: features/the-board-describes-itself.md
+      - The arguments:
+          - One page over every board: why/one-page-over-every-board.md
+          - Fresh, and fixed: why/fresh-and-fixed.md
+          - Update without touching your nodes: why/update-without-touching-your-nodes.md
+          - Updates that undo themselves: why/updates-that-undo-themselves.md
+          - See what the board sees: why/see-what-the-board-sees.md
+          - Pick a version, from anywhere: why/pick-a-version.md
+          - A console to every module: why/a-console-to-every-module.md
+          - A certificate that does not rot: why/a-certificate-that-does-not-rot.md
+          - The board describes its own API: why/the-board-describes-itself.md
   - Guides:
       - Overview: guides/index.md
       - Install: guides/install.md
