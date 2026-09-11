@@ -6,7 +6,7 @@ hide:
 
 <div class="tp-hero-band" markdown>
 <span class="tp-eyebrow">Features</span>
-# Twelve things this board does that it did not before
+# Thirteen things this board does that it did not before
 
 <p>Every one of them started as something that went wrong on a real board. The short version is on the plates; behind each is the argument, with the measurement that backs it and the date it was taken.</p>
 </div>
@@ -23,7 +23,7 @@ hide:
 
     [One page over every board](one-page-over-every-board.md)
 
-    A board that can reflash four computers should not face the internet. One page in the cluster reaches them all, and holds no credential of its own.
+    A board that can reflash four computers should not face the internet. One page in the cluster drives them all, with every control the board has, and holds no credential of its own.
 
 -   [![](../assets/icons/rails.svg)](update-without-touching-your-nodes.md)
 
@@ -60,6 +60,12 @@ hide:
     [The board describes its own API](the-board-describes-itself.md)
 
     OpenAPI 3.1, served by the board. This site's reference and the interface's own types are both generated from it.
+
+-   [![](../assets/icons/certificate.svg)](a-certificate-that-does-not-rot.md)
+
+    [A certificate that does not rot](a-certificate-that-does-not-rot.md)
+
+    Stock ships one no browser can accept, valid thirty days, never replaced. This one is named, renews itself, and refuses to overwrite yours.
 
 -   [![](../assets/icons/metrics.svg)](../reference/metrics.md)
 

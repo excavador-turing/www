@@ -27,6 +27,7 @@ nav:
       - See what the board sees: features/see-what-the-board-sees.md
       - Pick a version, from anywhere: features/pick-a-version.md
       - A console to every module: features/a-console-to-every-module.md
+      - A certificate that does not rot: features/a-certificate-that-does-not-rot.md
       - The board describes its own API: features/the-board-describes-itself.md
   - Guides:
       - Overview: guides/index.md

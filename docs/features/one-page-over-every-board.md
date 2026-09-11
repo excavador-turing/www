@@ -8,14 +8,36 @@ hide:
 <span class="tp-eyebrow">Feature</span>
 # One page over every board
 
-<p>A board's own interface can power off and reflash every compute module in it, which makes it the last thing you want facing the internet. So the boards do not face it. One page in the cluster reaches all of them, and it is the only thing exposed.</p>
+<p>A board's own interface can power off and reflash every compute module in it, which makes it the last thing you want facing the internet. So the boards do not face it. One page in the cluster reaches all of them — with every control the board's own interface has — and it is the only thing exposed.</p>
 </div>
 
 <div class="tp-proof">
 <div><b>1</b><span>hostname for the whole estate</span></div>
+<div><b>9</b><span>tabs per board, the same ones the board serves</span></div>
 <div><b>0</b><span>credentials held by the page</span></div>
 <div><b>0</b><span>boards on the public network</span></div>
 </div>
+
+## Everything the board's own interface can do
+
+Not a status page. Power a module on or off, reset it, rename it, route the
+USB bus, open its serial console, write an OS image to it, upgrade the board's
+firmware, set its time servers, hold its fan, back up and restore its
+configuration — for any board, without leaving this page and without that
+board's password.
+
+These are not reimplementations. They are **the same components** the board
+serves itself, rendered against that board's API. A control that exists once
+cannot drift into a worse second copy, and a fix to one is a fix to both.
+
+The overview is still the first thing you see, because "is anything wrong
+across eight modules" is the question you usually arrive with. Picking a board
+gives you that board's whole interface.
+
+Two boards can be worked on at once. Each gets its own cache, its own request
+path and its own progress state, so a firmware upload to one does not show up
+as the other one's progress bar — which is what happens when that state is
+shared, and it is not obvious until the day you need both.
 
 ## What exposing a board would have cost
 
@@ -80,7 +102,7 @@ page cannot ask for a field the daemon does not have.
 
 <div class="tp-next">
 <a href="../../#demo/fleet"><b>Open the fleet demo →</b><span>Two boards on one page, answering from a real capture.</span></a>
-<a href="../update-without-touching-your-nodes/"><b>Updating them →</b><span>The BMC updates without power-cycling your compute modules.</span></a>
+<a href="../a-certificate-that-does-not-rot/"><b>The certificate on that connection →</b><span>What the board checks before it believes who you are.</span></a>
 <a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>The honest list, with tickets.</span></a>
 <a href="../../about/"><b>Why this fork exists →</b><span>What upstream does, and what changed.</span></a>
 </div>
