@@ -671,12 +671,13 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    and never more -- a screenshot that pushes the numbers off the bottom has
    stopped being evidence and become decoration. */
 .md-typeset figure.tp-feature__show { margin: 0; max-width: none; width: 100%; }
-/* `cover`, not `contain`. These are full-page captures: contained in a
-   column they scale to something nobody can read, which is a picture of a
-   screenshot rather than a screenshot. Cropped from the top they arrive at
-   the scale they were taken, and the top of each one is the part the caption
-   is about. */
-.md-typeset figure.tp-feature__show img { display: block; width: 100%; height: clamp(300px, 56svh, 620px); object-fit: cover; object-position: top center; border: 1px solid var(--tp-line); border-radius: 0.6rem; background: var(--tp-plate); }
+/* `contain`, and the captures are taken at the slot's own shape.
+   `cover` cropped them -- both axes, so the right-hand edge of the interface
+   went missing as well as the bottom -- and `contain` on a full-page capture
+   scaled it to something nobody could read. Neither is a fix: the fix is to
+   take the picture at 1120x800, which is 1.4:1, which is this slot. Then it
+   arrives whole, at the size it was taken, and nothing is cropped at all. */
+.md-typeset figure.tp-feature__show img { display: block; width: 100%; aspect-ratio: 1.4; height: auto; max-height: clamp(300px, 56svh, 620px); object-fit: contain; border: 1px solid var(--tp-line); border-radius: 0.6rem; background: var(--tp-plate); }
 .md-typeset figure.tp-feature__show figcaption { font-size: 0.68rem; line-height: 1.4; color: var(--tp-muted); margin-top: 0.5rem; text-align: left; }
 
 /* One column below a laptop, and the picture goes second: the claim is what
@@ -684,11 +685,11 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    anyway until they tap it. */
 @media (max-width: 1000px) {
   .tp-feature { grid-template-columns: 1fr; gap: 1rem; }
-  .md-typeset figure.tp-feature__show img { height: 30svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 30svh; }
 }
 @media (max-width: 600px) {
   .md-typeset .tp-feature .tp-next { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .md-typeset figure.tp-feature__show img { height: 19svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 19svh; }
   .md-typeset figure.tp-feature__show figcaption { display: none; }
 }
 
@@ -704,7 +705,7 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
   .tp-feature { gap: 0.7rem; }
 }
 @media (max-width: 600px) and (max-height: 780px) {
-  .md-typeset figure.tp-feature__show img { height: 15svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 15svh; }
   .md-typeset .tp-feature__say h1 { font-size: 1.1rem; }
   .md-typeset .tp-feature__say > p { font-size: 0.68rem; }
 }
@@ -713,13 +714,13 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    at 1366x768 the picture alone was 430px of a 768px window, and on a tablet
    the two halves stack so the picture is paid in full on top of the text. */
 @media (min-width: 601px) and (max-height: 830px) {
-  .md-typeset figure.tp-feature__show img { height: clamp(260px, 46svh, 420px); }
+  .md-typeset figure.tp-feature__show img { max-height: clamp(260px, 46svh, 420px); }
   .md-typeset .tp-feature__say h1 { font-size: clamp(1.4rem, 2.4vw, 2rem); }
   .md-typeset .tp-feature__say > p { font-size: 0.8rem; line-height: 1.5; }
   .md-typeset a.tp-why { margin-bottom: 0.7rem; }
 }
 @media (min-width: 601px) and (max-width: 1000px) {
-  .md-typeset figure.tp-feature__show img { height: 22svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 22svh; }
   .md-typeset .tp-feature__say h1 { font-size: 1.5rem; }
   .md-typeset .tp-feature__say > p { font-size: 0.78rem; line-height: 1.5; }
   .md-typeset .tp-feature .tp-next { padding-top: 0.7rem; }
@@ -734,14 +735,14 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
   .md-typeset .tp-feature .tp-proof { margin-bottom: 0.7rem; }
 }
 @media (min-width: 601px) and (max-width: 1000px) {
-  .md-typeset figure.tp-feature__show img { height: 19svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 19svh; }
 }
 @media (max-width: 600px) {
-  .md-typeset figure.tp-feature__show img { height: 16svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 16svh; }
   .md-typeset .tp-feature__say .tp-eyebrow { margin-bottom: 0.3rem; }
 }
 @media (max-width: 600px) and (max-height: 780px) {
-  .md-typeset figure.tp-feature__show img { height: 13svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 13svh; }
   .md-typeset .tp-feature .tp-next a { padding: 0.3rem 0.45rem; }
   .md-typeset .tp-feature .tp-next b { font-size: 0.68rem; }
   .md-typeset a.tp-why { font-size: 0.64rem; margin-bottom: 0.4rem; }
@@ -752,7 +753,7 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    that this is an interface and not a slide, and tapping it opens the page it
    came from. */
 @media (max-width: 600px) and (max-height: 700px) {
-  .md-typeset figure.tp-feature__show img { height: 11svh; }
+  .md-typeset figure.tp-feature__show img { max-height: 11svh; }
   .md-typeset .tp-feature .tp-proof span { font-size: 0.55rem; line-height: 1.2; }
   .md-typeset .tp-feature__say > p { font-size: 0.64rem; line-height: 1.4; margin-bottom: 0.4rem; }
   .tp-feature { gap: 0.5rem; }

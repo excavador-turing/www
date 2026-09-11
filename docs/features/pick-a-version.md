@@ -30,8 +30,8 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![Every configured source side by side — this fork, upstream's two catalogues, and the SD card — with each candidate's checksum state.](../assets/cards/card-versions.png)
-<figcaption>Every configured source side by side — this fork, upstream's two catalogues, and the SD card — with each candidate's checksum state.</figcaption>
+![Where this board looks for firmware: this fork, upstream's two catalogues and the SD card, with the checksum each publisher does or does not ship.](../assets/captures/sources.png)
+<figcaption>Where this board looks for firmware: this fork, upstream's two catalogues and the SD card, with the checksum each publisher does or does not ship.</figcaption>
 </figure>
 
 </div>

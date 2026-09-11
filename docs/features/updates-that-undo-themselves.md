@@ -30,8 +30,8 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![The Firmware tab on board B, minutes after its first upgrade: the running slot, and the image it can fall back to in the previous one.](../assets/fork/06-firmware-upgrade.png)
-<figcaption>The Firmware tab on board B, minutes after its first upgrade: the running slot, and the image it can fall back to in the previous one.</figcaption>
+![The Firmware tab: the running slot, the image it can fall back to, and when the gate last promoted one.](../assets/captures/firmware.png)
+<figcaption>The Firmware tab: the running slot, the image it can fall back to, and when the gate last promoted one.</figcaption>
 </figure>
 
 </div>

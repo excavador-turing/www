@@ -30,7 +30,7 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![This site's API reference, emitted from the document the board serves. Nothing on this page was written by hand.](../assets/captures/api-reference.png)
+![This site's API reference, emitted from the document the board serves. Nothing on this page was written by hand.](../assets/captures/api.png)
 <figcaption>This site's API reference, emitted from the document the board serves. Nothing on this page was written by hand.</figcaption>
 </figure>
 

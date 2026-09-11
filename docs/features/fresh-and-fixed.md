@@ -30,7 +30,7 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![What the board says it is running: kernel, daemon, interface and firmware, each a version you can check against a release.](../assets/fork/10-about.png)
+![What the board says it is running: kernel, daemon, interface and firmware, each a version you can check against a release.](../assets/captures/about.png)
 <figcaption>What the board says it is running: kernel, daemon, interface and firmware, each a version you can check against a release.</figcaption>
 </figure>
 
