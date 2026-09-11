@@ -55,6 +55,15 @@ check: build
 clean:
     rm -rf site
 
+# Which bmcd release gained which API operation.
+#
+# NOT `mike`. SQU-152 asked for versioning "the Reference section only", and
+# mike cannot do that -- it publishes whole-site versions and would version
+# Features and Guides too, which the same ticket refuses. The reader's real
+# question is narrower and one table answers it.
+refresh-api-history *ARGS:
+    ./scripts/api-history.py {{ARGS}}
+
 # Rebuild the changelog pages from the GitHub release notes.
 # `just refresh-changelog` for all four, or name one: `just refresh-changelog bmcd`.
 #
