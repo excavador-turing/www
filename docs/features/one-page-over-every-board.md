@@ -4,101 +4,102 @@ hide:
   - toc
 ---
 
-<div class="tp-hero-band" markdown>
+<div class="tp-hero-band tp-one-screen" markdown>
 <span class="tp-eyebrow">Feature</span>
 # One page over every board
 
-<p>A board's own interface can power off and reflash every compute module in it, which makes it the last thing you want facing the internet. So the boards do not face it. One page in the cluster reaches all of them — with every control the board's own interface has — and it is the only thing exposed.</p>
+<p>A board's own interface can power off and reflash every module in it, so no board here faces the internet. One page in the cluster reaches them all, with every control a board's interface has.</p>
 </div>
 
 <div class="tp-proof">
 <div><b>1</b><span>hostname for the whole estate</span></div>
 <div><b>9</b><span>tabs per board, the same ones the board serves</span></div>
 <div><b>0</b><span>credentials held by the page</span></div>
-<div><b>0</b><span>boards on the public network</span></div>
 </div>
 
-## Everything the board's own interface can do
+??? note "The argument, and the measurements behind it"
 
-Not a status page. Power a module on or off, reset it, rename it, route the
-USB bus, open its serial console, write an OS image to it, upgrade the board's
-firmware, set its time servers, hold its fan, back up and restore its
-configuration — for any board, without leaving this page and without that
-board's password.
+    ## Everything the board's own interface can do
 
-These are not reimplementations. They are **the same components** the board
-serves itself, rendered against that board's API. A control that exists once
-cannot drift into a worse second copy, and a fix to one is a fix to both.
+    Not a status page. Power a module on or off, reset it, rename it, route the
+    USB bus, open its serial console, write an OS image to it, upgrade the board's
+    firmware, set its time servers, hold its fan, back up and restore its
+    configuration — for any board, without leaving this page and without that
+    board's password.
 
-The overview is still the first thing you see, because "is anything wrong
-across eight modules" is the question you usually arrive with. Picking a board
-gives you that board's whole interface.
+    These are not reimplementations. They are **the same components** the board
+    serves itself, rendered against that board's API. A control that exists once
+    cannot drift into a worse second copy, and a fix to one is a fix to both.
 
-Two boards can be worked on at once. Each gets its own cache, its own request
-path and its own progress state, so a firmware upload to one does not show up
-as the other one's progress bar — which is what happens when that state is
-shared, and it is not obvious until the day you need both.
+    The overview is still the first thing you see, because "is anything wrong
+    across eight modules" is the question you usually arrive with. Picking a board
+    gives you that board's whole interface.
 
-## What exposing a board would have cost
+    Two boards can be worked on at once. Each gets its own cache, its own request
+    path and its own progress state, so a firmware upload to one does not show up
+    as the other one's progress bar — which is what happens when that state is
+    shared, and it is not obvious until the day you need both.
 
-Per board: a public hostname, a certificate, a route, a policy that verifies
-the board's certificate, and a policy that authenticates the human. Board B
-doubled every one of them. A third board would have tripled them.
+    ## What exposing a board would have cost
 
-And each of those hostnames would have published something that can cut power
-to four computers, protected by whatever that board's own authentication
-happened to be.
+    Per board: a public hostname, a certificate, a route, a policy that verifies
+    the board's certificate, and a policy that authenticates the human. Board B
+    doubled every one of them. A third board would have tripled them.
 
-The fleet page collapses that to one of each. **Adding board B was two lines
-of configuration**, which is the whole argument for the shape.
+    And each of those hostnames would have published something that can cut power
+    to four computers, protected by whatever that board's own authentication
+    happened to be.
 
-## The pod holds no credential
+    The fleet page collapses that to one of each. **Adding board B was two lines
+    of configuration**, which is the whole argument for the shape.
 
-This is the part worth being precise about, because "a page that reaches
-every board" sounds like something that holds the keys to every board.
+    ## The pod holds no credential
 
-It holds nothing. The page is a static bundle — HTML, JavaScript and a web
-server, with no server code of its own. Two separate things happen in front
-of it:
+    This is the part worth being precise about, because "a page that reaches
+    every board" sounds like something that holds the keys to every board.
 
-- **The proxy authenticates you** against the estate's identity provider, and
-  will not pass a request from anyone outside the group that is allowed in.
-- **The proxy holds the client certificate**, not the page, and presents it
-  to a board on your behalf. The board trusts that certificate and reads the
-  name of the human the proxy already checked.
+    It holds nothing. The page is a static bundle — HTML, JavaScript and a web
+    server, with no server code of its own. Two separate things happen in front
+    of it:
 
-So a board admits the request because of something the *proxy* proved, and it
-records *your* name against it, not the page's. Stealing the bundle gets an
-attacker a copy of some HTML.
+    - **The proxy authenticates you** against the estate's identity provider, and
+      will not pass a request from anyone outside the group that is allowed in.
+    - **The proxy holds the client certificate**, not the page, and presents it
+      to a board on your behalf. The board trusts that certificate and reads the
+      name of the human the proxy already checked.
 
-## The board still works without any of it
+    So a board admits the request because of something the *proxy* proved, and it
+    records *your* name against it, not the page's. Stealing the bundle gets an
+    attacker a copy of some HTML.
 
-The board keeps its whole interface on the management network, with a
-password, and nothing here changes that. It has to: this page depends on a
-cluster, a tunnel and an identity provider, and the reason the board exists
-is to fix the cluster when the cluster is broken.
+    ## The board still works without any of it
 
-That is also why client certificates are *requested* and not *required*. A
-browser on the management network presents none and reaches the login page as
-it always did — the same interface, with
-[its own console per module](a-console-to-every-module.md) and
-[the sensors it can read](see-what-the-board-sees.md). What shrinks is the
-exposure machinery per board, not the firmware.
+    The board keeps its whole interface on the management network, with a
+    password, and nothing here changes that. It has to: this page depends on a
+    cluster, a tunnel and an identity provider, and the reason the board exists
+    is to fix the cluster when the cluster is broken.
 
-## A board that is down costs you its card
+    That is also why client certificates are *requested* and not *required*. A
+    browser on the management network presents none and reaches the login page as
+    it always did — the same interface, with
+    [its own console per module](a-console-to-every-module.md) and
+    [the sensors it can read](see-what-the-board-sees.md). What shrinks is the
+    exposure machinery per board, not the firmware.
 
-Every board answers for itself. One that is rebooting, or off the network,
-shows as exactly that, with a retry — and the boards either side of it carry
-on reporting. That is not a nicety: the times you most want a page over every
-board are the times one of them is not answering.
+    ## A board that is down costs you its card
 
-Boards on different firmware are normal here and always will be — which is
-what [picking a version per board](pick-a-version.md) makes possible — so
-every reading is allowed to be absent, and a board running a daemon outside
-the range the page was built against says so in a banner rather than
-breaking. The readings themselves come from
-[the description the board publishes](the-board-describes-itself.md), so the
-page cannot ask for a field the daemon does not have.
+    Every board answers for itself. One that is rebooting, or off the network,
+    shows as exactly that, with a retry — and the boards either side of it carry
+    on reporting. That is not a nicety: the times you most want a page over every
+    board are the times one of them is not answering.
+
+    Boards on different firmware are normal here and always will be — which is
+    what [picking a version per board](pick-a-version.md) makes possible — so
+    every reading is allowed to be absent, and a board running a daemon outside
+    the range the page was built against says so in a banner rather than
+    breaking. The readings themselves come from
+    [the description the board publishes](the-board-describes-itself.md), so the
+    page cannot ask for a field the daemon does not have.
 
 <div class="tp-next">
 <a href="../../#demo/fleet"><b>Open the fleet demo →</b><span>Two boards on one page, answering from a real capture.</span></a>

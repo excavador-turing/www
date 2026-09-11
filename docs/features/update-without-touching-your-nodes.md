@@ -4,7 +4,7 @@ hide:
   - toc
 ---
 
-<div class="tp-hero-band" markdown>
+<div class="tp-hero-band tp-one-screen" markdown>
 <span class="tp-eyebrow">Feature</span>
 # Update the BMC without touching your nodes
 
@@ -17,57 +17,59 @@ hide:
 <div><b>48 s</b><span>for the board to come back</span></div>
 </div>
 
-## Why upstream cycles them at all
+??? note "The argument, and the measurements behind it"
 
-Not out of malice: the daemon persisted each node's power state to a file and
-re-applied it on start. A firmware upgrade restarts the daemon, the daemon
-re-applies what the file says, and every module is switched to match — which
-means off and on again, whatever it was doing.
+    ## Why upstream cycles them at all
 
-The file is also the wrong source. It records what someone last asked for, not
-what the hardware is doing, so after any disagreement the daemon confidently
-restores a state that was never true.
+    Not out of malice: the daemon persisted each node's power state to a file and
+    re-applied it on start. A firmware upgrade restarts the daemon, the daemon
+    re-applies what the file says, and every module is switched to match — which
+    means off and on again, whatever it was doing.
 
-## What happens instead
+    The file is also the wrong source. It records what someone last asked for, not
+    what the hardware is doing, so after any disagreement the daemon confidently
+    restores a state that was never true.
 
-The daemon **reads the power state from the hardware on start** instead of
-re-applying it from a file. There is nothing to restore, so nothing is
-switched. A module that was running before the upgrade is still running
-during and after it, with no interruption to its power.
+    ## What happens instead
 
-Staging is separate from applying, too. Writing a new image arms the next
-boot and changes nothing else; the board only moves when you reboot it. Right
-up to that moment the whole thing is reversible with one `fw_setenv` — and
-once it does move, [the image has to prove itself](updates-that-undo-themselves.md)
-before it is kept.
+    The daemon **reads the power state from the hardware on start** instead of
+    re-applying it from a file. There is nothing to restore, so nothing is
+    switched. A module that was running before the upgrade is still running
+    during and after it, with no interruption to its power.
 
-## Measured on a nine-node cluster
+    Staging is separate from applying, too. Writing a new image arms the next
+    boot and changes nothing else; the board only moves when you reboot it. Right
+    up to that moment the whole thing is reversible with one `fw_setenv` — and
+    once it does move, [the image has to prove itself](updates-that-undo-themselves.md)
+    before it is kept.
 
-Board B was upgraded from stock firmware to this fork while its four modules
-were running Kubernetes workloads, including an etcd member of the cluster's
-control plane.
+    ## Measured on a nine-node cluster
 
-| | |
-|---|---|
-| Transfer of 36.12 MiB | 26.6 s |
-| Reboot, until the board answered again | 48 s |
-| Modules power-cycled | **0** |
-| Nodes that went `NotReady` | **0** |
+    Board B was upgraded from stock firmware to this fork while its four modules
+    were running Kubernetes workloads, including an etcd member of the cluster's
+    control plane.
 
-The honest detail: the network switch on the board *is* driven by the BMC, so
-a BMC reboot does interrupt the modules' **links**, even though their power is
-untouched — [the switch ports are visible per module](../reference/api/network.md)
-if you want to watch it happen. On this run the reboot was quick enough that no node's kubelet
-noticed. That is a property of the measurement, not a guarantee — a slower
-boot could cross a readiness threshold, and this page says so rather than
-claiming an isolation the hardware does not provide.
+    | | |
+    |---|---|
+    | Transfer of 36.12 MiB | 26.6 s |
+    | Reboot, until the board answered again | 48 s |
+    | Modules power-cycled | **0** |
+    | Nodes that went `NotReady` | **0** |
 
-!!! warning "A prediction that was wrong, kept on the record"
-    Before this upgrade the expectation written down was that four nodes would
-    drop and etcd would fall to two of three members. None of that happened.
-    The prediction is recorded on the ticket beside the result, because a
-    project that only publishes its correct predictions is not measuring
-    anything.
+    The honest detail: the network switch on the board *is* driven by the BMC, so
+    a BMC reboot does interrupt the modules' **links**, even though their power is
+    untouched — [the switch ports are visible per module](../reference/api/network.md)
+    if you want to watch it happen. On this run the reboot was quick enough that no node's kubelet
+    noticed. That is a property of the measurement, not a guarantee — a slower
+    boot could cross a readiness threshold, and this page says so rather than
+    claiming an isolation the hardware does not provide.
+
+    !!! warning "A prediction that was wrong, kept on the record"
+        Before this upgrade the expectation written down was that four nodes would
+        drop and etcd would fall to two of three members. None of that happened.
+        The prediction is recorded on the ticket beside the result, because a
+        project that only publishes its correct predictions is not measuring
+        anything.
 
 <div class="tp-next">
 <a href="../../#demo/fork"><b>See it in the interface →</b><span>The Firmware tab, on a board that took this upgrade.</span></a>

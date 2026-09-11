@@ -227,3 +227,380 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 .tp-proof > div { border-top: 3px solid var(--tp-lime); padding-top: 0.5rem; }
 .md-typeset .tp-proof b { display: block; font-size: 1.45rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); font-variant-numeric: tabular-nums; }
 .md-typeset .tp-proof span { display: block; font-size: 0.7rem; line-height: 1.4; color: var(--tp-muted); margin-top: 0.15rem; }
+
+/* --------------------------------------------------------------------------
+   One screen, every feature page (SQU-197)
+
+   A feature page is a pitch, not a chapter: the reader should be able to see
+   the claim, the three numbers behind it, and where to go next WITHOUT
+   SCROLLING, on a phone as well as a laptop. The argument is not deleted for
+   that -- it sits in a collapsed disclosure, in the same place on every page,
+   one click below the numbers.
+
+   These rules are what buys the room. They are opt-in through `tp-one-screen`
+   on the hero band so the landing page and the guides, which are meant to be
+   read straight down, keep the roomier spacing.
+
+   Measured, not estimated: docs/../parts.py renders each page in headless
+   Chrome at 1440x900 and 390x844 and reports the height of every band. The
+   phone is the binding constraint by a wide margin, which is why almost
+   everything below sits in the narrow media query.
+   -------------------------------------------------------------------------- */
+.md-main:has(.tp-one-screen) .tp-hero-band { padding: clamp(1rem, 3vh, 2rem) 0 0.8rem; margin-bottom: 1.1rem; }
+.md-main:has(.tp-one-screen) .md-typeset .tp-hero-band .tp-eyebrow { margin-bottom: 0.5rem; }
+.md-main:has(.tp-one-screen) .md-typeset .tp-hero-band h1 { margin-bottom: 0.45rem; }
+.md-main:has(.tp-one-screen) .tp-proof { margin-bottom: 1.1rem; }
+/* The disclosure is the page's one closed door; it should read as a control,
+   not as a warning box sitting in the middle of the layout. */
+.md-main:has(.tp-one-screen) .md-typeset details { margin: 0; font-size: 0.8rem; }
+.md-main:has(.tp-one-screen) .md-typeset details > summary { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.md-main:has(.tp-one-screen) .tp-next { margin-top: 1.4rem; padding-top: 1rem; }
+/* "Last update" metadata is worth having on a guide and worth 27px of a
+   phone screen nowhere. */
+.md-main:has(.tp-one-screen) .md-source-file { display: none; }
+
+@media (max-width: 600px) {
+  /* Three numbers stay three numbers. Stacking them into two rows costs a
+     hundred pixels and breaks the one thing every feature page shares. */
+  .md-main:has(.tp-one-screen) .tp-proof { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-proof b { font-size: 1.1rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-proof span { font-size: 0.62rem; line-height: 1.3; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band p { font-size: 0.8rem; line-height: 1.5; }
+  /* The four destinations keep their headings and lose their descriptions:
+     a link whose title already says where it goes does not need a subtitle
+     on a 390px screen, and the four subtitles together are 250px. */
+  .md-main:has(.tp-one-screen) .tp-next { grid-template-columns: 1fr; gap: 0.4rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next a { padding: 0.5rem 0.7rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next b { font-size: 0.78rem; margin-bottom: 0; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next span { display: none; }
+}
+
+/* The footer these pages get is the meta bar alone -- `hide: navigation`
+   already drops the previous/next pair -- and on a phone its copyright line
+   and its social icon wrap onto two rows, 92px. One row is 46. Written after
+   reading the rendered footer: an earlier version of this rule hid
+   `.md-footer__inner`, which these pages do not have, and measured exactly
+   the same as no rule at all. */
+@media (max-width: 600px) {
+  body:has(.tp-one-screen) .md-footer-meta__inner { padding: 0.3rem 0.8rem; }
+  body:has(.tp-one-screen) .md-typeset .md-copyright { font-size: 0.55rem; padding: 0; margin: 0; width: auto; }
+  body:has(.tp-one-screen) .md-copyright__highlight { display: inline; }
+  body:has(.tp-one-screen) .md-social { padding: 0; margin: 0; }
+  body:has(.tp-one-screen) .md-social__link { width: 1.2rem; height: 1.2rem; }
+}
+
+@media (max-width: 600px) {
+  .md-main:has(.tp-one-screen) .md-content__inner { padding-bottom: 1rem; }
+  /* Two by two rather than a column of four: the titles are long enough to
+     wrap at 390px either way, so the second column is free height. */
+  .md-main:has(.tp-one-screen) .tp-next { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .md-main:has(.tp-one-screen) .tp-hero-band { padding-top: 0.7rem; margin-bottom: 0.9rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band h1 { font-size: 1.45rem; }
+  .md-main:has(.tp-one-screen) .tp-proof { margin-bottom: 0.9rem; }
+  .md-main:has(.tp-one-screen) .tp-next { margin-top: 1rem; padding-top: 0.8rem; }
+}
+
+/* The disclosure summary is one line of the page's budget, so it is set as
+   one line: no admonition icon indent to speak of, no block margins. */
+@media (max-width: 600px) {
+  .md-main:has(.tp-one-screen) .md-typeset details { font-size: 0.75rem; }
+  .md-main:has(.tp-one-screen) .md-typeset details > summary { padding: 0.35rem 0.6rem 0.35rem 1.8rem; line-height: 1.3; }
+}
+
+/* A short phone is a different constraint from a narrow one, and the estate
+   has both: a 390x844 handset clears the page with 50-120px to spare, while a
+   375x667 one was 143px over with exactly the same layout. So the last tier
+   keys on HEIGHT as well as width and steps the whole page down a notch --
+   type, padding and gaps together, so the proportions survive the shrink.
+   Measured on 375x667 and 360x740; a taller phone never reaches these rules. */
+@media (max-width: 600px) and (max-height: 780px) {
+  .md-main:has(.tp-one-screen) .tp-hero-band { padding-top: 0.5rem; padding-bottom: 0.6rem; margin-bottom: 0.7rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band h1 { font-size: 1.25rem; margin-bottom: 0.35rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band p { font-size: 0.72rem; line-height: 1.45; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band .tp-eyebrow { font-size: 0.55rem; padding: 0.15rem 0.45rem; margin-bottom: 0.35rem; }
+  .md-main:has(.tp-one-screen) .tp-proof { gap: 0.4rem; margin-bottom: 0.7rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-proof b { font-size: 0.95rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-proof span { font-size: 0.58rem; line-height: 1.25; }
+  .md-main:has(.tp-one-screen) .md-typeset details { font-size: 0.7rem; }
+  .md-main:has(.tp-one-screen) .md-typeset details > summary { padding: 0.25rem 0.5rem 0.25rem 1.6rem; }
+  .md-main:has(.tp-one-screen) .tp-next { margin-top: 0.7rem; padding-top: 0.6rem; gap: 0.35rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next a { padding: 0.35rem 0.5rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next b { font-size: 0.7rem; line-height: 1.25; }
+}
+
+/* Same argument on the other axis: a 1366x768 laptop is a wide screen and a
+   short one, and it was 24px over while a 1440x900 one had room. The hero's
+   own padding is the give here -- `clamp(1rem, 3vh, 2rem)` already shrinks
+   with the viewport, just not far enough. */
+@media (min-width: 601px) and (max-height: 830px) {
+  .md-main:has(.tp-one-screen) .tp-hero-band { padding-top: 0.7rem; padding-bottom: 0.6rem; margin-bottom: 0.9rem; }
+  .md-main:has(.tp-one-screen) .tp-proof { margin-bottom: 0.9rem; }
+  .md-main:has(.tp-one-screen) .tp-next { margin-top: 1rem; padding-top: 0.8rem; }
+}
+
+/* The disclosure is the page's one control, so it is dressed as one rather
+   than as Material's blue "note" aside: the same line, plate and lime the
+   proof strip above it uses. A blue box in the middle of a lime-and-ink page
+   reads as a warning somebody left behind. */
+.md-main:has(.tp-one-screen) .md-typeset details.note { border: 1px solid var(--tp-line); border-left: 3px solid var(--tp-lime); border-radius: 0.5rem; box-shadow: none; }
+.md-main:has(.tp-one-screen) .md-typeset details.note > summary { background: var(--tp-plate); color: var(--tp-ink); border-radius: 0; }
+.md-main:has(.tp-one-screen) .md-typeset details.note > summary::before { background-color: var(--tp-ink); }
+.md-main:has(.tp-one-screen) .md-typeset details.note > summary::after { color: var(--tp-muted); }
+
+/* The about page carries four doors rather than one, so the per-door cost is
+   multiplied and worth another pass: a summary is one line of text and should
+   occupy one line of the budget. The trailing space under the destinations is
+   the other easy 16px -- the footer provides its own. */
+.md-main:has(.tp-one-screen) .md-typeset details > summary { padding-top: 0.3rem; padding-bottom: 0.3rem; }
+.md-main:has(.tp-one-screen) .md-typeset details + details { margin-top: 0.3rem; }
+.md-main:has(.tp-one-screen) .md-content__inner { padding-bottom: 1rem; }
+@media (min-width: 601px) and (max-height: 830px) {
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next a { padding: 0.6rem 0.8rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band h1 { font-size: clamp(1.5rem, 2.8vw, 2.2rem); }
+}
+
+/* On a short screen the proof strip's labels are the cheapest thing to shrink:
+   the number carries the claim and the label is the footnote under it. */
+@media (min-width: 601px) and (max-height: 830px) {
+  .md-main:has(.tp-one-screen) .md-typeset .tp-proof b { font-size: 1.3rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-proof span { font-size: 0.66rem; line-height: 1.35; }
+}
+
+/* ---- the front page on a phone ---------------------------------------- */
+/* The landing was built to land on one screen from about 800px tall up, and
+   below that it scrolled "honestly". A phone is 844px tall and never got
+   there, because three blocks expand rather than shrink when the columns
+   collapse: the explainer's photo goes full-width (260px of a 390px screen),
+   the four destination cards stack with a 150px picture each (920px), and the
+   three claims each carry a paragraph of evidence.
+   So on a phone each of those keeps its most useful half. The destinations
+   keep their names and lose their pictures, the claims keep their sentence
+   and lose the evidence behind it, and the explainer keeps the photo, the
+   question and the link out and drops the paragraph. Nothing here is the only
+   route to anything: every one of them is a link to a page that says it in
+   full. Measured at 390x844 and 375x667. */
+@media (max-width: 600px) {
+  body:has(.tp-landing) .md-main__inner { margin-top: 0; }
+  .tp-view--home { gap: 0.6rem; padding-top: 0.6rem; }
+  .md-typeset .tp-hero h1 { font-size: 1.35rem; margin-bottom: 0.4rem; }
+  .md-typeset .tp-hero p.lede { font-size: 0.76rem; line-height: 1.45; margin-bottom: 0.6rem; }
+  .md-typeset .tp-actions { gap: 0.35rem; }
+  .md-typeset .tp-actions .md-button { font-size: 0.66rem; padding: 0.35rem 0.75rem; border-width: 1px; }
+
+  .md-typeset .tp-what { grid-template-columns: 88px minmax(0, 1fr); gap: 0.6rem; padding: 0.35rem; align-items: center; }
+  .md-typeset .tp-what img { height: 56px; width: 100%; }
+  .md-typeset .tp-what__body { display: none; }
+  .md-typeset .tp-what__text { font-size: 0.7rem; line-height: 1.3; }
+  .md-typeset .tp-what__text b { display: block; font-size: 0.78rem; margin: 0; }
+
+  .tp-claims { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+  .md-typeset .tp-claims b { font-size: 0.68rem; line-height: 1.2; margin-bottom: 0; }
+  .md-typeset .tp-claims span { display: none; }
+
+  .tp-dest { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .md-typeset .tp-dest__card img { display: none; }
+  .md-typeset .tp-dest__card b { font-size: 0.8rem; margin: 0.45rem 0.6rem 0.1rem; }
+  .md-typeset .tp-dest__card span { font-size: 0.62rem; line-height: 1.3; margin: 0 0.6rem 0.45rem; }
+}
+
+/* A 375x667 phone is 177px shorter than a 390x844 one and the landing was
+   exactly that much over. The destinations give it up most cheaply: on a
+   screen this short the four names alone are the menu, and the sentence under
+   each was already a summary of the page it links to. */
+@media (max-width: 600px) and (max-height: 780px) {
+  .tp-view--home { gap: 0.45rem; padding-top: 0.45rem; }
+  .md-typeset .tp-hero h1 { font-size: 1.15rem; margin-bottom: 0.3rem; }
+  .md-typeset .tp-hero p.lede { font-size: 0.7rem; line-height: 1.4; margin-bottom: 0.5rem; }
+  .md-typeset .tp-actions .md-button { font-size: 0.62rem; padding: 0.3rem 0.65rem; }
+  .md-typeset .tp-what img { height: 44px; }
+  .md-typeset .tp-what__text b { font-size: 0.72rem; }
+  .md-typeset .tp-claims b { font-size: 0.62rem; }
+  .md-typeset .tp-dest__card span { display: none; }
+  .md-typeset .tp-dest__card b { font-size: 0.74rem; margin: 0.4rem 0.55rem; }
+}
+
+/* ---- the demo pane, sized by what is left rather than by a guess -------- */
+/* The iframe used to be `100vh - header - var(--tp-bar)`, and `--tp-bar` is a
+   constant. On a phone the bar WRAPS -- the back button and the three pane
+   pills do not fit one row -- so the real bar is 122px where the constant
+   says 57, and the demo overflowed by exactly that difference on every
+   handset while looking right on every laptop.
+   A constant cannot know that, so nothing is measured here any more: the
+   demo view is a flex column and the frame takes what is left. `dvh` rather
+   than `vh` for the same class of reason -- a phone's address bar is not a
+   constant either. */
+.tp-landing:has(.tp-view--demo:not([hidden])) {
+  display: flex; flex-direction: column;
+  height: calc(100dvh - var(--tp-header) - 0.4rem);
+}
+.tp-view--demo:not([hidden]) { flex: 1 1 auto; min-height: 0; display: flex; }
+.tp-view--demo .tp-stage { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.tp-stage iframe:not([hidden]),
+.tp-stage .tp-stage__soon { flex: 1 1 auto; min-height: 0; height: auto; }
+
+/* The bar itself is worth keeping to one row on a phone even so: two rows of
+   chrome above a demo is 65px the demo could have had. */
+@media (max-width: 600px) {
+  .tp-bar { flex-wrap: nowrap; gap: 0.4rem; padding: 0.35rem 0; }
+  .md-typeset .tp-back { font-size: 0.6rem; padding: 0.3rem 0.55rem; border-width: 1px; }
+  .tp-seg { padding: 0.1rem; }
+  .md-typeset .tp-seg a { font-size: 0.6rem; padding: 0.3rem 0.5rem; }
+}
+
+/* ---- the features index: fourteen plates, one screen ------------------- */
+/* The plate with a 16:9 picture on top is right for four of them and wrong
+   for fourteen: at 1440 it is four rows of 300px, and the page a reader opens
+   to choose a feature was 2208px tall. Compact turns each plate on its side --
+   icon left, name and one line right -- which is the same information in a
+   fifth of the height, and keeps the icons doing their job as a way to
+   recognise a feature you have seen before. */
+.md-typeset .tp-plates--compact.grid.cards > ul > li {
+  display: grid; grid-template-columns: 30px minmax(0, 1fr); grid-template-rows: auto auto;
+  align-items: center; gap: 0 0.5rem; padding: 0.35rem 0.5rem;
+}
+.md-typeset .tp-plates--compact.grid.cards > ul > li > p:first-child { grid-area: 1 / 1 / 3 / 2; align-self: center; }
+/* line-height belongs on the paragraph, not on the link inside it: the
+   block's line boxes come from the paragraph's strut, so setting it on the
+   <a> left every wrapped title on Material's 1.6 and made a two-line name
+   44px tall. */
+.md-typeset .tp-plates--compact.grid.cards > ul > li > p:nth-child(2) { grid-area: 1 / 2 / 2 / 3; margin: 0; line-height: 1.2; }
+.md-typeset .tp-plates--compact.grid.cards > ul > li > p:last-child { grid-area: 2 / 2 / 3 / 3; margin: 0; }
+.md-typeset .tp-plates--compact.grid.cards > ul > li img {
+  width: 30px; height: 30px; aspect-ratio: 1; object-fit: contain;
+  background: transparent; border-bottom: 0;
+}
+.md-typeset .tp-plates--compact.grid.cards > ul > li > p:nth-child(2) a { font-size: 0.74rem; line-height: 1.2; }
+/* One line of summary, not two. Fourteen plates multiply every line: the
+   second one cost 57px of the laptop budget, and a plate is a label for a
+   page, not a substitute for it. */
+.md-typeset .tp-plates--compact.grid.cards > ul > li > p:last-child { font-size: 0.64rem; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+/* Four across from 1200px up: at 1366 three columns is five rows, and five
+   rows is what put this page over the edge on a laptop. */
+/* Five across, not four: fourteen plates over four columns is four rows and
+   142px too many at 1440. Five is three rows, and a plate this shape does
+   not need the width. */
+@media (min-width: 1200px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; } }
+/* A tablet is 768 wide and 1024 tall: three columns is five rows and 44px
+   too many, four columns is four rows and fits. */
+@media (max-width: 1199px) and (min-width: 700px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; } }
+@media (max-width: 699px) and (min-width: 561px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; } }
+/* A phone gets two columns and the names alone: fourteen one-line clauses
+   under fourteen names is a wall, and each name is a link to the page that
+   says it properly. */
+@media (max-width: 560px) {
+  .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li { grid-template-rows: auto; padding: 0.3rem 0.4rem; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li > p:first-child { grid-area: 1 / 1 / 2 / 2; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li > p:last-child { display: none; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li img { width: 22px; height: 22px; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li > p:nth-child(2) a { font-size: 0.68rem; }
+}
+
+/* A destination's subtitle is a hint, not a paragraph: two lines, so one long
+   one cannot push the page off the bottom. Guarded by a width, because the
+   phone rules above hide these entirely and `display` is what does it -- an
+   unguarded `-webkit-box` here put 84px back on every phone. */
+@media (min-width: 601px) {
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next span {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+}
+
+/* 20ch is the right measure for a headline that has room below it. On a page
+   that must end above the fold it is three lines where 28ch is two, and the
+   index's title -- "Fourteen things this board does that it did not before" --
+   was paying 41px for the narrower column. */
+@media (min-width: 601px) {
+  .md-main:has(.tp-one-screen) .md-typeset .tp-hero-band h1 { max-width: 28ch; }
+}
+@media (min-width: 601px) and (max-height: 830px) {
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next span { -webkit-line-clamp: 1; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li { padding: 0.25rem 0.45rem; }
+}
+
+/* The about page carries four doors where a feature page carries one, so the
+   last few pixels come off the doors and the band above them. */
+@media (min-width: 601px) and (max-height: 830px) {
+  .md-main:has(.tp-one-screen) .md-typeset details > summary { padding-top: 0.22rem; padding-bottom: 0.22rem; }
+  .md-main:has(.tp-one-screen) .tp-hero-band { padding-top: 0.5rem; padding-bottom: 0.5rem; margin-bottom: 0.7rem; }
+  .md-main:has(.tp-one-screen) .tp-proof { margin-bottom: 0.7rem; }
+}
+
+/* ---- the features index on a phone ------------------------------------ */
+/* Fourteen destinations is the one page where a phone cannot have everything:
+   the names alone, two abreast, are 333px of an 844px screen. So the index
+   keeps the fourteen names -- which are the whole point of an index -- and
+   gives up the sentence under the title. On the shortest phones it gives up
+   the three footer destinations too; the drawer menu still has them, and
+   fourteen names a thumb can reach is worth more than three it already had. */
+@media (max-width: 560px) {
+  /* The three destinations go on every phone, not only the short ones: the
+     drawer menu carries all three, and 163px is a fifth of the screen. */
+  .md-main:has(.tp-one-screen):has(.tp-plates--compact) .tp-next { display: none; }
+  .md-main:has(.tp-one-screen):has(.tp-plates--compact) .md-typeset .tp-hero-band p { display: none; }
+  .md-main:has(.tp-one-screen):has(.tp-plates--compact) .md-typeset .tp-hero-band h1 { font-size: 1.2rem; }
+  .md-typeset .tp-plates--compact.grid { gap: 0.3rem; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li { padding: 0.25rem 0.4rem; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li > p:nth-child(2) a { font-size: 0.62rem; line-height: 1.15; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li img { width: 18px; height: 18px; }
+}
+/* A 375x667 phone holds fourteen plates and nothing else: the band above
+   them becomes a title on one line. */
+@media (max-width: 560px) and (max-height: 780px) {
+  .md-main:has(.tp-one-screen):has(.tp-plates--compact) .md-typeset .tp-hero-band h1 { font-size: 0.98rem; }
+  .md-main:has(.tp-one-screen):has(.tp-plates--compact) .md-typeset .tp-hero-band .tp-eyebrow { display: none; }
+  .md-main:has(.tp-one-screen):has(.tp-plates--compact) .tp-hero-band { padding: 0.4rem 0 0.4rem; margin-bottom: 0.5rem; }
+  .md-typeset .tp-plates--compact.grid { gap: 0.25rem; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li { padding: 0.2rem 0.35rem; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li > p:nth-child(2) a { font-size: 0.58rem; }
+  .md-typeset .tp-plates--compact.grid.cards > ul > li img { width: 15px; height: 15px; }
+}
+
+/* Same trap as the plates, in the destinations: the bold name is a <b> inside
+   a block that keeps Material's 1.6 line-height, so a two-line destination
+   was 49px of text in a 69px card. */
+@media (max-width: 600px) {
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next b { line-height: 1.2; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next a { line-height: 1.2; }
+}
+
+/* The last ten pixels, and they are all on the about page, which is the only
+   one carrying four doors and three destinations at once. Doors sit closer
+   together and the strip above them gives up a little air. */
+.md-main:has(.tp-one-screen) .md-typeset details + details { margin-top: 0.2rem; }
+@media (min-width: 601px) and (max-height: 830px) {
+  .md-main:has(.tp-one-screen) .tp-proof { margin-bottom: 0.55rem; }
+  .md-main:has(.tp-one-screen) .md-typeset details + details { margin-top: 0.15rem; }
+}
+@media (max-width: 600px) and (max-height: 780px) {
+  .md-main:has(.tp-one-screen) .md-typeset details > summary { padding-top: 0.2rem; padding-bottom: 0.2rem; }
+  .md-main:has(.tp-one-screen) .md-typeset details + details { margin-top: 0.15rem; }
+  .md-main:has(.tp-one-screen) .tp-next { margin-top: 0.55rem; padding-top: 0.5rem; }
+}
+
+/* ---- the landing on a tablet ------------------------------------------ */
+/* Between the phone rules and the laptop ones sits a 768x1024 tablet, where
+   the destination cards keep a 150px picture each and stack two abreast: two
+   rows of 230px, and the page was 213px over. The pictures give that back --
+   they are decoration on a card whose name and sentence are the content. */
+@media (min-width: 601px) and (max-width: 1100px) {
+  .md-typeset .tp-dest__card img { height: 96px; }
+  .md-typeset .tp-dest__card b { font-size: 0.88rem; margin: 0.5rem 0.8rem 0.1rem; }
+  .md-typeset .tp-dest__card span { font-size: 0.68rem; line-height: 1.35; margin: 0 0.8rem 0.6rem;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .md-typeset .tp-claims span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .md-typeset .tp-what__text { font-size: 0.7rem; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .md-typeset .tp-what img { height: 88px; }
+}
+
+/* On a tablet the destinations fall to two columns, so three of them make two
+   rows and every extra line of subtitle is paid twice. */
+@media (min-width: 601px) and (max-width: 1100px) {
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next a { padding: 0.55rem 0.8rem; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next b { line-height: 1.2; }
+  .md-main:has(.tp-one-screen) .md-typeset .tp-next span { -webkit-line-clamp: 1; line-height: 1.35; }
+}
