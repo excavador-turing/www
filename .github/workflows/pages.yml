@@ -98,6 +98,12 @@ jobs:
           set -eu
           npm ci --no-audit --no-fund
           npm run build
+          # Moved aside immediately: the fleet build below runs `npm run
+          # build` again into the same `dist`, and without this the fork
+          # pane is quietly replaced by the fleet one. The demo-mode check
+          # caught exactly that -- it looked for the console's recording
+          # notice in what it thought was the fork bundle, and refused.
+          mv dist ../fork-dist
 
       # Prove the bundle is a demo before publishing it. A release without
       # the demo mode builds just as green and then, framed on the front
@@ -125,7 +131,7 @@ jobs:
           set -eu
           rm -rf docs/demo/fork
           mkdir -p docs/demo/fork
-          cp -a bmc-ui/dist/. docs/demo/fork/
+          cp -a fork-dist/. docs/demo/fork/
           echo "${{ steps.ui.outputs.tag }}" > docs/demo/fork/VERSION
           if ! grep -rqlF "a recording, not a live stream" docs/demo/fork/assets; then
             echo "${{ steps.ui.outputs.tag }} built without its demo mode; refusing to publish it as one" >&2
