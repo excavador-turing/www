@@ -77,6 +77,7 @@ captured off a real board. Nothing in it talks to hardware.
   apart from answering from fixtures — it is GPL-2.0, as is this fork, and its
   copyright notice is intact.
 
-The fork pane is built from the tag the firmware pins, by `just refresh-demo`,
-and names its version on the About tab. The stock pane was captured once and
-does not change.
+The fork pane is built at every deploy from the **latest BMC-UI release**,
+not from a copy kept on this site, and names its version on the About tab; a
+release of the interface is what updates it. The stock pane was captured once
+and does not change.
