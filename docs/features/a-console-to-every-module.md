@@ -30,8 +30,8 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.](../assets/fork/07-console.png)
-<figcaption>Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.</figcaption>
+![A module's console in the browser, opened on the scrollback the daemon kept before the tab was.](../assets/captures/console.png)
+<figcaption>A module's console in the browser, opened on the scrollback the daemon kept before the tab was.</figcaption>
 </figure>
 
 </div>

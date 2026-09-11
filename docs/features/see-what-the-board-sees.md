@@ -30,8 +30,8 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![The Overview on board B: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.](../assets/fork/02-info.png)
-<figcaption>The Overview on board B: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.</figcaption>
+![The Overview: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.](../assets/captures/info.png)
+<figcaption>The Overview: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.</figcaption>
 </figure>
 
 </div>

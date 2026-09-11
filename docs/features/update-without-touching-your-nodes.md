@@ -30,8 +30,8 @@ hide:
 </div>
 
 <figure class="tp-feature__show" markdown>
-![The Firmware tab, where a BMC upgrade starts. The four compute modules keep running throughout.](../assets/cards/card-firmware.png)
-<figcaption>The Firmware tab, where a BMC upgrade starts. The four compute modules keep running throughout.</figcaption>
+![The four compute modules, powered and counted in uptime. A BMC upgrade leaves every one of them exactly like this.](../assets/captures/nodes.png)
+<figcaption>The four compute modules, powered and counted in uptime. A BMC upgrade leaves every one of them exactly like this.</figcaption>
 </figure>
 
 </div>
