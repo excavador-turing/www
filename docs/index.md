@@ -6,12 +6,9 @@ hide:
 
 <div class="tp-landing" markdown>
 
-<div class="tp-bar">
-<nav class="tp-seg tp-switch" aria-label="View">
-<a href="#overview" data-view="home">Overview</a>
-<a href="#demo/fork" data-view="demo">Live demo</a>
-</nav>
-<nav class="tp-seg tp-panes" aria-label="Which interface" hidden="hidden">
+<div class="tp-bar" hidden="hidden">
+<a class="tp-back" href="#overview">← Overview</a>
+<nav class="tp-seg tp-panes" aria-label="Which interface">
 <a href="#demo/stock" data-pane="stock">Stock firmware</a>
 <a href="#demo/fork" data-pane="fork">This fork</a>
 <a href="#demo/fleet" data-pane="fleet">turing-fleet</a>
@@ -29,6 +26,11 @@ hide:
 <div class="tp-actions"><a class="md-button md-button--primary" href="#demo/fork">Try it, live</a> <a class="md-button" href="guides/install/">Install it</a> <a class="md-button" href="guides/upgrade-from-stock/">Coming from stock?</a></div>
 
 </div>
+
+<a class="tp-what" href="https://turingpi.com/" rel="noopener">
+<img src="assets/turing-pi-2-hand.jpg" alt="A hand placing a compute module onto a Turing Pi 2 board that already carries three">
+<span class="tp-what__text"><b>What is a Turing Pi?</b> A mini-ITX board that carries four compute modules — Raspberry Pi CM4, Turing RK1 or Nvidia Jetson — with their network switch, power and a small management computer on the board itself. That computer, the BMC, is what this firmware runs on: it powers the modules, flashes them and hands you their consoles. Made by Turing Machines — <span class="tp-what__link">turingpi.com →</span></span>
+</a>
 
 <div class="tp-claims" markdown>
 <div markdown><b>Flash it wrong and lose nothing.</b><span>A new image boots on trial and is kept only if the board comes back right. On this board: 18 updates, 1 automatic rollback, 0 trips to the rack — [read off the board](reference/gate-history.md).</span></div>
@@ -65,10 +67,7 @@ hide:
     var pane = demo ? (h.split('/')[1] || 'fork') : null;
     root.querySelector('.tp-view--home').hidden = demo;
     root.querySelector('.tp-view--demo').hidden = !demo;
-    root.querySelector('.tp-panes').hidden = !demo;
-    root.querySelectorAll('.tp-switch a').forEach(function (a) {
-      a.setAttribute('aria-current', a.dataset.view === (demo ? 'demo' : 'home') ? 'true' : 'false');
-    });
+    root.querySelector('.tp-bar').hidden = !demo;
     root.querySelectorAll('.tp-panes a').forEach(function (a) {
       a.setAttribute('aria-current', a.dataset.pane === pane ? 'true' : 'false');
     });

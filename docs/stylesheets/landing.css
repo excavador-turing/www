@@ -42,19 +42,21 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 .tp-seg { display: inline-flex; gap: 0.15rem; padding: 0.15rem; border: 1px solid var(--tp-line); border-radius: 999px; }
 .md-typeset .tp-seg a { font-size: 0.68rem; font-weight: 600; line-height: 1; padding: 0.42rem 0.85rem; border-radius: 999px; color: var(--tp-muted); }
 .md-typeset .tp-seg a:hover { color: var(--tp-ink); }
-.md-typeset .tp-switch a[aria-current="true"] { background: var(--tp-ink); color: #fff; }
-[data-md-color-scheme="slate"] .md-typeset .tp-switch a[aria-current="true"] { background: #fff; color: #171717; }
+.md-typeset .tp-back { font-size: 0.7rem; font-weight: 600; color: var(--tp-ink); padding: 0.42rem 0.9rem; border: 2px solid var(--tp-ink); border-radius: 999px; }
+.md-typeset .tp-back:hover { background: var(--tp-ink); color: #fff; }
 .md-typeset .tp-panes a[aria-current="true"] { background: var(--tp-lime); color: var(--tp-lime-ink); }
 
-/* The overview fills what is left of the viewport and centres in it. Every
+/* The overview has no bar of its own: the demo is one click away in the
+   hero and in the first plate, and a third entry was noise. The overview fills
+   what is left of the viewport. Every
    size below is in vh or clamped so the whole thing lands on one screen from
    about 800px tall up; below that it scrolls, honestly. */
 .tp-view--home {
-  height: calc(100vh - var(--tp-header) - var(--tp-bar) - 0.4rem);
+  height: calc(100vh - var(--tp-header) - 0.4rem);
   box-sizing: border-box;
-  display: grid; grid-template-rows: auto auto minmax(0, 1fr);
+  display: grid; grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: clamp(0.7rem, 2.2vh, 1.4rem);
-  padding-bottom: 0.3rem;
+  padding: clamp(0.8rem, 3vh, 2rem) 0 0.3rem;
 }
 .tp-hero { text-align: center; }
 .md-typeset .tp-hero h1 {
@@ -68,6 +70,15 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 .md-typeset .tp-actions .md-button { border-radius: 999px; padding: 0.45rem 1rem; font-weight: 600; font-size: 0.72rem; border: 2px solid var(--tp-ink); color: var(--tp-ink); margin: 0; }
 .md-typeset .tp-actions .md-button--primary { background: var(--tp-lime); border-color: var(--tp-lime); color: var(--tp-lime-ink); }
 .md-typeset .tp-actions .md-button--primary:hover { filter: brightness(0.96); }
+
+/* What the board is, for the reader who arrived from a search: one photo
+   from the maker, one paragraph, one link out. The whole strip is the link. */
+.md-typeset .tp-what { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: center; color: inherit; border: 1px solid var(--tp-line); border-radius: 0.6rem; padding: 0.5rem 0.9rem 0.5rem 0.5rem; }
+.md-typeset .tp-what:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.md-typeset .tp-what img { display: block; height: clamp(72px, 11vh, 120px); width: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 0.4rem; margin: 0; }
+.md-typeset .tp-what__text { font-size: 0.74rem; line-height: 1.5; color: var(--tp-muted); }
+.md-typeset .tp-what__text b { color: var(--tp-ink); font-size: 0.86rem; margin-right: 0.3rem; }
+.md-typeset .tp-what__link { color: var(--tp-ink); font-weight: 600; white-space: nowrap; }
 
 /* Three claims: a sentence and its evidence, not adjectives. */
 .tp-claims { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2rem; }
@@ -113,6 +124,8 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 }
 @media (max-width: 720px) {
   .tp-dest, .tp-claims { grid-template-columns: 1fr; }
+  .md-typeset .tp-what { grid-template-columns: 1fr; }
+  .md-typeset .tp-what img { height: auto; width: 100%; }
   .tp-bar { height: auto; flex-wrap: wrap; padding: 0.5rem 0; }
 }
 

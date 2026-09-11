@@ -87,3 +87,12 @@ refresh-demo checkout tag:
     cp -a "$src/dist/." docs/demo/fork/
     echo "demo fork pane: {{tag}} ($(find docs/demo/fork -type f | wc -l) files)"
     python3 scripts/demo-ribbon.py
+
+# The fork demo pane the way the site deploys it: from the latest BMC-UI
+# release. Needs a BMC-UI checkout to build in, and gh for the release lookup.
+demo-fork-latest checkout:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    tag=$(gh api repos/excavador-turing/BMC-UI/releases/latest --jq .tag_name)
+    just refresh-demo "{{checkout}}" "$tag"
+    echo "$tag" > docs/demo/fork/VERSION

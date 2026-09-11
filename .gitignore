@@ -2,3 +2,7 @@
 .devbox/
 site/
 __pycache__/
+
+# The fork demo pane is built at deploy from the latest BMC-UI release
+# (.github/workflows/pages.yml); locally, `just demo-fork-latest <checkout>`.
+docs/demo/fork/
