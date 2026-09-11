@@ -6,7 +6,7 @@ hide:
 
 <div class="tp-hero-band" markdown>
 <span class="tp-eyebrow">Features</span>
-# Thirteen things this board does that it did not before
+# Fourteen things this board does that it did not before
 
 <p>Every one of them started as something that went wrong on a real board. The short version is on the plates; behind each is the argument, with the measurement that backs it and the date it was taken.</p>
 </div>
@@ -81,15 +81,21 @@ hide:
 
 -   [![](../assets/icons/network.svg)](../reference/api/network.md)
 
-    [Network and time](../reference/api/network.md)
+    [The network, named and watched](../reference/api/network.md)
 
-    Ports and link state per module, an NTP source you can set, and whether the clock actually synchronised.
+    What the board calls itself, and what its switch is doing: link, speed and counters for every module's port.
+
+-   [![](../assets/icons/clock.svg)](../reference/api/board.md)
+
+    [A clock you can trust](../reference/api/board.md)
+
+    Set the time sources, and read back whether the board actually synchronised — not merely that it was asked to.
 
 -   [![](../assets/icons/name.svg)](../reference/api/board.md)
 
-    [Name it, back it up](../reference/api/board.md)
+    [Backup and restore](../reference/api/board.md)
 
-    The hostname and the clock are controls, the whole configuration backs up and restores, and `tpi` reaches every one of them.
+    Every setting on the board as one file, applied back field by field, with each one reported separately.
 
 </div>
 
