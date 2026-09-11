@@ -217,3 +217,13 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 [data-md-color-scheme="slate"] .md-typeset .tp-vs__us::before { color: var(--tp-lime); }
 .tp-vs__row .tp-vs__us { border-left: 3px solid var(--tp-lime); padding-left: 0.7rem; }
 @media (max-width: 800px) { .tp-vs__row { grid-template-columns: 1fr; gap: 0.5rem; } }
+
+/* ---- the proof strip on a feature page --------------------------------- */
+/* Every feature opens with the same thing: a few numbers somebody measured.
+   Consistent across the pages on purpose -- a reader who has seen one knows
+   where to look on the next -- and numbers rather than adjectives, because
+   every one of these is checkable and the adjectives would not be. */
+.tp-proof { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 0.9rem; margin: 0 0 1.6rem; max-width: 1100px; }
+.tp-proof > div { border-top: 3px solid var(--tp-lime); padding-top: 0.5rem; }
+.md-typeset .tp-proof b { display: block; font-size: 1.45rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); font-variant-numeric: tabular-nums; }
+.md-typeset .tp-proof span { display: block; font-size: 0.7rem; line-height: 1.4; color: var(--tp-muted); margin-top: 0.15rem; }

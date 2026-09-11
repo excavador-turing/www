@@ -12,7 +12,7 @@ hide:
 <nav class="tp-seg tp-panes" aria-label="Which interface">
 <a href="#demo/stock" data-pane="stock">Stock firmware</a>
 <a href="#demo/fork" data-pane="fork">This fork</a>
-<a href="#demo/fleet" data-pane="fleet">turing-fleet</a>
+<a href="#demo/fleet" data-pane="fleet">The fleet</a>
 </nav>
 </div>
 
@@ -52,7 +52,7 @@ hide:
 <div class="tp-stage">
 <iframe data-pane="stock" data-src="demo/stock/" title="Stock Turing Pi 2 interface, demo" hidden="hidden"></iframe>
 <iframe data-pane="fork" data-src="demo/fork/" title="This fork's interface, demo" hidden="hidden"></iframe>
-<div class="tp-stage__soon" data-pane="fleet" hidden="hidden"><div><h2>turing-fleet</h2><p>One interface over every board. It is the next thing being built, and this space is honest about that rather than showing a mock-up.</p></div></div>
+<iframe data-pane="fleet" data-src="demo/fleet/" title="The fleet interface over every board, demo" hidden="hidden"></iframe>
 </div>
 </section>
 
