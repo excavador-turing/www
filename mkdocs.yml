@@ -29,6 +29,7 @@ nav:
       - A console to every module: features/a-console-to-every-module.md
       - A certificate that does not rot: features/a-certificate-that-does-not-rot.md
       - The board describes its own API: features/the-board-describes-itself.md
+      - Flash a module from the card: features/flash-from-the-card.md
       - The arguments:
           - One page over every board: why/one-page-over-every-board.md
           - Fresh, and fixed: why/fresh-and-fixed.md
@@ -39,6 +40,7 @@ nav:
           - A console to every module: why/a-console-to-every-module.md
           - A certificate that does not rot: why/a-certificate-that-does-not-rot.md
           - The board describes its own API: why/the-board-describes-itself.md
+          - Flash a module from the card: why/flash-from-the-card.md
   - Guides:
       - Overview: guides/index.md
       - Install: guides/install.md

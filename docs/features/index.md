@@ -6,7 +6,7 @@ hide:
 
 <div class="tp-hero-band tp-one-screen tp-hero-band--plates" markdown>
 <span class="tp-eyebrow">Features</span>
-# Fourteen things this board does that it did not before
+# Fifteen things this board does that it did not before
 
 <p>Every one of them started as something that went wrong on a real board. Behind each plate is the argument, with the measurement that backs it.</p>
 </div>
@@ -48,6 +48,12 @@ hide:
     [See what the board sees](see-what-the-board-sees.md)
 
     The temperature sensor upstream never described, and a fan that can tell you which trip point put it where it is.
+
+-   [![](../assets/icons/sdcard.svg)](flash-from-the-card.md)
+
+    [Flash a module from the card](flash-from-the-card.md)
+
+    What is on the board's own SD card, what can be written to a module, and why the rest cannot.
 
 -   [![](../assets/icons/versions.svg)](pick-a-version.md)
 
