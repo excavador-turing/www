@@ -11,6 +11,12 @@ hide:
 <p>On upstream's firmware, updating the management controller power-cycles all four compute modules. If those modules are a Kubernetes cluster, patching the BMC means an outage. Here the modules' rails are never touched, and the upgrade was measured on a live cluster to prove it.</p>
 </div>
 
+<div class="tp-proof">
+<div><b>0</b><span>modules power-cycled by a BMC update</span></div>
+<div><b>0</b><span>cluster nodes lost, measured</span></div>
+<div><b>48 s</b><span>for the board to come back</span></div>
+</div>
+
 ## Why upstream cycles them at all
 
 Not out of malice: the daemon persisted each node's power state to a file and
@@ -31,7 +37,9 @@ during and after it, with no interruption to its power.
 
 Staging is separate from applying, too. Writing a new image arms the next
 boot and changes nothing else; the board only moves when you reboot it. Right
-up to that moment the whole thing is reversible with one `fw_setenv`.
+up to that moment the whole thing is reversible with one `fw_setenv` — and
+once it does move, [the image has to prove itself](updates-that-undo-themselves.md)
+before it is kept.
 
 ## Measured on a nine-node cluster
 
@@ -48,7 +56,8 @@ control plane.
 
 The honest detail: the network switch on the board *is* driven by the BMC, so
 a BMC reboot does interrupt the modules' **links**, even though their power is
-untouched. On this run the reboot was quick enough that no node's kubelet
+untouched — [the switch ports are visible per module](../reference/api/network.md)
+if you want to watch it happen. On this run the reboot was quick enough that no node's kubelet
 noticed. That is a property of the measurement, not a guarantee — a slower
 boot could cross a readiness threshold, and this page says so rather than
 claiming an isolation the hardware does not provide.

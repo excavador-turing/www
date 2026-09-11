@@ -11,6 +11,12 @@ hide:
 <p>Upstream documented its API in prose on a web page. This fork's daemon serves an OpenAPI 3.1 document describing every operation it has, and that document is the source both this site's reference and the interface's own types are generated from.</p>
 </div>
 
+<div class="tp-proof">
+<div><b>33</b><span>operations, described by the board itself</span></div>
+<div><b>3</b><span>things generated from that description</span></div>
+<div><b>0</b><span>hand-written pages that can drift</span></div>
+</div>
+
 A prose page is a description of an API that drifts from it. Nothing checks
 it, nothing regenerates from it, and the moment a handler changes the page is
 quietly wrong. The only way to find out is to call the endpoint and compare.

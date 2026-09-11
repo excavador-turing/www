@@ -11,6 +11,12 @@ hide:
 <p>Every compute module has a serial console, and reaching it used to mean a USB adapter and three jumper wires on the board's header. The BMC is already wired to all four. This fork puts them in the browser, and each one replays what happened before you opened the tab.</p>
 </div>
 
+<div class="tp-proof">
+<div><b>4</b><span>consoles, one per module</span></div>
+<div><b>16 KiB</b><span>of scrollback replayed when you open one</span></div>
+<div><b>0</b><span>USB adapters and jumper wires</span></div>
+</div>
+
 <figure markdown>
 ![Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.](../assets/fork/07-console.png)
 <figcaption>Node 1's console in the browser, opened on its recent scrollback — a Talos node mid-boot, not a blank terminal.</figcaption>

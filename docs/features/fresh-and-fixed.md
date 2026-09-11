@@ -11,6 +11,12 @@ hide:
 <p>Upstream's last firmware release was February 2025, on a kernel that was never a longterm series and a Buildroot that has since gone end of life. This fork tracks the supported versions of both, and has spent 66 releases taking out faults that made the board hard to trust.</p>
 </div>
 
+<div class="tp-proof">
+<div><b>6.12 LTS</b><span>kernel, against upstream's 6.8</span></div>
+<div><b>66</b><span>releases across four components</span></div>
+<div><b>6</b><span>named faults taken out</span></div>
+</div>
+
 ## The base is supported again
 
 | | upstream | this fork |

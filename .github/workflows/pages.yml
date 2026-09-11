@@ -98,24 +98,64 @@ jobs:
           set -eu
           npm ci --no-audit --no-fund
           npm run build
+          # Moved aside immediately: the fleet build below runs `npm run
+          # build` again into the same `dist`, and without this the fork
+          # pane is quietly replaced by the fleet one. The demo-mode check
+          # caught exactly that -- it looked for the console's recording
+          # notice in what it thought was the fork bundle, and refused.
+          mv dist ../fork-dist
 
       # Prove the bundle is a demo before publishing it. A release without
       # the demo mode builds just as green and then, framed on the front
       # page, tries to talk to a board that is not there.
+      # The fleet interface, from the same release, answering from the same
+      # capture. It is a different build of one tree -- the board's page and
+      # the page over every board share their data layer by import -- so one
+      # release gives the site both, and they cannot drift apart.
+      - name: build the fleet demo
+        if: steps.ui.outputs.skip != 'true'
+        working-directory: bmc-ui
+        env:
+          VITE_APP: fleet
+          VITE_DEMO: "1"
+          VITE_BASE: /demo/fleet/
+          BMC_UI_VERSION: ${{ steps.ui.outputs.tag }}
+        run: |
+          set -eu
+          npm run build
+          mv dist ../fleet-dist
+
       - name: place it, prove it, give it a way out
         if: steps.ui.outputs.skip != 'true'
         run: |
           set -eu
           rm -rf docs/demo/fork
           mkdir -p docs/demo/fork
-          cp -a bmc-ui/dist/. docs/demo/fork/
+          cp -a fork-dist/. docs/demo/fork/
           echo "${{ steps.ui.outputs.tag }}" > docs/demo/fork/VERSION
           if ! grep -rqlF "a recording, not a live stream" docs/demo/fork/assets; then
             echo "${{ steps.ui.outputs.tag }} built without its demo mode; refusing to publish it as one" >&2
             exit 1
           fi
+          rm -rf docs/demo/fleet
+          mkdir -p docs/demo/fleet
+          cp -a fleet-dist/. docs/demo/fleet/
+          # The board list the demo shows. Both cards answer from ONE board's
+          # capture, which the demo page says out loud -- inventing a second
+          # board's readings would be the first thing on this site that was
+          # not measured.
+          cat > docs/demo/fleet/config.json <<'JSON'
+          {
+            "boards": [
+              { "id": "bmc-1", "name": "bmc-1 (board A)", "note": "hive-1 … hive-4" },
+              { "id": "bmc-2", "name": "bmc-2 (board B)", "note": "hive-5 … hive-8" }
+            ],
+            "supportedBmcd": { "min": "2.20.0", "max": "2.30.0" }
+          }
+          JSON
           python3 scripts/demo-ribbon.py
           echo "fork pane: ${{ steps.ui.outputs.tag }} ($(find docs/demo/fork -type f | wc -l) files)"
+          echo "fleet pane: ${{ steps.ui.outputs.tag }} ($(find docs/demo/fleet -type f | wc -l) files)"
 
       - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
         if: steps.ui.outputs.skip != 'true'

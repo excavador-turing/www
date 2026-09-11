@@ -11,12 +11,20 @@ hide:
 <p>Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release — so following the documented update path can walk a board backwards. Here the sources are a setting, and every candidate arrives with its checksum and its real ordering.</p>
 </div>
 
+<div class="tp-proof">
+<div><b>3</b><span>kinds of source: this fork, upstream, the SD card</span></div>
+<div><b>2</b><span>upstream catalogues, disagreeing by a release</span></div>
+<div><b>0</b><span>checksums upstream publishes</span></div>
+</div>
+
 <figure markdown>
 ![Every configured source, side by side: this fork, upstream's two catalogues, and the SD card — with each candidate's checksum state, and an honest error where a source had nothing.](../assets/cards/card-versions.png)
 <figcaption>Every configured source, side by side: this fork, upstream's two catalogues, and the SD card — with each candidate's checksum state, and an honest error where a source had nothing.</figcaption>
 </figure>
 
-This fork makes the sources a setting, and shows you what each one offers.
+This fork makes the sources a setting, and shows you what each one offers —
+and whichever you pick, [a bad image undoes itself](updates-that-undo-themselves.md)
+rather than costing you a trip to the rack.
 
 ## Every source, with what it is worth
 

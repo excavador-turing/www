@@ -11,6 +11,12 @@ hide:
 <p>The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing could read it, and the fan ran at a fixed speed somebody once wrote down. Adding two lines to the device tree made the board explicable.</p>
 </div>
 
+<div class="tp-proof">
+<div><b>5</b><span>trip points the fan follows</span></div>
+<div><b>34</b><span>metric families the board exposes</span></div>
+<div><b>0</b><span>temperature readings upstream can take</span></div>
+</div>
+
 <figure markdown>
 ![The Overview on board B: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.](../assets/fork/02-info.png)
 <figcaption>The Overview on board B: storage, board health, NAND erase blocks, and which clock the board is actually synchronised to.</figcaption>

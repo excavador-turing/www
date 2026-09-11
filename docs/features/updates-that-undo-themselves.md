@@ -11,6 +11,12 @@ hide:
 <p>Upstream promotes a new firmware image the moment it boots. Two images this fork built would have passed that bar while being broken, and one of them cuts all four compute modules off the network. Here a new image is kept only if the board comes back right.</p>
 </div>
 
+<div class="tp-proof">
+<div><b>18</b><span>updates taken on this board</span></div>
+<div><b>1</b><span>rolled back by the board itself</span></div>
+<div><b>0</b><span>trips to the rack</span></div>
+</div>
+
 <figure markdown>
 ![The Firmware tab on board B, minutes after its first upgrade: the running slot, and the stock image it can fall back to sitting in the previous one.](../assets/fork/06-firmware-upgrade.png)
 <figcaption>The Firmware tab on board B, minutes after its first upgrade: the running slot, and the stock image it can fall back to sitting in the previous one.</figcaption>

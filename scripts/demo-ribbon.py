@@ -25,11 +25,15 @@ RIBBON = (
     'document.getElementById(i).hidden=true}}</script>'
 )
 
-WHAT = {"fork": "this fork", "stock": "the stock firmware"}
+WHAT = {
+    "fork": "this fork",
+    "stock": "the stock firmware",
+    "fleet": "the fleet interface",
+}
 
 
 def main() -> int:
-    for pane in ("fork", "stock"):
+    for pane in ("fork", "stock", "fleet"):
         path = Path("docs/demo") / pane / "index.html"
         if not path.exists():
             print(f"  {path}: missing, skipped")

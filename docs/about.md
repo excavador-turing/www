@@ -81,6 +81,11 @@ release, answering from readings captured off a real board.
   that this is a demo. A control that pretends to work is exactly what this
   project keeps removing from the real interface.
 - **The console replays a recording** and the panel says it is one.
+- **The fleet pane shows two cards from one board's capture.** There is one
+  set of readings and both boards display it, because inventing a second
+  board's numbers would be the first thing on this site that was not
+  measured. The interface is the real one, built from the same release as
+  the board's own page.
 - **Stock is stock** — the vendor's own interface, unmodified apart from
   answering from fixtures. It is GPL-2.0, as is this fork, and its copyright
   notice is intact.
