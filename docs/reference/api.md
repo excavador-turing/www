@@ -80,6 +80,13 @@ serves nothing else — so nothing that scrapes it can reach this API.
     repository; the diff is then the API change, which is the point of
     committing it rather than fetching at build time.
 
+!!! tip "On an older board?"
+    These pages describe the newest release. [What each release's API
+    had](api-history.md) lists, for every published version, which operations
+    it carried — generated from the `openapi.json` each release publishes, so
+    it cannot drift from them.
+
+
     A board running something else serves its own document at
     `GET /api/bmc/openapi.json`, and that one is authoritative for that board.
 

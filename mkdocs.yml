@@ -44,6 +44,7 @@ nav:
       - API:
           - The API: reference/api.md
           - Every operation: reference/api/index.md
+          - What each release's API had: reference/api-history.md
           - The board: reference/api/board.md
           - The nodes: reference/api/nodes.md
           - Firmware: reference/api/firmware.md
