@@ -109,4 +109,5 @@ hide:
 <a href="../#demo/fork"><b>See it working →</b><span>Three interfaces — stock, this fork, and the page over every board — all answering from data captured off real hardware.</span></a>
 <a href="../about/"><b>Why this fork exists →</b><span>What upstream does, what changed, and what is still not fixed.</span></a>
 <a href="../guides/"><b>Put it on your board →</b><span>Install, upgrade from stock, and what to do when a flash goes wrong.</span></a>
+<a href="../roadmap/"><b>Vote on what comes next →</b><span>Six planned features, each a GitHub Discussion you can upvote — or propose the one that is missing.</span></a>
 </div>
