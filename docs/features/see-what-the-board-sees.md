@@ -16,7 +16,7 @@ hide:
 
 <div class="tp-proof">
 <div><b>5</b><span>trip points the fan follows</span></div>
-<div><b>34</b><span>metric families the board exposes</span></div>
+<div><b>40</b><span>metric families the board exposes</span></div>
 <div><b>0</b><span>temperature readings upstream can take</span></div>
 </div>
 
