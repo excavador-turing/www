@@ -78,6 +78,7 @@ nav:
 
 theme:
   name: material
+  custom_dir: overrides
   features:
     - navigation.instant
     - navigation.tracking
@@ -140,6 +141,13 @@ plugins:
       fallback_to_build_date: true
 
 extra:
+  # Cloudflare Web Analytics beacon token. Public by design: it names the
+  # site to the beacon and reads nothing (cookieless, no consent banner).
+  # The value is a Pulumi stack output in opwerm/nexus, scope cloudflare,
+  # export webAnalyticsToken-turingpi.xyz; empty means no beacon is emitted
+  # (overrides/main.html checks). GitHub's own panel keeps fourteen days;
+  # this keeps history, for one question: is anyone arriving, from where.
+  cloudflare_beacon: ""
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/excavador-turing
