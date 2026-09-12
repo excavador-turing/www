@@ -15,7 +15,7 @@ hide:
 <a class="tp-why" href="../../why/updates-that-undo-themselves/">The argument, and the measurements behind it →</a>
 
 <div class="tp-proof">
-<div><b>18</b><span>updates taken on this board</span></div>
+<div><b>26</b><span>updates taken on this board</span></div>
 <div><b>1</b><span>rolled back by the board itself</span></div>
 <div><b>0</b><span>trips to the rack</span></div>
 </div>
