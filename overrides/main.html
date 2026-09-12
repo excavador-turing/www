@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{#
+  The one thing this override adds: Cloudflare Web Analytics.
+
+  Cookieless, no consent banner, and the token below is public by design --
+  it identifies the site to Cloudflare's beacon and cannot read anything. It
+  is here rather than in `extra_javascript` because the beacon needs a data
+  attribute, which mkdocs' list of script paths cannot express.
+
+  GitHub's own traffic panel keeps fourteen days; this keeps history. The
+  numbers are for one question -- is anyone arriving, and from where -- not
+  for following a person around the site, which it cannot do.
+#}
+{% block extrahead %}
+  {{ super() }}
+  {% if config.extra.cloudflare_beacon %}
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "{{ config.extra.cloudflare_beacon }}"}'></script>
+  {% endif %}
+{% endblock %}
