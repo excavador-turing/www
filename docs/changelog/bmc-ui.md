@@ -2,9 +2,26 @@
 
 The web interface the board serves.
 
-Newest release **v3.27.0**, 25 in total. Every entry is the release note as published on [GitHub](https://github.com/excavador-turing/BMC-UI/releases), fetched by `just refresh-changelog` — not written here, so the two cannot disagree.
+Newest release **v3.28.0**, 26 in total. Every entry is the release note as published on [GitHub](https://github.com/excavador-turing/BMC-UI/releases), fetched by `just refresh-changelog` — not written here, so the two cannot disagree.
 
-???+ note "v3.27.0 — 12 September 2026"
+???+ note "v3.28.0 — 12 September 2026"
+
+    BMC-UI built from the `hive` branch of this fork, for the
+    Turing Pi 2 BMC firmware build to consume.
+
+    **Not a Turing Pi release.** `bmc-ui-v3.28.0.tar.gz`
+    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
+
+    Verify with:
+
+    ```
+    sha256sum -c SHA256SUMS
+    ```
+
+    SHA256SUMS lists bare filenames, so run it from the directory
+    holding the tarball.
+
+??? note "v3.27.0 — 12 September 2026"
 
     BMC-UI built from the `hive` branch of this fork, for the
     Turing Pi 2 BMC firmware build to consume.
