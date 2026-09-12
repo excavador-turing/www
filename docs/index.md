@@ -24,7 +24,7 @@ hide:
 
 <p class="lede">Upstream stopped in February 2025. This fork keeps the board on a supported kernel, makes a bad flash undo itself, and reads the sensors the hardware always had.</p>
 
-<div class="tp-actions"><a class="md-button md-button--primary" href="#demo/fork">Try it, live</a> <a class="md-button" href="guides/install/">Install it</a> <a class="md-button" href="guides/upgrade-from-stock/">Coming from stock?</a> <a class="tp-feedback" href="feedback/">Feedback →</a></div>
+<div class="tp-actions"><a class="md-button md-button--primary" href="#demo/fork">Try it, live</a> <a class="md-button" href="guides/install/">Install it</a> <a class="md-button" href="guides/upgrade-from-stock/">Coming from stock?</a> <a class="tp-feedback" href="roadmap/">Vote on what comes next →</a> <a class="tp-feedback" href="feedback/">Feedback →</a></div>
 
 </div>
 
