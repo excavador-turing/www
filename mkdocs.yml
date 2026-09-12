@@ -147,7 +147,7 @@ extra:
   # export webAnalyticsToken-turingpi.xyz; empty means no beacon is emitted
   # (overrides/main.html checks). GitHub's own panel keeps fourteen days;
   # this keeps history, for one question: is anyone arriving, from where.
-  cloudflare_beacon: ""
+  cloudflare_beacon: "c6b63bc6a4b14ad9ac85b01f2af1b8bd"
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/excavador-turing
