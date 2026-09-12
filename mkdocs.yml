@@ -72,6 +72,7 @@ nav:
       - BMC-UI: changelog/bmc-ui.md
       - tpi: changelog/tpi.md
   - Roadmap: roadmap.md
+  - Feedback: feedback.md
   - About: about.md
   - Contributing: contributing.md
 

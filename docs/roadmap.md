@@ -11,7 +11,7 @@ done first, and the argument for each is in the discussion rather than here.
 
 Not on the list? [Propose it](https://github.com/excavador-turing/BMC-Firmware/discussions/new?category=ideas)
 — a sentence about the problem is enough. Found something broken?
-[Report it](https://github.com/excavador-turing/BMC-Firmware/issues/new/choose),
+[Report it](feedback.md),
 and read [what is and isn't fixed](reference/known-faults.md) first, because it
 may already be there with a ticket.
 

@@ -820,3 +820,10 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
   .md-typeset .tp-plates--compact.grid.cards > ul > li > p:first-child { display: none; }
   .md-typeset .tp-plates--compact.grid.cards > ul > li { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The fourth action on the front page is a link, not a button: three buttons
+   are a choice, four are a menu. It is there because the owner looked for
+   "feedback" on the site and did not find it -- the footer icons are real
+   but nobody reads a footer for that. */
+.md-typeset .tp-actions .tp-feedback { display: inline-flex; align-items: center; font-size: 0.72rem; font-weight: 600; color: var(--tp-muted); padding: 0.45rem 0.6rem; }
+.md-typeset .tp-actions .tp-feedback:hover { color: var(--tp-ink); }
