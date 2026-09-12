@@ -118,6 +118,40 @@ userspace dies stays dead until someone cuts its power.
 
 ## Fixed, and worth knowing about
 
+### Reconnect wrote a second copy of the scrollback
+
+**Affected every release up to BMC-UI 3.27.0; fixed in 3.28.0 (firmware
+v2.31.0).** Pressing **Reconnect** kept the terminal, as it is meant to, and
+then replayed the daemon's whole 16 KiB ring buffer underneath what was
+already on screen — the same lines with the same kernel timestamps, twice:
+
+```
+[64064.315286] eth0: renamed from tmpe5b7c
+[65264.283498] eth0: renamed from tmp5cff0
+[61664.597477] eth0: renamed from tmpc8e55    <- the ring again, from the top
+[62864.338706] eth0: renamed from tmp83239
+```
+
+It affected a board's own interface and the fleet alike, because one component
+serves both.
+
+The replay is there because the daemon forwards only what arrives *after* a
+subscriber joins; without it, a console opened on a module that has been up
+for hours shows nothing at all. It simply never asked whether the terminal
+already held that output.
+
+Clearing the terminal first would have fixed the duplication and cost the
+thing the scrollback is for. The daemon keeps only the last 16 KiB and one
+module boot is about 82 KB, so the terminal is the only place a full boot
+survives. Instead the replay now works out where what it has already shown
+ends inside the buffer it has just been handed, and writes only what follows:
+a reconnect with nothing new writes nothing, one after a gap writes exactly
+the gap, and when the module wrote more than the ring holds there is no
+overlap and the whole buffer is written, because there is a hole either way.
+
+**Redraw is unchanged** and still clears first. It answers a different
+question: *show me what the module's screen says now*.
+
 ### A console that failed at random, and a board that never said why
 
 **Affected every release from bmcd 2.30.0 to 2.36.2; fixed in 2.36.3
