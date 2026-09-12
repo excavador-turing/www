@@ -486,10 +486,17 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 /* Five across, not four: fourteen plates over four columns is four rows and
    142px too many at 1440. Five is three rows, and a plate this shape does
    not need the width. */
-@media (min-width: 1200px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; } }
+/* SIX columns from 1200px, not five, since the sixteenth feature landed.
+   Fifteen plates divided into five columns as exactly three rows; sixteen
+   needs a fourth, and that fourth row is what pushed this page 146px past the
+   fold on a 1440x900 laptop. Six columns is three rows again (6+6+4) with the
+   plates no narrower than the 4-column case a 1199px window already gets. */
+@media (min-width: 1200px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.5rem; } }
 /* A tablet is 768 wide and 1024 tall: three columns is five rows and 44px
    too many, four columns is four rows and fits. */
-@media (max-width: 1199px) and (min-width: 700px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; } }
+/* Four columns here would be four rows for sixteen plates; five is four rows
+   too on the narrow end but the plates stay legible, and the page fits. */
+@media (max-width: 1199px) and (min-width: 700px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.45rem; } }
 @media (max-width: 699px) and (min-width: 561px) { .md-typeset .tp-plates--compact.grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; } }
 /* A phone gets two columns and the names alone: fourteen one-line clauses
    under fourteen names is a wall, and each name is a link to the page that

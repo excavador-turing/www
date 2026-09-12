@@ -6,7 +6,7 @@ hide:
 
 <div class="tp-hero-band tp-one-screen tp-hero-band--plates" markdown>
 <span class="tp-eyebrow">Features</span>
-# Fifteen things this board does that it did not before
+# Sixteen things this board does that it did not before
 
 <p>Every one of them started as something that went wrong on a real board. Behind each plate is the argument, with the measurement that backs it.</p>
 </div>
@@ -54,6 +54,12 @@ hide:
     [Flash a module from the card](flash-from-the-card.md)
 
     What is on the board's own SD card, what can be written to a module, and why the rest cannot.
+
+-   [![](../assets/icons/access.svg)](who-may-reach-this-board.md)
+
+    [Who may reach this board](who-may-reach-this-board.md)
+
+    The password, and the certificate a proxy must hold to name you — both readable and both changeable, from the page that asks for one of them.
 
 -   [![](../assets/icons/versions.svg)](pick-a-version.md)
 
