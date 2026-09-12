@@ -1,6 +1,6 @@
 # Metrics
 
-Upstream's firmware exposes no metrics. This fork serves **34 families**
+Upstream's firmware exposes no metrics. This fork serves **40 families**
 at `/metrics`, in Prometheus text format.
 
 This page is generated from the daemon's source, so it cannot describe a metric
@@ -108,6 +108,39 @@ build is simply absent rather than zero.
 |---|---|---|
 | `bmcd_node_power_on_seconds` | gauge | Seconds since a compute module was powered on. |
 | `bmcd_node_power_state` | gauge | Whether a compute module is powered on. |
+| `bmcd_node_usb_boot_armed` | gauge | 1 when a module's USB-boot pin is asserted, which stops it booting from its own eMMC. |
+| `bmcd_usb_config` | gauge | The board's persisted USB multiplexer configuration, labelled with its node, mode, route and bus type. |
+
+!!! warning "The one to put a rule on"
+    `bmcd_node_usb_boot_armed` is the only reading here that describes a
+    **trap rather than a state**. Flashing a module leaves the board's
+    persisted configuration at `Flashing(nodeN, …)`, and the daemon re-applies
+    it on every start — which holds that module's USB-boot pin high and stops
+    it booting from its own eMMC.
+
+    The module carries on running, because it is already booted. The failure
+    arrives at its *next* reboot, which can be weeks later, and it looks like
+    dead hardware: nothing at all on the serial console, not even a bootloader
+    banner, because the loader does not use the console; nothing on the
+    network; and the board still reporting the rail on. `tpi usb status`
+    cannot tell you either — it prints the same route for a normal
+    configuration and for this one.
+
+    So alert on **duration**, not on the state. Flashing a module is a
+    legitimate thing to be doing; a module still armed fifteen minutes later
+    is a forgotten `tpi usb device -n N`, and the page reaches whoever armed
+    it while they still remember.
+
+    ```yaml
+    - alert: ModuleLeftArmedForUsbBoot
+      expr: bmcd_node_usb_boot_armed == 1
+      for: 15m
+      annotations:
+        summary: "{{ $labels.node }} will not boot from its own eMMC - run `tpi usb device`."
+    ```
+
+    The family is four samples rather than one because a single "which node"
+    gauge cannot say *none*, and none is the normal answer.
 
 ## The BMC itself
 
@@ -122,6 +155,22 @@ build is simply absent rather than zero.
 | `bmcd_process_resident_bytes` | gauge | This daemon's own resident set. Board memory says the board is being consumed; only this says by whom. |
 | `bmcd_process_threads` | gauge | Threads this daemon has. Read beside the resident set: a heap leak grows memory with this flat, while a leaked task or an unreaped blocking thread grows both, because every thread carries a stack. |
 | `bmcd_uptime_seconds` | gauge | Seconds since the BMC booted. |
+
+## The certificate it is serving
+
+| metric | type | what it is |
+|---|---|---|
+| `bmcd_tls_certificate_expiry_timestamp_seconds` | gauge | When the certificate the listener is serving expires. |
+| `bmcd_tls_certificate_info` | gauge | The key behind that certificate, in a `key` label. Always `1`; the answer is the label. |
+
+Both describe the **running listener**, not whatever is on disk now. They are
+read once, when the certificate is read, which is at start — so replacing the
+file and not restarting is exactly the case where a fresh read would lie, and
+these keep telling you what the board is actually presenting.
+
+Alert on the expiry with a long fuse. A board whose certificate has expired
+still serves, but nothing that verifies can reach it, and the recovery needs a
+hand on the board.
 
 ## NAND
 
@@ -146,6 +195,7 @@ build is simply absent rather than zero.
 | metric | type | what it is |
 |---|---|---|
 | `bmcd_firmware_promotion_total` | counter | Boots that ran the firmware health gate, by what the gate decided. `promoted` is derived as attempts minus rollbacks, because the gate has no single line meaning `kept`; a board cut off mid-gate therefore counts as promoted. |
+| `bmcd_firmware_last_promotion_timestamp_seconds` | gauge | When the firmware health gate last decided, so a dashboard can say *when* and not only how often. Absent rather than wrong when the board's clock cannot be trusted: the gate records the board's own time, which on a BMC that has just come up may be well before the real one, and only UTC is accepted. |
 | `bmcd_firmware_slot_info` | gauge | A firmware slot on the BMC's NAND. The rollback slot is not mounted, so it has no version. |
 | `bmcd_firmware_slot_size_bytes` | gauge | Size of the firmware in a slot. |
 | `bmcd_firmware_update_staged` | gauge | Whether a firmware update is staged for the next boot. Absent when the U-Boot environment cannot be read. |

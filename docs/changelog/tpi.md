@@ -2,9 +2,17 @@
 
 The command-line client.
 
-Newest release **v1.7.0**, 7 in total. Every entry is the release note as published on [GitHub](https://github.com/excavador-turing/tpi/releases), fetched by `just refresh-changelog` — not written here, so the two cannot disagree.
+Newest release **v1.8.0**, 8 in total. Every entry is the release note as published on [GitHub](https://github.com/excavador-turing/tpi/releases), fetched by `just refresh-changelog` — not written here, so the two cannot disagree.
 
-???+ note "v1.7.0 — 11 September 2026"
+???+ note "v1.8.0 — 11 September 2026"
+
+    #### What's Changed
+    * 1.8.0: a false warning, a command that broke, and two the daemon had and this did not by @excavador in https://github.com/excavador-turing/tpi/pull/7
+
+
+    **Full Changelog**: https://github.com/excavador-turing/tpi/compare/v1.7.0...v1.8.0
+
+??? note "v1.7.0 — 11 September 2026"
 
     #### What's Changed
     * The rename does not move your metrics history by @excavador in https://github.com/excavador-turing/tpi/pull/5

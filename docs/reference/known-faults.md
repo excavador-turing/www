@@ -118,6 +118,70 @@ userspace dies stays dead until someone cuts its power.
 
 ## Fixed, and worth knowing about
 
+### A console that failed at random, and a board that never said why
+
+**Affected every release from bmcd 2.30.0 to 2.36.2; fixed in 2.36.3
+(firmware v2.30.0).** A serial console or an API call arriving through a proxy
+would occasionally fail outright, on any board, with nothing in the daemon's
+log and the board perfectly healthy either side of it. Reconnecting usually
+worked, which is what made it look like a network fault.
+
+OpenSSL will not resume a TLS session on a server that asks for client
+certificates unless the context carries a session id context — and the refusal
+is not a quiet cache miss. It is `internal_error`, fatal, sent before a byte
+of HTTP is exchanged:
+
+```
+error:0A000115:SSL routines:ssl_get_prev_session:session id context uninitialized
+```
+
+That error is raised on the **server**, which never logged it. The only trace
+anywhere was an alert the client could not explain.
+
+It looked random because of who resumes. A proxy keeps one session per board
+and offers it on the next connection it opens, so connections taken from the
+pool were always fine and new ones were a coin flip. Measured on a gateway in
+front of two boards: **8 of 28** new connections failed to one, **19 of 45**
+to the other. Reproduced deterministically from the same host — 30 fresh
+connections all succeeded, 30 offering back a saved session all failed.
+
+Nothing about it was specific to a gateway. Any client that resumes a session
+hit the same wall, and the fault arrived the day client certificates were
+first offered, so it was present and invisible for six releases.
+
+The acceptor now sets a session id context, derived from the client CA so that
+replacing a board's trust anchor will not resume a session authenticated under
+the old one.
+
+*Tracked as SQU-212.*
+
+### A module in flash mode looked exactly like dead hardware
+
+**Fixed in bmcd 2.36.3 (firmware v2.30.0), by making it visible rather than by
+changing the behaviour.** Flashing a module leaves the board's persisted USB
+configuration at `Flashing(nodeN, …)`, and the daemon re-applies it on every
+start — which holds that module's USB-boot pin high and stops it booting from
+its own eMMC.
+
+The module carries on running, because it is already booted. The failure
+arrives at its **next** reboot, which can be weeks later, and by then nothing
+connects the two. What you see is a module that is silent on the serial
+console — not a byte, not even a bootloader banner, because the loader does
+not use the console — unreachable on the network, with the board still
+reporting its rail on. `tpi usb status` did not help: it prints the same route
+for a normal configuration and for this one.
+
+Twenty minutes went into exactly that on 2026-09-12, on a board where the
+answer was sitting in the daemon's own database unexported.
+
+`/metrics` now carries `bmcd_node_usb_boot_armed`, one sample per module.
+Alert on it lasting more than a few minutes and the page reaches whoever armed
+it while they still remember doing so; the
+[metrics reference](metrics.md#compute-modules) has the rule. Finish a flash
+with `tpi usb device -n N` and it never arms at all.
+
+*Tracked as SQU-213.*
+
 ### The board could stop checking for firmware, for ever
 
 **Affected every release up to bmcd 2.34.0; fixed in 2.35.0.** The Firmware
