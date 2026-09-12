@@ -24,6 +24,7 @@ may already be there with a ticket.
 | [A hardware watchdog, so a hung daemon does not mean a trip to the rack](https://github.com/excavador-turing/BMC-Firmware/discussions/24) | The SoC has one; this firmware does not arm it yet. The last gap where recovery means walking to the hardware. | Open |
 | [Choose the self-signed certificate's key type and validity](https://github.com/excavador-turing/BMC-Firmware/discussions/26) | Two settings with sane defaults, and a renamed board that reissues its own certificate. | Open |
 | [Remote syslog, and an audit line for every mutating API call](https://github.com/excavador-turing/BMC-Firmware/discussions/27) | Logs that survive the board, and one line per call that changed something. | Open |
+| [Manage the board's SSH keys from the interface and the fleet](https://github.com/excavador-turing/BMC-Firmware/discussions/29) | See, add and revoke the keys `root` trusts — on one board, or on every board at once — instead of editing a file that outlives every flash. | Open |
 | [VLANs on the board's switch, with apply-then-confirm](https://github.com/excavador-turing/BMC-Firmware/discussions/25) | Segment the management network — with a change that reverts itself unless confirmed through the new configuration. | Backlog |
 
 ## Shipped, recently
