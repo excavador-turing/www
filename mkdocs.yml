@@ -71,6 +71,7 @@ nav:
       - bmcd: changelog/bmcd.md
       - BMC-UI: changelog/bmc-ui.md
       - tpi: changelog/tpi.md
+  - Roadmap: roadmap.md
   - About: about.md
   - Contributing: contributing.md
 
@@ -141,3 +142,14 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/excavador-turing
+      name: The code
+    # The footer is the one place every page shares, so it is where a reader
+    # who found something wrong or wants something new is told where to go.
+    # Bugs to Issues, which have templates; ideas to Discussions, because that
+    # is the category GitHub gives upvotes to (the Roadmap page explains).
+    - icon: fontawesome/solid/bug
+      link: https://github.com/excavador-turing/BMC-Firmware/issues/new/choose
+      name: Report a problem
+    - icon: fontawesome/solid/lightbulb
+      link: https://github.com/excavador-turing/BMC-Firmware/discussions/categories/ideas
+      name: Propose a feature, or vote on one

@@ -1,9 +1,9 @@
 # Installing on your own board
 
 !!! danger "Read this part"
-    This is unofficial firmware for hardware you own. It has run on exactly one
-    board — mine — across the upgrades
-    [its own counter records](../reference/gate-history.md).
+    This is unofficial firmware for hardware you own. It has run on two boards
+    — both mine, both revision v2.5.2 — across the upgrades
+    [their own counters record](../reference/gate-history.md).
 
     The A/B health gate makes it **safer than upstream's update path**: a bad
     image reboots back onto the previous one by itself. But it cannot save an
@@ -14,7 +14,8 @@
 
 ## What you need
 
-- A Turing Pi 2, revision **v2.4, v2.5 or v2.5.1**
+- A Turing Pi 2, revision **v2.4, v2.5, v2.5.1 or v2.5.2**. Only v2.5.2 has
+  been run here; the others are upstream's list, not this fork's proof.
 - The BMC reachable over the network
 - Its root password
 

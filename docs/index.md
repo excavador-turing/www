@@ -34,7 +34,7 @@ hide:
 </a>
 
 <div class="tp-claims" markdown>
-<div markdown><b>Flash it wrong and lose nothing.</b><span>A new image boots on trial and is kept only if the board comes back right. On this board: 18 updates, 1 automatic rollback, 0 trips to the rack — [read off the board](reference/gate-history.md).</span></div>
+<div markdown><b>Flash it wrong and lose nothing.</b><span>A new image boots on trial and is kept only if the board comes back right. On this board: 26 updates, 1 automatic rollback, 0 trips to the rack — [read off the board](reference/gate-history.md).</span></div>
 <div markdown><b>Update the BMC without touching your nodes.</b><span>Upstream power-cycles all four compute modules during a firmware update. This fork leaves their rails alone.</span></div>
 <div markdown><b>Software that is still maintained.</b><span>Kernel 6.12 LTS on Buildroot 2025.02 LTS. Upstream ships 6.8 on an end-of-life Buildroot, and its last release was February 2025.</span></div>
 </div>

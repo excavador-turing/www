@@ -22,7 +22,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.23.0 — 11 September 2026"
 
@@ -42,7 +42,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.22.0 — 11 September 2026"
 
@@ -62,7 +62,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.21.0 — 11 September 2026"
 
@@ -82,7 +82,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.20.0 — 10 September 2026"
 
@@ -102,7 +102,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.19.0 — 09 September 2026"
 
@@ -122,7 +122,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.18.0 — 09 September 2026"
 
@@ -142,7 +142,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.17.0 — 09 September 2026"
 
@@ -162,7 +162,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.16.0 — 09 September 2026"
 
@@ -182,7 +182,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.15.0 — 09 September 2026"
 
@@ -202,7 +202,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.14.0 — 09 September 2026"
 
@@ -222,7 +222,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.13.0 — 09 September 2026"
 
@@ -242,7 +242,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.12.0 — 09 September 2026"
 
@@ -262,7 +262,7 @@ Newest release **v2.24.0**, 21 in total. Every entry is the release note as publ
     `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
     metrics this build's daemon emits. Import it and pick your
     Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    https://turingpi.xyz/guides/monitor-it/
 
 ??? note "v2.11.0 — 09 September 2026"
 
