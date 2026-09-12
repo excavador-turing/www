@@ -95,7 +95,8 @@ hide:
       notice is intact.
 
 <div class="tp-next">
-<a href="../features/"><b>What it does →</b><span>Nine features, each with the evidence behind it.</span></a>
+<a href="../features/"><b>What it does →</b><span>Fifteen features, each with the evidence behind it.</span></a>
 <a href="../guides/install/"><b>Put it on your board →</b><span>Install it, and what to read first.</span></a>
 <a href="../reference/comparison/"><b>The measurements →</b><span>Every claim above, with its date and method.</span></a>
+<a href="../roadmap/"><b>What is coming →</b><span>Planned features you can vote on, and where to propose your own.</span></a>
 </div>
