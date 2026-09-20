@@ -63,6 +63,11 @@ That is a smaller thing than removing the bypass, and it is not a substitute
 for it. It means an unauthenticated power-off can be found afterwards, not
 that it can be prevented.
 
+The forced password change shipping in the next release does **not** fix this
+and does not try to: loopback is exempt from it, for the same reason the bypass
+is hard to remove — a process on the board is already root on the board. The
+two faults look alike and are not the same one.
+
 *Tracked as SQU-165 (a Unix socket authenticated by peer credentials, so the
 bypass can be removed rather than merely narrowed) and SQU-113.*
 
@@ -117,6 +122,39 @@ userspace dies stays dead until someone cuts its power.
 *Tracked as SQU-106, and it is the most valuable unbuilt thing on the list.*
 
 ## Fixed, and worth knowing about
+
+### Every board shipped with the same password, and kept it
+
+**Fixed in the next release (SQU-275).** A board leaves the factory as `root` /
+`turing`. It is printed in the quick-start guide, it is identical on every
+board anyone has bought, and nothing ever asked for it to be changed — on a
+project whose own front page says [a board should not face the
+internet](../guides/facing-the-internet.md). Upstream has had an issue open
+about it since 2023.
+
+Until the password is changed, the board now answers **403 to every API call**
+except logging in, reading the access card, and changing the password, and the
+interface shows one page: the change. Not a warning banner — a banner is a
+thing people close.
+
+The test is the factory password, **not the first login**. `root`'s hash is
+asked whether it still verifies the word `turing`, of `/etc/shadow` itself,
+cached against that file's modification time. So a board whose password was
+changed over SSH before anyone opened the interface is never asked, and a board
+reset to factory defaults is asked again — which a flag saying "somebody has
+been through the wizard" would get wrong in both directions.
+
+**What it deliberately does not cover:** requests from the board's own loopback
+interface, which are exempt. Refusing them would protect nothing — anyone with
+a shell on the board is already root on it and can change the password
+directly — while breaking the on-board `tpi`. The threat this is for is a
+stranger who can reach port 443 on the management LAN, and that stranger is not
+on loopback. `tpi` pointed at a factory board *from another machine* is over
+the network, is refused, and says why.
+
+It is also not the rest of the hardening: SSH still accepts that password until
+key-only SSH lands, and the loopback bypass above is its own fault, tracked
+separately.
 
 ### Reconnect wrote a second copy of the scrollback
 

@@ -120,6 +120,16 @@ page](../reference/comparison.md).
 
 Your root password and your authorised keys survive: they live on the overlay
 volume, which the upgrade does not touch. The hostname survives for the same
-reason. Node power states are read from the hardware on start rather than
+reason.
+
+**With one consequence worth knowing about.** If your board is still on the
+password it shipped with — `root` / `turing` — that survives too, and this
+firmware will not run on it until you change it: the interface shows one page
+asking for a new password, and the API refuses everything else. It is the
+published password on every board ever sold, so a board keeping it is a board
+anyone who can reach it can administer. Twelve characters, once, and the rest
+of the interface opens.
+
+If you changed it at any point, you will not be asked. Node power states are read from the hardware on start rather than
 re-applied from a stale file, so modules are not power-cycled to suit the
 daemon's memory of them.

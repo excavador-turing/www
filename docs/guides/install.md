@@ -93,6 +93,14 @@ from being gone.
 
 ## Afterwards
 
+**The first thing the board asks for is a password.** Boards ship as `root` /
+`turing`, which is printed in the quick-start guide and is the same on every
+board — so until it is changed the interface shows one page and the API
+refuses everything else. Twelve characters minimum. It is one account: the new
+password is also this board's SSH password.
+
+If you had already changed it over SSH, you are never asked.
+
 The interface gains a **Firmware Upgrade** page that lists what every
 configured source offers, and installs a chosen version. Four sources ship by
 default: this fork, the SD card, and both of Turing Pi's own channels.
