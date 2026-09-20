@@ -47,18 +47,39 @@ refresh-gate-history board:
 serve:
     mkdocs serve
 
-# --strict fails on a broken internal link. This site points at repositories
-# that move; the link check is the only thing that notices when one of them
-# moves out from under a page.
-check: build one-screen
+# Everything CI checks, in the order CI checks it. Run this before pushing;
+# `checks.yml` runs exactly these and nothing else, and the deploy runs none
+# of them.
+check: facts-check build screens
 
-# Prove every page that promises one screen still fits on one.
+# Prove every screen reads whole, at nine viewports.
 #
-# The promise those pages make is that you can see the claim, the numbers and
-# where to go next without scrolling. One added paragraph breaks it silently,
-# so it is measured in a browser rather than reviewed by eye.
-one-screen: build
-    ./scripts/one-screen.py
+# A page may scroll. A SCREEN may not: a part of a page marked `data-screen`
+# is a thing the reader must take in at once, and it must fit, with nothing
+# clipped and no picture stretched to fill leftover height.
+#
+# This replaced `one-screen.py`, which asked only whether the document
+# scrolled. The front page cut its cards off mid-sentence at 1366x768 and gave
+# a drawing a 501px box at 2560x1440, and neither scrolled, so both passed --
+# for 132 seconds of every deploy.
+screens: build
+    ./scripts/screens.py
+
+# Re-record the faults the site is allowed to have.
+#
+# 467 the day the gate could first see them. Run this after fixing some, and
+# commit the smaller file -- the gate fails on a baselined fault that no
+# longer happens, so the count cannot drift back up.
+screens-baseline: build
+    ./scripts/screens.py --update-baseline
+
+# Rebuild docs/data/facts.yaml from the pages and data that own each number.
+facts:
+    ./scripts/facts.py
+
+# Fail if the committed facts file no longer matches its sources.
+facts-check:
+    ./scripts/facts.py --check
 
 clean:
     rm -rf site

@@ -15,3 +15,14 @@ pymdown-extensions==11.0.2
 # rather than in a second requirements file because the site has exactly one
 # Python environment and a second one is a second thing to keep pinned.
 websockets==17.1
+
+# Facts, once. Every number the site quotes about itself lives in
+# docs/data/facts.yaml (scripts/facts.py) and pages ask for it rather than
+# retyping it -- `{{ gate.promoted }}`, never 26. Five numbers had already
+# drifted apart by the time this was added.
+#
+# Rendering is OPT-IN per page (`render_macros: true` in front matter),
+# because macros expands Jinja before Markdown and so reaches inside fenced
+# code blocks: reference/metrics.md carries a Prometheus alert template,
+# `{{ $labels.node }}`, which would otherwise be eaten at build time.
+mkdocs-macros-plugin==1.5.0

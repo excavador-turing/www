@@ -1,0 +1,75 @@
+name: Checks
+
+# Everything that judges the site, and nothing that publishes it.
+#
+# These used to live inside the deploy. The screen gate alone was 132 of the
+# 178 seconds a deploy took, while building the site itself took 3 -- so
+# publishing a typo waited two minutes on a browser measuring pages that had
+# not changed. Worse, the thing it was protecting could not be protected that
+# way: a layout regression should stop a merge, not a publish, because by the
+# time a publish is running the change is already on main.
+#
+# So: this blocks merges, `pages.yml` publishes, and neither waits on the
+# other. Make this job required on main in branch protection -- it is the only
+# thing standing between a bad layout and the live site now.
+on:
+  pull_request:
+  workflow_dispatch:
+  # Also on main, where it cannot block anything and is a canary: if a check
+  # fails here, something reached main without passing, and the run is the
+  # record of it.
+  push:
+    branches: [main]
+
+concurrency:
+  # Unlike the deploy, a superseded run of this is pure waste.
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The revision-date plugin reads git history; a shallow clone makes
+          # every page claim it was written at build time, and then the two
+          # builds -- here and in pages.yml -- disagree about every page.
+          fetch-depth: 0
+          lfs: true
+
+      - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: requirements.txt
+
+      - name: install
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
+
+      # Before the build, because a stale facts file makes every page that
+      # quotes it wrong, and the pages themselves will look fine.
+      - name: the facts file matches its sources
+        run: .venv/bin/python scripts/facts.py --check
+
+      - name: build, strict
+        run: .venv/bin/mkdocs build --strict
+
+      # The demo panes are NOT built here. They are somebody else's bundle,
+      # they are proved in the deploy path where they are actually published,
+      # and their absence changes no layout: the frame that holds them is
+      # sized by this site's stylesheet either way.
+      - name: every screen fits, nothing clipped, nothing stretched
+        run: .venv/bin/python scripts/screens.py
+
+      - name: the measurements, if anything failed
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: screens
+          path: screens.json
+          if-no-files-found: ignore
