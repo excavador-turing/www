@@ -34,24 +34,14 @@ render_macros: true
 
 ??? note "What changed"
 
-    <div class="tp-vs">
-    <div class="tp-vs__row"><div class="tp-vs__what">Kernel</div><div class="tp-vs__them">6.8, which is not a longterm release</div><div class="tp-vs__us"><b>6.12 LTS</b>, tracking the stable series</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Buildroot</div><div class="tp-vs__them">2024.05.1, end of life</div><div class="tp-vs__us"><b>2025.02 LTS</b></div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">A bad image</div><div class="tp-vs__them">promoted the moment it boots; recovering means a trip to the rack</div><div class="tp-vs__us"><b>boots on trial</b> and is taken back automatically if the board does not come back right</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Updating the BMC</div><div class="tp-vs__them">power-cycles all four compute modules</div><div class="tp-vs__us"><b>leaves their rails alone</b></div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Board temperature</div><div class="tp-vs__them">unreadable — the sensor exists but the device tree never described it</div><div class="tp-vs__us"><b>read, with its trip points</b>, so the fan can say why it is where it is</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">The fan</div><div class="tp-vs__them">a fixed speed somebody once wrote down</div><div class="tp-vs__us"><b>kernel-governed</b>, and overridable behind an explicit switch</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Metrics</div><div class="tp-vs__them">none</div><div class="tp-vs__us"><b>a documented catalogue</b>, on a listener that holds no credential and reaches nothing else</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Checksums</div><div class="tp-vs__them">none published, on either catalogue</div><div class="tp-vs__us"><b>SHA256SUMS per release</b>, verified on download</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Serial consoles</div><div class="tp-vs__them">a header on the board, and your own USB adapter</div><div class="tp-vs__us"><b>four, in the browser</b>, each replaying the scrollback you missed</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Firmware sources</div><div class="tp-vs__them">one, hard-coded — and its two catalogues disagree</div><div class="tp-vs__us"><b>a setting</b>: GitHub releases, an HTTP directory, or the SD card</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Several boards</div><div class="tp-vs__them">one interface per board, each of which can reflash four computers, each needing its own exposure</div><div class="tp-vs__us"><b>one page over all of them</b>, and it is the only thing exposed — a board is never on the public network</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">The API</div><div class="tp-vs__them">described in prose on a web page</div><div class="tp-vs__us"><b>OpenAPI 3.1, served by the board</b>, and everything generated from it</div></div>
-    <div class="tp-vs__row"><div class="tp-vs__what">Command line</div><div class="tp-vs__them">upstream's <code>tpi</code>, unaware of all of the above</div><div class="tp-vs__us"><b>reaches every endpoint</b> this fork added</div></div>
-    </div>
+    {{ comparison_table() | indent(4) }}
 
-    Every row above is [backed by a measurement](../reference/comparison/), taken
-    on a running board and dated, including the rows where upstream is ahead.
+    Every row above is the [comparison page](reference/comparison.md)'s own,
+    rendered from it: measured on a running board, dated, and including the
+    rows where upstream is ahead. What the table does not carry -- the
+    consoles, the metrics port, the checksums, the fleet page, the API the
+    board describes -- has [a feature page each](features/index.md) with the
+    measurement behind it.
 
 ??? note "What is still not fixed"
 

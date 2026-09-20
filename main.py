@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import html
 import pathlib
+import re
 
 # The four things a reader wants next, in the order they want them. Fixed,
 # because the labels were the loudest inconsistency between these pages and
@@ -101,6 +102,26 @@ def define_env(env):
 """.strip()
 
     @env.macro
+    def comparison_table():
+        """About's "what changed", rendered from the page that measures it."""
+        rows = comparison_rows()
+        stated = (env.variables.get("platform") or {}).get("rows")
+        if stated is not None and stated != len(rows):
+            raise RuntimeError(
+                f"comparison.md has {len(rows)} rows and facts.yaml says "
+                f"{stated}: run `just facts` and commit the result")
+        out = ['<div class="tp-vs">']
+        for label, them, us in rows:
+            out.append(
+                '<div class="tp-vs__row">'
+                f'<div class="tp-vs__what">{_md_inline(label)}</div>'
+                f'<div class="tp-vs__them">{_md_inline(them) or "—"}</div>'
+                f'<div class="tp-vs__us">{_md_inline(us) or "—"}</div>'
+                "</div>")
+        out.append("</div>")
+        return "\n".join(out)
+
+    @env.macro
     def feature_plates():
         """The features index, from the pages themselves.
 
@@ -134,6 +155,42 @@ def define_env(env):
                 f'<span>{html.escape(p["summary"])}</span></a>')
         out.append("</div>")
         return "\n".join(out)
+
+
+def comparison_rows() -> list[tuple[str, str, str]]:
+    """The upstream-vs-fork rows of reference/comparison.md.
+
+    About carried its own thirteen-row table of "what changed" -- a
+    DIFFERENT thirteen from the comparison page's, sharing five rows and
+    diverging on eight, under a sentence promising that every row was backed
+    by a measurement there. It was not: Metrics, Checksums, Serial consoles,
+    Firmware sources, Several boards, The API and Command line have no row on
+    the comparison page at all. Two hand-kept tables of the same claim, and a
+    count above them that matched only by coincidence.
+
+    Same parse as scripts/facts.py: a labelled row, skipping the header rule,
+    the `route` header and the two-catalogue table's linked rows. The macro
+    asserts its count against the facts file at build time, so the two
+    cannot drift silently.
+    """
+    text = (ROOT / "docs" / "reference" / "comparison.md").read_text()
+    rows = []
+    for m in re.finditer(r"^\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|", text, re.M):
+        label = m.group(1).strip()
+        if not label or set(label) <= set("-: ") or label.lower() == "route":
+            continue
+        if label.startswith("["):
+            continue
+        rows.append((label, m.group(2).strip(), m.group(3).strip()))
+    return rows
+
+
+def _md_inline(s: str) -> str:
+    """Bold and code, which is all the comparison cells use."""
+    s = html.escape(s)
+    s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
+    return s
 
 
 def _front_matter(path: pathlib.Path) -> dict:
