@@ -7,9 +7,21 @@ hide:
 
 The web interface the board serves.
 
-Newest release **v3.31.0**, 20 September 2026. 29 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v3.32.0**, 20 September 2026. 30 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "v3.31.0 — 20 September 2026"
+???+ note "v3.32.0 — 20 September 2026"
+
+    **Changed**
+
+    - **Which module: four pills, not a drop-down.** Console, USB and Flash each
+      opened with a list that unfolded to show four fixed entries, one of them
+      already chosen -- a click and a scan to answer a question the page could
+      have asked in one row. The three tabs now share one `NodePicker`: Node 1
+      to 4 side by side, the chosen one green, keyboard-reachable as a radio
+      group. The flash form still reads the module by field name; a hidden
+      input carries it where the select used to.
+
+??? note "v3.31.0 — 20 September 2026"
 
     **Fixed**
 
