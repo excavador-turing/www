@@ -94,6 +94,54 @@ That second one is the trap. Spanning tree's delay is handled for you — see
 below — but a DHCP server that does not answer on the new segment is not, and
 it looks exactly like a board that has gone away.
 
+## Your own layout
+
+The three above are starting points, not modes. **The table is editable**, and
+once you have picked a preset you are simply editing it — there is nothing to
+switch into and nothing to switch back out of.
+
+Each port gets one **untagged** VLAN, or none, and any number of **tagged**
+ones. A port in no VLAN carries nothing, which is how you park an uplink you
+are not using. Two switches sit under the table: whether the switch looks at
+VLANs at all, and whether spanning tree is on.
+
+**The BMC's own port is untagged only**, so its tagged box cannot be typed in.
+This board's network stack reads untagged frames; a tag there would be traffic
+it cannot see.
+
+**Name your VLANs.** Beside each number there is a box for a word —
+`management`, `storage`, `guests`. The board carries the names with the
+configuration and never acts on them. They are for the person who opens this
+board in a year, which is usually you, having forgotten what 30 was for.
+
+**The board checks every edit as you make it.** Not this page, and not the
+interface — the board. Each change goes to it and comes back either accepted,
+or refused with the reason in the board's own words, and Apply is greyed out
+until it is accepted. Warnings appear beside the port they are about. Nothing
+here keeps its own copy of the rules, because a copy would eventually disagree
+with the board, and the way that disagreement shows up is a board nobody can
+reach.
+
+### One module on its own network
+
+Say `node3` runs something that should not see the rest.
+
+1. Start from **Flat**, then turn *Look at VLANs* on.
+2. Set `node3`'s untagged VLAN to `30`, and name it.
+3. The board warns: *VLAN 30 has one member, node 3. It can talk to nobody.*
+   True — it has no way off the board.
+4. Put `ge1` in `30` as well and plug `ge1` into the port your router serves
+   that network on. The warning goes.
+
+Everything else stays in VLAN 1 out of `ge0`, including the BMC.
+
+### Two networks, one cable
+
+Both VLANs tagged out of `ge0`, which is what **Trunk** builds — but by hand
+you can mix: the modules split across two VLANs, one uplink trunked and the
+other parked, the BMC untagged on the management VLAN. The refusals below are
+the only shapes the board will not build.
+
 ## Applying it without locking yourself out
 
 The board's own port is the one that can strand it. Put it in a VLAN nothing
@@ -126,6 +174,31 @@ the previous configuration back by itself and records why, and the next time
 you load the page it tells you: *your change at 12:03 was put back because it
 was not confirmed in time*. That is the design working.
 
+### Try it
+
+Beside Apply there is **Try it**, which does the same thing with no intention
+of confirming. Apply the layout, watch what you reach the board by, and let
+the window run out.
+
+For a hand-made layout this is the honest dry run, and it is the only one
+there is. A configuration can be correct, pass every refusal, and still cut
+the particular path *you* arrive by — and the way you find that out is by
+losing the page. Try it means losing the page for thirty seconds on purpose
+rather than indefinitely by accident.
+
+### Confirm from the network you just changed
+
+> Confirm from the browser, or from `tpi` on the machine you reach the board
+> with. That is the whole proof: if the confirmation arrives, the new
+> configuration works for you. A confirmation sent from a shell **on the board
+> itself** arrives over nothing, proves nothing, and the board refuses it.
+
+This is not theory. On 20 September 2026 a configuration that had been reasoned
+through and looked harmless was applied to a board and confirmed from that
+board's own console. It locked its owner out of the interface — and the revert
+window, which exists for exactly that, never got the chance to run, because
+the confirmation had already arrived.
+
 ### Why the countdown starts late
 
 **The window is 30 seconds by default, and it does not start when you press
@@ -147,7 +220,9 @@ You can set the window per apply, between 10 seconds and 5 minutes.
 In order. The first one is almost always enough.
 
 **1. Wait.** Do not confirm, and the board reverts on its own within the
-window. This is the ordinary recovery and it needs nothing from you.
+window. This is the ordinary recovery and it needs nothing from you. And if
+you are ever tempted to confirm from the board's own console to save the
+change — do not. Let it revert.
 
 **2. Reboot.** Only a *confirmed* configuration is ever written down. A reboot
 during the window comes back on the previous one, because the pending change
