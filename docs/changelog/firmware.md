@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # BMC-Firmware
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.

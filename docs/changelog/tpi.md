@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # tpi
 
 The command-line client.

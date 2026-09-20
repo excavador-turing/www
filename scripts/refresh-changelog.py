@@ -180,7 +180,11 @@ def render(slug: str, repo: str, blurb: str) -> dict:
     missing_entry = [e["version"] for e in shipped
                      if e["source"] == "release-note"]
 
-    lines = [f"# {repo}", "", blurb, ""]
+    # No table of contents: the page is a list of collapsed releases, and the
+    # only headings it has are the ones inside a release body -- so the
+    # contents read "Note, Confirmed" and named nothing a reader wanted.
+    lines = ["---", "hide:", "  - toc", "---", "",
+             f"# {repo}", "", blurb, ""]
     if newest:
         lines += [
             f"Newest release **{newest['version']}**, "

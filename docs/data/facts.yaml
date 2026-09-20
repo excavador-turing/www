@@ -21,11 +21,11 @@ releases:
     count: 38
   ui:
     newest: v3.29.0
-    count: 28
+    count: 27
   tpi:
     newest: 1.8.0
     count: 13
-  total: 108
+  total: 107
 features:
   source: docs/features/*.md -- a feature is a page
   count: 11

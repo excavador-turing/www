@@ -16,6 +16,7 @@
      heading overshot its paragraph by most of the screen. */
   --tp-measure: 740px;
   --tp-header: 2.4rem;   /* Material's header height */
+  --tp-tabs: 2.4rem;     /* the tab strip under it (navigation.tabs.sticky) */
   --tp-bar: 2.6rem;      /* the Overview / Live demo strip */
 }
 [data-md-color-scheme="slate"] {
@@ -25,23 +26,34 @@
   --tp-plate: #1c1c1c;
 }
 
-/* ---- the front page: one screen, two views ---------------------------- */
-/* The page is a selling page and a demo, switched in place: the hash picks
-   the view (#demo/fork) so a click swaps them without a load, and a link to
-   the demo is a link, not a route. It is full-width -- Material's 61rem grid
-   is right for prose and wrong for four plates and an iframe. */
+/* ---- the front page: chapters, and the demo ---------------------------- */
+/* The page was one screen, locked to the viewport height, with the four
+   destination cards standing in for a footer because a footer was the
+   hundred pixels that made it scroll. That constraint is what broke it: the
+   card pictures took whatever height was left over, so they were 90px on a
+   1280x720 laptop and 501px on a 2560x1440 monitor, and on the short screens
+   the sentence under each card was cut off mid-word.
+
+   So the page scrolls now, in chapters. The FIRST screen is still complete on
+   its own -- headline, one line, two buttons, and the interface itself -- and
+   every chapter below it fits a screen too, which `scripts/screens.py`
+   measures at nine viewports rather than trusting. Nothing is sized from
+   leftover height any more: a picture is sized by its own aspect ratio and
+   the text is sized by the type scale.
+
+   Full width, because Material's 61rem prose grid is right for a guide and
+   wrong for a picture beside a paragraph. */
 .md-main:has(.tp-landing) .md-grid { max-width: 100%; }
-.md-main:has(.tp-landing) .md-content__inner { margin: 0 auto; padding: 0 clamp(1rem, 2.5vw, 2.4rem) 0.4rem; max-width: 1760px; }
+.md-main:has(.tp-landing) .md-content__inner { margin: 0 auto; padding: 0 clamp(1rem, 2.5vw, 2.4rem) 0; max-width: 1600px; }
 .md-main:has(.tp-landing) .md-content__inner::before { display: none; }
 .md-main:has(.tp-landing) .md-content__button,
 .md-main:has(.tp-landing) .md-source-file { display: none; }
-/* The footer and the main's top margin were the hundred pixels that made a
-   one-screen page scroll. The four destinations replace the footer here. */
-body:has(.tp-landing) .md-footer { display: none; }
 body:has(.tp-landing) .md-main__inner { margin-top: 0; }
-/* Material never sets display on these, but anything below that does would
-   silently defeat the hidden attribute, so say it once. */
 .tp-landing [hidden] { display: none !important; }
+
+/* The demo is a view, not a chapter: it takes the whole window, and the
+   site's footer steps out of the way while it is open. */
+body.tp-demo-open .md-footer { display: none; }
 
 .tp-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: var(--tp-bar); }
 .tp-seg { display: inline-flex; gap: 0.15rem; padding: 0.15rem; border: 1px solid var(--tp-line); border-radius: 999px; }
@@ -51,69 +63,104 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 .md-typeset .tp-back:hover { background: var(--tp-ink); color: #fff; }
 .md-typeset .tp-panes a[aria-current="true"] { background: var(--tp-lime); color: var(--tp-lime-ink); }
 
-/* The overview has no bar of its own: the demo is one click away in the
-   hero and in the first plate, and a third entry was noise. The overview fills
-   what is left of the viewport. Every
-   size below is in vh or clamped so the whole thing lands on one screen from
-   about 800px tall up; below that it scrolls, honestly. */
-.tp-view--home {
-  height: calc(100vh - var(--tp-header) - 0.4rem);   /* older browsers */
-  height: calc(100svh - var(--tp-header) - 0.4rem);
+/* A screen: one idea, taken in at once. Its height is a MINIMUM, never a
+   fixed size -- content that needs more room gets it and the page grows,
+   which is the whole difference from the layout this replaces. The gate
+   fails a screen that grows past the viewport, so the two agree. */
+.tp-screen {
   box-sizing: border-box;
-  display: grid; grid-template-rows: auto auto auto minmax(0, 1fr);
-  gap: clamp(0.7rem, 2.2svh, 1.4rem);
-  padding: clamp(0.8rem, 3svh, 2rem) 0 0.3rem;
+  min-height: calc(100svh - var(--tp-header) - var(--tp-tabs));
+  display: grid;
+  align-content: center;
+  gap: clamp(1.2rem, 3.5svh, 2.6rem);
+  padding: clamp(1.4rem, 5svh, 3.4rem) 0;
 }
-.tp-hero { text-align: center; }
+.tp-screen + .tp-screen { border-top: 1px solid var(--tp-line); }
+
+/* Screen one: the claim, and the thing itself. */
+.tp-hero { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: center; }
 .md-typeset .tp-hero h1 {
-  font-size: clamp(1.5rem, 2.6vw, 2.35rem);
-  line-height: 1.08; font-weight: 700; letter-spacing: -0.02em;
-  color: var(--tp-ink); margin: 0 auto 0.5rem; max-width: 24ch; text-wrap: balance;
+  font-size: clamp(2.1rem, 4.4vw, 3.6rem);
+  line-height: 1.02; font-weight: 700; letter-spacing: -0.03em;
+  color: var(--tp-ink); margin: 0 0 1rem; max-width: 15ch; text-wrap: balance;
 }
-.md-typeset .tp-hero p.lede { font-size: clamp(0.8rem, 1vw, 0.95rem); line-height: 1.5; max-width: 72ch; color: var(--tp-ink); margin: 0 auto 0.8rem; }
-.md-typeset .tp-hero p:empty { display: none; }
-.tp-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; }
-.md-typeset .tp-actions .md-button { border-radius: 999px; padding: 0.45rem 1rem; font-weight: 600; font-size: 0.72rem; border: 2px solid var(--tp-ink); color: var(--tp-ink); margin: 0; }
+.md-typeset .tp-hero p.lede { font-size: clamp(0.88rem, 1.15vw, 1.08rem); line-height: 1.55; max-width: 46ch; color: var(--tp-muted); margin: 0 0 1.4rem; }
+.tp-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.md-typeset .tp-actions .md-button { border-radius: 999px; padding: 0.6rem 1.4rem; font-weight: 600; font-size: 0.8rem; border: 2px solid var(--tp-ink); color: var(--tp-ink); margin: 0; }
 .md-typeset .tp-actions .md-button--primary { background: var(--tp-lime); border-color: var(--tp-lime); color: var(--tp-lime-ink); }
 .md-typeset .tp-actions .md-button--primary:hover { filter: brightness(0.96); }
 
-/* What the board is, for the reader who arrived from a search: one photo
-   from the maker, one paragraph, one link out. The whole strip is the link. */
-.md-typeset .tp-what { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: center; color: inherit; border: 1px solid var(--tp-line); border-radius: 0.6rem; padding: 0.5rem 0.9rem 0.5rem 0.5rem; }
+/* Every picture on this page is a screenshot at 2240x1600, so its box is
+   given that aspect ratio and a width, and never a height. That is the rule
+   the old layout broke. */
+.md-typeset .tp-hero__show,
+.md-typeset .tp-chapter__show { margin: 0; min-width: 0; }
+.md-typeset .tp-hero__show img,
+.md-typeset .tp-chapter__show img {
+  display: block; width: 100%; height: auto; aspect-ratio: 2240 / 1600;
+  object-fit: cover; object-position: top center;
+  border: 1px solid var(--tp-line); border-radius: 0.7rem;
+  background: var(--tp-plate);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.10);
+}
+.md-typeset .tp-chapter__show figcaption { font-size: 0.72rem; line-height: 1.45; color: var(--tp-muted); margin-top: 0.6rem; text-align: left; }
+
+/* A chapter: one claim, its evidence, and the picture that shows it. */
+.tp-chapter { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; }
+.tp-chapter--flip .tp-chapter__say { order: 2; }
+.tp-chapter--flip .tp-chapter__show { order: 1; }
+.tp-chapter__say { min-width: 0; }
+.md-typeset .tp-chapter h2 {
+  font-size: clamp(1.5rem, 2.5vw, 2.3rem); line-height: 1.08; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--tp-ink); margin: 0.2rem 0 0.7rem;
+  max-width: 20ch; text-wrap: balance;
+}
+.md-typeset .tp-chapter p { font-size: clamp(0.8rem, 0.95vw, 0.95rem); line-height: 1.6; color: var(--tp-muted); max-width: 52ch; margin: 0 0 1.2rem; }
+.md-typeset .tp-eyebrow {
+  display: inline-block; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--tp-lime); color: var(--tp-lime-ink);
+  padding: 0.24rem 0.6rem; border-radius: 999px;
+}
+.md-typeset a.tp-why { display: inline-block; font-weight: 600; font-size: 0.78rem; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); }
+
+/* What's new: the two questions a returning reader has. It has no picture,
+   so it is one band rather than two columns of unequal weight. */
+.tp-chapter--news { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+.tp-news { width: 100%; max-width: 1100px; text-align: center; }
+.md-typeset .tp-chapter--news h2 { max-width: none; margin-left: auto; margin-right: auto; }
+.tp-news__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem; text-align: left; margin-top: 1.6rem; }
+.tp-news__col { border: 1px solid var(--tp-line); border-radius: 0.7rem; padding: 1.1rem 1.3rem; background: var(--tp-plate); }
+.md-typeset .tp-news__col > b { display: block; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tp-muted); margin-bottom: 0.5rem; }
+.md-typeset .tp-news__col p { font-size: 0.82rem; margin-bottom: 0.8rem; max-width: none; color: var(--tp-ink); }
+.md-typeset .tp-news__col a { font-weight: 600; font-size: 0.76rem; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); margin-right: 0.9rem; }
+
+/* The last chapter: what the board is, for a reader who arrived from a
+   search, and the four places to go next. */
+.tp-chapter--what { grid-template-columns: minmax(0, 1fr); align-content: center; }
+.tp-what-grid { display: grid; gap: 1.4rem; }
+.md-typeset .tp-what { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.2rem; align-items: center; color: inherit; border: 1px solid var(--tp-line); border-radius: 0.7rem; padding: 0.7rem 1.2rem 0.7rem 0.7rem; }
 .md-typeset .tp-what:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-.md-typeset .tp-what img { display: block; height: clamp(72px, 11svh, 120px); width: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 0.4rem; margin: 0; }
-.md-typeset .tp-what__text { font-size: 0.74rem; line-height: 1.5; color: var(--tp-muted); }
-.md-typeset .tp-what__text b { color: var(--tp-ink); font-size: 0.86rem; margin-right: 0.3rem; }
+.md-typeset .tp-what img { display: block; width: 168px; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 0.5rem; margin: 0; }
+.md-typeset .tp-what__text { font-size: 0.78rem; line-height: 1.55; color: var(--tp-muted); }
+.md-typeset .tp-what__text b { color: var(--tp-ink); font-size: 0.9rem; margin-right: 0.3rem; }
 .md-typeset .tp-what__link { color: var(--tp-ink); font-weight: 600; white-space: nowrap; }
 
-/* Three claims: a sentence and its evidence, not adjectives. */
-.tp-claims { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2rem; }
-.tp-claims > div { border-top: 3px solid var(--tp-lime); padding-top: 0.5rem; }
-.md-typeset .tp-claims p { margin: 0; }
-.md-typeset .tp-claims b { display: block; font-size: 0.86rem; line-height: 1.25; color: var(--tp-ink); margin-bottom: 0.2rem; }
-.md-typeset .tp-claims span { font-size: 0.72rem; line-height: 1.45; color: var(--tp-muted); }
-
-/* Four destinations. One click reaches the demo, the features, the docs or
-   the story; the image height follows the viewport so the row fits. */
 .tp-dest { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
 .md-typeset .tp-dest__card {
-  display: flex; flex-direction: column; overflow: hidden;
-  border: 1px solid var(--tp-line); border-radius: 0.6rem; color: inherit;
+  display: flex; flex-direction: column; gap: 0.3rem;
+  border: 1px solid var(--tp-line); border-radius: 0.7rem; color: inherit;
+  padding: 1rem 1.1rem;
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .md-typeset .tp-dest__card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-.tp-dest { min-height: 0; }
-.md-typeset .tp-dest__card { min-height: 0; }
-/* The picture takes whatever height the row has left, so the page fits by
-   construction rather than by a number that is right on one monitor. */
-.md-typeset .tp-dest__card img { display: block; width: 100%; flex: 1 1 0; min-height: 90px; object-fit: contain; background: var(--tp-plate); border-bottom: 1px solid var(--tp-line); margin: 0; }
-.md-typeset .tp-dest__card b { font-size: 0.95rem; color: var(--tp-ink); margin: 0.7rem 0.9rem 0.15rem; }
-.md-typeset .tp-dest__card span { font-size: 0.72rem; line-height: 1.45; color: var(--tp-muted); margin: 0 0.9rem 0.85rem; }
+.md-typeset .tp-dest__card b { font-size: 0.95rem; color: var(--tp-ink); }
+.md-typeset .tp-dest__card span { font-size: 0.74rem; line-height: 1.5; color: var(--tp-muted); }
 
 /* The demo view: one interface at a time, as large as the screen allows.
    Side by side is what made them too small to use. */
 .tp-stage iframe,
-.tp-stage__soon { display: block; width: 100%; height: calc(100svh - var(--tp-header) - var(--tp-bar) - 0.5rem); border: 1px solid var(--tp-line); border-radius: 0.5rem; background: #fff; }
+.tp-stage__soon { display: block; width: 100%; height: calc(100svh - var(--tp-header) - var(--tp-tabs) - var(--tp-bar) - 0.5rem); border: 1px solid var(--tp-line); border-radius: 0.5rem; background: #fff; }
 .tp-stage__soon { display: flex; align-items: center; justify-content: center; text-align: center; border-style: dashed; padding: 2rem; background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(0,0,0,0.025) 10px 20px); }
 .tp-stage__soon > div { max-width: 40ch; }
 .md-typeset .tp-stage__soon h2 { margin: 0 0 0.4rem; font-size: 1.3rem; color: var(--tp-ink); }
@@ -121,19 +168,23 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
 .md-typeset .tp-bar__note { flex: 1 1 0; min-width: 0; font-size: 0.62rem; line-height: 1.35; color: var(--tp-muted); text-align: center; overflow: hidden; }
 @media (max-width: 1100px) { .md-typeset .tp-bar__note { display: none; } }
 
-/* Short or narrow screens scroll, honestly, with a fixed picture height. */
-@media (max-height: 700px), (max-width: 1100px) {
-  .tp-view--home { height: auto; display: flex; flex-direction: column; }
-  .md-typeset .tp-dest__card img { flex: none; height: 150px; }
-}
-@media (max-width: 1100px) {
+/* Narrow: everything stacks, the picture leads, and nothing is dropped.
+   The old layout hid the card pictures, the claim evidence and half the
+   explainer on a phone to buy back height it did not have. */
+@media (max-width: 900px) {
+  .tp-screen { min-height: 0; gap: 1.2rem; padding: 2.2rem 0; }
+  .tp-hero, .tp-chapter { grid-template-columns: minmax(0, 1fr); }
+  .tp-chapter--flip .tp-chapter__say,
+  .tp-chapter--flip .tp-chapter__show { order: 0; }
+  .md-typeset .tp-hero h1 { font-size: clamp(1.9rem, 8vw, 2.4rem); max-width: none; }
+  .md-typeset .tp-hero p.lede { max-width: none; }
+  .tp-news__grid { grid-template-columns: minmax(0, 1fr); }
   .tp-dest { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md-typeset .tp-what { grid-template-columns: minmax(0, 1fr); }
+  .md-typeset .tp-what img { width: 100%; }
 }
-@media (max-width: 720px) {
-  .tp-dest, .tp-claims { grid-template-columns: 1fr; }
-  .md-typeset .tp-what { grid-template-columns: 1fr; }
-  .md-typeset .tp-what img { height: auto; width: 100%; }
-  .tp-bar { height: auto; flex-wrap: wrap; padding: 0.5rem 0; }
+@media (max-width: 560px) {
+  .tp-dest { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---- features page: eight plates, four across ------------------------- */
@@ -370,58 +421,11 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
   .md-main:has(.tp-one-screen) .md-typeset .tp-proof span { font-size: 0.66rem; line-height: 1.35; }
 }
 
-/* ---- the front page on a phone ---------------------------------------- */
-/* The landing was built to land on one screen from about 800px tall up, and
-   below that it scrolled "honestly". A phone is 844px tall and never got
-   there, because three blocks expand rather than shrink when the columns
-   collapse: the explainer's photo goes full-width (260px of a 390px screen),
-   the four destination cards stack with a 150px picture each (920px), and the
-   three claims each carry a paragraph of evidence.
-   So on a phone each of those keeps its most useful half. The destinations
-   keep their names and lose their pictures, the claims keep their sentence
-   and lose the evidence behind it, and the explainer keeps the photo, the
-   question and the link out and drops the paragraph. Nothing here is the only
-   route to anything: every one of them is a link to a page that says it in
-   full. Measured at 390x844 and 375x667. */
-@media (max-width: 600px) {
-  body:has(.tp-landing) .md-main__inner { margin-top: 0; }
-  .tp-view--home { gap: 0.6rem; padding-top: 0.6rem; }
-  .md-typeset .tp-hero h1 { font-size: 1.35rem; margin-bottom: 0.4rem; }
-  .md-typeset .tp-hero p.lede { font-size: 0.76rem; line-height: 1.45; margin-bottom: 0.6rem; }
-  .md-typeset .tp-actions { gap: 0.35rem; }
-  .md-typeset .tp-actions .md-button { font-size: 0.66rem; padding: 0.35rem 0.75rem; border-width: 1px; }
-
-  .md-typeset .tp-what { grid-template-columns: 88px minmax(0, 1fr); gap: 0.6rem; padding: 0.35rem; align-items: center; }
-  .md-typeset .tp-what img { height: 56px; width: 100%; }
-  .md-typeset .tp-what__body { display: none; }
-  .md-typeset .tp-what__text { font-size: 0.7rem; line-height: 1.3; }
-  .md-typeset .tp-what__text b { display: block; font-size: 0.78rem; margin: 0; }
-
-  .tp-claims { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
-  .md-typeset .tp-claims b { font-size: 0.68rem; line-height: 1.2; margin-bottom: 0; }
-  .md-typeset .tp-claims span { display: none; }
-
-  .tp-dest { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-  .md-typeset .tp-dest__card img { display: none; }
-  .md-typeset .tp-dest__card b { font-size: 0.8rem; margin: 0.45rem 0.6rem 0.1rem; }
-  .md-typeset .tp-dest__card span { font-size: 0.62rem; line-height: 1.3; margin: 0 0.6rem 0.45rem; }
-}
-
-/* A 375x667 phone is 177px shorter than a 390x844 one and the landing was
-   exactly that much over. The destinations give it up most cheaply: on a
-   screen this short the four names alone are the menu, and the sentence under
-   each was already a summary of the page it links to. */
-@media (max-width: 600px) and (max-height: 780px) {
-  .tp-view--home { gap: 0.45rem; padding-top: 0.45rem; }
-  .md-typeset .tp-hero h1 { font-size: 1.15rem; margin-bottom: 0.3rem; }
-  .md-typeset .tp-hero p.lede { font-size: 0.7rem; line-height: 1.4; margin-bottom: 0.5rem; }
-  .md-typeset .tp-actions .md-button { font-size: 0.62rem; padding: 0.3rem 0.65rem; }
-  .md-typeset .tp-what img { height: 44px; }
-  .md-typeset .tp-what__text b { font-size: 0.72rem; }
-  .md-typeset .tp-claims b { font-size: 0.62rem; }
-  .md-typeset .tp-dest__card span { display: none; }
-  .md-typeset .tp-dest__card b { font-size: 0.74rem; margin: 0.4rem 0.55rem; }
-}
+/* The front page's old phone tier lived here: it hid the destination
+   pictures, the evidence under each claim and half the explainer, to buy
+   back height for a layout locked to one screen. The page scrolls now, so
+   a phone gets the same words a laptop does -- see the narrow rules in the
+   front-page section above. */
 
 /* ---- the demo pane, sized by what is left rather than by a guess -------- */
 /* The iframe used to be `100vh - header - var(--tp-bar)`, and `--tp-bar` is a
@@ -437,8 +441,8 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    always. */
 .tp-landing:has(.tp-view--demo:not([hidden])) {
   display: flex; flex-direction: column;
-  height: calc(100vh - var(--tp-header) - 0.4rem);   /* older browsers */
-  height: calc(100svh - var(--tp-header) - 0.4rem);
+  height: calc(100vh - var(--tp-header) - var(--tp-tabs) - 0.4rem);   /* older browsers */
+  height: calc(100svh - var(--tp-header) - var(--tp-tabs) - 0.4rem);
 }
 .tp-view--demo:not([hidden]) { flex: 1 1 auto; min-height: 0; display: flex; }
 .tp-view--demo .tp-stage { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
@@ -592,21 +596,12 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
   .md-main:has(.tp-one-screen) .tp-next { margin-top: 0.55rem; padding-top: 0.5rem; }
 }
 
-/* ---- the landing on a tablet ------------------------------------------ */
-/* Between the phone rules and the laptop ones sits a 768x1024 tablet, where
-   the destination cards keep a 150px picture each and stack two abreast: two
-   rows of 230px, and the page was 213px over. The pictures give that back --
-   they are decoration on a card whose name and sentence are the content. */
-@media (min-width: 601px) and (max-width: 1100px) {
-  .md-typeset .tp-dest__card img { height: 96px; }
-  .md-typeset .tp-dest__card b { font-size: 0.88rem; margin: 0.5rem 0.8rem 0.1rem; }
-  .md-typeset .tp-dest__card span { font-size: 0.68rem; line-height: 1.35; margin: 0 0.8rem 0.6rem;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .md-typeset .tp-claims span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .md-typeset .tp-what__text { font-size: 0.7rem; line-height: 1.4;
-    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-  .md-typeset .tp-what img { height: 88px; }
-}
+/* The landing's old tablet tier lived here. It clamped the explainer to four
+   lines, the card subtitles to two, and forced the photo to 88px, all to buy
+   height for a page locked to one screen -- and the forced height fought the
+   photo's own aspect ratio, so at 768x1024 the picture sat in a box a third
+   of its shape and the explainer lost 39px of its text off the bottom. The
+   page scrolls now and needs none of it. */
 
 /* On a tablet the destinations fall to two columns, so three of them make two
    rows and every extra line of subtitle is paid twice. */
@@ -834,3 +829,85 @@ body:has(.tp-landing) .md-main__inner { margin-top: 0; }
    but nobody reads a footer for that. */
 .md-typeset .tp-actions .tp-feedback { display: inline-flex; align-items: center; font-size: 0.72rem; font-weight: 600; color: var(--tp-muted); padding: 0.45rem 0.6rem; }
 .md-typeset .tp-actions .tp-feedback:hover { color: var(--tp-ink); }
+
+/* ---- the site's footer ------------------------------------------------- */
+/* Material's own footer is one line naming the generator plus three icons --
+   a template footer, not a site footer -- and the front page hid even that,
+   because the page was locked to the viewport and the footer was the hundred
+   pixels that made it scroll. The four destination cards were standing in
+   for it.
+   The front page scrolls now, so it has a real one, on every page. */
+.tp-footer {
+  background: var(--tp-plate);
+  border-top: 1px solid var(--tp-line);
+  color: var(--tp-ink);
+  margin-top: 3rem;
+}
+.tp-footer__inner {
+  max-width: 1600px; margin: 0 auto;
+  padding: 2.6rem clamp(1rem, 2.5vw, 2.4rem) 1.8rem;
+  display: grid; grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));
+  gap: 1.6rem 2rem;
+}
+.tp-footer__brand b { display: block; font-size: 0.95rem; margin-bottom: 0.45rem; }
+.tp-footer__brand span { display: block; font-size: 0.74rem; line-height: 1.55; color: var(--tp-muted); max-width: 34ch; }
+.tp-footer__col b {
+  display: block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--tp-muted); margin-bottom: 0.7rem;
+}
+.tp-footer__col ul { list-style: none; margin: 0; padding: 0; }
+.tp-footer__col li { margin: 0 0 0.42rem; }
+.tp-footer__col a { font-size: 0.78rem; line-height: 1.45; color: var(--tp-ink); text-decoration: none; }
+.tp-footer__col a:hover { border-bottom: 2px solid var(--tp-lime); }
+.tp-footer__legal {
+  max-width: 1600px; margin: 0 auto;
+  padding: 0.9rem clamp(1rem, 2.5vw, 2.4rem) 1.6rem;
+  border-top: 1px solid var(--tp-line);
+  display: flex; align-items: center; justify-content: space-between; gap: 1.4rem;
+}
+.tp-footer__legal span { font-size: 0.7rem; line-height: 1.5; color: var(--tp-muted); }
+.tp-footer__legal b { color: var(--tp-ink); }
+.tp-footer__legal a { color: var(--tp-ink); }
+.tp-footer__social { display: flex; gap: 0.7rem; flex: none; }
+.tp-footer__social a { display: inline-flex; width: 1.1rem; height: 1.1rem; color: var(--tp-muted); }
+.tp-footer__social a:hover { color: var(--tp-ink); }
+.tp-footer__social svg { width: 100%; height: 100%; fill: currentColor; }
+@media (max-width: 1100px) {
+  .tp-footer__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tp-footer__brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .tp-footer__inner { grid-template-columns: minmax(0, 1fr); gap: 1.3rem; }
+  .tp-footer__legal { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---- the tab strip ----------------------------------------------------- */
+/* Seven tabs, in the board's palette rather than Material's. The active one
+   is underlined in lime, which is the only accent this site uses. */
+.md-tabs { background: var(--tp-ink); border-bottom: 1px solid rgba(255,255,255,0.08); }
+[data-md-color-scheme="slate"] .md-tabs { background: #0f0f0f; }
+.md-tabs__link { font-size: 0.72rem; font-weight: 600; opacity: 0.72; margin-top: 0.62rem; }
+.md-tabs__link:hover, .md-tabs__link--active { opacity: 1; }
+.md-tabs__item--active .md-tabs__link { box-shadow: inset 0 -2px 0 var(--tp-lime); padding-bottom: 0.5rem; }
+
+/* ---- admonitions in the board's palette -------------------------------- */
+/* Material's `note` is indigo on pale blue, which is the one colour this
+   site does not use anywhere else -- and the changelog is twenty-nine of
+   them stacked, so it was the loudest thing on the page. */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: var(--tp-line);
+  box-shadow: none;
+  border-radius: 0.5rem;
+}
+.md-typeset .note > .admonition-title,
+.md-typeset .note > summary {
+  background: var(--tp-plate);
+  font-weight: 600;
+}
+.md-typeset .note > .admonition-title::before,
+.md-typeset .note > summary::before { background-color: var(--tp-ink); }
+.md-typeset details.note[open] > summary { border-bottom: 1px solid var(--tp-line); }
+/* The newest release is the one open block; give it the accent so it is
+   findable in a column of twenty-nine. */
+.md-typeset details.note[open]:first-of-type > summary { box-shadow: inset 3px 0 0 var(--tp-lime); }

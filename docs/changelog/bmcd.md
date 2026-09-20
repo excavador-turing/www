@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # bmcd
 
 The daemon: the API, the update logic, the metrics.

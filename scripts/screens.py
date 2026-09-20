@@ -105,7 +105,18 @@ MEASURE = """
 
   // A screen is a part of a page that must be taken in at once. A page with
   // none is not making that promise and is only checked for the faults.
+  //
+  // The promise is made by the STYLESHEET, not by the markup: a section is
+  // claiming to be a screen at this viewport only while its computed
+  // min-height is viewport-sized. That is what lets a phone off -- a chapter
+  // with a screenshot, a heading, a paragraph and three numbers does not fit
+  // 667px, and the honest thing is to stack and scroll rather than to hide
+  // half of it, which is what the layout this replaced did. Where the CSS
+  // releases the min-height, the page has stopped promising and the gate
+  // stops asking.
   for (const el of document.querySelectorAll('[data-screen]')) {
+    const claimed = parseFloat(getComputedStyle(el).minHeight) || 0;
+    if (claimed < usable * 0.5) continue;
     const h = Math.round(el.getBoundingClientRect().height);
     out.fit.push({ name: el.getAttribute('data-screen') || '(unnamed)', height: h,
                    over: h - usable });

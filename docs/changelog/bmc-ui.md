@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # BMC-UI
 
 The web interface the board serves.

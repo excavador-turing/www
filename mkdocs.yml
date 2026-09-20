@@ -15,6 +15,18 @@ site_dir: site
 # Reference so the articles link to evidence rather than restating it -- an
 # earlier draft carried a hand-counted promotion total in three places and all
 # three had drifted apart by the time a metric could check them.
+# Seven tabs across the top, because until now the site had no navigation at
+# all on the pages that sell it: the front page, Features and About hide the
+# sidebar, so the only way onward from any of them was the cards on the page.
+# Changelog was three clicks from the front page, through Documentation and a
+# line in a reference list; a returning reader looking for what changed had
+# to go through the documentation hub to find it. It is one click now, from
+# everywhere.
+#
+# A Feature argues, a Guide instructs, a Reference lists. The numbers live in
+# Reference so the articles link to evidence rather than restating it -- an
+# earlier draft carried a hand-counted promotion total in three places and all
+# three had drifted apart by the time a metric could check them.
 nav:
   - Home: index.md
   - Try it: demo/index.md
@@ -43,19 +55,19 @@ nav:
           - The board describes its own API: why/the-board-describes-itself.md
           - Flash a module from the card: why/flash-from-the-card.md
           - Who may reach this board: why/who-may-reach-this-board.md
-  - Guides:
+  - Docs:
       - Overview: guides/index.md
-      - Install: guides/install.md
-      - Upgrading from stock: guides/upgrade-from-stock.md
-      - Recover a bad flash: guides/recover-a-bad-flash.md
-      - Monitor it: guides/monitor-it.md
-      - Developing: guides/development.md
-  - Reference:
-      - Upstream vs this fork: reference/comparison.md
-      - The factory firmware: reference/factory-firmware.md
-      - Command line: reference/cli.md
-      - Metrics: reference/metrics.md
-      - API:
+      - Guides:
+          - Install: guides/install.md
+          - Upgrading from stock: guides/upgrade-from-stock.md
+          - Recover a bad flash: guides/recover-a-bad-flash.md
+          - Monitor it: guides/monitor-it.md
+          - Developing: guides/development.md
+      - Reference:
+          - Upstream vs this fork: reference/comparison.md
+          - The factory firmware: reference/factory-firmware.md
+          - Command line: reference/cli.md
+          - Metrics: reference/metrics.md
           - The API: reference/api.md
           - Every operation: reference/api/index.md
           - What each release's API had: reference/api-history.md
@@ -65,8 +77,8 @@ nav:
           - Storage: reference/api/storage.md
           - Network and time: reference/api/network.md
           - Cooling and thermals: reference/api/thermal.md
-      - The gate's record: reference/gate-history.md
-      - What is and isn't fixed: reference/known-faults.md
+          - The gate's record: reference/gate-history.md
+          - What is and isn't fixed: reference/known-faults.md
   - Changelog:
       - Overview: changelog/index.md
       - BMC-Firmware: changelog/firmware.md
@@ -74,9 +86,10 @@ nav:
       - BMC-UI: changelog/bmc-ui.md
       - tpi: changelog/tpi.md
   - Roadmap: roadmap.md
-  - Feedback: feedback.md
-  - About: about.md
-  - Contributing: contributing.md
+  - About:
+      - Why this fork exists: about.md
+      - Feedback: feedback.md
+      - Contributing: contributing.md
 
 theme:
   name: material
@@ -84,6 +97,11 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
+    # The tabs ARE the site's navigation. Without them the selling pages --
+    # which hide the sidebar so the layout can use the full width -- had no
+    # way out except the cards on the page.
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.top
     - content.code.copy
@@ -156,6 +174,41 @@ plugins:
       fallback_to_build_date: true
 
 extra:
+  # The site footer. Material's own is one line saying which generator built
+  # it, plus three icons -- a template footer, not a site footer -- and the
+  # front page hid even that, because the four destination cards were doing
+  # its job inside a page locked to one screen.
+  #
+  # Declared here rather than derived from the nav: the Features tab alone has
+  # twenty-two children, and a footer that lists everything is a footer nobody
+  # reads. Every link is internal or to the project's own GitHub, so
+  # `mkdocs build --strict` fails on a broken one.
+  footer:
+    - title: The firmware
+      links:
+        - {text: What it does, href: features/}
+        - {text: Try it live, href: "#demo/fork"}
+        - {text: Install it, href: guides/install/}
+        - {text: Coming from stock, href: guides/upgrade-from-stock/}
+    - title: What is changing
+      links:
+        - {text: Changelog, href: changelog/}
+        - {text: Roadmap, and votes, href: roadmap/}
+        - {text: Follow by feed, href: feed.xml}
+        - {text: What is not fixed, href: reference/known-faults/}
+    - title: When it goes wrong
+      links:
+        - {text: Recover a bad flash, href: guides/recover-a-bad-flash/}
+        - {text: Report a problem, href: "https://github.com/excavador-turing/BMC-Firmware/issues/new/choose"}
+        - {text: Ask a question, href: "https://github.com/excavador-turing/BMC-Firmware/discussions/categories/q-a"}
+        - {text: All the feedback doors, href: feedback/}
+    - title: The project
+      links:
+        - {text: Why this fork exists, href: about/}
+        - {text: Upstream vs this fork, href: reference/comparison/}
+        - {text: The code, href: "https://github.com/excavador-turing"}
+        - {text: Contributing, href: contributing/}
+
   # Cloudflare Web Analytics beacon token. Public by design: it names the
   # site to the beacon and reads nothing (cookieless, no consent banner).
   # The value is a Pulumi stack output in opwerm/nexus, scope cloudflare,
