@@ -58,8 +58,8 @@ Jinja before Markdown and would otherwise eat the Prometheus alert template in
 > 107, and 4 open faults where the list had 5. None were wrong when written.
 > They were written more than once.
 
-The changelog and the roadmap are generated too, from each repository's
-`CHANGELOG.md` and from the Ideas discussions and their votes. Generated
+The news, the changelogs and the roadmap are generated too, from each
+repository's `CHANGELOG.md` and from the Ideas discussions and their votes. Generated
 output is **committed**, so the site builds offline and a change arrives as a
 reviewable diff — and because nobody remembers to run the scripts, the hourly
 Pages job runs them and commits what moved.
@@ -97,7 +97,7 @@ a bad layout and the live site.
 | output | recipe | source |
 |---|---|---|
 | `docs/data/facts.yaml` | `just facts` | the pages and data that own each number |
-| `docs/changelog/*.md`, `docs/feed.xml` | `just refresh-changelog` | each repository's `CHANGELOG.md`, with the release note where there is no entry |
+| `docs/changelog/*.md`, `docs/news/posts/*.md`, `docs/feed.xml` | `just refresh-changelog` | each repository's `CHANGELOG.md`, with the release note where there is no entry; one news post per firmware release |
 | `docs/roadmap.md`, `docs/data/roadmap.json` | `just refresh-roadmap` | the Ideas discussions and their votes |
 | `docs/reference/api/*.md` | `just refresh-api vX.Y.Z` | the board's own OpenAPI document |
 | `docs/reference/api-history.md` | `just refresh-api-history` | which release gained which operation |
@@ -136,6 +136,7 @@ docs/            the site
   features/      one page per feature; data in front matter
   why/           the full argument behind each feature
   changelog/     generated from each repository's CHANGELOG.md
+  news/          one post per firmware release, generated from the same; Material's blog plugin lists them
 overrides/       the footer, and the analytics beacon
 main.py          macros: the feature template and the index
 scripts/         every generator and every check

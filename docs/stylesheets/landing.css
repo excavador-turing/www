@@ -216,7 +216,7 @@ body.tp-demo-open .md-footer { display: none; }
    plate grid are exempt and stay wide -- which is why this selects direct
    children rather than wrapping the page in a div the markdown would have to
    nest inside. */
-.md-main:has(.tp-hero-band) .md-content__inner > *:not(figure):not(.highlight):not(pre):not(.tp-hero-band):not(.tp-next):not(.tp-plates):not(.tp-vs):not(.tp-dest) { max-width: var(--tp-measure); }
+.md-main:has(.tp-hero-band) .md-content__inner > *:not(figure):not(.highlight):not(pre):not(.tp-hero-band):not(.tp-next):not(.tp-plates):not(.tp-vs):not(.tp-dest):not(.tp-ideas):not(.tp-releases) { max-width: var(--tp-measure); }
 .md-main:has(.tp-hero-band) .md-typeset h2 { font-size: 1.45rem; line-height: 1.15; letter-spacing: -0.015em; margin: 2.4rem 0 0.7rem; padding-top: 1.4rem; border-top: 3px solid var(--tp-lime); }
 .md-main:has(.tp-hero-band) .md-typeset h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; }
 .md-main:has(.tp-hero-band) .md-typeset p,
@@ -675,3 +675,52 @@ body.tp-demo-open .md-footer { display: none; }
    back takes the whole first row -- it is the one a reader who came from
    the feature page most likely wants. */
 .md-typeset .tp-next--argument > a:first-child { grid-column: 1 / -1; }
+
+/* ---- roadmap: the ideas as cards ----------------------------------------- */
+/* The page was a table -- seven rows, four columns, the vote count in bold
+   at the left edge and the status in prose at the right -- and read like a
+   spreadsheet beside every other page. A card carries the same four facts
+   in the site's own shape, and the number that orders the page is the thing
+   you see first. */
+.tp-ideas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(310px, 100%), 1fr)); gap: 1rem; margin: 0 0 1.4rem; }
+.md-typeset a.tp-idea {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto 1fr;
+  column-gap: 0.9rem; row-gap: 0.3rem; align-items: start;
+  border: 1px solid var(--tp-line); border-radius: 0.7rem; padding: 1rem 1.1rem;
+  color: inherit; background: var(--tp-plate);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.md-typeset a.tp-idea:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.08); }
+.md-typeset .tp-idea__votes {
+  grid-row: 1 / span 3; display: flex; flex-direction: column; align-items: center;
+  min-width: 2.6rem; padding-right: 0.9rem; border-right: 1px solid var(--tp-line); align-self: stretch;
+  font-size: 1.6rem; line-height: 1; font-weight: 700; color: var(--tp-ink); font-variant-numeric: tabular-nums;
+}
+.md-typeset .tp-idea__votes small { font-size: 0.56rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tp-muted); margin-top: 0.3rem; }
+.md-typeset .tp-idea__title { font-size: 0.92rem; line-height: 1.25; font-weight: 700; color: var(--tp-ink); }
+.md-typeset .tp-idea__what { font-size: 0.74rem; line-height: 1.5; color: var(--tp-muted); }
+.md-typeset .tp-idea__status { justify-self: start; align-self: end; font-size: 0.66rem; font-weight: 600; line-height: 1.35; padding: 0.15rem 0.55rem; border-radius: 999px; border: 1px solid var(--tp-line); color: var(--tp-muted); margin-top: 0.3rem; }
+.md-typeset .tp-idea--started .tp-idea__status { background: var(--tp-lime); color: var(--tp-lime-ink); border-color: transparent; }
+.md-typeset .tp-idea--shipped .tp-idea__status { background: var(--tp-ink); color: var(--tp-plate); border-color: transparent; }
+.md-typeset .tp-ideas--done a.tp-idea { background: transparent; }
+
+.tp-releases { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 0.7rem; margin: 0 0 1rem; }
+.md-typeset .tp-releases a { display: block; border: 1px solid var(--tp-line); border-radius: 0.6rem; padding: 0.6rem 0.8rem; color: inherit; transition: transform 120ms ease, box-shadow 120ms ease; }
+.md-typeset .tp-releases a:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.md-typeset .tp-releases b { display: block; font-size: 0.9rem; color: var(--tp-ink); font-variant-numeric: tabular-nums; }
+.md-typeset .tp-releases span { font-size: 0.68rem; color: var(--tp-muted); }
+
+/* The changelog index: four plates, one per component. */
+.md-typeset a.tp-plate .tp-plate__meta { font-size: 0.66rem; color: var(--tp-muted); font-variant-numeric: tabular-nums; align-self: end; margin-top: 0.4rem; }
+
+/* ---- news: Material's blog index, in the same family ---------------------- */
+.md-main:has(.tp-hero-band) .md-post--excerpt { border: 1px solid var(--tp-line); border-radius: 0.7rem; padding: 1.1rem 1.3rem 1rem; margin: 0 0 1rem; }
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-post__header { margin: 0 0 0.35rem; }
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-post__meta { font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tp-muted); }
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-typeset h2 { margin: 0 0 0.45rem; padding: 0; border: 0; font-size: 1.15rem; }
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-post__content > p,
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-post__content > ul,
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-post__content > blockquote { font-size: 0.82rem; line-height: 1.6; color: var(--tp-muted); }
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-post__action { margin-top: 0.2rem; }
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-post__action a { font-weight: 600; font-size: 0.76rem; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); }
+.md-main:has(.tp-hero-band) .md-pagination { max-width: var(--tp-measure); }

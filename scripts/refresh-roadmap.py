@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import html
 import json
 import pathlib
 import re
@@ -140,39 +141,96 @@ def fetch() -> list[dict]:
     return items
 
 
+# A status that begins with "Shipped" moves the card off the planned list:
+# a shipped thing still carries its votes and its discussion, but it is not
+# something to vote on any more. "Listing shipped in v3.25.0; the rest is
+# open" does not begin with it, and stays.
+SHIPPED = re.compile(r"^\s*shipped\b", re.I)
+
+
+def inline(text: str) -> str:
+    """Escape a summary for raw HTML, keeping `code` as code."""
+    out = html.escape(text, quote=True)
+    return re.sub(r"`([^`]+)`", r"<code>\1</code>", out)
+
+
+def card(i: dict) -> str:
+    st = i["status"]
+    kind = ("shipped" if SHIPPED.match(st) else
+            "started" if re.search(r"shipped|started|designed|in progress",
+                                   st, re.I) else "open")
+    return (
+        f'<a class="tp-idea tp-idea--{kind}" href="{html.escape(i["url"])}">'
+        f'<b class="tp-idea__votes">{i["votes"]}<small>'
+        f'{"vote" if i["votes"] == 1 else "votes"}</small></b>'
+        f'<span class="tp-idea__title">{inline(i["title"])}</span>'
+        f'<span class="tp-idea__what">{inline(i["summary"])}</span>'
+        f'<span class="tp-idea__status">{inline(st)}</span>'
+        "</a>")
+
+
 def render(items: list[dict], as_of: str) -> str:
+    planned = [i for i in items if not SHIPPED.match(i["status"])]
+    done = [i for i in items if SHIPPED.match(i["status"])]
     total = sum(i["votes"] for i in items)
+    when = dt.date.fromisoformat(as_of).strftime("%-d %B %Y")
+    propose = f"https://github.com/{ORG}/{REPO}/discussions/new?category=ideas"
     lines = [
         "---",
+        "title: Roadmap",
         "hide:",
+        "  - navigation",
         "  - toc",
         "---",
         "",
-        "# Roadmap",
+        # The page was a table: seven rows, four columns, the one number
+        # that orders it in bold at the left edge and the status in prose at
+        # the right. It carried the facts and read like a spreadsheet next
+        # to every other page on the site. The cards carry the same four
+        # facts in the site's own shape, and the vote is the thing you see.
+        '<div class="tp-hero-band" markdown>',
+        '<span class="tp-eyebrow">Roadmap</span>',
+        f"# {len(planned)} things planned. Your vote orders them.",
         "",
-        f"{len(items)} things planned, ordered by votes, {total} cast so far. "
-        "Every row is a GitHub Discussion: **upvote the ones you want**, and "
-        "the order on this page changes.",
+        "<p>Every card is a GitHub Discussion. Upvote the ones you want and "
+        "this page reorders itself: the votes are read every hour, so a vote "
+        "cast now is on the page within one. Not on the list? "
+        f'<a href="{propose}">Propose it</a> — a sentence about the problem is '
+        "enough.</p>",
+        "</div>",
         "",
-        "Not on the list? "
-        f"[Propose it](https://github.com/{ORG}/{REPO}/discussions/new?category=ideas)"
-        " — a sentence about the problem is enough. Something broken instead? "
-        "[Report it](feedback.md), and read [what is and isn't "
-        "fixed](reference/known-faults.md) first, because it may already be "
-        "there with a ticket.",
+        '<div class="tp-proof">',
+        f"<div><b>{len(planned)}</b><span>planned, ordered by votes</span></div>",
+        f"<div><b>{total}</b><span>votes cast, read hourly</span></div>",
+        f"<div><b>{len(done)}</b><span>shipped from this list</span></div>",
+        "</div>",
         "",
-        "| votes | feature | what it is | where it stands |",
-        "|--:|---|---|---|",
+        '<div class="tp-ideas">',
+        *[card(i) for i in planned],
+        "</div>",
+        "",
+        "Something broken rather than missing? [Report it](feedback.md), "
+        "and read [what is and isn't fixed](reference/known-faults.md) first, "
+        "because it may already be there with a ticket.",
     ]
-    for i in items:
-        lines.append(f"| **{i['votes']}** | [{i['title']}]({i['url']}) | "
-                     f"{i['summary']} | {i['status']} |")
+    if done:
+        lines += [
+            "",
+            "## Shipped from this list",
+            "",
+            "Voted for, built, released. Each card still opens its discussion."
+            "",
+            '<div class="tp-ideas tp-ideas--done">',
+            *[card(i) for i in done],
+            "</div>",
+        ]
     lines += [
         "",
         "## Recently shipped",
         "",
-        "Every feature has a page with the measurement behind it, and every "
-        "release has [its changelog entry](changelog/firmware.md).",
+        "One post per firmware release, from the repositories' own "
+        "changelogs — [all of them](news/index.md), or "
+        "[by feed](feed.xml).",
         "",
         "{{ recent_releases }}",
         "",
@@ -185,21 +243,35 @@ def render(items: list[dict], as_of: str) -> str:
         "this one: what is wrong today, with the ticket that tracks it. A "
         "roadmap that lists only what is coming is advertising.",
         "",
-        f"Votes read {as_of} by `just refresh-roadmap`.",
+        f"Votes read {when} by `just refresh-roadmap`, which runs every hour.",
+        "",
+        '<div class="tp-next">',
+        '<a href="news/"><b>What shipped →</b><span>One post per firmware '
+        "release, newest first.</span></a>",
+        '<a href="feedback/"><b>Propose or report →</b><span>Ideas carry '
+        "votes; faults carry tickets.</span></a>",
+        '<a href="reference/known-faults/"><b>What is not fixed →</b>'
+        "<span>The honest list, each with a ticket.</span></a>",
+        '<a href="features/"><b>What it does today →</b><span>Every feature, '
+        "with the measurement behind it.</span></a>",
+        "</div>",
     ]
     return "\n".join(lines) + "\n"
 
 
 def recent(n: int = 5) -> str:
-    """The newest firmware releases, from the changelog page this site owns."""
+    """The newest firmware releases, each linking to its news post."""
     page = ROOT / "docs" / "changelog" / "firmware.md"
     if not page.exists():
         return "_Run `just refresh-changelog` first._"
     rows = re.findall(r'^\?\?\?\+? note "([^"]+)"', page.read_text(), re.M)
-    out = ["| release | when |", "|---|---|"]
+    out = ['<div class="tp-releases">']
     for row in rows[:n]:
         ver, _, when = row.partition(" — ")
-        out.append(f"| [{ver}](changelog/firmware.md) | {when} |")
+        when = when.replace(" (not released)", "").replace(" (pre-release)", "")
+        out.append(f'<a href="news/{html.escape(ver)}/"><b>{html.escape(ver)}'
+                   f"</b><span>{html.escape(when)}</span></a>")
+    out.append("</div>")
     return "\n".join(out)
 
 

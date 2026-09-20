@@ -136,6 +136,38 @@ def define_env(env):
         return "\n".join(out)
 
     @env.macro
+    def news_lede():
+        """The newest firmware release, in its own first sentence.
+
+        The front page's What's-new column carried a sentence typed by hand,
+        and it was two releases old on the day this replaced it. The post the
+        changelog generator writes opens with the release's own lede, so the
+        front page now says what the newest post says, by construction.
+        """
+        newest = None
+        for path in (ROOT / "docs" / "news" / "posts").glob("*.md"):
+            meta = _front_matter(path)
+            key = (str(meta.get("date", "")),
+                   [int(x) for x in re.findall(r"\d+", path.stem)])
+            if newest is None or key > newest[0]:
+                newest = (key, path, meta)
+        if newest is None:
+            return ""
+        _, path, meta = newest
+        text = path.read_text().split("---", 2)[2]
+        text = text.split("<!-- more -->", 1)[0]
+        text = re.sub(r"\s+", " ", re.sub(r"\*\*|`", "", text)).strip()
+        # An entry with no lede opens with its label and first item:
+        # "Fixed - A renamed board reissues its own certificate."
+        text = re.sub(r"^(Added|Changed|Fixed|Removed|Deprecated|Security)"
+                      r"\s*[-*]\s*", "", text)
+        first = re.split(r"(?<=[.!?])\s+", text)[0]
+        ver = html.escape(str(meta.get("title", "")).replace("Firmware ", ""))
+        if first.startswith("Pins "):
+            return f"Firmware <b>{ver}</b> pins {html.escape(first[5:])}"
+        return f"Firmware <b>{ver}</b>: {html.escape(first)}"
+
+    @env.macro
     def feature_plates():
         """The features index, from the pages themselves.
 
