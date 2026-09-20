@@ -8,6 +8,21 @@
   <updated>2026-09-20T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.34.0: Pick a module with one click</title>
+    <link href="https://turingpi.xyz/news/v2.34.0/"/>
+    <id>tag:turingpi.xyz,2026-09-21:firmware/2.34.0</id>
+    <updated>2026-09-21T00:00:00Z</updated>
+    <content type="text">Pins **BMC-UI 3.32.0**. bmcd stays at 2.37.0 and tpi at 1.9.0.
+
+### Changed
+
+- **Which module: four pills, not a drop-down.** Console, USB and Flash each
+  opened with a list that unfolded to show four fixed entries, one already
+  chosen. The three tabs now share one picker, Node 1 to 4 side by side with
+  the chosen one green — the same change the fleet shows, because it is one
+  component serving both.</content>
+  </entry>
+  <entry>
     <title>Firmware v2.33.0: The board's switch gets VLANs, and the board asks for a password</title>
     <link href="https://turingpi.xyz/news/v2.33.0/"/>
     <id>tag:turingpi.xyz,2026-09-20:firmware/2.33.0</id>

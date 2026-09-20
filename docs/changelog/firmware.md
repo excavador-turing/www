@@ -7,7 +7,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.33.0**, 20 September 2026. 30 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.33.0**, 20 September 2026. 31 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -19,7 +19,19 @@ Newest release **v2.33.0**, 20 September 2026. 30 in total. Each entry is this r
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.33.0 — 20 September 2026"
+???+ note "v2.34.0 — 21 September 2026 (not released)"
+
+    Pins **BMC-UI 3.32.0**. bmcd stays at 2.37.0 and tpi at 1.9.0.
+
+    **Changed**
+
+    - **Which module: four pills, not a drop-down.** Console, USB and Flash each
+      opened with a list that unfolded to show four fixed entries, one already
+      chosen. The three tabs now share one picker, Node 1 to 4 side by side with
+      the chosen one green — the same change the fleet shows, because it is one
+      component serving both.
+
+??? note "v2.33.0 — 20 September 2026"
 
     Pins **bmcd 2.37.0**, **BMC-UI 3.30.0** and **tpi 1.9.0** — the first release
     carrying the on-board switch, the certificate endpoint and the forced password
