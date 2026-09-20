@@ -84,7 +84,7 @@ Firmware **{{ releases.firmware.newest }}** is the newest of
 {{ releases.total }} releases across four components. The changelog is each
 repository's own, not a summary, and there is a feed.
 
-[The changelog →](changelog/index.md) · [Follow by feed →](feed.xml)
+[The news →](news/index.md) · [Every component's changelog →](changelog/index.md) · [Follow by feed →](feed.xml)
 
 <div class="tp-next">
 <a href="features/"><b>What it does →</b><span>{{ features.count }} features, each with the measurement behind it.</span></a>

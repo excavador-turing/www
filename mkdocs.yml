@@ -82,12 +82,13 @@ nav:
           - Cooling and thermals: reference/api/thermal.md
           - The gate's record: reference/gate-history.md
           - What is and isn't fixed: reference/known-faults.md
-  - Changelog:
-      - Overview: changelog/index.md
-      - BMC-Firmware: changelog/firmware.md
-      - bmcd: changelog/bmcd.md
-      - BMC-UI: changelog/bmc-ui.md
-      - tpi: changelog/tpi.md
+          - Changelogs:
+              - Every component: changelog/index.md
+              - BMC-Firmware: changelog/firmware.md
+              - bmcd: changelog/bmcd.md
+              - BMC-UI: changelog/bmc-ui.md
+              - tpi: changelog/tpi.md
+  - News: news/index.md
   - Roadmap: roadmap.md
   - About:
       - Why this fork exists: about.md
@@ -174,6 +175,21 @@ plugins:
   # scripts/generate-api-pages.py now emits Markdown instead, which keeps the
   # indexability and adds the navigation: real headings, real nav, one page
   # per group. Same document, same generator-owns-it rule.
+  # News: one post per firmware release, written by refresh-changelog.py
+  # into docs/news/posts/. Material's own blog plugin lists them newest
+  # first with the excerpt above `<!-- more -->`, which the generator sets
+  # to the release's lede -- the sentence that says what the release is.
+  # `post_excerpt: required` makes a post without one a build failure.
+  - blog:
+      blog_dir: news
+      post_url_format: "{slug}"
+      post_excerpt: required
+      post_readtime: false
+      post_date_format: "d MMMM yyyy"
+      archive: false
+      categories: false
+      authors: false
+      pagination_per_page: 10
   # Every page says when it was last touched. These sites describe a moving
   # target -- repositories that release often -- and a doc page with no date
   # invites the reader to assume it is current.
@@ -200,7 +216,8 @@ extra:
         - {text: Coming from stock, href: guides/upgrade-from-stock/}
     - title: What is changing
       links:
-        - {text: Changelog, href: changelog/}
+        - {text: News, href: news/}
+        - {text: Changelogs, href: changelog/}
         - {text: Roadmap, and votes, href: roadmap/}
         - {text: Follow by feed, href: feed.xml}
         - {text: What is not fixed, href: reference/known-faults/}

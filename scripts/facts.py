@@ -139,12 +139,20 @@ def roadmap() -> dict:
                           "`just refresh-roadmap`", "count": 0, "top": None}
     data = json.loads(f.read_text())
     items = sorted(data.get("items", []), key=lambda i: -i.get("votes", 0))
+    # An idea whose status begins with "Shipped" is off the planned list on
+    # the roadmap page (refresh-roadmap.py, SHIPPED); it keeps its votes in
+    # the total, because they were cast, but it is not planned and not what
+    # is "leading" -- the front page said the VLANs led the roadmap the
+    # evening they shipped.
+    planned = [i for i in items
+               if not re.match(r"\s*shipped\b", i.get("status", ""), re.I)]
     return {"source": "docs/data/roadmap.json, written by `just refresh-roadmap` "
                       "from the Ideas discussions",
             "as_of": data.get("as_of"),
-            "count": len(items),
+            "count": len(planned),
+            "shipped": len(items) - len(planned),
             "votes": sum(i.get("votes", 0) for i in items),
-            "top": items[0]["title"] if items else None}
+            "top": planned[0]["title"] if planned else None}
 
 
 def platform() -> dict:

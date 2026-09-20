@@ -152,10 +152,15 @@ jobs:
             echo "building the demo from $tag (the site carries $live)"
           fi
 
-      # The panes are a pure function of the BMC-UI release and the ribbon
-      # script, so a docs-only deploy has no reason to rebuild them -- which
-      # is most deploys. npm ci plus two Vite builds is 16 of the ~45 seconds
-      # left in this job.
+      # The panes are a pure function of the BMC-UI release and how this job
+      # builds them, so a docs-only deploy has no reason to rebuild them --
+      # which is most deploys. npm ci plus two Vite builds is 16 of the ~45
+      # seconds left in this job.
+      #
+      # The key includes THIS FILE, not just the ribbon script: the build
+      # environment lives here, and the first time it changed -- the fleet
+      # pane gaining VITE_BMC_UI_VERSION -- a cached pane built without it
+      # would have been served for that release's whole life.
       - name: the demo panes, if this release has been built before
         id: demo-cache
         if: steps.ui.outputs.skip != 'true'
@@ -164,7 +169,7 @@ jobs:
           path: |
             docs/demo/fork
             docs/demo/fleet
-          key: demo-${{ steps.ui.outputs.tag }}-${{ hashFiles('scripts/demo-ribbon.py') }}
+          key: demo-${{ steps.ui.outputs.tag }}-${{ hashFiles('scripts/demo-ribbon.py', '.github/workflows/pages.yml') }}
 
       - name: BMC-UI at that release
         if: steps.ui.outputs.skip != 'true' && steps.demo-cache.outputs.cache-hit != 'true'
@@ -215,6 +220,10 @@ jobs:
           VITE_DEMO: "1"
           VITE_BASE: /demo/fleet/
           BMC_UI_VERSION: ${{ steps.ui.outputs.tag }}
+          # The fleet header reads import.meta.env.VITE_BMC_UI_VERSION; Vite
+          # only exposes VITE_-prefixed variables, so without this the demo's
+          # fleet says "dev" -- the same slip Dockerfile.fleet had until 3.31.0.
+          VITE_BMC_UI_VERSION: ${{ steps.ui.outputs.tag }}
         run: |
           set -eu
           npm run build

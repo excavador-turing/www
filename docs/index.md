@@ -148,8 +148,8 @@ render_macros: true
 
 <div class="tp-news__col" markdown>
 <b>Just shipped</b>
-<p>Firmware <b>{{ releases.firmware.newest }}</b>, carrying BMC-UI {{ releases.ui.newest }}. Its newest change: a module armed for USB boot now says so on its own liveness line, because from outside it looks exactly like dead hardware.</p>
-<a href="changelog/firmware/">Everything that changed →</a> <a href="feed.xml">Follow by feed →</a>
+<p>{{ news_lede() }}</p>
+<a href="news/">Everything that changed →</a> <a href="feed.xml">Follow by feed →</a>
 </div>
 
 <div class="tp-news__col" markdown>

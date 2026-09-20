@@ -15,7 +15,7 @@ again.
 
 A breadth-first walk over the BUILT site's internal links, starting at
 index.html, counting clicks. Every page in the nav must be within two; the
-changelog and the roadmap within one, because they are what a returning
+the news and the roadmap within one, because they are what a returning
 reader comes back for.
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ SITE = ROOT / "site"
 
 # Reachable in one click from the front page, by decision: the two pages a
 # reader who already runs this firmware comes back for.
-ONE_CLICK = {"changelog/", "roadmap/"}
+ONE_CLICK = {"news/", "roadmap/"}
 MAX_CLICKS = 2
 
 
@@ -170,7 +170,7 @@ def main() -> int:
 
     deepest = max(clicks[p] for p in nav_pages() if p in clicks)
     print(f"  {len(nav_pages())} nav pages, every one within {deepest} clicks "
-          f"of the front page; changelog and roadmap within one")
+          f"of the front page; news and roadmap within one")
     return 0
 
 

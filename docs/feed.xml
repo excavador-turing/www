@@ -3,13 +3,13 @@
   <title>Turing Pi 2 BMC firmware releases</title>
   <subtitle>Every release of this fork's firmware, with what changed in it.</subtitle>
   <link href="https://turingpi.xyz/feed.xml" rel="self"/>
-  <link href="https://turingpi.xyz/changelog/firmware/"/>
+  <link href="https://turingpi.xyz/news/"/>
   <id>https://turingpi.xyz/feed.xml</id>
   <updated>2026-09-20T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
     <title>Firmware v2.33.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.33.0/"/>
     <id>tag:turingpi.xyz,2026-09-20:firmware/2.33.0</id>
     <updated>2026-09-20T00:00:00Z</updated>
     <content type="text">Pins **bmcd 2.37.0**, **BMC-UI 3.30.0** and **tpi 1.9.0** — the first release
@@ -74,7 +74,7 @@ this image adds on top of them.
   </entry>
   <entry>
     <title>Firmware v2.32.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.32.0/"/>
     <id>tag:turingpi.xyz,2026-09-13:firmware/2.32.0</id>
     <updated>2026-09-13T00:00:00Z</updated>
     <content type="text">Pins BMC-UI 3.29.0. bmcd stays at 2.36.3 and tpi is unchanged.
@@ -110,7 +110,7 @@ this image adds on top of them.
   </entry>
   <entry>
     <title>Firmware v2.31.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.31.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.31.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
     <content type="text">Pins BMC-UI 3.28.0. bmcd stays at 2.36.3 and tpi is unchanged.
@@ -138,7 +138,7 @@ this image adds on top of them.
   </entry>
   <entry>
     <title>Firmware v2.30.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.30.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.30.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
     <content type="text">Pins bmcd 2.36.3. BMC-UI stays at 3.27.0 and tpi is unchanged.
@@ -190,7 +190,7 @@ this image adds on top of them.
   </entry>
   <entry>
     <title>Firmware v2.29.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.29.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.29.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
     <content type="text">Pins bmcd 2.36.1. BMC-UI stays at 3.27.0 and tpi is unchanged.
@@ -210,7 +210,7 @@ this image adds on top of them.
   </entry>
   <entry>
     <title>Firmware v2.28.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.28.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.28.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
     <content type="text">Pins bmcd 2.36.0 and BMC-UI 3.27.0; tpi is unchanged and already current.
@@ -253,7 +253,7 @@ measurement: BMC-UI 3.25.0 (the SD card picker and two dead flash buttons) and
   </entry>
   <entry>
     <title>Firmware v2.27.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.27.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.27.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
     <content type="text">The first release that carries the latest of all three: BMC-UI 3.26.0, bmcd
@@ -268,7 +268,7 @@ measurement: BMC-UI 3.25.0 (the SD card picker and two dead flash buttons) and
   </entry>
   <entry>
     <title>Firmware v2.26.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.26.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.26.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
     <content type="text">Pins BMC-UI 3.25.0: the SD card picker, and the flash button that threw
@@ -282,7 +282,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.25.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.25.0/"/>
     <id>tag:turingpi.xyz,2026-09-11:firmware/2.25.0</id>
     <updated>2026-09-11T00:00:00Z</updated>
     <content type="text">### Fixed
@@ -307,7 +307,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.24.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.24.0/"/>
     <id>tag:turingpi.xyz,2026-09-11:firmware/2.24.0</id>
     <updated>2026-09-11T00:00:00Z</updated>
     <content type="text">Everything current: the daemon, the interface and the CLI.
@@ -354,7 +354,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.23.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.23.0/"/>
     <id>tag:turingpi.xyz,2026-09-11:firmware/2.23.0</id>
     <updated>2026-09-11T00:00:00Z</updated>
     <content type="text">TLS, made usable rather than merely present.
@@ -419,7 +419,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.22.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.22.0/"/>
     <id>tag:turingpi.xyz,2026-09-11:firmware/2.22.0</id>
     <updated>2026-09-11T00:00:00Z</updated>
     <content type="text">### Added
@@ -435,7 +435,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.21.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.21.0/"/>
     <id>tag:turingpi.xyz,2026-09-10:firmware/2.21.0</id>
     <updated>2026-09-10T00:00:00Z</updated>
     <content type="text">### Changed
@@ -453,7 +453,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.20.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.20.0/"/>
     <id>tag:turingpi.xyz,2026-09-10:firmware/2.20.0</id>
     <updated>2026-09-10T00:00:00Z</updated>
     <content type="text">### Added
@@ -482,7 +482,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.19.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.19.0/"/>
     <id>tag:turingpi.xyz,2026-09-10:firmware/2.19.0</id>
     <updated>2026-09-10T00:00:00Z</updated>
     <content type="text">### Changed
@@ -518,7 +518,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.18.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.18.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.18.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Fixed
@@ -548,7 +548,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.17.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.17.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.17.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">&gt; **The `tpi` change below is inert.** It describes behaviour v1.5.0 did not
@@ -576,7 +576,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.16.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.16.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.16.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -622,7 +622,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.15.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.15.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.15.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -665,7 +665,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.14.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.14.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.14.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -712,7 +712,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.13.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.13.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.13.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -769,7 +769,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.12.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.12.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.12.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Fixed
@@ -801,7 +801,7 @@ instead of flashing.
   </entry>
   <entry>
     <title>Firmware v2.11.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.11.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.11.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">Built but **not installed**: the board wedged before this could be flashed and
@@ -827,7 +827,7 @@ it comes back.
   </entry>
   <entry>
     <title>Firmware v2.10.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.10.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.10.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -843,7 +843,7 @@ it comes back.
   </entry>
   <entry>
     <title>Firmware v2.9.2</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.9.2/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.9.2</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -855,7 +855,7 @@ it comes back.
   </entry>
   <entry>
     <title>Firmware v2.9.1</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.9.1/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.9.1</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -869,7 +869,7 @@ it comes back.
   </entry>
   <entry>
     <title>Firmware v2.9.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.9.0/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.9.0</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Changed
@@ -918,7 +918,7 @@ it comes back.
   </entry>
   <entry>
     <title>Firmware v2.8.1</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.8.1/"/>
     <id>tag:turingpi.xyz,2026-09-09:firmware/2.8.1</id>
     <updated>2026-09-09T00:00:00Z</updated>
     <content type="text">### Added
@@ -969,7 +969,7 @@ it comes back.
   </entry>
   <entry>
     <title>Firmware v2.8.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.8.0/"/>
     <id>tag:turingpi.xyz,2026-09-08:firmware/2.8.0</id>
     <updated>2026-09-08T00:00:00Z</updated>
     <content type="text">### Changed
@@ -980,7 +980,7 @@ it comes back.
   </entry>
   <entry>
     <title>Firmware v2.7.0</title>
-    <link href="https://turingpi.xyz/changelog/firmware/"/>
+    <link href="https://turingpi.xyz/news/v2.7.0/"/>
     <id>tag:turingpi.xyz,2026-09-08:firmware/2.7.0</id>
     <updated>2026-09-08T00:00:00Z</updated>
     <content type="text">### Added

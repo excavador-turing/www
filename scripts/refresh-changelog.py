@@ -35,6 +35,7 @@ from datetime import datetime, timezone
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUTDIR = ROOT / "docs" / "changelog"
+NEWS = ROOT / "docs" / "news" / "posts"
 ORG = "excavador-turing"
 
 # Ordered as a reader meets them: the thing you flash, then what runs on it,
@@ -48,6 +49,8 @@ COMPONENTS: list[tuple[str, str, str]] = [
     ("bmc-ui", "BMC-UI", "The web interface the board serves."),
     ("tpi", "tpi", "The command-line client."),
 ]
+
+SLUG_OF = {repo: slug for slug, repo, _ in COMPONENTS}
 
 # `## [v2.32.0] — 2026-09-13`, `## [2.36.3] — 2026-09-12`, `## [Unreleased]`.
 # The repositories spell the version with and without its v and use an em
@@ -249,7 +252,7 @@ def render(slug: str, repo: str, blurb: str) -> dict:
 
     page = OUTDIR / f"{slug}.md"
     page.write_text("\n".join(lines).rstrip() + "\n")
-    return {"slug": slug, "repo": repo, "page": page,
+    return {"slug": slug, "repo": repo, "page": page, "blurb": blurb,
             "count": len(shipped),
             "newest": newest["version"] if newest else None,
             "newest_date": newest["date"] if newest else None,
@@ -261,18 +264,28 @@ def render(slug: str, repo: str, blurb: str) -> dict:
 
 def write_index(summary: list[dict]) -> pathlib.Path:
     idx = [
-        "# Changelog",
+        "---",
+        "title: Changelogs",
+        "hide:",
+        "  - toc",
+        "---",
+        "",
+        "# Every component's changelog",
         "",
         "What changed in each release, taken from each repository's own "
-        "`CHANGELOG.md`.",
+        "`CHANGELOG.md`. For the same history as one post per firmware "
+        "release, newest first, read [the news](../news/index.md).",
         "",
-        "| component | newest | when | releases |",
-        "|---|---|---|---|",
+        '<div class="tp-plates">',
     ]
     for s in summary:
-        idx.append(f"| [{s['repo']}]({s['slug']}.md) | `{s['newest']}` | "
-                   f"{human(s['newest_date'])} | {s['count']} |")
+        idx.append(
+            f'<a class="tp-plate" href="../{s["slug"]}/"><b>{s["repo"]}</b>'
+            f'<span>{s["blurb"]}</span>'
+            f'<span class="tp-plate__meta">{s["newest"]} · '
+            f'{human(s["newest_date"])} · {s["count"]} releases</span></a>')
     idx += [
+        "</div>",
         "",
         "These four version together. The firmware image carries a `bmcd`, a "
         "`BMC-UI` and a `tpi`, and the board's About tab names all four — so a "
@@ -288,6 +301,109 @@ def write_index(summary: list[dict]) -> pathlib.Path:
     p = OUTDIR / "index.md"
     p.write_text("\n".join(idx) + "\n")
     return p
+
+
+# `Pins **bmcd 2.37.0**, **BMC-UI 3.30.0** and **tpi 1.9.0**` -- what a firmware
+# release carries, read from its own first paragraph. "bmcd stays at 2.36.3"
+# does not match, and is not meant to: a post names what changed.
+PIN = re.compile(r"\b(?P<repo>bmcd|BMC-UI|tpi)\s+\*{0,2}v?(?P<ver>\d+\.\d+\.\d+)")
+
+
+def excerpt_at(body: str) -> int:
+    """Where the post's excerpt ends: after the lede, or after the first item.
+
+    Eleven of thirty firmware entries open with a paragraph that says what
+    the release is; the other nineteen open with **Added** or **Changed**
+    and go straight to the list. For those the excerpt is the label and the
+    first item, which is the newest thing the release did -- the entries
+    are written newest-first within a category.
+    """
+    blocks = re.split(r"\n\s*\n", body)
+    pos = 0
+    first = blocks[0].lstrip()
+    if not (first.startswith("**") or first.startswith("- ")
+            or first.startswith("* ")):
+        return len(blocks[0])
+    seen_item = False
+    for b in blocks:
+        pos = body.index(b, pos) + len(b)
+        stripped = b.lstrip()
+        if stripped.startswith(("- ", "* ")):
+            if seen_item:
+                # A second item: the first ended before this block.
+                return body.index(b, 0)
+            seen_item = True
+        elif seen_item and not b.startswith(" "):
+            return body.index(b, 0)
+    return pos
+
+
+def write_news(summary: list[dict]) -> list[pathlib.Path]:
+    """One post per firmware release, for the blog plugin.
+
+    The changelog pages are a reference: thirty collapsed releases per
+    component, and four components. Nobody reads a reference to find out what
+    is new. A post is the firmware release's own entry -- the image is the
+    thing a reader flashes, so its version is the one that means anything --
+    followed by the entries of the components it newly pins, so what the
+    release actually changed on the board is on one page.
+    """
+    fw = next(s for s in summary if s["slug"] == "firmware")
+    by_repo = {s["repo"]: {e["bare"]: e for e in s["entries"]} for s in summary}
+    NEWS.mkdir(parents=True, exist_ok=True)
+    written = []
+    for e in fw["entries"]:
+        rel = e.get("released")
+        when = (rel.get("publishedAt", "")[:10] if rel else None) or e["date"]
+        if not when:
+            continue                      # a post has a date, or it is not one
+        body = (demote(e["body"]) if e["source"] == "changelog"
+                else e["body"]) or "_No entry._"
+        cut = excerpt_at(body)
+        title = f"Firmware {e['version']}"
+        if rel and rel.get("isPrerelease"):
+            title += " (pre-release)"
+        elif not rel:
+            title += " (not released)"
+        lines = [
+            "---",
+            f"title: {title}",
+            f"date: {when}",
+            f"slug: {e['version']}",
+            "hide:",
+            "  - toc",
+            "---",
+            "",
+            body[:cut].rstrip(),
+            "",
+            "<!-- more -->",
+            "",
+            body[cut:].strip(),
+        ]
+        carried = []
+        for m in PIN.finditer(body[:cut]):
+            entry = by_repo.get(m.group("repo"), {}).get(m.group("ver"))
+            if entry and entry["body"] and (m.group("repo"), m.group("ver")) not in carried:
+                carried.append((m.group("repo"), m.group("ver")))
+                lines += ["", f"## {m.group('repo')} {m.group('ver')}", "",
+                          f"What the {m.group('repo')} this image carries "
+                          f"changed, from [its own changelog]"
+                          f"(../../changelog/{SLUG_OF[m.group('repo')]}.md).",
+                          "",
+                          demote(entry["body"]) if entry["source"] == "changelog"
+                          else entry["body"]]
+        lines += ["", "---", "",
+                  f"[Every release of the firmware](../../changelog/firmware.md) · "
+                  f"[the roadmap](../../roadmap.md) · "
+                  f"[follow by feed](../../feed.xml)"]
+        p = NEWS / f"{e['bare']}.md"
+        p.write_text("\n".join(lines).rstrip() + "\n")
+        written.append(p)
+    # A release that vanished from the changelog takes its post with it.
+    for stale in NEWS.glob("*.md"):
+        if stale not in written:
+            stale.unlink()
+    return written
 
 
 def write_feed(firmware: dict) -> pathlib.Path:
@@ -311,7 +427,7 @@ def write_feed(firmware: dict) -> pathlib.Path:
            "  <subtitle>Every release of this fork's firmware, with what "
            "changed in it.</subtitle>",
            f'  <link href="{site}/feed.xml" rel="self"/>',
-           f'  <link href="{site}/changelog/firmware/"/>',
+           f'  <link href="{site}/news/"/>',
            f"  <id>{site}/feed.xml</id>",
            f"  <updated>{updated}</updated>",
            "  <author><name>excavador-turing</name></author>"]
@@ -319,7 +435,7 @@ def write_feed(firmware: dict) -> pathlib.Path:
         when = f"{e['date']}T00:00:00Z" if e["date"] else updated
         out += ["  <entry>",
                 f"    <title>Firmware {esc(e['version'])}</title>",
-                f'    <link href="{site}/changelog/firmware/"/>',
+                f'    <link href="{site}/news/{esc(e["version"])}/"/>',
                 f"    <id>tag:turingpi.xyz,{e['date'] or '1970-01-01'}:"
                 f"firmware/{esc(e['bare'])}</id>",
                 f"    <updated>{when}</updated>",
@@ -347,7 +463,7 @@ def main(argv: list[str]) -> int:
         return 2
 
     feed = ROOT / "docs" / "feed.xml"
-    before = {p: p.read_text() for p in OUTDIR.glob("*.md")}
+    before = {p: p.read_text() for p in (*OUTDIR.glob("*.md"), *NEWS.glob("*.md"))}
     if feed.exists():
         before[feed] = feed.read_text()
 
@@ -375,14 +491,20 @@ def main(argv: list[str]) -> int:
         fw = next(s for s in summary if s["slug"] == "firmware")
         print(f"  {write_feed(fw).relative_to(ROOT)}: "
               f"{min(len(fw['entries']), 40)} entries")
+        posts = write_news(summary)
+        print(f"  {NEWS.relative_to(ROOT)}/: {len(posts)} posts")
 
     if args.check:
-        after = {p: p.read_text() for p in OUTDIR.glob("*.md")}
+        after = {p: p.read_text() for p in (*OUTDIR.glob("*.md"), *NEWS.glob("*.md"))}
         if feed.exists():
             after[feed] = feed.read_text()
         stale = sorted(p for p in after if before.get(p) != after[p])
+        stale += sorted(p for p in before if p not in after)
+        for p in after:
+            if p not in before:
+                p.unlink()              # --check writes nothing
         for p, text in before.items():
-            p.write_text(text)          # --check writes nothing
+            p.write_text(text)
         if stale:
             print("\nstale, run `just refresh-changelog` and commit:",
                   file=sys.stderr)

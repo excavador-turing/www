@@ -1,12 +1,12 @@
 {
- "as_of": "2026-09-20",
+ "as_of": "2026-09-21",
  "items": [
   {
    "number": 25,
    "title": "VLANs on the board's switch, with apply-then-confirm",
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/25",
    "votes": 5,
-   "status": "Backlog",
+   "status": "Shipped in v2.33.0",
    "status_from": "fallback",
    "summary": "VLAN filtering and STP on the RTL8370MB-CG, first in the daemon, then in the interface."
   },
