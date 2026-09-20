@@ -62,6 +62,7 @@ nav:
           - Upgrading from stock: guides/upgrade-from-stock.md
           - Recover a bad flash: guides/recover-a-bad-flash.md
           - Your own certificate: guides/your-own-certificate.md
+          - Segment the network: guides/segment-the-network.md
           - Should it face the internet?: guides/facing-the-internet.md
           - Monitor it: guides/monitor-it.md
           - Developing: guides/development.md
