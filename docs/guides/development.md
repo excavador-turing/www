@@ -66,15 +66,90 @@ Pinning bmcd by commit means a one-line change normally costs: commit, push,
 tag, wait for a release, re-pin, recompute a hash, rebuild the firmware. For
 day-to-day work, override the source instead.
 
-Buildroot reads `buildroot/local.mk` for overrides:
+Buildroot reads `buildroot/local.mk` for overrides. The build container
+mounts this repository's parent read-only at `/src`, so a sibling checkout is
+reachable as `/src/<repo>`:
 
 ```make
-BMCD_OVERRIDE_SRCDIR = /work/local-src/bmcd
-BMC_UI_OVERRIDE_SRCDIR = /work/local-src/BMC-UI
+BMCD_OVERRIDE_SRCDIR = /src/bmcd
+BMCD_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS = --exclude target --exclude .git
+
+BMC_UI_OVERRIDE_SRCDIR = /src/BMC-UI/dist
 ```
 
-An override **rsyncs your working tree** in place of the pinned archive, and
-builds into a separate `bmcd-custom` directory. No commit, no tag, no hash.
+An override **rsyncs that tree** in place of the pinned archive and builds
+into a separate `bmcd-custom` directory. No commit, no tag, no hash.
+
+!!! warning "The two packages want different things"
+
+    **`bmcd` is source.** Buildroot compiles it, so the override is the
+    repository root — and `target/` must be excluded. It is tens of gigabytes
+    of host-architecture build output, and rsync fails partway through
+    `target/debug/incremental` anyway, because Cargo is rewriting it while the
+    copy runs.
+
+    **`bmc-ui` is not source.** Its pinned download is a release tarball of
+    the *built* interface, and the package's install step copies the source
+    directory straight into `/srv/bmcd/www/`. So the override is `dist/`, and
+    you run `npm run build` in BMC-UI yourself first.
+
+    Point the interface override at the repository instead and `node_modules`
+    lands in the web root — the build then fails on x86-64 `.node` binaries
+    being installed into an ARM image, which is a confusing way to be told
+    you pointed at the wrong directory.
+
+!!! danger "`RSYNC_EXCLUSIONS` takes rsync flags, not names"
+
+    Buildroot drops that variable into the `rsync` command **verbatim**, so it
+    has to carry the `--exclude` itself. Write `target .git` and rsync reads
+    them as two more *source* paths, the exclusion never happens, and the copy
+    quietly becomes the whole tree — tens of gigabytes, with no error to tell
+    you why the build is suddenly slow.
+
+    The tell is a build that goes silent with nothing burning CPU. Look at the
+    process list inside the container (`docker top <name> -o cmd`) and read
+    the rsync invocation; it shows exactly what it was given.
+
+!!! tip "A host path will not work"
+
+    `/home/you/src/bmcd` is a path in *your* shell, not in the container. An
+    override naming one fails with `ERROR: <path> does not exist`, from
+    inside, where that path genuinely does not.
+
+!!! danger "A bad build leaves its mess in the next one"
+
+    Buildroot's `target/` tree is built up in place, and nothing sweeps it
+    between builds. A package that installed the wrong files once keeps them
+    there until you remove them by hand, so the *next* build — with the
+    override corrected — still ships them.
+
+    The symptom is a rootfs several times the slot size. One wrong interface
+    override put 406 MB of *repository* into `/srv/bmcd/www`, and the
+    following build produced a 206 MB rootfs against a 46 MB slot. Nothing in
+    the log mentioned the earlier mistake.
+
+    Clear the files the package installed and the stamps that say it is
+    already installed:
+
+    ```sh
+    rm -rf buildroot/output/target/srv/bmcd/www
+    rm -f  buildroot/output/build/bmc-ui-*/.stamp_target_installed
+    ```
+
+    When in doubt about which package is responsible, the size is the clue:
+    compare the rootfs against the slot before you go looking anywhere else.
+
+!!! warning "Do not start a build over a running one"
+
+    A second build entering the same `output/` tree while the first is still
+    writing fails in a way that reads like nothing happened. `rm -rf` on the
+    package directory reports **Directory not empty**, the `&&` chain gives
+    up, and the log the new build would have written is never created.
+
+    If your status check then greps that log with stderr discarded, it finds
+    no `BUILD_RC` line and reports a build still in progress — for a build
+    that never began. Check for a running container first, and treat a
+    missing log as a failure, not as patience.
 
 !!! danger "Remove `local.mk` before computing any hash"
     With an override in place, the hash you compute describes whatever happened
