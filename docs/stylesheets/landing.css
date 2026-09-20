@@ -738,5 +738,5 @@ body.tp-demo-open .md-footer { display: none; }
    thumbnail that crops the tab was the first version, and the screens gate
    refused it: a capture is never cropped or stretched on this site. The
    hero-band figure rule above would set it wider than the card. */
-.md-main:has(.tp-hero-band) .md-typeset .md-post--excerpt figure.tp-post-figure { width: 100%; max-width: 100%; margin: 0.2rem 0 0.9rem; }
+.md-main:has(.tp-hero-band) .md-post--excerpt .md-typeset figure.tp-post-figure { width: 100%; max-width: 100%; margin: 0.2rem 0 0.9rem; }
 .md-main:has(.tp-hero-band) .md-post--excerpt figure.tp-post-figure img { box-shadow: none; }
