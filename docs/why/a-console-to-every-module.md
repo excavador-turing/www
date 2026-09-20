@@ -54,13 +54,16 @@ The reader is running; nothing is arriving. If you want to know whether the
 module is alive, the node's power state and its switch port say so, and this
 line does not.
 
-!!! note "Why the buffer is 16 KiB and not larger"
-    It lives in the BMC's RAM, and the BMC has 116 MB of it with no swap. Four
-    modules at 16 KiB is 64 KiB, which is free; four at a megabyte is a
-    meaningful fraction of a board that has already died twice this year from
-    running out of memory.
+## What it does not cover
 
-    Keeping a longer history means writing it somewhere, and the overlay is
-    UBI on a NAND with five free eraseblocks. Sending the lines off the board
-    with `syslogd -R` is the answer that scales, and it is
-    [one line of configuration](../reference/known-faults.md).
+It lives in the BMC's RAM, and the BMC has 116 MB of it with no swap. Four
+modules at 16 KiB is 64 KiB, which is free; four at a megabyte is a
+meaningful fraction of a board that has already died twice this year from
+running out of memory.
+
+Keeping a longer history means writing it somewhere, and the overlay is
+UBI on a NAND with five free eraseblocks. Sending the lines off the board
+with `syslogd -R` is the answer that scales, and it is
+[one line of configuration](../reference/known-faults.md).
+
+<div class="tp-next tp-next--argument"><a href="../../features/a-console-to-every-module/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The Console tab, replaying a real recording.</span></a><a href="../reference/cli/"><b>Do it on your board →</b><span>The same consoles from a shell, through tpi.</span></a><a href="../reference/known-faults/"><b>The evidence →</b><span>Including the console fault fixed in v2.31.0.</span></a><a href="../a-certificate-that-does-not-rot/"><b>A certificate that does not rot →</b><span>Why a console needs a certificate a browser accepts.</span></a></div>

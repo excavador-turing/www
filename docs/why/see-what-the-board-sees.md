@@ -132,3 +132,10 @@ Temperature   53.8 °C   fan step 5 of 6   above the 45 °C trip
 The slider that commands the fan stays on Settings. The control belongs there.
 The reading does not.
 
+## What it does not cover
+
+The board reads its own temperature; it does not act on it. There is no `critical` trip, so nothing shuts the board down if it overheats — a held fan is taken back by the daemon above the hottest active trip, which is a weaker guarantee than a kernel doing it. That is [an open fault](../reference/known-faults.md), not a setting.
+
+And a reading is not a record. These numbers are what the board says now; keeping them means [scraping the metrics port](../guides/monitor-it.md), which is a separate thing to run.
+
+<div class="tp-next tp-next--argument"><a href="../../features/see-what-the-board-sees/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The Overview tab, with real readings from a board.</span></a><a href="../guides/monitor-it/"><b>Do it on your board →</b><span>The metrics port, a scrape config and the dashboard.</span></a><a href="../reference/metrics/"><b>The evidence →</b><span>Every family the board can measure, catalogued.</span></a><a href="../the-board-describes-itself/"><b>The board describes its own API →</b><span>Where the readings on this page come from.</span></a></div>

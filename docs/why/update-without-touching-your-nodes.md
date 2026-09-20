@@ -51,9 +51,12 @@ noticed. That is a property of the measurement, not a guarantee — a slower
 boot could cross a readiness threshold, and this page says so rather than
 claiming an isolation the hardware does not provide.
 
-!!! warning "A prediction that was wrong, kept on the record"
-    Before this upgrade the expectation written down was that four nodes would
-    drop and etcd would fall to two of three members. None of that happened.
-    The prediction is recorded on the ticket beside the result, because a
-    project that only publishes its correct predictions is not measuring
-    anything.
+## What it does not cover
+
+Before this upgrade the expectation written down was that four nodes would
+drop and etcd would fall to two of three members. None of that happened.
+The prediction is recorded on the ticket beside the result, because a
+project that only publishes its correct predictions is not measuring
+anything.
+
+<div class="tp-next tp-next--argument"><a href="../../features/update-without-touching-your-nodes/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The Nodes tab, with every module powered and counted.</span></a><a href="../guides/upgrade-from-stock/"><b>Do it on your board →</b><span>Coming from stock firmware, step by step.</span></a><a href="../reference/comparison/"><b>The evidence →</b><span>This row and twelve others, each with its method.</span></a><a href="../updates-that-undo-themselves/"><b>Updates that undo themselves →</b><span>What happens if the image you are updating to is bad.</span></a></div>

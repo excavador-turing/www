@@ -40,7 +40,7 @@ feature:
     evidence:
       href: ../../reference/comparison/
       text: The evidence
-      note: Thirteen rows against upstream, including where upstream leads.
+      note: Every row against upstream, including where upstream leads.
     related:
       href: ../pick-a-version/
       text: Pick a version, from anywhere

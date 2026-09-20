@@ -87,3 +87,11 @@ the range the page was built against says so in a banner rather than
 breaking. The readings themselves come from
 [the description the board publishes](../features/the-board-describes-itself.md), so the
 page cannot ask for a field the daemon does not have.
+
+## What it does not cover
+
+The page holds no credential, which is the point, and also the limit: it can only be as safe as the gateway in front of it. Nothing here authenticates anybody — that is [the proxy's job](../features/who-may-reach-this-board.md), and a board reached some other way is still trusted locally without one, which is [an open fault](../reference/known-faults.md).
+
+It also shows one estate. There is no multi-tenancy, no per-board permission, and no audit of who pressed what beyond each board's own log.
+
+<div class="tp-next tp-next--argument"><a href="../../features/one-page-over-every-board/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fleet"><b>See it in the demo →</b><span>Two boards on one page, from a real board's capture.</span></a><a href="../guides/install/"><b>Do it on your board →</b><span>Install the firmware each board in the fleet runs.</span></a><a href="../reference/known-faults/"><b>The evidence →</b><span>What is still not fixed, including where trust is assumed.</span></a><a href="../who-may-reach-this-board/"><b>Who may reach this board →</b><span>The two ways in, and what a trusted proxy buys.</span></a></div>
