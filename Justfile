@@ -50,7 +50,7 @@ serve:
 # Everything CI checks, in the order CI checks it. Run this before pushing;
 # `checks.yml` runs exactly these and nothing else, and the deploy runs none
 # of them.
-check: facts-check feature-lint ribbon-check build screens
+check: facts-check facts-lint feature-lint ribbon-check build screens
 
 # Prove every screen reads whole, at nine viewports.
 #
@@ -98,6 +98,14 @@ ribbon-check:
 # Fail if the committed facts file no longer matches its sources.
 facts-check:
     ./scripts/facts.py --check
+
+# Fail if a page types a number the facts file owns.
+#
+# facts.py claimed this script existed from the day it was written -- in its
+# own docstring and in the header it generates into facts.yaml -- and it did
+# not. The claim shipped and was served on the site inside a generated file.
+facts-lint:
+    ./scripts/facts-lint.py
 
 clean:
     rm -rf site

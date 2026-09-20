@@ -59,6 +59,9 @@ jobs:
       # The eleven feature pages are one page eleven times, and the captures
       # are all taken the same way. Both are content rules a template cannot
       # enforce, and both are what made the pages look like different sites.
+      - name: no page types a number the facts file owns
+        run: .venv/bin/python scripts/facts-lint.py
+
       - name: the feature pages have one shape
         run: .venv/bin/python scripts/feature-lint.py
 

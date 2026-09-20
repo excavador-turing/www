@@ -55,8 +55,11 @@ a diff exactly when the API changed, and never otherwise. A reference that
 regenerates from whatever is currently running would show the reader today's
 board and tell them nothing about what changed.
 
-!!! note "What this does not give you"
-    A served description is not a served playground. There is no request
-    console on this site, deliberately — the operations that matter here power
-    modules off and flash them, and a documentation page is the wrong place to
-    have that one click away from a reader who is browsing.
+## What it does not cover
+
+A served description is not a served playground. There is no request
+console on this site, deliberately — the operations that matter here power
+modules off and flash them, and a documentation page is the wrong place to
+have that one click away from a reader who is browsing.
+
+<div class="tp-next tp-next--argument"><a href="../../features/the-board-describes-itself/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The interface built from the types this document generates.</span></a><a href="../reference/cli/"><b>Do it on your board →</b><span>tpi reaches every operation the document describes.</span></a><a href="../reference/api/"><b>The evidence →</b><span>Every operation, on pages emitted from the document.</span></a><a href="../see-what-the-board-sees/"><b>See what the board sees →</b><span>The readings those operations return.</span></a></div>

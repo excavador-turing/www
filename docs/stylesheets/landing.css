@@ -669,3 +669,9 @@ body.tp-demo-open .md-footer { display: none; }
 @media (max-width: 720px) {
   .tp-maker { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The argument pages close with five cards: the way back to the feature and
+   the feature's own four. Five in two columns leaves an orphan, so the way
+   back takes the whole first row -- it is the one a reader who came from
+   the feature page most likely wants. */
+.md-typeset .tp-next--argument > a:first-child { grid-column: 1 / -1; }

@@ -104,10 +104,12 @@ would describe something that is not being served.
     would fire every alert ever written against that metric on a board whose
     certificate is fine.
 
-## What is next
+## What it does not cover
 
 The board still receives its key from elsewhere when it is enrolled into a
 real authority. The next step is for it to generate its own key and emit a
 certificate signing request, so the private key never leaves the board at
 all — which also makes it enrollable into any internal PKI rather than one
 particular setup.
+
+<div class="tp-next tp-next--argument"><a href="../../features/a-certificate-that-does-not-rot/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The interface the certificate protects.</span></a><a href="../guides/install/"><b>Do it on your board →</b><span>Install the firmware that issues it.</span></a><a href="../reference/known-faults/"><b>The evidence →</b><span>Including the console's certificate requirement.</span></a><a href="../who-may-reach-this-board/"><b>Who may reach this board →</b><span>The other half of the board's access story.</span></a></div>

@@ -11,7 +11,7 @@ hide:
 <div class="tp-index__head" markdown>
 <span class="tp-eyebrow">Features</span>
 
-# Eleven things this board does that it did not before
+# {{ features.count | title_number }} things this board does that it did not before
 
 <p>Every one of them started as something that went wrong on a real board. Behind each is the argument, with the measurement that backs it.</p>
 </div>
