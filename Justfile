@@ -50,7 +50,7 @@ serve:
 # Everything CI checks, in the order CI checks it. Run this before pushing;
 # `checks.yml` runs exactly these and nothing else, and the deploy runs none
 # of them.
-check: facts-check facts-lint feature-lint ribbon-check build screens
+check: facts-check facts-lint feature-lint ribbon-check build screens reach
 
 # Prove every screen reads whole, at nine viewports.
 #
@@ -64,6 +64,13 @@ check: facts-check facts-lint feature-lint ribbon-check build screens
 # for 132 seconds of every deploy.
 screens: build
     ./scripts/screens.py
+
+# Prove every nav page is within two clicks of the front page, and the
+# changelog and roadmap within one -- counting only links a reader can see.
+# The changelog was three clicks deep before the tabs and footer existed;
+# this is what keeps it from going deep again.
+reach: build
+    ./scripts/reach.py
 
 # Re-record the faults the site is allowed to have.
 #
