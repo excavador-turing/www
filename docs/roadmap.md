@@ -25,11 +25,11 @@ Every feature has a page with the measurement behind it, and every release has [
 
 | release | when |
 |---|---|
+| [v2.33.0](changelog/firmware.md) | 20 September 2026 |
 | [v2.32.0](changelog/firmware.md) | 13 September 2026 |
 | [v2.31.0](changelog/firmware.md) | 12 September 2026 |
 | [v2.30.0](changelog/firmware.md) | 12 September 2026 |
 | [v2.29.0](changelog/firmware.md) | 12 September 2026 |
-| [v2.28.0](changelog/firmware.md) | 12 September 2026 |
 
 ## How a thing gets from here to there
 

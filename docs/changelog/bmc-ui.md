@@ -7,9 +7,219 @@ hide:
 
 The web interface the board serves.
 
-Newest release **3.29.0**, 13 September 2026. 27 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v3.30.0**, 20 September 2026. 28 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "Unreleased — merged, not yet on a board"
+???+ note "v3.30.0 — 20 September 2026"
+
+    **Added**
+
+    - **The confirm window is settable, beside the buttons it belongs to.** The
+      daemon has accepted `window_s` per apply since the switch landed — 10 to 300
+      seconds — and publishes its own default and range; `tpi` has `--window`. The
+      card sent neither, so every apply, **including Try it**, silently got 30
+      seconds.
+
+      Thirty is enough to watch a preset take effect and too short to check a
+      layout you made by hand, which is exactly when Try it is worth using.
+
+      The bounds come from the board's published limits, never from a number in
+      this page, and an untouched control sends no `window_s` at all so the board
+      keeps deciding. An out-of-range value greys the button out rather than being
+      sent to be refused, and the Apply confirmation quotes the number it will
+      actually use.
+
+    **Changed**
+
+    - **Network, Security and Settings each fit a laptop window now.** Measured on
+      bmc-2 at 1280×800, where a tab has 744 px of usable height: Network was
+      1149 px, Access 1670, Settings 942. **All three are 800 px** — no scroll.
+
+      The cause was shared: every tab stacked full-width cards down a 1280 px
+      screen, so pages made of three or four short cards scrolled while half the
+      window stayed empty. `TabView` takes a `columns` prop and lays them out in
+      two columns at `xl`, where a column is still wide enough for a form. Below
+      `xl` nothing changes — two columns at 768 px would be two cramped ones.
+
+    - **The hostname moved to Network, and Access became Security.** A board's
+      name is a network fact: it is how you reach it, it is in the certificate's
+      subject-alternative names, and it is what the board advertises over mDNS. It
+      sat on a different tab from the addresses it belongs with.
+
+      With it gone, the honest name for what is left — the password, the trusted
+      proxy, the certificate — is **Security**. That name was considered and
+      rejected one release ago for the good reason that a hostname is not a
+      security setting; moving the hostname is what makes it right.
+
+    - **Addresses are one line per interface**, not three definition rows. The
+      device, its address and its MAC are one fact about one thing.
+
+    - **Installing a certificate is behind a disclosure.** Two PEM boxes were
+      250 px of a card whose everyday job is answering *what certificate does this
+      board serve, and when does it expire*.
+
+    - **The switch's link column reads `1 Gb`**, not `1000 Mb/s · full duplex` —
+      which was most of the table's width and pushed it into a horizontal
+      scrollbar inside a column. Half duplex still shows, in amber, because a
+      gigabit port that negotiated half is a bad cable.
+
+    **Changed**
+
+    - **The fleet's chrome on a phone: 301 px to 121 px.** Measured on the demo
+      build at 390×844, a board inside the fleet spent **more than a third of the
+      viewport** on three stacked rows — a header with a three-line subtitle, the
+      board switcher wrapped to two lines, and ten tabs wrapped to four — before
+      the first thing anybody came to look at.
+
+      Both rows now **scroll rather than wrap**. That is not only about height: a
+      row that wraps moves every tab sideways when a board is added, which is how
+      somebody ends up on Settings having aimed at Network. The subtitle is
+      orientation rather than instruction, and is kept where there is room for it.
+
+      Desktop is unchanged at 137 px, which it already was: the fleet has its own
+      header and never rendered the board's, so it did not pay the 182 px the
+      board tab bar used to cost. That is worth saying because the ticket assumed
+      otherwise — the fleet's problem was the phone, and only the phone.
+
+    **Security**
+
+    - **A board still on the password it shipped with shows one page and nothing
+      else.** Every board leaves the factory as `root` / `turing`, which is
+      printed in the quick-start guide and identical on every board anyone has
+      bought — so a board that has not had it changed is a board anybody who can
+      reach it can administer.
+
+      The daemon refuses everything but logging in and changing it, so without
+      this page the interface would render every tab as an error and leave the
+      operator to work out why. Not a banner over the ordinary interface: a banner
+      is a thing people close.
+
+      The page asks for the current password like any other change, which on this
+      board is the published one. That is one more field to type and it keeps a
+      single code path, rather than a "first time" route that skips a check.
+
+      It says, because it is one account: the new password is also the SSH
+      password for the board.
+
+      The strings are English in every locale, for the reason the `access` strings
+      already are — this is the page that tells somebody their board is open to
+      anyone who can reach it, and a guessed translation of that is worse than a
+      sentence they can look up.
+
+      A board on an older daemon sends no `factory_password` at all, and nothing
+      changes for it: that daemon refuses nothing, so a page saying otherwise
+      would simply be false.
+
+    **Added**
+
+    - **A page-length gate in CI.** `scripts/screens.py` measures every tab at
+      1280×800 and 390×844 on every pull request and fails on a header over
+      64 px, a tab over two screens, or a horizontal scrollbar at phone width.
+      Console is exempt: a terminal is meant to be tall.
+
+      Against the **demo build**, so no board is involved — the captured fixtures
+      answer, and a card whose endpoint they lack hides itself exactly as it does
+      on an older board. That also means the gate undercounts Access and Network
+      by the access, certificate and switch cards, which is said in the script
+      rather than left for somebody to discover; capturing those endpoints from a
+      board closes it.
+
+      A baseline holds what is over the line today and is checked **both
+      directions**, so a fault that gets fixed and left in the baseline fails too.
+      It keys on the fault, never on the pixel count: a baseline holding numbers
+      would fail on a one-pixel move, and a gate that cries every day gets
+      switched off.
+
+      `npm run screens` runs it locally; `npm run screens -- --record` re-records.
+
+    **Changed**
+
+    - **The Firmware tab shows the newest release per source, not three.** Four
+      sources at three rows each was twelve rows of catalogue; the question the
+      page exists to answer is *is there something newer than what I am running,
+      and where from*. Each source now shows its newest, with **show all N**
+      opening the rest of that source in place. Nothing on offer changed, only how
+      much of it is open at once — and a source that returned an error still shows
+      the error where its row would be, because an empty list and an unreadable
+      one are different answers.
+
+    **Added**
+
+    - **An Access tab: what this board is called, and who may reach it.** The
+      hostname, the password and trusted proxy, and the certificate this board
+      serves, moved out of Settings into a tab of their own between Network and
+      Firmware. Reading one of the three usually means reading the next.
+
+      "Security" was considered and rejected: a hostname is not a security
+      setting, and a tab whose name is wrong for a quarter of what it holds is a
+      tab people do not look in.
+
+    **Changed**
+
+    - **Settings is a page again: 3014 px to 942 px** at 1280×800, four screens to
+      just over one. Three cards went to Access, and **Firmware sources stopped
+      being rendered on two tabs** — the same editor was on Settings and on
+      Firmware, and it only ever belonged where the sources are used. What is left
+      is time, the fan, backup and restore, and the two buttons that touch the
+      whole board.
+
+    - **One header bar, with the tabs inside it: 126 px back on every page.**
+      Measured on bmc-2 at 1280×800, the logo block was 128 px and the tab strip
+      beneath it another 54 px, so every tab began 182 px down and a laptop showed
+      618 px of content out of 800. It is now 56 px, and the tabs are in it.
+
+      The board's name and firmware version stay — they are how you know which
+      window you are typing into — on one line beside the logo rather than under
+      it. The active tab is underlined rather than drawn as a tab, because inside
+      a header bar there is no strip for it to be part of.
+
+      Between `md` and `xl` the strip stays: seven tabs plus the board's name do
+      not fit beside each other at 768 px, and tabs that wrap are worse than tabs
+      on a row of their own. Below `md` nothing changes at all — logo, name,
+      hamburger, tabs in the drawer.
+
+    - **The switch table is editable, and it is the only table on the Network
+      tab.** Presets fill it; they are no longer the only thing you can ask for.
+
+      Pick Flat, Split or Trunk and the cells populate from the board's own
+      expansion. Then change any of them: each port's untagged VLAN is one box,
+      its tagged VLANs a comma-separated list, and spanning tree and VLAN
+      filtering are switches under the table. There is no Custom mode to enter,
+      because there is no mode — **the table is the configuration and a preset is
+      a starting point.**
+
+      **The board judges every edit, and this page judges none of them.** The
+      whole table goes to `POST .../network/switch/validate` as you type; a
+      refusal disables Apply and is shown in the board's own words, and each
+      warning sits beside the port it is about. The one judgement the client makes
+      is whether what you typed is a number, because that is about text rather
+      than about switches. A copy of the board's rules in here would eventually
+      disagree with the board, and the way that disagreement surfaces is a board
+      nobody can reach.
+
+      **Try it** applies a change with no intention of keeping it. Watch what you
+      reach the board by, see whether it still works, and let the window run out.
+      For a hand-made layout it is the only honest dry run: the alternative is
+      finding out by being locked out.
+
+      **VLANs can be named** — a word beside each number, carried in the document
+      the board persists. A table of bare numbers is not a layout anybody can read
+      a year later.
+
+      **One table, not two.** Link state and VLAN membership were separate panels
+      about the same seven ports, so answering *is node 3's cable in, and which
+      network is it on* meant matching names between them. They are now one row
+      per port: link, negotiated rate, untagged, tagged — with traffic and error
+      counters one click away. The unprobed-port alarm moved with them, and the
+      table still renders on a board whose daemon has no switch configuration at
+      all, because link state is the older feature and the one people arrive
+      looking for.
+
+      **The BMC's own row cannot be given a tagged VLAN.** The board refuses such
+      a document; a box you cannot type in says so before it has to.
+
+      Under Confirm, one line about where a confirmation has to come from: the
+      browser you reach this board with, never a shell on the board itself. The
+      daemon refuses the latter outright.
 
     **Added**
 

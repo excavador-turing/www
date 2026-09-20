@@ -106,12 +106,11 @@ would describe something that is not being served.
 
 ## What it does not cover
 
-**It does not get your certificate onto the board.** The generator issues one
-and renews it; installing a certificate your own authority signed is still a
-shell operation, and an install control is on the roadmap rather than in the
-firmware. Until it exists, the shortest path to a green padlock is to trust
-your CA once in the browser, which also makes the serial console connect —
-[the whole story is its own guide](../guides/your-own-certificate.md).
+**It does not issue a certificate your own authority signed** — but it no
+longer stands in the way of one. Installing your own is a control on the
+Security tab, `tpi tls install`, or the API, and the board refuses a pair that
+does not match, has expired or does not name it, having written nothing.
+[The whole story is its own guide](../guides/your-own-certificate.md).
 
 **It does not renew a certificate somebody else issued.** A private authority
 that hands out 24-hour certificates — which is what step-ca does by default —

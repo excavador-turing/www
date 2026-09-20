@@ -7,11 +7,57 @@ hide:
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.36.3**, 12 September 2026. 38 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.37.0**, 20 September 2026. 39 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "Unreleased — merged, not yet on a board"
+???+ note "v2.37.0 — 20 September 2026"
 
     **Security**
+
+    - **A board still on its factory password can do exactly one thing.** Every
+      board leaves the factory as `root` / `turing` — printed in the quick-start
+      guide, identical on every board ever sold, on a project whose own front page
+      says a board should not face the internet. Upstream has had an issue open
+      about it since 2023.
+
+      Until it is changed, `/api/bmc` answers **403 to everything** except
+      `/authenticate`, `/access` and `/access/password`, with a
+      `application/problem+json` body saying why. Not a banner: a banner is a
+      thing people close.
+
+      **The test is the factory password, not the first login.** `root`'s hash is
+      asked whether it still verifies the word `turing`, of `/etc/shadow` itself,
+      cached against that file's modification time. Never a flag. A board whose
+      password was changed over SSH before anyone opened the interface is never
+      asked; a board reset to factory defaults is asked again, because it is a
+      factory board again. A change made by anything — this daemon, `passwd`, an
+      editor — is noticed on the next request, with no restart.
+
+      **Loopback is exempt, because refusing it would protect nothing.** Anyone
+      with a shell on the board is already root on it — they can read
+      `/etc/shadow`, run `chpasswd`, or stop the daemon. The threat this gate
+      exists for is a stranger who can reach port 443 on the management LAN, and
+      that stranger is not on loopback. What the exemption buys is the on-board
+      `tpi` working on a board that has not been set up; it is the only thing left
+      that relies on the bypass at all. `tpi` pointed at a factory board from
+      another machine is over the network, is gated, and says so.
+
+      *(An earlier draft of this entry justified the exemption by the first-boot
+      promotion check. That was wrong: `/metrics` is a separate plain-HTTP
+      listener and `S99postupdate` does not pass through `/api/bmc` at all.
+      Corrected rather than deleted — a security exemption with a reason that does
+      not hold is worse than one with a thin reason.)*
+
+      A wrong password on a factory board is still answered as a wrong password.
+      Saying "this board is on its factory password" to a failed login would
+      confirm the account name to somebody guessing.
+
+      The fleet is gated too: a gateway vouching for a person says nothing about
+      whether the board has been set up.
+
+      `GET /api/bmc/access` gains **`factory_password`**, so the interface can
+      decide what to render before it asks for anything else. An interface that
+      learned its state from the 403s it collected would show a broken page first
+      and the explanation second.
 
     - **A confirmation sent from the board itself is refused.** `POST
       /api/bmc/network/switch/confirm` answers **403** to a request that arrived

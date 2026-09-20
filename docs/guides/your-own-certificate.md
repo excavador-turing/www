@@ -67,12 +67,26 @@ $ step ca certificate bmc-1.lan bmc.crt bmc.key
 
 — and install it on the board.
 
-!!! warning "Today this is a shell operation"
+Three ways, and they do the same thing:
 
-    There is no endpoint for it yet: copy the pair over SSH and restart the
-    daemon. An install control on the Settings tab, in `tpi`, and in the
-    fleet is [on the roadmap](../roadmap.md) and is the thing to upvote if you
-    want it.
+* **The Security tab**, under *Install your own* — paste the certificate and
+  its key.
+* **`tpi tls install --cert cert.pem --key key.pem`**, from any machine that
+  can reach the board.
+* **`PUT /api/bmc/tls/certificate`** with the two PEMs in a JSON body.
+
+The board checks that the pair matches, that the certificate is valid now,
+that it is marked for server authentication and that it names this board — and
+refuses with the reason if any of that is wrong, having written nothing.
+
+**It takes effect on the next connection, with no restart.** Open sessions are
+not dropped, including the one that installed it.
+
+!!! tip "The key is never written to a log"
+
+    This takes a JSON body on its own path rather than the legacy
+    query-string interface, which records every mutating call. `tpi tls reset`
+    puts the board back on a certificate it issues itself.
 
 Whatever you install is what the board serves. Every key type is covered by a
 test that performs a real handshake against the real acceptor, over both
