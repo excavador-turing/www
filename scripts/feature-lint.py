@@ -76,7 +76,12 @@ def check_argument(path: pathlib.Path, feature: pathlib.Path, bad) -> None:
         if heads and heads[-1] != LIMITS:
             here(f"`## {LIMITS}` is not the last section (followed by "
                  f"{heads[-1]!r})")
-    if 'class="tp-next"' not in text:
+    # A prefix match, not the exact attribute: the block carries a second
+    # class on these pages, and the first version of this line looked for
+    # `class="tp-next"` verbatim -- which failed on all eleven pages the
+    # moment the modifier was added, after the commit had already been pushed
+    # because the check's exit code was piped into `tail`.
+    if not re.search(r'class="tp-next[" ]', text):
         here("has no way onward -- an argument page that ends in prose is a "
              "dead end, and these are the deepest pages on the site")
     elif "Back to the feature" not in text:
