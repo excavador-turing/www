@@ -106,10 +106,22 @@ would describe something that is not being served.
 
 ## What it does not cover
 
-The board still receives its key from elsewhere when it is enrolled into a
-real authority. The next step is for it to generate its own key and emit a
-certificate signing request, so the private key never leaves the board at
-all — which also makes it enrollable into any internal PKI rather than one
-particular setup.
+**It does not get your certificate onto the board.** The generator issues one
+and renews it; installing a certificate your own authority signed is still a
+shell operation, and an install control is on the roadmap rather than in the
+firmware. Until it exists, the shortest path to a green padlock is to trust
+your CA once in the browser, which also makes the serial console connect —
+[the whole story is its own guide](../guides/your-own-certificate.md).
+
+**It does not renew a certificate somebody else issued.** A private authority
+that hands out 24-hour certificates — which is what step-ca does by default —
+needs an ACME client on the board. Also on the roadmap.
+
+**And it will not enrol itself into your authority.** The board generating its
+own key and emitting a signing request was designed and dropped: a
+CA-signed certificate matters only where a browser talks to a board directly,
+the gateway in front of the fleet already verifies each board against a named
+CA, and the cost was a signing service with standing access to every board.
+The guide above records that decision beside the two things that were kept.
 
 <div class="tp-next tp-next--argument"><a href="../../features/a-certificate-that-does-not-rot/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The interface the certificate protects.</span></a><a href="../guides/install/"><b>Do it on your board →</b><span>Install the firmware that issues it.</span></a><a href="../reference/known-faults/"><b>The evidence →</b><span>Including the console's certificate requirement.</span></a><a href="../who-may-reach-this-board/"><b>Who may reach this board →</b><span>The other half of the board's access story.</span></a></div>
