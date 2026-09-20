@@ -16,6 +16,7 @@ your board is; the references are there when a guide sends you to one.
 - **[Install](install.md)** — putting this on your own board
 - **[Upgrading from stock](upgrade-from-stock.md)** — from the firmware it shipped with, and what to expect on the way
 - **[Recover a bad flash](recover-a-bad-flash.md)** — what to do when it goes wrong
+- **[Should it face the internet?](facing-the-internet.md)** — no, and what to expose instead
 - **[Your own certificate](your-own-certificate.md)** — a green padlock, a working console, and why not Let's Encrypt
 - **[Monitor it](monitor-it.md)** — the metrics port, a scrape config, the dashboard
 - **[Developing](development.md)** — build it, and iterate without cutting a release

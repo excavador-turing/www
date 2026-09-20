@@ -15,6 +15,41 @@ no tag, no release, no twenty-minute CI round trip.
 
     Put dev images on a board you can reach.
 
+## How this is built, and what checks it
+
+People ask, so: some of this is written with a machine's help, and the parts
+that decide whether a board comes back are read line by line — the API
+surface, the build scripts, the TLS handling, the update gate. The rest of
+this page is the loop that proves it, and the honest division is between what
+a machine can check without hardware and what only a board can.
+
+**What CI proves, with no board attached:**
+
+| | |
+|---|---|
+| the update gate's logic | runs as a test in the build container — the promotion decision is exercised without a promotion |
+| the daemon on the board's target | a cross-compile check, because a host-green build is not a board-green build |
+| the versions a release pins | a gate in the workflow that publishes, so a stale pin stops the release rather than being reported after it |
+| every TLS key type the board offers | a **real handshake** against the real acceptor, over both protocol versions — RSA, P-256, P-384, P-521, Ed25519 |
+| the daemon without hardware | the `stubbed` feature builds and tests against an in-memory HAL |
+| the interface's types | generated from the pinned daemon release, so a drifted type fails the build |
+
+**What only a board proves**, and therefore what every release gets: the loop
+below, run against live hardware. A firmware release is installed on a real
+board and exercised before it is called done. The patch releases that follow
+minors in [the changelog](changelog/firmware.md) are what that looks like from
+outside — a regression found on hardware, fixed, released again.
+
+**What is not proven that way**, said plainly: hardware-less contract tests
+for the whole daemon API are an open ticket, not a thing that exists. The
+`stubbed` HAL had drifted out of sync with the real one for months before
+anything built it, because nothing did. And two boards is the whole fleet this
+runs on; [what is and isn't fixed](reference/known-faults.md) is the list of
+what that has not caught.
+
+The trick, with a person or a machine writing the code, is the same one: write
+the test first, and make the test the thing that decides.
+
 ## Three repositories
 
 | repo | what it is |

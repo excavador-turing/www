@@ -185,25 +185,26 @@ Newest release **v2.32.0**, 13 September 2026. 29 in total. Each entry is this r
 
 ??? note "v2.27.0 — 12 September 2026"
 
-    Turing Pi 2 BMC firmware, built from the `hive` branch.
+    The first release that carries the latest of all three: BMC-UI 3.26.0, bmcd
+    2.34.0 and tpi 1.8.0.
 
-    **Not a Turing Pi release.** Upstream is dormant: last release
-    v2.1.0 (2025-02-05), last commit 2025-08-28, and the lead
-    maintainer stated on 2026-06-16 that he has moved on.
+    **Fixed**
 
-    Includes the unmerged versioning fix (upstream PR #242), so
-    `/etc/os-release` reports the actual firmware version instead of
-    Buildroot's, and bmcd moves v2.3.4 -> v2.3.7.
+    - **The pin gate moved to the workflow that publishes**, so it can actually
+      refuse. It ran where it could report a stale pin and not stop the release,
+      which is how v2.26.0 shipped a `tpi` two versions behind the daemon it was
+      packaged with.
 
-    `.tpu` is the OTA package, `.img` the recovery SD image.
-    Verify with `sha256sum -c SHA256SUMS`.
+??? note "v2.26.0 — 11 September 2026"
 
-    `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
-    metrics this build's daemon emits. Import it and pick your
-    Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
+    Pins BMC-UI 3.25.0: the SD card picker, and the flash button that threw
+    instead of flashing.
 
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
+    ##### Known at the time
+
+    - This release shipped a stale `tpi`. The gate that should have refused it ran
+      in a workflow that could not stop a release; v2.27.0 moved it and carries
+      the right one.
 
 ??? note "v2.25.0 — 11 September 2026"
 
@@ -360,28 +361,6 @@ Newest release **v2.32.0**, 13 September 2026. 29 in total. Each entry is this r
     - **The Grafana dashboard names the board on every series.** With two boards
       reporting, a panel that did not carry the instance label was drawing both
       as one line.
-
-??? note "v2.26.0 — 11 September 2026"
-
-    Turing Pi 2 BMC firmware, built from the `hive` branch.
-
-    **Not a Turing Pi release.** Upstream is dormant: last release
-    v2.1.0 (2025-02-05), last commit 2025-08-28, and the lead
-    maintainer stated on 2026-06-16 that he has moved on.
-
-    Includes the unmerged versioning fix (upstream PR #242), so
-    `/etc/os-release` reports the actual firmware version instead of
-    Buildroot's, and bmcd moves v2.3.4 -> v2.3.7.
-
-    `.tpu` is the OTA package, `.img` the recovery SD image.
-    Verify with `sha256sum -c SHA256SUMS`.
-
-    `turingpi-bmc-dashboard.json` is a Grafana dashboard over the
-    metrics this build's daemon emits. Import it and pick your
-    Prometheus-compatible datasource; see
-    https://turing.excavador.xyz/guides/monitor-it/
-
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
 
 ??? note "v2.20.0 — 10 September 2026"
 

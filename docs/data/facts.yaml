@@ -20,7 +20,7 @@ releases:
     newest: 2.36.3
     count: 38
   ui:
-    newest: v3.29.0
+    newest: 3.29.0
     count: 27
   tpi:
     newest: 1.8.0
