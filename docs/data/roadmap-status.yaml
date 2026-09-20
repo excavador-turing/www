@@ -1,0 +1,10 @@
+# Where each planned thing stands. A judgement, not a fact a script can read.
+#
+# It belongs in the discussion, as a line reading `Status: <text>` in the
+# opening post, so it sits with the argument rather than here. These are what
+# the roadmap page carried while it was written by hand, kept so nothing was
+# lost when it became generated -- delete an entry once its discussion says
+# it itself, and `just refresh-roadmap` will report which are still here.
+23: Listing shipped in v3.25.0; the rest is open
+22: Designed, not started
+25: Backlog

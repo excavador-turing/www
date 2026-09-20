@@ -1,0 +1,68 @@
+{
+ "as_of": "2026-09-20",
+ "items": [
+  {
+   "number": 25,
+   "title": "VLANs on the board's switch, with apply-then-confirm",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/25",
+   "votes": 5,
+   "status": "Backlog",
+   "status_from": "fallback",
+   "summary": "VLAN filtering and STP on the RTL8370MB-CG, first in the daemon, then in the interface."
+  },
+  {
+   "number": 24,
+   "title": "A hardware watchdog, so a hung daemon does not mean a trip to the rack",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/24",
+   "votes": 3,
+   "status": "Open",
+   "status_from": "default",
+   "summary": "The SoC has a watchdog and this firmware does not arm it."
+  },
+  {
+   "number": 27,
+   "title": "Remote syslog, and an audit line for every mutating API call",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/27",
+   "votes": 2,
+   "status": "Open",
+   "status_from": "default",
+   "summary": "Ship the board's logs somewhere that survives it, and write one line per call that changes state \u2014 who, what, from where."
+  },
+  {
+   "number": 29,
+   "title": "Manage the BMC's SSH keys and change its password from the interface and the fleet",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/29",
+   "votes": 2,
+   "status": "Open",
+   "status_from": "default",
+   "summary": "The only way to put an SSH key on the BMC, or take one off, is to log in over SSH and edit `/root/.ssh/authorized_keys` by hand."
+  },
+  {
+   "number": 22,
+   "title": "OpenTelemetry: traces, logs and metrics over OTLP, opt-in",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/22",
+   "votes": 1,
+   "status": "Designed, not started",
+   "status_from": "fallback",
+   "summary": "The board already exposes Prometheus metrics on their own credential-free listener, which is the right thing when the cluster is down."
+  },
+  {
+   "number": 23,
+   "title": "SD card: checksums computed on the board, upload, rename and move",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/23",
+   "votes": 1,
+   "status": "Listing shipped in v3.25.0; the rest is open",
+   "status_from": "fallback",
+   "summary": "The interface can now list what is on the card and say which files can be written to a module (v3.25.0)."
+  },
+  {
+   "number": 26,
+   "title": "Choose the self-signed certificate's key type and validity",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/26",
+   "votes": 1,
+   "status": "Open",
+   "status_from": "default",
+   "summary": "When no operator certificate is installed the board issues its own: EC P-384, real names, 825 days, renewed 30 days out."
+  }
+ ]
+}
