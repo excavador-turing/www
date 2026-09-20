@@ -1,3 +1,7 @@
+# Both spellings: `just check` in a worktree wants a venv, and a symlink to
+# the main checkout's is the cheap way to get one -- which `.venv/` does not
+# match, so it got staged once.
+.venv
 .venv/
 .devbox/
 /site/
@@ -7,3 +11,8 @@ __pycache__/
 # (.github/workflows/pages.yml); locally, `just demo-fork-latest <checkout>`.
 docs/demo/fork/
 docs/demo/fleet/
+
+# Worktrees live inside the checkout (the standing rule is to branch in one
+# rather than disturb the main tree). Without this, `git add -A` records the
+# whole worktree as a gitlink.
+/worktree/

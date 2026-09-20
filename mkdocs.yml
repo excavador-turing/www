@@ -125,6 +125,19 @@ markdown_extensions:
 
 plugins:
   - search
+  # Facts, once: docs/data/facts.yaml (scripts/facts.py) is the only place a
+  # number about this project is written, and pages ask for it. Five of them
+  # had already drifted apart -- the features index said 18 updates where the
+  # board said 26, About said 66 releases where the changelog said 95.
+  #
+  # OPT-IN per page. Macros expands Jinja before Markdown, so it reaches
+  # inside fenced code blocks; reference/metrics.md carries a Prometheus
+  # alert template, `{{ $labels.node }}`, that would be eaten at build time.
+  # A page that quotes a fact says `render_macros: true` in its front matter.
+  - macros:
+      render_by_default: false
+      include_yaml:
+        - docs/data/facts.yaml
   # neoteroi.mkdocsoad is GONE (2026-09-10). It was chosen over Scalar for a
   # good reason -- it emitted real HTML that search could index, where Scalar
   # is one un-indexable widget -- and that reason still stands. What it could
