@@ -62,6 +62,7 @@ nav:
           - Upgrading from stock: guides/upgrade-from-stock.md
           - Recover a bad flash: guides/recover-a-bad-flash.md
           - Your own certificate: guides/your-own-certificate.md
+          - Should it face the internet?: guides/facing-the-internet.md
           - Monitor it: guides/monitor-it.md
           - Developing: guides/development.md
       - Reference:
@@ -89,6 +90,7 @@ nav:
   - Roadmap: roadmap.md
   - About:
       - Why this fork exists: about.md
+      - Questions people ask: faq.md
       - Feedback: feedback.md
       - Contributing: contributing.md
 
@@ -206,6 +208,7 @@ extra:
         - {text: Recover a bad flash, href: guides/recover-a-bad-flash/}
         - {text: Report a problem, href: "https://github.com/excavador-turing/BMC-Firmware/issues/new/choose"}
         - {text: Ask a question, href: "https://github.com/excavador-turing/BMC-Firmware/discussions/categories/q-a"}
+        - {text: Questions people ask, href: faq/}
         - {text: All the feedback doors, href: feedback/}
     - title: The project
       links:

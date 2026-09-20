@@ -14,8 +14,14 @@
 
 ## What you need
 
-- A Turing Pi 2, revision **v2.4, v2.5, v2.5.1 or v2.5.2**. Only v2.5.2 has
-  been run here; the others are upstream's list, not this fork's proof.
+- A Turing Pi 2, revision **v2.4, v2.5, v2.5.1 or v2.5.2**.
+
+    What has actually been run, rather than upstream's compatibility list:
+    **v2.5.2** on the two boards this fork is developed against, across the
+    upgrades [their own counters record](../reference/gate-history.md); and
+    **v2.4** by one reader, reported on 2026-09-16, who installed from the SD
+    image below and found no crash and no bug. Two boards and one report is
+    not a test matrix, and this page will not pretend otherwise.
 - The BMC reachable over the network
 - Its root password
 
@@ -55,6 +61,35 @@ and lands back on what you had.
     [the releases page](https://github.com/excavador-turing/BMC-Firmware/releases)
     through the stock web interface's **Firmware Upgrade** tab, with the
     published SHA-256 in the checksum field.
+
+## From an SD card, without touching the NAND
+
+Every release also ships a `-sdcard-*.img`, and the board boots from a card
+when one is present. Nothing is written to the board's own storage, so this
+is the way to try a version without committing to it — and the way back when
+something on the NAND has gone wrong.
+
+```console
+$ xz -d tp2-bmc-firmware-sdcard-v2.32.0.img.xz
+$ sudo dd if=tp2-bmc-firmware-sdcard-v2.32.0.img of=/dev/sdX bs=4M status=progress conv=fsync
+```
+
+Insert the card, power-cycle the board, and it comes up on the image from the
+card. The interface looks the same; `tpi info` reports the version you wrote.
+
+Two things to know before you rely on it:
+
+- **The NAND is untouched.** Pull the card, power-cycle, and the board is back
+  on whatever was installed before — including a stock board that has never
+  seen this fork.
+- **Your settings do not follow.** The overlay that holds the hostname, the
+  NTP servers, the fan mode and the certificate lives on the board, not on the
+  card, so a card boot starts from defaults.
+
+This is also the path to take for anything that can strand the board. It is
+how the switch and VLAN work will be done, with the USB-OTG console attached,
+because a wrong network configuration on a card boot is a power cycle away
+from being gone.
 
 ## Afterwards
 

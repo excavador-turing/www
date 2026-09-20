@@ -7,9 +7,31 @@ hide:
 
 The web interface the board serves.
 
-Newest release **v3.29.0**, 13 September 2026. 27 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **3.29.0**, 13 September 2026. 27 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "Unreleased — merged, not yet on a board"
+???+ note "3.29.0 — 13 September 2026"
+
+    **Added**
+
+    - **A node armed for USB boot says so, on its own liveness line.** A module
+      whose USB-boot pin is held will not boot from its own eMMC, and from outside
+      that is indistinguishable from dead hardware: silent on the serial console,
+      off the network, and the board still reporting its rail on. The note leads
+      the liveness line, in red, ahead of power state and link state, because both
+      of those read perfectly normal in this failure.
+
+      The USB selector on the same card already showed `Flash` for that node. A
+      select says what you may *set*, not what is *wrong*, and says nothing about
+      the consequence or the remedy; the note beside the warning names both.
+
+    **Changed**
+
+    - **A toast names the board it is about.** With a fleet on one screen,
+      "Flashing started" told you an operation began somewhere, and a notification
+      from one board was indistinguishable from the same notification from
+      another. Toasts raised inside a board's scope now carry that board's name.
+
+??? note "3.28.0 — 12 September 2026"
 
     **Fixed**
 
@@ -38,195 +60,112 @@ Newest release **v3.29.0**, 13 September 2026. 27 in total. Each entry is this r
       Redraw is unchanged and still clears first: it means "show me what the
       module's screen says now", which is a different question.
 
-??? note "v3.29.0 — 13 September 2026"
+??? note "3.27.0 — 12 September 2026"
 
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
+    **Fixed**
 
-    **Not a Turing Pi release.** `bmc-ui-v3.29.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
+    - **The fleet's serial console connects.** It was one gate away: the
+      certificate path was already wired end to end, and the interface refused
+      before trying.
 
-    Verify with:
+    **Added**
 
-    ```
-    sha256sum -c SHA256SUMS
-    ```
+    - **Settings can say who may get in.** The access card: how you arrived, the
+      password for the local account, and the certificate authority a proxy must
+      hold to name you — the first time either half was visible from the
+      interface, let alone changeable there.
 
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
+??? note "3.26.0 — 11 September 2026"
 
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
+    **Changed**
 
-??? note "v3.28.0 — 12 September 2026"
+    - **The temperature moved to Board Health.** It was filed under Settings,
+      inside the fan card — a reading beside a control — so somebody asking "is
+      this board hot?" opened the tab called Board Health, found five other
+      numbers, and concluded the board could not tell them. It now sits with
+      uptime, load, memory and the clock, and shows the trip point that explains
+      the fan's step, because a step with no reason beside it reads as arbitrary.
 
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
+    **Fixed**
 
-    **Not a Turing Pi release.** `bmc-ui-v3.28.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
+    - **The console hint names what actually breaks it.** A browser will not open
+      a WebSocket to a certificate it does not trust, and the exception you
+      granted by clicking through on the page does not extend to that connection.
+      The hint led with a rejected token and a daemon too old to serve the
+      endpoint; both are possible and neither is what people hit.
 
-    Verify with:
+??? note "3.25.0 — 11 September 2026"
 
-    ```
-    sha256sum -c SHA256SUMS
-    ```
+    **Added**
 
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
+    - **Choose an image off the SD card.** A 2 GB image is usually already on the
+      board's own card, and installing it meant typing its path from memory into a
+      field and finding out minutes later whether you had. The picker lists what is
+      there, marks what can be written to a module, and says why the rest cannot.
 
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
+    **Fixed**
 
-??? note "v3.27.0 — 12 September 2026"
+    - A button on the flash page that had never worked.
 
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
+??? note "3.24.0 — 11 September 2026"
 
-    **Not a Turing Pi release.** `bmc-ui-v3.27.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
+    **Changed**
 
-    Verify with:
+    - **Installing firmware asks in a modal**, not in a confirmation that appeared
+      below the version list where the reader was not looking.
 
-    ```
-    sha256sum -c SHA256SUMS
-    ```
+??? note "3.23.0 — 11 September 2026"
 
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
+    **Added**
 
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
+    - **The fleet can drive a board, not just describe one.** It shipped as an
+      overview — tiles, versions, uptime, nothing you could press — and a status
+      page is not what removes the need to open eight tabs. First pass at parity
+      with the board's own interface.
 
-??? note "v3.26.0 — 11 September 2026"
+    **Fixed**
 
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
+    - **Stop escaping the daemon's messages twice**, which rendered `&#x2F;` where
+      a slash belonged on the Firmware page.
 
-    **Not a Turing Pi release.** `bmc-ui-v3.26.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
+??? note "3.22.0 — 11 September 2026"
 
-    Verify with:
+    **Added**
 
-    ```
-    sha256sum -c SHA256SUMS
-    ```
+    - **The fleet: one interface over every board**, and the image and chart that
+      deploy it. A board that can reflash four computers should not face the
+      internet; the fleet is the thing that is exposed instead, and it holds no
+      credential of its own.
 
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
+    **Changed**
 
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
+    - **The site is not told what shipped; it looks.** The demo the site serves is
+      built from the latest release rather than committed by hand.
 
-??? note "v3.25.0 — 11 September 2026"
+??? note "3.21.0 — 11 September 2026"
 
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
+    **Fixed**
 
-    **Not a Turing Pi release.** `bmc-ui-v3.25.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
+    - **The four modules fit the demo frame too.** The same one-screen fix as
+      3.20.0, in the frame the site embeds.
 
-    Verify with:
+??? note "3.20.0 — 11 September 2026"
 
-    ```
-    sha256sum -c SHA256SUMS
-    ```
+    **Added**
 
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
+    - **A release tells the site**, so a new interface reaches turingpi.xyz
+      without anyone remembering.
 
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
+    **Changed**
 
-??? note "v3.24.0 — 11 September 2026"
+    - **The four modules fit on one screen.** The node cards had grown past the
+      height a laptop has.
 
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
+    **Fixed**
 
-    **Not a Turing Pi release.** `bmc-ui-v3.24.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
-
-    Verify with:
-
-    ```
-    sha256sum -c SHA256SUMS
-    ```
-
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
-
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
-
-??? note "v3.23.0 — 11 September 2026"
-
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
-
-    **Not a Turing Pi release.** `bmc-ui-v3.23.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
-
-    Verify with:
-
-    ```
-    sha256sum -c SHA256SUMS
-    ```
-
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
-
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
-
-??? note "v3.22.0 — 11 September 2026"
-
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
-
-    **Not a Turing Pi release.** `bmc-ui-v3.22.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
-
-    Verify with:
-
-    ```
-    sha256sum -c SHA256SUMS
-    ```
-
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
-
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
-
-??? note "v3.21.0 — 11 September 2026"
-
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
-
-    **Not a Turing Pi release.** `bmc-ui-v3.21.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
-
-    Verify with:
-
-    ```
-    sha256sum -c SHA256SUMS
-    ```
-
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
-
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
-
-??? note "v3.20.0 — 11 September 2026"
-
-    BMC-UI built from the `hive` branch of this fork, for the
-    Turing Pi 2 BMC firmware build to consume.
-
-    **Not a Turing Pi release.** `bmc-ui-v3.20.0.tar.gz`
-    unpacks to `dist/`, which is what lands in `/srv/bmcd/www/`.
-
-    Verify with:
-
-    ```
-    sha256sum -c SHA256SUMS
-    ```
-
-    SHA256SUMS lists bare filenames, so run it from the directory
-    holding the tarball.
-
-    *No entry in `CHANGELOG.md` for this release; the text above is its release note.*
+    - **The demo answers from fixtures instead of a board**, so the interface on
+      the site is the real bundle with captured data behind it rather than a
+      build that tries to reach hardware that is not there.
 
 ??? note "3.19.0 — 10 September 2026"
 
