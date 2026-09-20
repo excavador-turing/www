@@ -105,10 +105,12 @@ render_macros: true
 <a href="https://www.linkedin.com/in/oleg-tsarev-a0340012/" rel="me noopener">LinkedIn</a>
 <a href="https://github.com/excavador" rel="me noopener">GitHub</a>
 <a href="https://excavador.xyz/" rel="me noopener">excavador.xyz</a>
-<!-- The personal site moves to tsarev.id eventually, with homelab.excavador.xyz
-     alongside it. On 2026-09-20 that zone was at Cloudflare with no A record,
-     so the link stays on excavador.xyz until tsarev.id answers -- linking a
-     domain that does not is the turing.excavador.xyz mistake again. -->
+<!-- This flips to tsarev.id when SQU-271 lands: the personal site moves
+     there and homelab.excavador.xyz to homelab.tsarev.id, with the old names
+     redirecting. On 2026-09-20 tsarev.id had a Cloudflare zone and no A
+     record at all, so the link stays on excavador.xyz until it answers --
+     linking a domain that does not is the turing.excavador.xyz mistake
+     again, which is still returning 502 in every old release note. -->
 </div>
 </div>
 
