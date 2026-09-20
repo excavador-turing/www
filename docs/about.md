@@ -2,6 +2,7 @@
 hide:
   - navigation
   - toc
+render_macros: true
 ---
 
 <div class="tp-hero-band tp-one-screen" markdown>
@@ -12,9 +13,9 @@ hide:
 </div>
 
 <div class="tp-proof">
-<div><b>13</b><span>rows where this fork differs, each one measured</span></div>
-<div><b>66</b><span>releases across four components</span></div>
-<div><b>4</b><span>faults still open, each with a ticket</span></div>
+<div><b>{{ platform.rows }}</b><span>rows where this fork differs, each one measured</span></div>
+<div><b>{{ releases.total }}</b><span>releases across four components</span></div>
+<div><b>{{ faults.count }}</b><span>faults still open, each with a ticket</span></div>
 </div>
 
 ??? note "Why fork it at all"
@@ -94,8 +95,27 @@ hide:
       answering from fixtures. It is GPL-2.0, as is this fork, and its copyright
       notice is intact.
 
+<div class="tp-maker">
+<div class="tp-maker__who">
+<span class="tp-eyebrow">Who makes this</span>
+<b>Oleg Tsarev</b>
+<span>One person, two boards, and a cluster that has to keep running while its firmware is rewritten under it. Every number on this site was measured on that hardware.</span>
+</div>
+<div class="tp-maker__links">
+<a href="https://www.linkedin.com/in/oleg-tsarev-a0340012/" rel="me noopener">LinkedIn</a>
+<a href="https://github.com/excavador" rel="me noopener">GitHub</a>
+<a href="https://excavador.xyz/" rel="me noopener">excavador.xyz</a>
+<!-- This flips to tsarev.id when SQU-271 lands: the personal site moves
+     there and homelab.excavador.xyz to homelab.tsarev.id, with the old names
+     redirecting. On 2026-09-20 tsarev.id had a Cloudflare zone and no A
+     record at all, so the link stays on excavador.xyz until it answers --
+     linking a domain that does not is the turing.excavador.xyz mistake
+     again, which is still returning 502 in every old release note. -->
+</div>
+</div>
+
 <div class="tp-next">
-<a href="../features/"><b>What it does →</b><span>Sixteen features, each with the evidence behind it.</span></a>
+<a href="../features/"><b>What it does →</b><span>{{ features.count }} features, each with the evidence behind it.</span></a>
 <a href="../guides/install/"><b>Put it on your board →</b><span>Install it, and what to read first.</span></a>
 <a href="../reference/comparison/"><b>The measurements →</b><span>Every claim above, with its date and method.</span></a>
 <a href="../roadmap/"><b>What is coming →</b><span>Planned features you can vote on, and where to propose your own.</span></a>
