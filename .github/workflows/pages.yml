@@ -215,6 +215,10 @@ jobs:
           VITE_DEMO: "1"
           VITE_BASE: /demo/fleet/
           BMC_UI_VERSION: ${{ steps.ui.outputs.tag }}
+          # The fleet header reads import.meta.env.VITE_BMC_UI_VERSION; Vite
+          # only exposes VITE_-prefixed variables, so without this the demo's
+          # fleet says "dev" -- the same slip Dockerfile.fleet had until 3.31.0.
+          VITE_BMC_UI_VERSION: ${{ steps.ui.outputs.tag }}
         run: |
           set -eu
           npm run build

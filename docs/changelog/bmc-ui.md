@@ -7,9 +7,33 @@ hide:
 
 The web interface the board serves.
 
-Newest release **v3.30.0**, 20 September 2026. 28 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v3.31.0**, 20 September 2026. 29 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "v3.30.0 — 20 September 2026"
+???+ note "v3.31.0 — 20 September 2026"
+
+    **Fixed**
+
+    - **The fleet says which version of itself it is.** `Dockerfile.fleet` has
+      taken a `BMC_UI_VERSION` build argument since the image existed, and the
+      release workflow has been passing the tag into it all along — but it was set
+      as a plain `ENV`, and **Vite only puts `VITE_`-prefixed variables into the
+      bundle**. So the value arrived at the build and stopped there.
+
+      The cost was not cosmetic: the deployed fleet sat **two releases behind**
+      with nothing on the page able to say so. It is in the header now, beside the
+      name.
+
+    - **The fleet has a footer, and a mark of its own.** It is a separate entry
+      point built from this same tree and never renders the board's root route, so
+      it had no logo, no version and no footer — which also meant the upstream
+      copyright notice, which is there for a legal reason, was missing from one of
+      the two things this repository ships. The footer is now a shared component
+      used by both.
+
+    - **The docs link pointed at a dead host.** `turing.excavador.xyz` has not
+      answered for some time; the documentation is at `turingpi.xyz`.
+
+??? note "v3.30.0 — 20 September 2026"
 
     **Added**
 
