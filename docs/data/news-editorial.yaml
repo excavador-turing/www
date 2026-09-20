@@ -17,6 +17,8 @@ v2.33.0:
     VLANs on the board's own switch, tried before they are kept; a certificate
     endpoint; and a board still on the factory password now insists you change
     it before it will do anything else.
+  capture: captures/news/switch.png
+  caption: The Network tab — the switch as a table, a preset to start from, and Apply beside Try it, which undoes itself.
 
 v2.34.0:
   title: Pick a module with one click
