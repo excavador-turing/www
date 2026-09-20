@@ -1,37 +1,60 @@
 ---
+title: Updates that undo themselves
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 1
+  icon: undo.svg
+  summary: A new image boots on trial and is kept only if the board comes back right.
+  lede: Upstream promotes a new image the moment it boots, which proves the kernel started and nothing
+    else. Here an image boots on trial and is kept only if the board answers properly afterwards.
+  capture: firmware.png
+  alt: 'The Firmware tab: the running slot, the image it can fall back to, and when the gate last promoted
+    one.'
+  caption: 'The Firmware tab: the running slot, the image it can fall back to, and when the gate last
+    promoted one.'
+  proofs:
+  - n: '26'
+    of: updates taken on this board
+    source: the board's own bmcd_firmware_promotion_total counter
+    as_of: '2026-09-12'
+  - n: '1'
+    of: rolled back by the board itself
+    source: the board's own bmcd_firmware_promotion_total counter
+    as_of: '2026-09-12'
+  - n: '0'
+    of: trips to the rack
+    source: the board's own bmcd_firmware_promotion_total counter
+    as_of: '2026-09-12'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The Firmware tab, answering from a real board's data.
+    do:
+      href: ../../guides/install/
+      text: Do it on your board
+      note: Install this firmware, and what to read first.
+    evidence:
+      href: ../../reference/gate-history/
+      text: The evidence
+      note: Every decision the gate has made here, read off the board.
+    related:
+      href: ../pick-a-version/
+      text: Pick a version, from anywhere
+      note: Where the image the gate judges comes from.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# Updates that undo themselves
+<div class="tp-argument" markdown>
 
-<p>Upstream promotes a new firmware image the moment it boots. Two images this fork built would have passed that bar while being broken, and one of them cuts all four compute modules off the network. Here a new image is kept only if the board comes back right.</p>
+## The argument
 
-<a class="tp-why" href="../../why/updates-that-undo-themselves/">The argument, and the measurements behind it →</a>
+The gate asks three questions after a new image boots, not one. Two images this fork built would have passed "did it boot" while being broken, and one of them cut all four compute modules off the network. The one rollback on record was deliberate: an image with its staged note tampered to claim an older version, refused in about 35 seconds.
 
-<div class="tp-proof">
-<div><b>26</b><span>updates taken on this board</span></div>
-<div><b>1</b><span>rolled back by the board itself</span></div>
-<div><b>0</b><span>trips to the rack</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/fork"><b>See the Firmware tab →</b><span>The slots, the rollback image, and what the gate last decided.</span></a>
-<a href="../see-what-the-board-sees/"><b>See what the board sees →</b><span>The sensor upstream never described, and a fan that explains itself.</span></a>
-<a href="../../reference/gate-history/"><b>The gate's record →</b><span>Every decision it has made on this board, read off the board.</span></a>
-<a href="../../guides/recover-a-bad-flash/"><b>When it goes wrong anyway →</b><span>The recovery path, and what is genuinely irreversible.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![The Firmware tab: the running slot, the image it can fall back to, and when the gate last promoted one.](../assets/captures/firmware.png)
-<figcaption>The Firmware tab: the running slot, the image it can fall back to, and when the gate last promoted one.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/updates-that-undo-themselves.md)
 
 </div>

@@ -1,37 +1,60 @@
 ---
+title: See what the board sees
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 6
+  icon: sensors.svg
+  summary: The temperature sensor upstream never described, and a fan that says why it is where it is.
+  lede: The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing
+    could read it and the fan ran against nothing.
+  capture: info.png
+  alt: 'The Overview: temperature and the trip that explains the fan''s step, beside storage, load, memory
+    and the clock.'
+  caption: 'The Overview: temperature and the trip that explains the fan''s step, beside storage, load,
+    memory and the clock.'
+  proofs:
+  - n: '5'
+    of: trip points the fan follows
+    source: the board's own thermal zone and /metrics
+    as_of: '2026-09-12'
+  - n: '40'
+    of: metric families the board exposes
+    source: the board's own thermal zone and /metrics
+    as_of: '2026-09-12'
+  - n: '0'
+    of: temperature readings upstream can take
+    source: the board's own thermal zone and /metrics
+    as_of: '2026-09-12'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The Overview tab, with real readings from a board.
+    do:
+      href: ../../guides/monitor-it/
+      text: Do it on your board
+      note: The metrics port, a scrape config and the dashboard.
+    evidence:
+      href: ../../reference/metrics/
+      text: The evidence
+      note: Every family the board can measure, catalogued.
+    related:
+      href: ../the-board-describes-itself/
+      text: The board describes its own API
+      note: Where the readings on this page come from.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# See what the board sees
+<div class="tp-argument" markdown>
 
-<p>The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing could read it and the fan ran at a fixed speed.</p>
+## The argument
 
-<a class="tp-why" href="../../why/see-what-the-board-sees/">The argument, and the measurements behind it →</a>
+A fan speed nobody can explain is a fault waiting to be misdiagnosed. The board now reports the temperature, the trip points and which trip put the fan where it is, so "why is the fan at step 4" has an answer. Nothing here writes to the sensor; a held fan is taken back by the daemon above the hottest active trip.
 
-<div class="tp-proof">
-<div><b>5</b><span>trip points the fan follows</span></div>
-<div><b>40</b><span>metric families the board exposes</span></div>
-<div><b>0</b><span>temperature readings upstream can take</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/fork"><b>See the readings →</b><span>Temperatures, the fan step, and the trip it is following.</span></a>
-<a href="../a-console-to-every-module/"><b>A console to every module →</b><span>Four serial consoles in the browser, replaying what you missed.</span></a>
-<a href="../../reference/metrics/"><b>The metrics catalogue →</b><span>Every family the board exposes, generated from the daemon.</span></a>
-<a href="../../guides/monitor-it/"><b>Scrape it →</b><span>A scrape config and the dashboard, both published.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![The Overview: temperature and the trip that explains the fan's step, beside storage, load, memory and the clock.](../assets/captures/info.png)
-<figcaption>The Overview: temperature and the trip that explains the fan's step, beside storage, load, memory and the clock.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/see-what-the-board-sees.md)
 
 </div>

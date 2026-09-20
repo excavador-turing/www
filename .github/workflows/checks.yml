@@ -56,6 +56,15 @@ jobs:
       - name: the facts file matches its sources
         run: .venv/bin/python scripts/facts.py --check
 
+      # The eleven feature pages are one page eleven times, and the captures
+      # are all taken the same way. Both are content rules a template cannot
+      # enforce, and both are what made the pages look like different sites.
+      - name: the feature pages have one shape
+        run: .venv/bin/python scripts/feature-lint.py
+
+      - name: no capture carries the demo ribbon
+        run: .venv/bin/python scripts/crop-ribbon.py --check
+
       - name: build, strict
         run: .venv/bin/mkdocs build --strict
 

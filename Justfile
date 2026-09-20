@@ -50,7 +50,7 @@ serve:
 # Everything CI checks, in the order CI checks it. Run this before pushing;
 # `checks.yml` runs exactly these and nothing else, and the deploy runs none
 # of them.
-check: facts-check build screens
+check: facts-check feature-lint ribbon-check build screens
 
 # Prove every screen reads whole, at nine viewports.
 #
@@ -76,6 +76,24 @@ screens-baseline: build
 # Rebuild docs/data/facts.yaml from the pages and data that own each number.
 facts:
     ./scripts/facts.py
+
+# Prove the eleven feature pages are still one page eleven times.
+#
+# They shared a skeleton in eleven copies of the markup and it had drifted in
+# every direction: ledes from 22 to 48 words, eight different labels opening
+# the same demo, proof numbers with no source. main.py renders the shape now;
+# this checks the content a template cannot.
+feature-lint:
+    ./scripts/feature-lint.py
+
+# Take the demo's exit ribbon off any capture that was taken through it.
+# Five of the eleven had it and six did not, so the pages looked like two
+# different sites side by side.
+crop-ribbon:
+    ./scripts/crop-ribbon.py
+
+ribbon-check:
+    ./scripts/crop-ribbon.py --check
 
 # Fail if the committed facts file no longer matches its sources.
 facts-check:

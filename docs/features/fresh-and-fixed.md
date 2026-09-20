@@ -1,37 +1,60 @@
 ---
+title: Fresh, and fixed
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 4
+  icon: fresh.svg
+  summary: A longterm kernel, a supported Buildroot, and six named faults taken out.
+  lede: Upstream's last release was February 2025, on a kernel that is not a longterm release and a Buildroot
+    that is end of life. This fork tracks both and has taken out six named faults.
+  capture: about.png
+  alt: 'What the board says it is running: kernel, daemon, interface and firmware, each a version you
+    can check against a release.'
+  caption: 'The board''s About tab: kernel, daemon, interface and firmware, each a version you can check
+    against a release.'
+  proofs:
+  - n: '6.12'
+    of: LTS kernel, against upstream's 6.8
+    source: reference/comparison.md, read from a running board
+    as_of: '2026-09-08'
+  - n: '107'
+    of: releases across four components
+    source: reference/comparison.md, read from a running board
+    as_of: '2026-09-08'
+  - n: '6'
+    of: named faults taken out
+    source: reference/comparison.md, read from a running board
+    as_of: '2026-09-08'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The About tab, naming every component's version.
+    do:
+      href: ../../guides/upgrade-from-stock/
+      text: Do it on your board
+      note: Move a board off the firmware it shipped with.
+    evidence:
+      href: ../../reference/comparison/
+      text: The evidence
+      note: Thirteen rows against upstream, including where upstream leads.
+    related:
+      href: ../pick-a-version/
+      text: Pick a version, from anywhere
+      note: Why upstream's two catalogues disagree by a release.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# Fresh, and fixed
+<div class="tp-argument" markdown>
 
-<p>Upstream's last release was February 2025, on a kernel that was never a longterm series. This fork tracks the supported versions and has spent 66 releases taking faults out.</p>
+## The argument
 
-<a class="tp-why" href="../../why/fresh-and-fixed/">The argument, and the measurements behind it →</a>
+A longterm kernel matters here because the board is a management computer: it is the thing you reach for when the cluster is broken, so it is the thing that must not need attention itself. The six faults are named on the comparison page with the release that fixed each, including the mDNS responder that killed this board twice in one day.
 
-<div class="tp-proof">
-<div><b>6.12 LTS</b><span>kernel, against upstream's 6.8</span></div>
-<div><b>66</b><span>releases across four components</span></div>
-<div><b>6</b><span>named faults taken out</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/stock"><b>Compare with stock →</b><span>The firmware a board ships with, side by side.</span></a>
-<a href="../updates-that-undo-themselves/"><b>And if a release is bad →</b><span>The gate that boots it on trial and takes it back.</span></a>
-<a href="../../changelog/"><b>Every release →</b><span>All 66, per component, from the release notes themselves.</span></a>
-<a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>The honest list, with tickets.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![What the board says it is running: kernel, daemon, interface and firmware, each a version you can check against a release.](../assets/captures/about.png)
-<figcaption>What the board says it is running: kernel, daemon, interface and firmware, each a version you can check against a release.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/fresh-and-fixed.md)
 
 </div>

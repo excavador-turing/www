@@ -153,6 +153,10 @@ plugins:
   # alert template, `{{ $labels.node }}`, that would be eaten at build time.
   # A page that quotes a fact says `render_macros: true` in its front matter.
   - macros:
+      # main.py: one template for the eleven feature pages, and the index
+      # generated from them. The skeleton used to live in eleven copies of
+      # the markup and had drifted in every direction a skeleton can.
+      module_name: main
       render_by_default: false
       include_yaml:
         - docs/data/facts.yaml

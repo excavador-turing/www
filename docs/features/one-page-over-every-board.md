@@ -1,37 +1,60 @@
 ---
+title: One page over every board
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 3
+  icon: fleet.svg
+  summary: One page drives every board in the cluster, and holds no credential of its own.
+  lede: A board that can reflash four computers should not face the internet. One page inside the cluster
+    drives them all, with every control a board has, and it holds no credential of its own.
+  capture: fleet.png
+  alt: Both boards on one page, each answering for itself. A board that is down costs you its card and
+    nothing else.
+  caption: Both boards on one page, each answering for itself. A board that is down costs you its card
+    and nothing else.
+  proofs:
+  - n: '1'
+    of: hostname exposed for the whole estate
+    source: the fleet interface as shipped in BMC-UI 3.29.0
+    as_of: '2026-09-13'
+  - n: '9'
+    of: tabs per board, the same ones a board serves
+    source: the fleet interface as shipped in BMC-UI 3.29.0
+    as_of: '2026-09-13'
+  - n: '0'
+    of: credentials held by the page
+    source: the fleet interface as shipped in BMC-UI 3.29.0
+    as_of: '2026-09-13'
+  next:
+    demo:
+      href: ../../#demo/fleet
+      text: See it in the demo
+      note: Two boards on one page, from a real board's capture.
+    do:
+      href: ../../guides/install/
+      text: Do it on your board
+      note: Install the firmware each board in the fleet runs.
+    evidence:
+      href: ../../reference/known-faults/
+      text: The evidence
+      note: What is still not fixed, including where trust is assumed.
+    related:
+      href: ../who-may-reach-this-board/
+      text: Who may reach this board
+      note: The two ways in, and what a trusted proxy buys.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# One page over every board
+<div class="tp-argument" markdown>
 
-<p>A board's own interface can power off and reflash every module in it, so no board here faces the internet. One page in the cluster reaches them all, with every control a board's interface has.</p>
+## The argument
 
-<a class="tp-why" href="../../why/one-page-over-every-board/">The argument, and the measurements behind it →</a>
+The page renders each board's own tabs from the same data layer the board's page uses, so the two cannot drift apart. It holds no credential: a gateway in front of it authenticates the operator and presents a client certificate the board trusts, which is why no board needs to be reachable from anywhere else.
 
-<div class="tp-proof">
-<div><b>1</b><span>hostname for the whole estate</span></div>
-<div><b>9</b><span>tabs per board, the same ones the board serves</span></div>
-<div><b>0</b><span>credentials held by the page</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/fleet"><b>Open the fleet demo →</b><span>Two boards on one page, answering from a real capture.</span></a>
-<a href="../a-certificate-that-does-not-rot/"><b>The certificate on that connection →</b><span>What the board checks before it believes who you are.</span></a>
-<a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>The honest list, with tickets.</span></a>
-<a href="../../about/"><b>Why this fork exists →</b><span>What upstream does, and what changed.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![Both boards on one page, each answering for itself. A board that is down costs you its card and nothing else.](../assets/captures/fleet.png)
-<figcaption>Both boards on one page, each answering for itself. A board that is down costs you its card and nothing else.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/one-page-over-every-board.md)
 
 </div>

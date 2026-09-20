@@ -1,37 +1,60 @@
 ---
+title: A certificate that does not rot
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 11
+  icon: certificate.svg
+  summary: Named, renewed before it expires, and it refuses to overwrite one you installed.
+  lede: Stock firmware serves a certificate no browser will accept, valid for thirty days, and never replaces
+    it. This one is named after the board, renews itself, and will not overwrite yours.
+  capture: login.png
+  alt: The login page the certificate protects. On stock firmware no browser would accept the certificate
+    in front of it.
+  caption: The login page the certificate protects. On stock firmware no browser would accept the certificate
+    in front of it.
+  proofs:
+  - n: '825'
+    of: days of validity, renewed 30 days before it ends
+    source: the daemon's certificate path, with a real handshake per key type
+    as_of: '2026-09-12'
+  - n: '5'
+    of: key types served, each proved by a real handshake
+    source: the daemon's certificate path, with a real handshake per key type
+    as_of: '2026-09-12'
+  - n: '0'
+    of: certificates it will overwrite that it did not issue
+    source: the daemon's certificate path, with a real handshake per key type
+    as_of: '2026-09-12'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The interface the certificate protects.
+    do:
+      href: ../../guides/install/
+      text: Do it on your board
+      note: Install the firmware that issues it.
+    evidence:
+      href: ../../reference/known-faults/
+      text: The evidence
+      note: Including the console's certificate requirement.
+    related:
+      href: ../who-may-reach-this-board/
+      text: Who may reach this board
+      note: The other half of the board's access story.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# A certificate that does not rot
+<div class="tp-argument" markdown>
 
-<p>The board serves its login page over HTTPS, and on stock firmware that certificate is unusable by any browser made since 2017, expires in thirty days, and is never replaced. This fork fixes all three.</p>
+## The argument
 
-<a class="tp-why" href="../../why/a-certificate-that-does-not-rot/">The argument, and the measurements behind it →</a>
+An expired self-signed certificate teaches operators to click through warnings, which is the habit that makes every later certificate meaningless. This one carries the board's real names, renews itself 30 days out, and refuses to replace a certificate it did not issue -- so installing your own is safe.
 
-<div class="tp-proof">
-<div><b>825 days</b><span>validity, renewed 30 days before it ends</span></div>
-<div><b>5</b><span>key types served, each proved by a real handshake</span></div>
-<div><b>0</b><span>certificates this firmware will overwrite that it did not issue</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/fork"><b>See the interface it protects →</b><span>The login page, and everything behind it.</span></a>
-<a href="../one-page-over-every-board/"><b>One page over every board →</b><span>What the client certificate on that connection buys.</span></a>
-<a href="../../reference/metrics/"><b>Every metric the board exposes →</b><span>Including the expiry above.</span></a>
-<a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>The honest list, with tickets.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![The login page the certificate protects. On stock firmware no browser would accept the certificate in front of it.](../assets/captures/login.png)
-<figcaption>The login page the certificate protects. On stock firmware no browser would accept the certificate in front of it.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/a-certificate-that-does-not-rot.md)
 
 </div>
