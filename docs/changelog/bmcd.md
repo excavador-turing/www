@@ -9,7 +9,232 @@ The daemon: the API, the update logic, the metrics.
 
 Newest release **2.36.3**, 12 September 2026. 38 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "2.36.3 — 12 September 2026"
+???+ note "Unreleased — merged, not yet on a board"
+
+    **Security**
+
+    - **A confirmation sent from the board itself is refused.** `POST
+      /api/bmc/network/switch/confirm` answers **403** to a request that arrived
+      over loopback, and says why:
+
+      > A confirmation has to arrive over the network you just changed; that is
+      > what it proves. This one came from the board itself, which proves
+      > nothing. Confirm from the interface, or from `tpi` on another machine.
+
+      The whole design of apply-then-confirm rests on where the confirmation came
+      from: after an apply the old path no longer exists, so a request that
+      reaches the daemon came through the new configuration. A request over
+      loopback crossed no switch port. It proves nothing, and it made the change
+      permanent anyway — which is to say the one protection against locking
+      yourself out had a hole in it that could be walked through by accident,
+      from a console, by somebody being careful.
+
+      Found on hardware, not by reading. On 2026-09-20 a document reasoned to be
+      equivalent to Flat was applied to bmc-2 and confirmed from the board's own
+      ssh session; the board's owner lost the interface, and the window that
+      exists for exactly that case never ran, because the confirmation had
+      already arrived.
+
+      Apply and revert stay open to loopback. Applying is how a board is recovered
+      from its console, and reverting is the safe direction — it puts back a
+      configuration that was proved once already. Only the step that makes a
+      change permanent has to have come from somewhere.
+
+    **Added**
+
+    - **VLANs can be given names.** An optional `names` map on the switch
+      document, VLAN id to a word of up to 32 characters, carried and persisted
+      with the rest of it.
+
+      It reaches the hardware nowhere: two documents differing only in their names
+      plan no commands at all. It exists because a table of numbers is not a
+      layout anybody can read a year later, and because the alternative — a name
+      file beside the document — is a second thing to keep in step with the first,
+      which would drift the first time somebody applied a preset.
+
+      `Trunk` names its own two VLANs `management` and `nodes`, because those are
+      the numbers the operator chose and has to match on the router. `Flat` and
+      `Split` name nothing: Split's identifiers never leave the board, so putting
+      them on a page would be showing somebody two numbers they can do nothing
+      with.
+
+      A name is checked for being a name — not blank, not longer than 32
+      characters, no control characters, and not attached to a reserved VLAN id —
+      and for nothing else. Naming a VLAN nobody is in yet is allowed: people name
+      a layout while they are building it.
+
+    **Added**
+
+    - **Applying a switch configuration, and being able to undo it.** The rest of
+      the switch work: `GET` and `PUT /api/bmc/network/switch`, and
+      `POST .../confirm` and `.../revert`.
+
+      A change is applied on approval and kept on proof. `PUT` answers **202**,
+      not 200: the configuration is on the switch but it is not yours to keep yet.
+      Confirm within the window, or the board puts the previous one back by
+      itself and records why, so the interface can say *your change at 12:03 was
+      reverted because it was not confirmed*.
+
+      **The confirmation must arrive on a new connection, and that is the whole
+      proof.** After an apply the old path no longer exists, so any authenticated
+      request that reaches the daemon came through the new configuration. Nothing
+      else needs checking.
+
+      **The window does not start when the apply returns.** It starts when the
+      uplink carrying the BMC's VLAN reports forwarding. Spanning tree holds a
+      port in listening and learning for its own forwarding delay first — 30
+      seconds by default — so a window counted from the apply would expire before
+      anybody could confirm a correct Trunk change, and would revert every one of
+      them. The default window is 30 seconds and may be set per apply between 10
+      and 300.
+
+      **Only a confirmed document is ever written.** A reboot in the middle of an
+      unconfirmed change finds the previous one in `/etc/bmcd/switch.json`,
+      because the pending one was never persisted.
+
+      **Safe mode skips applying, not reading.** Holding KEY1 at power-on puts
+      `safemode` on the kernel command line, which `preinit` already reads; the
+      daemon reads it the same way and leaves the switch alone. That is the last
+      exit from a configuration that was reachable when it was confirmed and has
+      since stopped being, because a cable moved or the router changed.
+
+      The commands are planned as a list and then run, so the part most likely to
+      be wrong — the order — is a pure function with tests. Filtering is enabled
+      after the VLANs exist and disabled before they are removed, because a bridge
+      filtering with no VLANs forwards nothing.
+
+
+    **Added**
+
+    - **The switch as one document, and the rules the board refuses.** The model
+      half of the most-asked feature on the public roadmap. Two read-only
+      endpoints come with it: `GET /api/bmc/network/switch/presets` and
+      `POST /api/bmc/network/switch/validate`.
+
+      The configuration is **one object naming all seven ports** — four modules,
+      the BMC's own port, and both uplinks — rather than a set of calls. Partial
+      application is how a board strands itself: six `bridge vlan` calls where the
+      fourth fails leave a switch in a state nobody designed. One document is
+      applied as one operation, and rollback is then "apply the previous
+      document".
+
+      Three presets. **Flat** is one bridge with filtering off, how a board ships
+      and the reset target. **Split** is two groups that never meet, the BMC out
+      of one uplink and the modules out of the other, with nothing tagged, so the
+      other end needs no VLAN configuration at all. **Trunk** is one cable
+      carrying both, tagged, with the second uplink redundant under spanning tree
+      by default.
+
+      **The board expands its own presets.** A client that expanded `Split` itself
+      would eventually disagree with the board about what `Split` means, and that
+      disagreement shows up as a board nobody can reach.
+
+      Five refusals, each one a lockout rather than a preference:
+
+      - the BMC's own port in no untagged VLAN
+      - the BMC's own port alone in its VLAN
+      - a BMC VLAN that no uplink carries, so the board answers only to the
+        modules it is meant to administer
+      - a tagged BMC port, which its network stack cannot read
+      - two uplinks sharing a VLAN with spanning tree off, which is a loop
+
+      Everything else is a warning with the port it is about, so an interface can
+      say what is odd without refusing it.
+
+      Nothing here applies anything to hardware. The apply, the confirm window and
+      persistence are separate and deliberately cannot be reached from this model.
+
+
+    **Fixed**
+
+    - **A certificate naming the board by its real DNS name is no longer
+      refused.** The name check compared the certificate against the board's own
+      idea of what it is called, which on a real board is not what its certificate
+      says.
+
+      Found on bmc-2 while running the install gate. The board knows itself as
+      `bmc-2`. Its DHCP search domain is `haarlem.internal`. The certificate its
+      own authority issued names `bmc-2.haarlem.lan`. Three different answers to
+      "what is this board called", none of them wrong, and only one of them
+      written anywhere the board can read. That certificate was accepted only
+      because it happens to carry an IP address as well.
+
+      A certificate naming just an FQDN — which is what `step ca certificate
+      bmc.lan` produces, and what the people who asked for this feature will have
+      — would have been refused.
+
+      So the check now also asks the question a browser actually asks. A browser
+      does not compare a certificate against the board's idea of its own name; it
+      compares it against the name the operator typed, having resolved that name
+      to the board. A name that resolves to one of this board's addresses is a
+      name someone can reach it by.
+
+      Bounded at two seconds per name, and failure is simply "no match", so a
+      board whose DNS is down behaves exactly as it did before. Wildcards and
+      address literals are never looked up.
+
+
+    **Security**
+
+    - **The password validator no longer logs a hash of what was typed.** It
+      logged `crypt(password, hash)` at debug level on every attempt. For a
+      correct password that is the stored hash, which is only as secret as
+      `/etc/shadow`. For a wrong one it is a hash of whatever was typed — and what
+      people type into the wrong login box is usually a password that is correct
+      somewhere else. A log file is far easier to read than `/etc/shadow`, and the
+      board's logs are collected.
+
+      It was scaffolding for a four-line function that has tests.
+
+
+    **Added**
+
+    - **Install your own certificate and key, from the interface or the API.**
+      `GET`, `PUT` and `DELETE` on `/api/bmc/tls/certificate`. For anyone running
+      their own CA — the request came twice from people running step-ca — who
+      wants a board that a browser trusting that CA opens without a warning, and
+      a serial console that works, since a click-through exception does not cover
+      the console's WebSocket.
+
+      Before this the only way to put such a certificate on a board was to copy
+      two files over SSH.
+
+      Everything is checked before anything is written, because a board given a
+      certificate it cannot serve may be a board nobody can reach to correct it.
+      The key must belong to the certificate; the certificate must be valid now;
+      it must permit server authentication, where it says anything about purpose
+      at all; and it must name this board. A certificate naming some other host is
+      refused with both name lists in the reason, rather than installed for a
+      browser to reject later.
+
+      The key travels in a JSON body on its own path, never a query string. The
+      legacy dispatcher writes every `opt=set` call to the audit log in full, so a
+      key routed through it would be recorded in clear. What is logged is the
+      action, the actor, the subject and the expiry.
+
+      `DELETE` removes the pair and has the board issue its own, so it is never
+      left without one.
+
+    **Changed**
+
+    - **The certificate is no longer fixed at startup.** It lives behind a lock
+      and is chosen per connection through OpenSSL's servername callback, so
+      installing one takes effect on the next connection with no restart — and
+      the session that sent it survives to read the answer.
+
+      The callback is SNI's, and a BMC is normally reached by address, which sends
+      no SNI. OpenSSL runs the callback for those handshakes too, and there is a
+      test that connects with server-name indication switched off and asserts it
+      is served the certificate installed a moment earlier. Without that, every
+      board would keep serving its startup certificate while the API reported the
+      new one.
+
+    - **`bmcd_tls_certificate_info` gains a `source` label**, `self-signed` or
+      `installed`, read from the issuer rather than from any record of how the
+      file was written. It decides whether the board renews the certificate on its
+      own, so an expiry alert means something different for each.
+
+??? note "2.36.3 — 12 September 2026"
 
     **Added**
 

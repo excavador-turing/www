@@ -9,7 +9,147 @@ The web interface the board serves.
 
 Newest release **3.29.0**, 13 September 2026. 27 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "3.29.0 — 13 September 2026"
+???+ note "Unreleased — merged, not yet on a board"
+
+    **Added**
+
+    - **The switch on the Network tab: what it is doing, and how to change it.**
+      The most-asked feature on the public roadmap, and the one with the sharpest
+      failure — a wrong VLAN on the BMC's own port takes the board off the
+      network, and the thing you would use to undo it is this page.
+
+      So the card never applies anything it keeps. An apply puts the change on the
+      switch and starts a window; confirming is a second request, and the fact
+      that it arrives at all is the proof that the new configuration works. If the
+      page cannot reach the board there is nothing to press, the board puts the
+      old configuration back by itself, and the next load says *your change at
+      12:03 was put back because it was not confirmed in time*.
+
+      **The countdown does not start until the uplink forwards**, and the card
+      says which of the two it is waiting on. Spanning tree holds a port for its
+      own delay before it passes traffic, so a countdown started at the apply
+      would be counting down to a revert nobody could prevent.
+
+      The table shows all seven ports as they sit on the board, coloured by the
+      VLAN each is untagged in, with the BMC's own row marked. Colours are
+      assigned by order of appearance rather than by VLAN number, because the
+      numbers are the operator's and under Split they are internal ones nobody
+      should be reading.
+
+      **The card never expands a preset itself.** The board returns each preset's
+      full table and this shows it. A client that computed its own would
+      eventually disagree with the board about what a preset means, and that
+      disagreement is a board nobody can reach.
+
+      Six locales. Needs a daemon with `/bmc/network/switch`; on an older board
+      the card hides itself rather than appearing broken.
+
+
+    **Added**
+
+    - **The page notices when the board goes away, and notices when it comes
+      back.** Until now neither happened. Every polling query uses
+      `refetchInterval: (query) => (query.state.error ? false : N)`, which stops
+      the interval **permanently** on the first error — so a BMC reboot silenced
+      every query and nothing resumed when the board returned. A reboot the page
+      itself started ended at a toast, and the tab held stale data until somebody
+      reloaded it.
+
+      A banner above the header now says which of two things is happening, because
+      only one of them has a number. A reboot this page asked for takes about 48
+      seconds — measured, from the upgrade guide's cost table — and says so, with
+      a count. A board that stops answering on its own says that instead, with no
+      countdown, because nobody promised one.
+
+      The count is a hint and says so when it passes: a board taking longer is
+      still coming back, and presenting 48 seconds as a deadline would turn a slow
+      reboot into an apparent failure.
+
+      When the daemon answers again the page reloads itself and reports how long
+      it took, once. That is also how the number on the upgrade guide gets checked
+      by everyone who updates.
+
+      **Only a request that got no response counts as the board being gone.** A
+      query that fails with a status is a board that answered: endpoints are
+      allowed to refuse, and treating that as a dead board would put an outage
+      banner over a healthy one.
+
+      **And coming back is judged by the shape of the answer, not its status.**
+      bmcd serves this interface from the same listener and falls back to
+      `index.html` for a path it does not route, so a half-started daemon can
+      answer 200 with a page of HTML. Reloading on that lands on a page whose
+      first real query fails — the very fault this removes.
+
+      Six locales. The demo is excluded: its reboot answers with a refusal wrapped
+      in a 200, which the mutation reads as success, so without the guard the
+      exhibit would raise a banner and eventually reload itself.
+
+
+    **Changed**
+
+    - **The console says why it failed, instead of listing three possibilities.**
+      A browser exposes nothing about a failed WebSocket handshake — no status, no
+      reason, close code 1006 and silence — so the hint named the certificate as
+      the likely cause and left the other two for the reader to weigh.
+
+      It does not have to guess. After a socket that never opened, one request to
+      the same origin, for the console's own ring buffer, separates all three: an
+      answer proves this origin, this session and this daemon's console support
+      are all fine, which leaves only a certificate the browser will not open a
+      socket to. A 401 is a refused session. Anything else is an unreachable
+      board.
+
+      One sentence is shown, with the fix that matches it. The probe runs only
+      after a failure, so a console that works costs nothing extra.
+
+      **A 200 is not enough to say the daemon is fine.** bmcd serves the interface
+      from the same listener and falls back to `index.html` for a path it does not
+      route, so a daemon without the console endpoints answers the probe with the
+      interface's own page and a 200. The shape decides, not the status —
+      otherwise a board with a perfectly good certificate would be reported as
+      untrusted.
+
+      Six locales. The demo never opens a socket, so it cannot reach the probe.
+
+
+    **Added**
+
+    - **A certificate card on Settings.** What the board serves over HTTPS, and a
+      form to replace it with your own. Asked for twice in the Turing Pi Discord
+      by people running their own CA, who want a board a browser opens without a
+      warning — and a serial console that works, since a click-through certificate
+      exception does not extend to the console's WebSocket.
+
+      The card leads with **where the certificate came from**, because that looks
+      like a label and is really a question of who renews it. The board reissues
+      its own 30 days before expiry and needs nobody. It never touches an
+      installed one — deliberately, since replacing an operator's certificate with
+      a self-signed one at boot would turn a working deployment into a browser
+      warning — so an installed certificate's expiry is a date somebody has to
+      diarise, and the card says so in those words.
+
+      It shows the names the certificate asserts, because those are the reason a
+      browser accepts or refuses it, and the fingerprint, because it is the only
+      field that tells two certificates with the same subject apart.
+
+      Two mistakes are caught before the request: a certificate box that holds no
+      certificate, and one that holds a private key as well. The second is the
+      dangerous one — it is what `openssl` writes when told to put both in one
+      place, and sending it would put the key in a field the board treats as
+      public and echoes back.
+
+      A change takes effect on the next connection. Nothing restarts and no
+      session is dropped, including the one making the change.
+
+      Needs bmcd with `/bmc/tls/certificate`. On an older board the card hides
+      itself rather than appearing broken, by checking the shape of the answer
+      rather than its status — an older daemon serves `index.html` for a path it
+      does not route, so the status is 200 and the body is a page of HTML.
+
+      Not in the demo: its fixtures are captured from a real board, never written,
+      and there is no board running this daemon yet.
+
+??? note "3.29.0 — 13 September 2026"
 
     **Added**
 

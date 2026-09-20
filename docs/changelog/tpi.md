@@ -9,7 +9,111 @@ The command-line client.
 
 Newest release **1.8.0**, 11 September 2026. 13 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "1.8.0 — 11 September 2026"
+???+ note "Unreleased — merged, not yet on a board"
+
+    **Added**
+
+    - **`tpi network switch show --table`** — the running document alone, as JSON,
+      and nothing else. The other half of `apply --table`, so that editing a
+      layout by hand is a round trip rather than a transcription:
+
+      ```
+      tpi network switch show --table > mine.json
+      $EDITOR mine.json
+      tpi network switch apply --table mine.json
+      ```
+
+      Starting from what the board is running, rather than from a blank file,
+      means the ports you did not mean to change keep what they already had.
+
+      A board whose answer carries no document is an error here rather than an
+      empty file: an older daemon answers an unrouted path with 200 and
+      `index.html`, and writing that into the file somebody is about to apply
+      would be worse than saying so.
+
+    - **VLAN names are shown where VLAN numbers are.** `20 (nodes)` rather than
+      `20`, wherever the document the board sent carries a name for it. The number
+      comes first and is never replaced — it is what `bridge vlan show` prints and
+      what the router is configured with, so output that hid it could not be
+      checked against anything.
+
+    **Changed**
+
+    - **`apply` and `show` now say where a confirmation has to come from.** One
+      line under the confirm command:
+
+      > Confirm from this machine, or from the board's interface. A confirmation
+      > sent from a shell on the board itself is refused: it crossed no switch
+      > port, so it would prove nothing.
+
+      The daemon refuses it outright; this is the version somebody reads before
+      they try. Both say the same thing, in the same words, on purpose.
+
+    **Added**
+
+    - **`tpi network switch`** — `show`, `presets`, `apply`, `confirm`, `revert`.
+      The command line for the on-board switch.
+
+      `apply` takes `--preset flat|split|trunk` or `--table file.json`, with
+      `--mgmt-vid`, `--node-vid` and `--second-uplink` for trunk, and `--window`
+      for the confirm window.
+
+      It prints what it has done in the terms that matter: the change is on the
+      switch and **not kept**, the board will put the previous configuration back
+      unless you confirm, and the countdown starts when the uplink forwards rather
+      than now. The confirm command is printed ready to paste, because the moment
+      you need it is the moment the page you were reading may have gone.
+
+      `confirm` is a separate invocation on purpose. That is the proof: if it can
+      reach the board, the new configuration works.
+
+      Trunk's two VLAN identifiers are refused here rather than at the board when
+      they are missing or equal. They are the operator's — the router on the other
+      end has to agree, and this tool cannot know what is free there.
+
+      `presets` never expands anything itself. A client that expanded a preset
+      would eventually disagree with the board about what it means, and that
+      disagreement is a board nobody can reach.
+
+
+    **Added**
+
+    - **`tpi tls show`, `tpi tls install --cert --key` and `tpi tls reset`.** The
+      certificate the board serves over HTTPS, readable and replaceable from the
+      command line. For anyone running their own CA who wants a board a browser
+      opens without a warning — and a serial console that works, since a
+      click-through exception does not cover the console's WebSocket.
+
+      `show` prints the subject, issuer, validity, key type, the names the
+      certificate asserts and its fingerprint. It says in words whether the board
+      issued the certificate, and therefore renews it, or whether somebody
+      installed one and renewal is now their job.
+
+      `install` reads both files and checks their shape before contacting the
+      board: `--cert` and `--key` swapped, or one file holding both halves. The
+      board validates properly and refuses before writing anything; this is about
+      the message. A combined file is refused outright, because sending it would
+      put the private key in the field the board treats as public.
+
+      `reset` removes an installed certificate and has the board issue its own.
+
+      These are the only commands that do not go through the legacy dispatcher.
+      That is the daemon's decision: it writes every mutating legacy query to the
+      audit log in full, so a private key sent that way would be recorded in clear
+      on the board.
+
+      A board whose daemon is too old is reported as an old daemon rather than
+      with whatever it happened to answer. There is no version gate, because the
+      board's own answer costs nothing and cannot be wrong about the board.
+
+      Two answers mean the same thing, and both are handled. A later daemon may
+      route these paths and reply `404`; today's does not — bmcd serves the web
+      interface from the same listener and falls back to `index.html` for anything
+      it does not route, so an older board replies **200 with a page of HTML** and
+      the only symptom is JSON that will not parse. Reading the status alone would
+      quote a page of markup at you instead of one sentence.
+
+??? note "1.8.0 — 11 September 2026"
 
     **Fixed**
 
