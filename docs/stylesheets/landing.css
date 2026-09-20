@@ -641,3 +641,31 @@ body.tp-demo-open .md-footer { display: none; }
   .md-typeset .tp-feature .tp-next b { font-size: 0.72rem; }
   .md-typeset .tp-feature .tp-next span { font-size: 0.6rem; }
 }
+
+/* ---- who makes this: the About page's maintainer block ------------------- */
+/* The site said "the maintainer is one person with two boards" on the
+   feedback page and nowhere gave that person a name or a way to reach them
+   outside GitHub. One block, three links, `rel="me"` so the identity links
+   count as such. */
+.tp-maker {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.4rem;
+  align-items: center; max-width: none;
+  border: 1px solid var(--tp-line); border-radius: 0.7rem;
+  padding: 1.1rem 1.3rem; margin: 2rem 0 0; background: var(--tp-plate);
+}
+.tp-maker__who { display: grid; gap: 0.3rem; }
+/* justify-self, because the eyebrow is a grid ITEM here and a grid item
+   stretches: without it the pill ran the full width of the column and
+   read as a lime banner rather than a label. */
+.md-typeset .tp-maker__who .tp-eyebrow { justify-self: start; margin-bottom: 0.2rem; }
+.md-typeset .tp-maker__who > b { font-size: 1.05rem; color: var(--tp-ink); }
+.md-typeset .tp-maker__who > span { font-size: 0.78rem; line-height: 1.55; color: var(--tp-muted); max-width: 60ch; }
+.tp-maker__links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.md-typeset .tp-maker__links a {
+  display: inline-block; font-size: 0.76rem; font-weight: 600; color: var(--tp-ink);
+  padding: 0.45rem 0.95rem; border: 2px solid var(--tp-ink); border-radius: 999px;
+}
+.md-typeset .tp-maker__links a:hover { background: var(--tp-ink); color: #fff; }
+@media (max-width: 720px) {
+  .tp-maker { grid-template-columns: minmax(0, 1fr); }
+}

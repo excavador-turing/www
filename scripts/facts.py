@@ -151,6 +151,21 @@ def platform() -> dict:
     """The versions the comparison page proves, which the selling pages quote."""
     text = (DOCS / "reference" / "comparison.md").read_text()
 
+    # Data rows of the upstream-vs-fork tables: a row whose first cell is a
+    # label. Not the header rule, not the `route` header of the two-catalogue
+    # table, and not that table's two rows, whose labels are links. About
+    # quoted this as a typed 13, which happened to be right; it is read now
+    # so it stays right. (A first draft excluded hyphens from the label and
+    # so lost "Module power-on time" -- 12, not 13.)
+    rows = []
+    for label in re.findall(r"^\|\s*([^|]+?)\s*\|", text, re.M):
+        label = label.strip()
+        if not label or set(label) <= set("-: ") or label.lower() == "route":
+            continue
+        if label.startswith("["):
+            continue
+        rows.append(label)
+
     def row(label):
         m = re.search(r"^\|\s*" + label + r"\s*\|([^|]*)\|([^|]*)\|", text, re.M)
         if not m:
@@ -161,6 +176,7 @@ def platform() -> dict:
     up_kernel, our_kernel = row("Kernel")
     up_br, our_br = row("Buildroot")
     return {"source": "reference/comparison.md, measured on a running board",
+            "rows": len(rows),
             "kernel": {"upstream": up_kernel, "fork": our_kernel},
             "buildroot": {"upstream": up_br, "fork": our_br},
             "upstream_last_release": "2025-02-05",

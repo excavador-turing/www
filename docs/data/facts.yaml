@@ -58,6 +58,7 @@ roadmap:
   top: "VLANs on the board's switch, with apply-then-confirm"
 platform:
   source: reference/comparison.md, measured on a running board
+  rows: 13
   kernel:
     upstream: 6.8 — not a longterm release
     fork: 6.12.109 LTS
