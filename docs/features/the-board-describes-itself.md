@@ -1,37 +1,60 @@
 ---
+title: The board describes its own API
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 10
+  icon: describe.svg
+  summary: OpenAPI 3.1, served by the board, and this site's reference generated from it.
+  lede: Upstream documented its API in prose on a web page. This fork's daemon serves an OpenAPI 3.1 document
+    describing every operation it has, and everything else is generated from that.
+  capture: api.png
+  alt: This site's API reference, emitted from the document the board serves. Nothing on this page was
+    written by hand.
+  caption: This site's API reference, emitted from the document the board serves. Nothing on this page
+    was written by hand.
+  proofs:
+  - n: '33'
+    of: operations, described by the board itself
+    source: the openapi.json this site commits, from a bmcd release
+    as_of: '2026-09-12'
+  - n: '3'
+    of: things generated from that description
+    source: the openapi.json this site commits, from a bmcd release
+    as_of: '2026-09-12'
+  - n: '0'
+    of: hand-written pages that can drift
+    source: the openapi.json this site commits, from a bmcd release
+    as_of: '2026-09-12'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The interface built from the types this document generates.
+    do:
+      href: ../../reference/cli/
+      text: Do it on your board
+      note: tpi reaches every operation the document describes.
+    evidence:
+      href: ../../reference/api/
+      text: The evidence
+      note: Every operation, on pages emitted from the document.
+    related:
+      href: ../see-what-the-board-sees/
+      text: See what the board sees
+      note: The readings those operations return.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# The board describes its own API
+<div class="tp-argument" markdown>
 
-<p>Upstream documented its API in prose on a web page. This fork's daemon serves an OpenAPI 3.1 document describing every operation it has, and that document is the source both this site's reference and the interface's own types are generated from.</p>
+## The argument
 
-<a class="tp-why" href="../../why/the-board-describes-itself/">The argument, and the measurements behind it →</a>
+Three things are generated from one document: this site's reference, the interface's own types, and the command line's knowledge of what exists. A hand-written API page drifts from the API within about two releases; a generated one cannot.
 
-<div class="tp-proof">
-<div><b>33</b><span>operations, described by the board itself</span></div>
-<div><b>3</b><span>things generated from that description</span></div>
-<div><b>0</b><span>hand-written pages that can drift</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/fork"><b>See the interface →</b><span>Built from the types this document generates.</span></a>
-<a href="../../reference/api/"><b>Every operation →</b><span>The generated reference, one page per group.</span></a>
-<a href="../../reference/cli/"><b>The command line →</b><span><code>tpi</code> reaches every endpoint the document describes.</span></a>
-<a href="../pick-a-version/"><b>Pick a version →</b><span>The next feature: sources, candidates and checksums.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![This site's API reference, emitted from the document the board serves. Nothing on this page was written by hand.](../assets/captures/api.png)
-<figcaption>This site's API reference, emitted from the document the board serves. Nothing on this page was written by hand.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/the-board-describes-itself.md)
 
 </div>

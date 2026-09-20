@@ -37,7 +37,78 @@ permissions:
   contents: read
 
 jobs:
+  # The generated pages -- changelog, roadmap, facts -- are committed, so the
+  # site builds offline and a change to them arrives as a reviewable diff.
+  # The cost of that is somebody has to run the scripts, and nobody did: the
+  # site sat on firmware v2.31.0 for a week after v2.32.0 shipped, while the
+  # version badge in its own header said v2.32.0.
+  #
+  # So the hourly job does it. Only on the schedule and by hand -- a push
+  # already carries whatever the author committed, and refreshing under them
+  # would rewrite it.
+  refresh:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: requirements.txt
+
+      - name: install
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
+
+      - name: read the sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          .venv/bin/python scripts/refresh-changelog.py
+          .venv/bin/python scripts/refresh-roadmap.py
+          .venv/bin/python scripts/facts.py
+
+      - name: commit, if anything moved
+        id: commit
+        run: |
+          set -eu
+          if git diff --quiet -- docs/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "nothing moved"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -F - <<'MSG'
+          the site catches up with what the repositories say
+
+          Written by scripts/refresh-changelog.py, refresh-roadmap.py and
+          scripts/facts.py on the hourly Pages schedule. Nothing here is
+          typed by hand.
+          MSG
+          # A push authenticated with GITHUB_TOKEN does not start another
+          # workflow run, which is why the build job below checks main out
+          # again rather than leaving the deploy to a push event that will
+          # never arrive.
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          git --no-pager diff --stat HEAD~1 -- docs/
+
   build:
+    needs: [refresh]
+    # `needs` on a job that was skipped skips this one too, and a push must
+    # still build.
+    if: ${{ !cancelled() && (needs.refresh.result == 'success' || needs.refresh.result == 'skipped') }}
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.ui.outputs.skip }}
@@ -45,6 +116,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # main, not the commit this run started from: the refresh job above
+          # may have pushed to it, and that commit is the whole point of the
+          # run when it happens.
+          ref: main
           # The revision-date plugin reads git history; a shallow clone makes
           # every page claim it was written at build time.
           fetch-depth: 0
@@ -67,9 +142,11 @@ jobs:
           tag=$(gh api repos/excavador-turing/BMC-UI/releases/latest --jq .tag_name)
           live=$(curl -fsS --max-time 15 https://turingpi.xyz/demo/fork/VERSION 2>/dev/null || echo none)
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$tag" = "$live" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] \
+             && [ "$tag" = "$live" ] \
+             && [ "${{ needs.refresh.outputs.changed }}" != "true" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "the site already carries $tag; nothing to do"
+            echo "the site already carries $tag and nothing moved; nothing to do"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
             echo "building the demo from $tag (the site carries $live)"

@@ -1,37 +1,60 @@
 ---
+title: Flash a module from the card
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 7
+  icon: sdcard.svg
+  summary: What is on the board's own SD card, what can be written to a module, and why the rest cannot.
+  lede: A 2 GB image is usually already on the board's own SD card. Installing it meant typing its path
+    from memory into a field, and finding out minutes later whether you had.
+  capture: sdcard.png
+  alt: 'The picker on bmc-1: what is on the card, what can be written to a module, and how much room is
+    left.'
+  caption: 'The picker on a board: what is on the card, what can be written to a module, and how much
+    room is left.'
+  proofs:
+  - n: '16'
+    of: entries listed off a real card
+    source: the picker reading a board's own card
+    as_of: '2026-09-11'
+  - n: '14'
+    of: refused, each with the board's own reason
+    source: the picker reading a board's own card
+    as_of: '2026-09-11'
+  - n: '0'
+    of: paths typed from memory
+    source: the picker reading a board's own card
+    as_of: '2026-09-11'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The flash picker, listing a real card's contents.
+    do:
+      href: ../../reference/cli/
+      text: Do it on your board
+      note: The same operation from a shell, through tpi.
+    evidence:
+      href: ../../reference/api/storage/
+      text: The evidence
+      note: The endpoints the picker calls, as the board describes them.
+    related:
+      href: ../pick-a-version/
+      text: Pick a version, from anywhere
+      note: The card is one of three places firmware can come from.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# Flash a module from the card
+<div class="tp-argument" markdown>
 
-<p>A 2 GB image is usually already on the board's own SD card. Installing it meant typing its path from memory into a field, and finding out minutes later whether you had.</p>
+## The argument
 
-<a class="tp-why" href="../../why/flash-from-the-card/">The argument, and the measurements behind it →</a>
+The interface never decides what is flashable. It asks the board, and the board answers per entry with a reason -- too small, wrong magic, a directory -- so the list and the refusals come from the same place that would do the writing.
 
-<div class="tp-proof">
-<div><b>16</b><span>entries listed off a real card</span></div>
-<div><b>14</b><span>refused, each with the board's own reason</span></div>
-<div><b>0</b><span>paths typed from memory</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/fork"><b>See the interface →</b><span>The flash page, and everything behind it.</span></a>
-<a href="../pick-a-version/"><b>Where firmware comes from →</b><span>The card is a source for the board's own updates too.</span></a>
-<a href="../../reference/api/storage/"><b>The endpoints →</b><span>What the board answers about its card.</span></a>
-<a href="../../reference/cli/"><b>The command line →</b><span><code>tpi</code> has read images off the card all along.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![The picker on bmc-1: what is on the card, what can be written to a module, and how much room is left.](../assets/captures/sdcard.png)
-<figcaption>The picker on bmc-1: what is on the card, what can be written to a module, and how much room is left.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/flash-from-the-card.md)
 
 </div>

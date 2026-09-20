@@ -1,37 +1,61 @@
 ---
+title: Who may reach this board
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 8
+  icon: access.svg
+  summary: The password and the trusted proxy, both readable and both changeable from the page that asks
+    for one.
+  lede: 'There are two ways into a board running this firmware: a local password, and a proxy holding
+    a certificate the board trusts. Neither used to be visible from the interface, nor changeable there.'
+  capture: access.png
+  alt: 'The access card on Settings: how you got in, the password for the local account, and the certificate
+    authority a proxy must hold to name you.'
+  caption: 'The access card on Settings: how you got in, the password for the local account, and the certificate
+    authority a proxy must hold.'
+  proofs:
+  - n: '2'
+    of: ways in, both now visible
+    source: the daemon as shipped in bmcd 2.36.3
+    as_of: '2026-09-12'
+  - n: '12'
+    of: characters minimum, counted as characters
+    source: the daemon as shipped in bmcd 2.36.3
+    as_of: '2026-09-12'
+  - n: '0'
+    of: passwords written to the audit log
+    source: the daemon as shipped in bmcd 2.36.3
+    as_of: '2026-09-12'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The access card on Settings, from captured data.
+    do:
+      href: ../../guides/install/
+      text: Do it on your board
+      note: Install the firmware that carries these controls.
+    evidence:
+      href: ../../reference/known-faults/
+      text: The evidence
+      note: Including that anything local is still trusted without a credential.
+    related:
+      href: ../a-certificate-that-does-not-rot/
+      text: A certificate that does not rot
+      note: The certificate the board serves on that connection.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# Who may reach this board
+<div class="tp-argument" markdown>
 
-<p>On stock firmware the answer lives on the filesystem, and the only way to read or change it is a shell. The login page cannot change the password it demands. This fork puts both halves on Settings.</p>
+## The argument
 
-<a class="tp-why" href="../../why/who-may-reach-this-board/">The argument, and the rules behind each control →</a>
+These take a JSON body on their own path rather than joining the legacy interface, because every mutating call there is recorded with its whole query string -- which would put a password in a log file, in clear, for ever. What is logged is the action and the actor, never the secret. The current password is required even from an operator a proxy vouched for.
 
-<div class="tp-proof">
-<div><b>2</b><span>ways in, both now visible: a password, and a trusted proxy</span></div>
-<div><b>12</b><span>characters minimum, counted as characters and not as bytes</span></div>
-<div><b>0</b><span>passwords written to the audit log — the reason this is not the ordinary API</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../a-certificate-that-does-not-rot/"><b>The certificate it serves →</b><span>The other half of the board's TLS story.</span></a>
-<a href="../one-page-over-every-board/"><b>One page over every board →</b><span>What a trusted proxy buys: an operator who never types a board password.</span></a>
-<a href="../../#demo/fork"><b>See it working →</b><span>The card, in the live demo, answering from captured data.</span></a>
-<a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>The honest list, with tickets.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![The access card on Settings: how you got in, the password for the local account, and the certificate authority a proxy must hold to name you.](../assets/captures/access.png)
-<figcaption>It says how <em>you</em> arrived before offering either control: an operator who came through a gateway is not holding the board's password.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/who-may-reach-this-board.md)
 
 </div>

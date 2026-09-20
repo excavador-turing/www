@@ -1,37 +1,60 @@
 ---
+title: Pick a version, from anywhere
+render_macros: true
 hide:
-  - navigation
-  - toc
+- navigation
+- toc
+feature:
+  order: 9
+  icon: versions.svg
+  summary: This fork, upstream, or the SD card, every candidate checksum-verified and compared numerically.
+  lede: Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release.
+    Here the source is a setting, and every candidate arrives with its checksum.
+  capture: sources.png
+  alt: 'Where this board looks for firmware: this fork, upstream''s two catalogues and the SD card, with
+    the checksum each publisher does or does not ship.'
+  caption: 'Where a board looks for firmware: this fork, upstream''s two catalogues and the SD card, with
+    the checksum each publishes.'
+  proofs:
+  - n: '3'
+    of: 'kinds of source: this fork, upstream, the card'
+    source: reference/comparison.md, checked against both upstream catalogues
+    as_of: '2026-09-08'
+  - n: '2'
+    of: upstream catalogues, disagreeing by a release
+    source: reference/comparison.md, checked against both upstream catalogues
+    as_of: '2026-09-08'
+  - n: '0'
+    of: checksums upstream publishes
+    source: reference/comparison.md, checked against both upstream catalogues
+    as_of: '2026-09-08'
+  next:
+    demo:
+      href: ../../#demo/fork
+      text: See it in the demo
+      note: The firmware sources, with what each one publishes.
+    do:
+      href: ../../guides/upgrade-from-stock/
+      text: Do it on your board
+      note: Move off stock, and what to expect on the way.
+    evidence:
+      href: ../../reference/comparison/
+      text: The evidence
+      note: The two upstream catalogues, and what each returns.
+    related:
+      href: ../updates-that-undo-themselves/
+      text: Updates that undo themselves
+      note: What happens if the version you picked is bad.
 ---
 
-<div class="tp-feature tp-one-screen" markdown>
+{{ feature_screen() }}
 
-<div class="tp-feature__say" markdown>
-<span class="tp-eyebrow">Feature</span>
-# Pick a version, from anywhere
+<div class="tp-argument" markdown>
 
-<p>Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release. Here the sources are a setting, and every candidate arrives with its checksum.</p>
+## The argument
 
-<a class="tp-why" href="../../why/pick-a-version/">The argument, and the measurements behind it →</a>
+Versions are compared numerically, so 2.10 is not older than 2.9 -- which a string comparison says and which upstream's own updater believes. A source that publishes no checksum is labelled TLS only rather than treated as verified, because trusting a transport is not the same as verifying bytes.
 
-<div class="tp-proof">
-<div><b>3</b><span>kinds of source: this fork, upstream, the SD card</span></div>
-<div><b>2</b><span>upstream catalogues, disagreeing by a release</span></div>
-<div><b>0</b><span>checksums upstream publishes</span></div>
-</div>
-
-<div class="tp-next">
-<a href="../../#demo/fork"><b>See the sources →</b><span>Every candidate, where it came from, and its checksum.</span></a>
-<a href="../updates-that-undo-themselves/"><b>And if it is a bad one →</b><span>The gate that boots it on trial and takes it back.</span></a>
-<a href="../../guides/upgrade-from-stock/"><b>Coming from stock →</b><span>The upgrade, measured, and the way back.</span></a>
-<a href="../../reference/comparison/"><b>The two upstreams →</b><span>The evidence for the disagreement, with dates.</span></a>
-</div>
-
-</div>
-
-<figure class="tp-feature__show" markdown>
-![Where this board looks for firmware: this fork, upstream's two catalogues and the SD card, with the checksum each publisher does or does not ship.](../assets/captures/sources.png)
-<figcaption>Where this board looks for firmware: this fork, upstream's two catalogues and the SD card, with the checksum each publisher does or does not ship.</figcaption>
-</figure>
+[The full argument, with every measurement →](../why/pick-a-version.md)
 
 </div>

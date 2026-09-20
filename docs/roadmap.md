@@ -5,45 +5,34 @@ hide:
 
 # Roadmap
 
-What is planned, what is being built, and where to say what you want. Every
-row is a GitHub Discussion you can **upvote**; the ones with the most votes get
-done first, and the argument for each is in the discussion rather than here.
+7 things planned, ordered by votes, 15 cast so far. Every row is a GitHub Discussion: **upvote the ones you want**, and the order on this page changes.
 
-Not on the list? [Propose it](https://github.com/excavador-turing/BMC-Firmware/discussions/new?category=ideas)
-— a sentence about the problem is enough. Found something broken?
-[Report it](feedback.md),
-and read [what is and isn't fixed](reference/known-faults.md) first, because it
-may already be there with a ticket.
+Not on the list? [Propose it](https://github.com/excavador-turing/BMC-Firmware/discussions/new?category=ideas) — a sentence about the problem is enough. Something broken instead? [Report it](feedback.md), and read [what is and isn't fixed](reference/known-faults.md) first, because it may already be there with a ticket.
 
-## Planned
+| votes | feature | what it is | where it stands |
+|--:|---|---|---|
+| **5** | [VLANs on the board's switch, with apply-then-confirm](https://github.com/excavador-turing/BMC-Firmware/discussions/25) | VLAN filtering and STP on the RTL8370MB-CG, first in the daemon, then in the interface. | Backlog |
+| **3** | [A hardware watchdog, so a hung daemon does not mean a trip to the rack](https://github.com/excavador-turing/BMC-Firmware/discussions/24) | The SoC has a watchdog and this firmware does not arm it. | Open |
+| **2** | [Remote syslog, and an audit line for every mutating API call](https://github.com/excavador-turing/BMC-Firmware/discussions/27) | Ship the board's logs somewhere that survives it, and write one line per call that changes state — who, what, from where. | Open |
+| **2** | [Manage the BMC's SSH keys and change its password from the interface and the fleet](https://github.com/excavador-turing/BMC-Firmware/discussions/29) | The only way to put an SSH key on the BMC, or take one off, is to log in over SSH and edit `/root/.ssh/authorized_keys` by hand. | Open |
+| **1** | [OpenTelemetry: traces, logs and metrics over OTLP, opt-in](https://github.com/excavador-turing/BMC-Firmware/discussions/22) | The board already exposes Prometheus metrics on their own credential-free listener, which is the right thing when the cluster is down. | Designed, not started |
+| **1** | [SD card: checksums computed on the board, upload, rename and move](https://github.com/excavador-turing/BMC-Firmware/discussions/23) | The interface can now list what is on the card and say which files can be written to a module (v3.25.0). | Listing shipped in v3.25.0; the rest is open |
+| **1** | [Choose the self-signed certificate's key type and validity](https://github.com/excavador-turing/BMC-Firmware/discussions/26) | When no operator certificate is installed the board issues its own: EC P-384, real names, 825 days, renewed 30 days out. | Open |
 
-| Feature | What it is | Where it stands |
-|---|---|---|
-| [SD card: checksums computed on the board, upload, rename and move](https://github.com/excavador-turing/BMC-Firmware/discussions/23) | The card is where images already are; manage it from the interface, with a checksum of the bytes that will actually be written. | Listing shipped in v3.25.0; the rest is open |
-| [OpenTelemetry: traces, logs and metrics over OTLP, opt-in](https://github.com/excavador-turing/BMC-Firmware/discussions/22) | Three signals to the backend you already run, with a trace that crosses from browser to gateway to daemon. | Designed, not started |
-| [A hardware watchdog, so a hung daemon does not mean a trip to the rack](https://github.com/excavador-turing/BMC-Firmware/discussions/24) | The SoC has one; this firmware does not arm it yet. The last gap where recovery means walking to the hardware. | Open |
-| [Choose the self-signed certificate's key type and validity](https://github.com/excavador-turing/BMC-Firmware/discussions/26) | Two settings with sane defaults, and a renamed board that reissues its own certificate. | Open |
-| [Remote syslog, and an audit line for every mutating API call](https://github.com/excavador-turing/BMC-Firmware/discussions/27) | Logs that survive the board, and one line per call that changed something. | Open |
-| [Manage the board's SSH keys and change its password from the interface and the fleet](https://github.com/excavador-turing/BMC-Firmware/discussions/29) | See, add and revoke the keys `root` trusts, and change the password the interface and SSH share — on one board, or on every board at once — instead of a shell on each. | Open |
-| [VLANs on the board's switch, with apply-then-confirm](https://github.com/excavador-turing/BMC-Firmware/discussions/25) | Segment the management network — with a change that reverts itself unless confirmed through the new configuration. | Backlog |
+## Recently shipped
 
-## Shipped, recently
+Every feature has a page with the measurement behind it, and every release has [its changelog entry](changelog/firmware.md).
 
-The fifteen [features](features/index.md) each have a page with the
-measurement behind them. The most recent, with the release that carried each:
-
-| Feature | Release |
+| release | when |
 |---|---|
-| [Flash a module from the card](features/flash-from-the-card.md) | BMC-UI 3.25.0, firmware v2.26.0 |
-| Temperature on Board Health, with the trip that explains the fan | BMC-UI 3.26.0, firmware v2.27.0 |
-| The firmware listing survives a reboot | bmcd 2.35.0, firmware v2.27.0 |
-| [A certificate that does not rot](features/a-certificate-that-does-not-rot.md) | firmware v2.23.0 |
-| [One page over every board](features/one-page-over-every-board.md) | BMC-UI 3.22.0 |
+| [v2.32.0](changelog/firmware.md) | 13 September 2026 |
+| [v2.31.0](changelog/firmware.md) | 12 September 2026 |
+| [v2.30.0](changelog/firmware.md) | 12 September 2026 |
+| [v2.29.0](changelog/firmware.md) | 12 September 2026 |
+| [v2.28.0](changelog/firmware.md) | 12 September 2026 |
 
 ## How a thing gets from here to there
 
-A feature is a ticket in the maintainer's tracker, a Discussion here, and then
-a page under Features with the numbers that prove it — in that order. The
-[known-faults page](reference/known-faults.md) is the other half of this one:
-what is wrong today, with the ticket that tracks it. A roadmap that lists only
-what is coming is advertising.
+A feature is a ticket in the maintainer's tracker, a Discussion here, and then a page under [Features](features/index.md) with the numbers that prove it — in that order. The [known-faults page](reference/known-faults.md) is the other half of this one: what is wrong today, with the ticket that tracks it. A roadmap that lists only what is coming is advertising.
+
+Votes read 2026-09-20 by `just refresh-roadmap`.

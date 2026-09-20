@@ -50,7 +50,7 @@ serve:
 # Everything CI checks, in the order CI checks it. Run this before pushing;
 # `checks.yml` runs exactly these and nothing else, and the deploy runs none
 # of them.
-check: facts-check build screens
+check: facts-check feature-lint ribbon-check build screens
 
 # Prove every screen reads whole, at nine viewports.
 #
@@ -77,6 +77,24 @@ screens-baseline: build
 facts:
     ./scripts/facts.py
 
+# Prove the eleven feature pages are still one page eleven times.
+#
+# They shared a skeleton in eleven copies of the markup and it had drifted in
+# every direction: ledes from 22 to 48 words, eight different labels opening
+# the same demo, proof numbers with no source. main.py renders the shape now;
+# this checks the content a template cannot.
+feature-lint:
+    ./scripts/feature-lint.py
+
+# Take the demo's exit ribbon off any capture that was taken through it.
+# Five of the eleven had it and six did not, so the pages looked like two
+# different sites side by side.
+crop-ribbon:
+    ./scripts/crop-ribbon.py
+
+ribbon-check:
+    ./scripts/crop-ribbon.py --check
+
 # Fail if the committed facts file no longer matches its sources.
 facts-check:
     ./scripts/facts.py --check
@@ -93,15 +111,36 @@ clean:
 refresh-api-history *ARGS:
     ./scripts/api-history.py {{ARGS}}
 
-# Rebuild the changelog pages from the GitHub release notes.
+# Rebuild the changelog pages, and the feed, from each repository's CHANGELOG.md.
 # `just refresh-changelog` for all four, or name one: `just refresh-changelog bmcd`.
 #
+# NOT from the GitHub release notes, which is where this used to read. Every
+# firmware release note is the same fixed paragraph -- v2.28.0 and v2.32.0,
+# fourteen entries apart, published byte-identical bodies -- so the page a
+# returning reader comes to for "what changed" said nothing, twenty-eight
+# times. The repositories keep real changelogs; those are the source.
+#
+# Where a release has no changelog entry the release note is used instead and
+# the page says so. Neither source is complete: BMC-UI's changelog stops ten
+# releases back, and bmcd's carries five versions that only ever shipped
+# inside a firmware image.
+#
 # Committed rather than fetched at build time, for the same reason the OpenAPI
-# document is: the site builds offline and reproducibly, and a change to the
-# history arrives as a reviewable diff instead of appearing the next time CI
-# runs. Needs `gh` authenticated; it reads public releases and writes nothing.
+# document is: the site builds offline and reproducibly, and a change arrives
+# as a reviewable diff. The hourly Pages job runs this and commits what moves.
 refresh-changelog *COMPONENTS:
     ./scripts/refresh-changelog.py {{COMPONENTS}}
+
+# Rebuild the roadmap from the Ideas discussions and their votes.
+#
+# The page always claimed the most-voted thing gets done first. It was typed
+# by hand, showed no votes and was in no particular order, so the claim could
+# not be checked from the page that made it.
+refresh-roadmap:
+    ./scripts/refresh-roadmap.py
+
+# Everything the hourly job refreshes, in one go.
+refresh: refresh-changelog refresh-roadmap facts
 
 # Rebuild the fork pane of the demo from a BMC-UI checkout at a tag.
 #   just refresh-demo ../BMC-UI v3.19.0

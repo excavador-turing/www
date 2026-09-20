@@ -98,9 +98,14 @@ def releases() -> dict:
             continue
         text = f.read_text()
         newest = re.search(r"[Nn]ewest release \*\*(v?[0-9][^*]*)\*\*", text)
-        count = re.search(r"\*\*v?[0-9][^*]*\*\*,\s*(\d+)\s+in total", text)
-        n = int(count.group(1)) if count else len(
-            re.findall(r"^\?\?\??\+? note ", text, re.M))
+        # The page states its own count; counting collapsed blocks instead
+        # counted the Unreleased one as a release, and said BMC-UI had 28
+        # where the page it read said 27.
+        count = re.search(r"(\d+) in total", text)
+        if not count:
+            raise SystemExit(f"{f.name} no longer states 'N in total'; "
+                             f"facts.py reads the count out of it")
+        n = int(count.group(1))
         total += n
         out[name] = {"newest": newest.group(1).strip() if newest else None,
                      "count": n}

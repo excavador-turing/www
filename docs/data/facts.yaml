@@ -14,18 +14,18 @@ gate:
 releases:
   source: "docs/changelog/*.md, written by `just refresh-changelog` from each repository's CHANGELOG.md"
   firmware:
-    newest: v2.31.0
-    count: 28
+    newest: v2.32.0
+    count: 29
   bmcd:
-    newest: v2.36.3
-    count: 33
+    newest: 2.36.3
+    count: 38
   ui:
-    newest: v3.28.0
-    count: 26
+    newest: v3.29.0
+    count: 27
   tpi:
-    newest: v1.8.0
-    count: 8
-  total: 95
+    newest: 1.8.0
+    count: 13
+  total: 107
 features:
   source: docs/features/*.md -- a feature is a page
   count: 11
@@ -51,9 +51,11 @@ faults:
     - Nothing shuts the board down if it overheats
     - There is no watchdog
 roadmap:
-  source: docs/data/roadmap.json, written by `just refresh-roadmap`
-  count: 0
-  top: null
+  source: docs/data/roadmap.json, written by `just refresh-roadmap` from the Ideas discussions
+  as_of: 2026-09-20
+  count: 7
+  votes: 15
+  top: "VLANs on the board's switch, with apply-then-confirm"
 platform:
   source: reference/comparison.md, measured on a running board
   kernel:

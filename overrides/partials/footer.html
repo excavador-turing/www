@@ -1,0 +1,62 @@
+{#
+  The site's footer, on every page including the front one.
+
+  Material's own is `partials/copyright.html` plus three icons: one line
+  naming the generator, which is a template footer rather than a site
+  footer. The front page hid even that, because the page was locked to the
+  viewport height and the footer was the hundred pixels that made it scroll.
+  The front page scrolls now, in chapters, and this is its last one.
+
+  The columns come from `extra.footer` in mkdocs.yml. Not derived from the
+  nav: the Features tab alone has twenty-two children, and a footer that
+  lists everything is a footer nobody reads.
+#}
+<footer class="md-footer tp-footer">
+  <div class="tp-footer__inner">
+
+    <div class="tp-footer__brand">
+      <b>Turing Pi 2 BMC</b>
+      <span>Firmware for the Turing Pi 2 that undoes its own mistakes.
+      A fork, because upstream's last release was February 2025.</span>
+    </div>
+
+    {% for col in config.extra.footer %}
+      <nav class="tp-footer__col" aria-label="{{ col.title }}">
+        <b>{{ col.title }}</b>
+        <ul>
+          {% for link in col.links %}
+            {% set external = link.href.startswith("http") %}
+            <li>
+              <a href="{{ link.href if external or link.href.startswith('#')
+                          else (link.href | url) }}"
+                 {% if external %}rel="noopener"{% endif %}>{{ link.text }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endfor %}
+
+  </div>
+
+  <div class="tp-footer__legal">
+    {#
+      Said here rather than nowhere: this site is not Turing Machines, and a
+      reader who arrived from a search has no way to know that from a page
+      wearing the board's own palette.
+    #}
+    <span>GPL-2.0, like the upstream it forks.
+    <b>Not a Turing Machines product</b> — the board is theirs, at
+    <a href="https://turingpi.com/" rel="noopener">turingpi.com</a>;
+    this firmware is an independent fork.</span>
+    {% if config.extra.social %}
+      <div class="tp-footer__social">
+        {% for social in config.extra.social %}
+          <a href="{{ social.link }}" target="_blank" rel="noopener"
+             title="{{ social.name }}" aria-label="{{ social.name }}">
+            {% include ".icons/" ~ social.icon ~ ".svg" %}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</footer>
