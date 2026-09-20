@@ -293,7 +293,19 @@ jobs:
     # release, the hourly catch-up when it found something new, or a hand on
     # the button. Pull requests do not reach this workflow at all any more --
     # they run `checks.yml`, which publishes nothing.
-    if: github.ref == 'refs/heads/main' && needs.build.outputs.skip != 'true'
+    #
+    # `!cancelled()` is load-bearing and its absence cost a silent
+    # non-deploy. `refresh` above runs only on the schedule, so on a push it
+    # is SKIPPED; `build` tolerates that with its own guard and succeeds. A
+    # downstream job without a guard of its own inherits the skip from a
+    # transitive dependency, so this one was skipped while the run reported
+    # success -- main moved, the build went green, and the site did not
+    # change. `needs.build.result` is then checked explicitly, because
+    # `!cancelled()` would otherwise let a deploy follow a FAILED build.
+    if: ${{ !cancelled()
+            && needs.build.result == 'success'
+            && github.ref == 'refs/heads/main'
+            && needs.build.outputs.skip != 'true' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -305,3 +317,38 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # A deploy that does not happen must not report success.
+  #
+  # This is here because one already did: `deploy` inherited a skip from a
+  # transitive dependency, the run went green, main carried a rewritten site
+  # and turingpi.xyz served the old one. Nothing in the run said so -- every
+  # job was either success or skipped, which is what a green tick means.
+  published:
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: the site was actually published
+        env:
+          BUILD: ${{ needs.build.result }}
+          SKIP: ${{ needs.build.outputs.skip }}
+          DEPLOY: ${{ needs.deploy.result }}
+        run: |
+          set -eu
+          if [ "$SKIP" = "true" ]; then
+            echo "build decided there was nothing to publish; deploy: $DEPLOY"
+            exit 0
+          fi
+          if [ "$BUILD" != "success" ]; then
+            echo "build did not succeed ($BUILD); nothing to publish" >&2
+            exit 1
+          fi
+          if [ "$DEPLOY" != "success" ]; then
+            echo "build produced a site and deploy did not run ($DEPLOY)." >&2
+            echo "main has moved and turingpi.xyz has not. Check the deploy" >&2
+            echo "job's condition -- a skipped transitive dependency is how" >&2
+            echo "this happened the first time." >&2
+            exit 1
+          fi
+          echo "published"
