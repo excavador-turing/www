@@ -503,9 +503,24 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         parsed = e["source"] == "changelog"
         notes, cats = parse_entry(raw) if parsed else ([raw], {})
         lede = notes[0] if notes and not notes[0].lstrip().startswith(">") else ""
-        summary_text = meta.get("summary") or lede or f"Firmware {e['version']}."
-        lines += [summary_text.strip(), "", "<!-- more -->", ""]
+        # No lede: the entry opens with a label and a list. The first item's
+        # lead is what the release did, so it is the summary rather than a
+        # bare version number.
+        first_lead = ""
+        for cat in cats:                  # in the entry's own order
+            for it in cats.get(cat, []):
+                if "text" in it:
+                    first_lead = split_item(it["text"])[0] + "."
+                    break
+            if first_lead:
+                break
+        summary_text = (meta.get("summary") or lede or first_lead
+                        or f"Firmware {e['version']}.")
+        lines += [summary_text.strip(), ""]
 
+        # The picture sits above the fold on purpose: the news index shows
+        # the excerpt, and a list of releases with a picture each reads as
+        # news where a list of version numbers reads as a changelog.
         if meta.get("capture"):
             cap = meta["capture"]
             caption = meta.get("caption", "")
@@ -513,6 +528,7 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
                       f"![{caption}](../../assets/{cap})",
                       f"<figcaption>{caption}</figcaption>" if caption else "",
                       "</figure>", ""]
+        lines += ["<!-- more -->", ""]
 
         comps = carried(fw["entries"], idx, by_repo) if parsed else []
         pins = [f"[{r} {v}](../../changelog/{SLUG_OF[r]}.md)" for r, v, _ in comps]
@@ -534,8 +550,21 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         sources = [(None, cats)] + [(f"{r} {v}", parse_entry(c["body"])[1]
                                      if c["source"] == "changelog" else {})
                                     for r, v, c in comps]
+        seen: set[str] = set()
         for cat in CATEGORY_ORDER:
-            items = [(tag, it) for tag, cs in sources for it in cs.get(cat, [])]
+            items = []
+            for tag, cs in sources:
+                for it in cs.get(cat, []):
+                    key = (re.sub(r"[^a-z0-9]+", " ", split_item(it["text"])[0].lower()).strip()
+                           if "text" in it else "")
+                    # The image's entry restates a component's headline change
+                    # in its own words often enough that one post carried the
+                    # same heading twice. First writer keeps it.
+                    if key and key in seen:
+                        continue
+                    if key:
+                        seen.add(key)
+                    items.append((tag, it))
             if not items:
                 continue
             lines += [f"## {CATEGORY_TITLE[cat]}", ""]

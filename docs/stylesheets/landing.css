@@ -733,3 +733,10 @@ body.tp-demo-open .md-footer { display: none; }
 .md-typeset figure.tp-post-figure figcaption { font-size: 0.72rem; color: var(--tp-muted); margin-top: 0.5rem; text-align: left; }
 .md-typeset .md-post .md-post__content h2 { margin-top: 2rem; padding-top: 1rem; border-top: 3px solid var(--tp-lime); }
 .md-typeset .md-post .md-post__content h3 { margin-bottom: 0.3rem; }
+
+/* On the news index the picture is shown whole, at the card's width. A
+   thumbnail that crops the tab was the first version, and the screens gate
+   refused it: a capture is never cropped or stretched on this site. The
+   hero-band figure rule above would set it wider than the card. */
+.md-main:has(.tp-hero-band) .md-typeset .md-post--excerpt figure.tp-post-figure { width: 100%; max-width: 100%; margin: 0.2rem 0 0.9rem; }
+.md-main:has(.tp-hero-band) .md-post--excerpt figure.tp-post-figure img { box-shadow: none; }

@@ -64,7 +64,7 @@ this image adds on top of them.
   caught.</content>
   </entry>
   <entry>
-    <title>Firmware v2.32.0</title>
+    <title>Firmware v2.32.0: A module armed for USB boot says so</title>
     <link href="https://turingpi.xyz/news/v2.32.0/"/>
     <id>tag:turingpi.xyz,2026-09-13:firmware/2.32.0</id>
     <updated>2026-09-13T00:00:00Z</updated>
@@ -100,7 +100,7 @@ this image adds on top of them.
   that board's name.</content>
   </entry>
   <entry>
-    <title>Firmware v2.31.0</title>
+    <title>Firmware v2.31.0: The console stops replaying its scrollback twice</title>
     <link href="https://turingpi.xyz/news/v2.31.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.31.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
@@ -128,7 +128,7 @@ this image adds on top of them.
   Redraw is unchanged and still clears first. It answers a different question.</content>
   </entry>
   <entry>
-    <title>Firmware v2.30.0</title>
+    <title>Firmware v2.30.0: The metrics say which module is armed for USB boot</title>
     <link href="https://turingpi.xyz/news/v2.30.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.30.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
@@ -200,7 +200,7 @@ this image adds on top of them.
   wrong.</content>
   </entry>
   <entry>
-    <title>Firmware v2.28.0</title>
+    <title>Firmware v2.28.0: Who may reach this board, from the interface that asks for the password</title>
     <link href="https://turingpi.xyz/news/v2.28.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.28.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
@@ -243,7 +243,7 @@ measurement: BMC-UI 3.25.0 (the SD card picker and two dead flash buttons) and
 (the catalogue refresh that could wedge for ever, and the on-disk listing).</content>
   </entry>
   <entry>
-    <title>Firmware v2.27.0</title>
+    <title>Firmware v2.27.0: The latest of all three, and the SD card listed</title>
     <link href="https://turingpi.xyz/news/v2.27.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.27.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
@@ -258,7 +258,7 @@ measurement: BMC-UI 3.25.0 (the SD card picker and two dead flash buttons) and
   packaged with.</content>
   </entry>
   <entry>
-    <title>Firmware v2.26.0</title>
+    <title>Firmware v2.26.0: Choose an image off the SD card</title>
     <link href="https://turingpi.xyz/news/v2.26.0/"/>
     <id>tag:turingpi.xyz,2026-09-12:firmware/2.26.0</id>
     <updated>2026-09-12T00:00:00Z</updated>
@@ -272,7 +272,7 @@ instead of flashing.
   the right one.</content>
   </entry>
   <entry>
-    <title>Firmware v2.25.0</title>
+    <title>Firmware v2.25.0: The install confirmation is a modal</title>
     <link href="https://turingpi.xyz/news/v2.25.0/"/>
     <id>tag:turingpi.xyz,2026-09-11:firmware/2.25.0</id>
     <updated>2026-09-11T00:00:00Z</updated>
@@ -297,7 +297,7 @@ instead of flashing.
   written for, on its first real use.</content>
   </entry>
   <entry>
-    <title>Firmware v2.24.0</title>
+    <title>Firmware v2.24.0: Everything current — the daemon, the interface and the CLI</title>
     <link href="https://turingpi.xyz/news/v2.24.0/"/>
     <id>tag:turingpi.xyz,2026-09-11:firmware/2.24.0</id>
     <updated>2026-09-11T00:00:00Z</updated>
@@ -344,7 +344,7 @@ instead of flashing.
   board name at all, so nothing moves, and the CLI stops claiming otherwise.</content>
   </entry>
   <entry>
-    <title>Firmware v2.23.0</title>
+    <title>Firmware v2.23.0: TLS made usable — named, renewed, and every key served</title>
     <link href="https://turingpi.xyz/news/v2.23.0/"/>
     <id>tag:turingpi.xyz,2026-09-11:firmware/2.23.0</id>
     <updated>2026-09-11T00:00:00Z</updated>
