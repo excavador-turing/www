@@ -40,10 +40,10 @@ browser once and every certificate it issues is trusted — which is also the
 only fix for the serial console, because a click-through exception is not
 applied to a WebSocket.
 
-Getting your certificate onto the board is a shell operation today; an install
-control and automatic renewal over ACME are both on
-[the roadmap](roadmap.md). Let's Encrypt is possible and is the wrong tool
-here, for three reasons.
+Getting your certificate onto the board is a control now — the Security tab,
+`tpi tls install`, or the API — and it takes effect without a restart.
+Automatic renewal over ACME is still on [the roadmap](roadmap.md). Let's
+Encrypt is possible and is the wrong tool here, for three reasons.
 
 [All of it →](guides/your-own-certificate.md)
 

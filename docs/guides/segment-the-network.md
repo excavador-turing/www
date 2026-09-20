@@ -11,14 +11,6 @@ it can reach the BMC on — and the BMC can reflash any of them.
 
 This page is how to change that, and what it costs.
 
-!!! warning "Not in a release yet"
-
-    The switch controls described here are built and merged, and no firmware
-    release carries them. Until one does, this page is what is coming rather
-    than what you can do today. The
-    [roadmap](../roadmap.md) is where to watch, and it is the item with the
-    most votes.
-
 ## What the board's switch actually is
 
 Seven ports on one chip:

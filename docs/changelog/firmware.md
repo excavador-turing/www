@@ -7,7 +7,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.32.0**, 13 September 2026. 29 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.33.0**, 20 September 2026. 30 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -19,7 +19,69 @@ Newest release **v2.32.0**, 13 September 2026. 29 in total. Each entry is this r
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.32.0 — 13 September 2026"
+???+ note "v2.33.0 — 20 September 2026"
+
+    Pins **bmcd 2.37.0**, **BMC-UI 3.30.0** and **tpi 1.9.0** — the first release
+    carrying the on-board switch, the certificate endpoint and the forced password
+    change. Every component's own changelog has the detail; what follows is what
+    this image adds on top of them.
+
+    **Fixed**
+
+    - **A renamed board reissues its own certificate.** The generator reissued on
+      four conditions — no certificate, a mismatched pair, expiry within the
+      renewal window, and never for a certificate it did not issue — and none of
+      them was *the board is not called that any more*. Renaming a board, or
+      letting its address move, left the old names in place for up to 825 days
+      while every browser rejected it for a name mismatch.
+
+    **Added**
+
+    - **A Certificates section in the README**: what the board issues itself, that
+      it renews and now reissues on rename, that it never touches a certificate it
+      did not issue, the three ways to install your own, and why the serial console
+      is the one tab that breaks on an untrusted certificate.
+
+    **Fixed**
+
+    - **A renamed board reissues its own certificate.** The self-signed generator
+      reissued on four conditions — no certificate, a mismatched pair, expiry
+      within the renewal window, and never for a certificate it did not issue —
+      and none of them was *the board is not called that any more*. The names were
+      computed and used only when issuing, never compared against what was on
+      disk.
+
+      So renaming a board with `tpi hostname`, or letting its address move, left
+      the old names in the certificate **for up to 825 days** while every browser
+      rejected it for a name mismatch, on a board that was otherwise perfectly
+      healthy. It is the one trigger a "reissue now" button would have been for,
+      and it is detectable, so it should never have needed a button.
+
+      The comparison asks openssl one name at a time with `-checkhost` and
+      `-checkip`, and reads **what it says** rather than what it returns: this
+      workstation's openssl exits 1 for a name that is not in the certificate, and
+      the one on GitHub's runners exits 0 and says so only in its output. A check
+      built on the status passed here and did nothing there — the same bug being
+      fixed, inside the fix. There is a test that proves the primitive on whatever
+      openssl is present before the rest of the suite trusts it.
+
+      It reads the extension through openssl rather than comparing it as text. Text cannot be made
+      to work: the SAN is written `DNS:msa2,IP:fd7a:115c:a1e0::1533:6065` and
+      printed back as `DNS:msa2, IP Address:FD7A:115C:A1E0:0:0:0:1533:6065` — a
+      different separator, a different label, and an IPv6 address expanded and
+      upper-cased. Normalising that by hand means writing an IPv6 canonicaliser in
+      POSIX sh, and getting it subtly wrong means reissuing on **every run**: a new
+      key at every boot and every pinned client broken daily, which is a far worse
+      failure than the one being fixed. There is a test for that failure as well as
+      for the fix.
+
+      The predicate is *every name the board has now is in the certificate*, not
+      *the two lists are equal*. An address the board has dropped leaves a stale
+      name that asserts something untrue but breaks nothing and is gone at the next
+      renewal; a name the board has gained is what breaks browsers, and it is
+      caught.
+
+??? note "v2.32.0 — 13 September 2026"
 
     Pins BMC-UI 3.29.0. bmcd stays at 2.36.3 and tpi is unchanged.
 
