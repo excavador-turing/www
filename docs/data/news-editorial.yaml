@@ -17,6 +17,8 @@ v2.33.0:
     VLANs on the board's own switch, tried before they are kept; a certificate
     endpoint; and a board still on the factory password now insists you change
     it before it will do anything else.
+  capture: captures/news/switch.png
+  caption: The Network tab — the switch as a table, a preset to start from, and Apply beside Try it, which undoes itself.
 
 v2.34.0:
   title: Pick a module with one click
@@ -27,3 +29,50 @@ v2.34.0:
     same components.
   capture: captures/news/console-picker.png
   caption: The Console tab — Node 1 to 4 as pills, where a drop-down used to be.
+
+# Older releases, with the captures the site already had. Each picture is the
+# tab the release changed, captured off a board at the time; captions say
+# what the picture shows, not what the release did -- the post does that.
+
+v2.32.0:
+  title: A module armed for USB boot says so
+  capture: captures/nodes.png
+  caption: The Nodes tab — each module's liveness line, where an armed USB-boot pin now shows.
+
+v2.31.0:
+  title: The console stops replaying its scrollback twice
+  capture: captures/console.png
+  caption: The serial console — Reconnect keeps the terminal and adds only what it has not shown.
+
+v2.30.0:
+  title: The metrics say which module is armed for USB boot
+
+v2.28.0:
+  title: Who may reach this board, from the interface that asks for the password
+  capture: captures/access.png
+  caption: The Access card — who may reach this board, and by which route.
+
+v2.27.0:
+  title: The latest of all three, and the SD card listed
+  capture: captures/about.png
+  caption: The About tab — daemon, interface and command line, each at its newest release.
+
+v2.26.0:
+  title: Choose an image off the SD card
+  capture: captures/sdcard.png
+  caption: The flash form's picker — what is on the card, and which entries can be written to a module.
+
+v2.25.0:
+  title: The install confirmation is a modal
+  capture: captures/firmware.png
+  caption: The Firmware tab — the candidates, and a confirmation that no longer scrolls off the page.
+
+v2.24.0:
+  title: Everything current — the daemon, the interface and the CLI
+  capture: captures/info.png
+  caption: The About tab — kernel, daemon, interface and firmware, each a version you can check.
+
+v2.23.0:
+  title: TLS made usable — named, renewed, and every key served
+  capture: captures/login.png
+  caption: The login page, behind a certificate a browser will accept.
