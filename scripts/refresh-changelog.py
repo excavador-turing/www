@@ -305,37 +305,165 @@ def write_index(summary: list[dict]) -> pathlib.Path:
 
 # `Pins **bmcd 2.37.0**, **BMC-UI 3.30.0** and **tpi 1.9.0**` -- what a firmware
 # release carries, read from its own first paragraph. "bmcd stays at 2.36.3"
-# does not match, and is not meant to: a post names what changed.
+# does not match, and is not meant to: a release names what it changed.
 PIN = re.compile(r"\b(?P<repo>bmcd|BMC-UI|tpi)\s+\*{0,2}v?(?P<ver>\d+\.\d+\.\d+)")
 
+# What a post says that the changelog cannot: a headline, a summary, and a
+# picture. Keyed by firmware tag; every key is optional and a release with no
+# entry still gets a post, titled by its version. Written by a person at
+# release time, so the hourly job never waits on it.
+EDITORIAL = ROOT / "docs" / "data" / "news-editorial.yaml"
 
-def excerpt_at(body: str) -> int:
-    """Where the post's excerpt ends: after the lede, or after the first item.
+CATEGORY_ORDER = ["Added", "Changed", "Fixed", "Removed", "Deprecated",
+                  "Security"]
+CATEGORY_TITLE = {"Added": "New", "Changed": "Changed", "Fixed": "Fixed",
+                  "Removed": "Removed", "Deprecated": "Deprecated",
+                  "Security": "Security"}
+CAT_HEAD = re.compile(r"^###\s+(Added|Changed|Fixed|Removed|Deprecated|"
+                      r"Security)\s*$")
+# `- **A renamed board reissues its own certificate.** The generator ...`
+ITEM_LEAD = re.compile(r"^\*\*(?P<lead>.+?)\*\*[:.]?\s*", re.S)
+# How much of an item the post shows before folding the rest away.
+SHORT = 220
 
-    Eleven of thirty firmware entries open with a paragraph that says what
-    the release is; the other nineteen open with **Added** or **Changed**
-    and go straight to the list. For those the excerpt is the label and the
-    first item, which is the newest thing the release did -- the entries
-    are written newest-first within a category.
+
+def vtuple(v: str) -> tuple[int, ...]:
+    return tuple(int(x) for x in re.findall(r"\d+", v)[:3])
+
+
+def editorial() -> dict[str, dict]:
+    if not EDITORIAL.exists():
+        return {}
+    import yaml
+    data = yaml.safe_load(EDITORIAL.read_text()) or {}
+    return {str(k): (v or {}) for k, v in data.items()}
+
+
+def dedent2(block: str) -> str:
+    return "\n".join(ln[2:] if ln.startswith("  ") else ln
+                     for ln in block.splitlines())
+
+
+def parse_entry(body: str) -> tuple[list[str], dict[str, list[dict]]]:
+    """A Keep-a-Changelog entry -> (notes before any category, items per category).
+
+    An item is a top-level list entry; the indented paragraphs that follow it
+    are its continuation. Anything under a category that is not a list is a
+    note and is kept in order with the items.
     """
-    blocks = re.split(r"\n\s*\n", body)
-    pos = 0
-    first = blocks[0].lstrip()
-    if not (first.startswith("**") or first.startswith("- ")
-            or first.startswith("* ")):
-        return len(blocks[0])
-    seen_item = False
-    for b in blocks:
-        pos = body.index(b, pos) + len(b)
-        stripped = b.lstrip()
-        if stripped.startswith(("- ", "* ")):
-            if seen_item:
-                # A second item: the first ended before this block.
-                return body.index(b, 0)
-            seen_item = True
-        elif seen_item and not b.startswith(" "):
-            return body.index(b, 0)
-    return pos
+    notes: list[str] = []
+    cats: dict[str, list[dict]] = {}
+    cur = None
+    for block in re.split(r"\n[ \t]*\n", body):
+        b = block.strip("\n")
+        if not b.strip():
+            continue
+        m = CAT_HEAD.match(b.strip())
+        if m:
+            cur = m.group(1)
+            cats.setdefault(cur, [])
+            continue
+        if cur is None:
+            notes.append(b)
+            continue
+        if b.lstrip().startswith(("- ", "* ")) and not b.startswith("  "):
+            for item in re.split(r"\n(?=[-*] )", b):
+                text = dedent2(re.sub(r"^[-*] ", "", item))
+                cats[cur].append({"text": text, "more": []})
+        elif cats[cur] and b.startswith("  "):
+            cats[cur][-1]["more"].append(dedent2(b))
+        else:
+            cats[cur].append({"note": b})
+    return notes, cats
+
+
+def split_item(text: str) -> tuple[str, str, str]:
+    """(lead, short, rest): the bold lead, the first sentence or two, the rest."""
+    m = ITEM_LEAD.match(text)
+    if m:
+        lead, body = m.group("lead").strip().rstrip(".:"), text[m.end():].strip()
+    else:
+        parts = re.split(r"(?<=[.!?])\s+", text.strip(), 1)
+        lead, body = parts[0].rstrip("."), (parts[1] if len(parts) > 1 else "")
+    body = re.sub(r"\s*\n\s*", " ", body)
+    # "**A Certificates section in the README**: what the board issues..."
+    # -- the lead ends in a colon and the sentence continues in lower case,
+    # which reads fine inline and wrong under a heading.
+    if body[:1].islower():
+        body = body[0].upper() + body[1:]
+    short, rest = "", body
+    for sent in re.split(r"(?<=[.!?])\s+", body):
+        if short and len(short) + len(sent) > SHORT:
+            break
+        short = (short + " " + sent).strip()
+    rest = body[len(short):].strip()
+    return lead, short, rest
+
+
+def render_item(item: dict, tag: str | None) -> list[str]:
+    if "note" in item:
+        return [demote(item["note"]), ""]
+    lead, short, rest = split_item(item["text"])
+    out = [f"### {lead}"]
+    if tag:
+        out.append(f'<small class="tp-tag">{tag}</small>')
+    out.append("")
+    if short:
+        out += [short, ""]
+    more = ([rest] if rest else []) + item["more"]
+    if more:
+        out.append('??? note "The whole entry"')
+        out.append("")
+        for para in more:
+            out += ["    " + ln if ln.strip() else "" for ln in para.splitlines()]
+            out.append("")
+    return out
+
+
+def render_fix(item: dict, tag: str | None) -> list[str]:
+    if "note" in item:
+        return [demote(item["note"]), ""]
+    lead, short, rest = split_item(item["text"])
+    line = f"- **{lead}.**"
+    if short:
+        line += f" {short}"
+    if tag:
+        line += f' <small class="tp-tag">{tag}</small>'
+    out = [line]
+    more = ([rest] if rest else []) + item["more"]
+    if more:
+        out += ["", '    ??? note "The whole entry"', ""]
+        for para in more:
+            out += ["        " + ln if ln.strip() else "" for ln in para.splitlines()]
+            out.append("")
+    return out
+
+
+def carried(fw_entries: list[dict], idx: int, by_repo: dict) -> list[tuple[str, str, dict]]:
+    """(repo, version, entry) for every component version this image is the
+    first to carry: each version named in its lede, and the ones between it
+    and the version the previous image that named that component carried."""
+    entries = fw_entries                      # newest first
+    lede = (entries[idx]["body"] or "").split("\n\n", 1)[0]
+    out = []
+    for m in PIN.finditer(lede):
+        repo, ver = m.group("repo"), m.group("ver")
+        prev = None
+        for older in entries[idx + 1:]:
+            older_lede = (older["body"] or "").split("\n\n", 1)[0]
+            hits = [n.group("ver") for n in PIN.finditer(older_lede)
+                    if n.group("repo") == repo]
+            if hits:
+                prev = max(hits, key=vtuple)
+                break
+        versions = [v for v in by_repo.get(repo, {})
+                    if vtuple(v) <= vtuple(ver)
+                    and (prev is None and v == ver or prev is not None and vtuple(v) > vtuple(prev))]
+        for v in sorted(versions, key=vtuple, reverse=True):
+            e = by_repo[repo][v]
+            if e["body"] and (repo, v) not in [(r, x) for r, x, _ in out]:
+                out.append((repo, v, e))
+    return out
 
 
 def write_news(summary: list[dict]) -> list[pathlib.Path]:
@@ -343,59 +471,92 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
 
     The changelog pages are a reference: thirty collapsed releases per
     component, and four components. Nobody reads a reference to find out what
-    is new. A post is the firmware release's own entry -- the image is the
-    thing a reader flashes, so its version is the one that means anything --
-    followed by the entries of the components it newly pins, so what the
-    release actually changed on the board is on one page.
+    is new, and the first cut of this -- the firmware entry pasted whole,
+    followed by each component's entry pasted whole -- was a reference with a
+    date on it. A post is built from the same entries taken apart: every item
+    becomes a heading with its lead, one or two sentences, and the rest folded
+    away; items are grouped as New, Changed and Fixed across the image and the
+    component versions it is the first to carry; and a headline, a summary and
+    a picture come from docs/data/news-editorial.yaml when someone has written
+    them, and from the entry itself when nobody has.
     """
     fw = next(s for s in summary if s["slug"] == "firmware")
     by_repo = {s["repo"]: {e["bare"]: e for e in s["entries"]} for s in summary}
+    ed = editorial()
     NEWS.mkdir(parents=True, exist_ok=True)
     written = []
-    for e in fw["entries"]:
+    for idx, e in enumerate(fw["entries"]):
         rel = e.get("released")
         when = (rel.get("publishedAt", "")[:10] if rel else None) or e["date"]
         if not when:
             continue                      # a post has a date, or it is not one
-        body = (demote(e["body"]) if e["source"] == "changelog"
-                else e["body"]) or "_No entry._"
-        cut = excerpt_at(body)
-        title = f"Firmware {e['version']}"
+        meta = ed.get(e["version"], {})
+        title = meta.get("title") or f"Firmware {e['version']}"
         if rel and rel.get("isPrerelease"):
             title += " (pre-release)"
         elif not rel:
             title += " (not released)"
-        lines = [
-            "---",
-            f"title: {title}",
-            f"date: {when}",
-            f"slug: {e['version']}",
-            "hide:",
-            "  - toc",
-            "---",
-            "",
-            body[:cut].rstrip(),
-            "",
-            "<!-- more -->",
-            "",
-            body[cut:].strip(),
-        ]
-        carried = []
-        for m in PIN.finditer(body[:cut]):
-            entry = by_repo.get(m.group("repo"), {}).get(m.group("ver"))
-            if entry and entry["body"] and (m.group("repo"), m.group("ver")) not in carried:
-                carried.append((m.group("repo"), m.group("ver")))
-                lines += ["", f"## {m.group('repo')} {m.group('ver')}", "",
-                          f"What the {m.group('repo')} this image carries "
-                          f"changed, from [its own changelog]"
-                          f"(../../changelog/{SLUG_OF[m.group('repo')]}.md).",
-                          "",
-                          demote(entry["body"]) if entry["source"] == "changelog"
-                          else entry["body"]]
-        lines += ["", "---", "",
-                  f"[Every release of the firmware](../../changelog/firmware.md) · "
-                  f"[the roadmap](../../roadmap.md) · "
-                  f"[follow by feed](../../feed.xml)"]
+        lines = ["---", f"title: {json.dumps(title)}", f"date: {when}",
+                 f"slug: {e['version']}", "---", ""]
+
+        raw = e["body"] or ""
+        parsed = e["source"] == "changelog"
+        notes, cats = parse_entry(raw) if parsed else ([raw], {})
+        lede = notes[0] if notes and not notes[0].lstrip().startswith(">") else ""
+        summary_text = meta.get("summary") or lede or f"Firmware {e['version']}."
+        lines += [summary_text.strip(), "", "<!-- more -->", ""]
+
+        if meta.get("capture"):
+            cap = meta["capture"]
+            caption = meta.get("caption", "")
+            lines += ['<figure class="tp-post-figure" markdown>',
+                      f"![{caption}](../../assets/{cap})",
+                      f"<figcaption>{caption}</figcaption>" if caption else "",
+                      "</figure>", ""]
+
+        comps = carried(fw["entries"], idx, by_repo) if parsed else []
+        pins = [f"[{r} {v}](../../changelog/{SLUG_OF[r]}.md)" for r, v, _ in comps]
+        lines += [f"**Firmware {e['version']}**, {human(when)}"
+                  + (" — the first image to carry " + ", ".join(pins) + "."
+                     if pins else ".")
+                  + " Every item below is the repository's own changelog "
+                  "entry, taken apart; the whole entry is a click away under "
+                  "each one.", ""]
+
+        # Notes that are not the lede -- a blockquote warning, a paragraph
+        # about what the release is -- keep their place before the items.
+        for n in notes[1:] if lede else notes:
+            if n.strip():
+                lines += [demote(n), ""]
+
+        # Category by category, the image's own items first and then each
+        # carried component's, newest component version first.
+        sources = [(None, cats)] + [(f"{r} {v}", parse_entry(c["body"])[1]
+                                     if c["source"] == "changelog" else {})
+                                    for r, v, c in comps]
+        for cat in CATEGORY_ORDER:
+            items = [(tag, it) for tag, cs in sources for it in cs.get(cat, [])]
+            if not items:
+                continue
+            lines += [f"## {CATEGORY_TITLE[cat]}", ""]
+            for tag, it in items:
+                # New (and Security) items are the post: a heading each, so
+                # the table of contents lists them. Changed and Fixed are a
+                # compact list -- twenty headings for twenty adjustments
+                # made the contents a wall and the features invisible in it.
+                lines += (render_item(it, tag) if cat in ("Added", "Security")
+                          else render_fix(it, tag))
+            lines.append("")
+        for r, v, c in comps:
+            if c["source"] != "changelog":
+                lines += [f"## {r} {v}", "", c["body"], ""]
+        if not parsed:
+            lines += [raw, ""]
+
+        lines += ["---", "",
+                  "[Every release of the firmware](../../changelog/firmware.md) · "
+                  "[the roadmap](../../roadmap.md) · "
+                  "[follow by feed](../../feed.xml)"]
         p = NEWS / f"{e['bare']}.md"
         p.write_text("\n".join(lines).rstrip() + "\n")
         written.append(p)
@@ -418,6 +579,7 @@ def write_feed(firmware: dict) -> pathlib.Path:
         return (s.replace("&", "&amp;").replace("<", "&lt;")
                  .replace(">", "&gt;").replace('"', "&quot;"))
 
+    ed = editorial()
     site = "https://turingpi.xyz"
     updated = (f"{firmware['newest_date']}T00:00:00Z" if firmware["newest_date"]
                else datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
@@ -433,8 +595,11 @@ def write_feed(firmware: dict) -> pathlib.Path:
            "  <author><name>excavador-turing</name></author>"]
     for e in firmware["entries"][:40]:
         when = f"{e['date']}T00:00:00Z" if e["date"] else updated
+        title = ed.get(e["version"], {}).get("title")
+        title = (f"Firmware {e['version']}: {title}" if title
+                 else f"Firmware {e['version']}")
         out += ["  <entry>",
-                f"    <title>Firmware {esc(e['version'])}</title>",
+                f"    <title>{esc(title)}</title>",
                 f'    <link href="{site}/news/{esc(e["version"])}/"/>',
                 f"    <id>tag:turingpi.xyz,{e['date'] or '1970-01-01'}:"
                 f"firmware/{esc(e['bare'])}</id>",
