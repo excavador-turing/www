@@ -86,9 +86,11 @@ the file **existing** rather than by a path being configured. A board whose
 anchor was removed comes back up, instead of refusing to start because a
 setting still points at a file that is gone.
 
-## What this does not do
+## What it does not cover
 
 It does not manage SSH keys — `authorized_keys` on the board's overlay outlives
 every firmware flash, and nothing here shows it or takes it back. That is
 [the next item on the roadmap](../roadmap.md), and it is filed as one piece with
 this: the same page should answer for every way in, not two of the three.
+
+<div class="tp-next tp-next--argument"><a href="../../features/who-may-reach-this-board/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The access card on Settings, from captured data.</span></a><a href="../guides/install/"><b>Do it on your board →</b><span>Install the firmware that carries these controls.</span></a><a href="../reference/known-faults/"><b>The evidence →</b><span>Including that anything local is still trusted without a credential.</span></a><a href="../a-certificate-that-does-not-rot/"><b>A certificate that does not rot →</b><span>The certificate the board serves on that connection.</span></a></div>

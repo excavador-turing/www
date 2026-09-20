@@ -70,10 +70,13 @@ three layers from the message.
 Both were found by driving a browser against a real board rather than by
 reading types, which is the only reason either is in this release.
 
-!!! note "What this does not do yet"
-    The checksum is not computed on the board. Doing it means reading a
-    multi-gigabyte file on a machine with about 87 MB of usable memory, so it
-    has to be on demand, reported as progress, and cached against size and
-    modification time — none of which the daemon offers yet. Uploading,
-    renaming and moving files on the card are not here either. Both are
-    tracked in SQU-198.
+## What it does not cover
+
+The checksum is not computed on the board. Doing it means reading a
+multi-gigabyte file on a machine with about 87 MB of usable memory, so it
+has to be on demand, reported as progress, and cached against size and
+modification time — none of which the daemon offers yet. Uploading,
+renaming and moving files on the card are not here either. Both are
+tracked in SQU-198.
+
+<div class="tp-next tp-next--argument"><a href="../../features/flash-from-the-card/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The flash picker, listing a real card's contents.</span></a><a href="../reference/cli/"><b>Do it on your board →</b><span>The same operation from a shell, through tpi.</span></a><a href="../reference/api/storage/"><b>The evidence →</b><span>The endpoints the picker calls, as the board describes them.</span></a><a href="../pick-a-version/"><b>Pick a version, from anywhere →</b><span>The card is one of three places firmware can come from.</span></a></div>

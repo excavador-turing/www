@@ -102,3 +102,21 @@ flash that is already fully allocated, for bytes that change when somebody
 publishes a release. The stored copy is compared on what the sources offer,
 not on the whole record, because the timestamp moves every time and would make
 every refresh a change.
+
+## What it does not cover
+
+It makes upstream's two catalogues **visible**, not correct. The mirror the
+stock interface follows still stops at v2.0.5 while the GitHub releases reach
+v2.1.0, and nothing here can fix that — a board offered both simply sees both,
+with what each one publishes beside it.
+
+A source that publishes no checksum is labelled **TLS only** rather than
+treated as verified. That is a weaker guarantee honestly named, not a stronger
+one: trusting the transport is not verifying the bytes, and neither upstream
+route publishes a checksum at all.
+
+And picking a version is not judging it. Whether the image you chose is any
+good is [the gate's question](../features/updates-that-undo-themselves.md),
+after it boots.
+
+<div class="tp-next tp-next--argument"><a href="../../features/pick-a-version/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The firmware sources, with what each one publishes.</span></a><a href="../guides/upgrade-from-stock/"><b>Do it on your board →</b><span>Move off stock, and what to expect on the way.</span></a><a href="../reference/comparison/"><b>The evidence →</b><span>The two upstream catalogues, and what each returns.</span></a><a href="../updates-that-undo-themselves/"><b>Updates that undo themselves →</b><span>What happens if the version you picked is bad.</span></a></div>

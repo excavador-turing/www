@@ -37,8 +37,22 @@ ROLES = [
 ROOT = pathlib.Path(__file__).resolve().parent
 
 
+# Eleven reads better than 11 at the top of a page, and the count is still
+# the facts file's to state.
+NUMBER_WORDS = ("zero one two three four five six seven eight nine ten eleven "
+                "twelve thirteen fourteen fifteen sixteen seventeen eighteen "
+                "nineteen twenty").split()
+
+
 def define_env(env):
     """Hook for mkdocs-macros."""
+
+    @env.filter
+    def title_number(n):
+        """A small number spelled out, for a headline."""
+        n = int(n)
+        word = NUMBER_WORDS[n] if 0 <= n < len(NUMBER_WORDS) else str(n)
+        return word.capitalize()
 
     @env.macro
     def feature_screen():

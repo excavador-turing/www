@@ -1,5 +1,6 @@
 ---
 title: Fresh, and fixed
+render_macros: true
 ---
 
 # Fresh, and fixed
@@ -49,7 +50,7 @@ workflow went green.
 **`turingpi.local` stopped resolving** when avahi was dropped, which also
 meant `tpi` with no `--host` failed rather than falling back.
 
-## Sixty-six releases, and a count that is not decoration
+## {{ releases.total }} releases, and a count that is not decoration
 
 | component | releases |
 |---|---|
@@ -66,6 +67,15 @@ the releases cannot disagree.
 !!! note "Fast releasing is not the same as being stable"
     A high release count is only a good sign if a bad release cannot hurt you.
     That is what the [health-gated promotion](../features/updates-that-undo-themselves.md)
-    is for: this board has taken 18 firmware updates and rolled one back by
+    is for: this board has taken {{ gate.promoted }} firmware updates and
+    rolled {{ gate.rolled_back }} back by
     itself, with nobody at the rack. Releasing often and reverting
     automatically are the same policy seen from two sides.
+
+## What it does not cover
+
+A supported base is not a finished one. {{ faults.count }} faults are open on this fork right now, each with a ticket, and [the honest list](../reference/known-faults.md) is the other half of this page.
+
+Tracking a longterm kernel also means tracking it: the guarantee is that the base is still receiving fixes, not that every fix has already been taken. What this board runs is what its [About tab reports](../features/see-what-the-board-sees.md), and what the fork has published is [the changelog](../changelog/firmware.md).
+
+<div class="tp-next tp-next--argument"><a href="../../features/fresh-and-fixed/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The About tab, naming every component's version.</span></a><a href="../guides/upgrade-from-stock/"><b>Do it on your board →</b><span>Move a board off the firmware it shipped with.</span></a><a href="../reference/comparison/"><b>The evidence →</b><span>Every row against upstream, including where upstream leads.</span></a><a href="../pick-a-version/"><b>Pick a version, from anywhere →</b><span>Why upstream's two catalogues disagree by a release.</span></a></div>

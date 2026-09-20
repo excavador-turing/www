@@ -51,6 +51,38 @@ def front_matter(path: pathlib.Path) -> dict:
     return yaml.safe_load(text[3:text.index("\n---", 3)]) or {}
 
 
+# The one section every argument must end with. It was the most useful thing
+# on the two pages that had it and was missing from seven of eleven, under
+# five different names where it existed at all: "What this does not do",
+# "What a source cannot do", "What this does not give you", "What is next".
+LIMITS = "What it does not cover"
+
+
+def check_argument(path: pathlib.Path, feature: pathlib.Path, bad) -> None:
+    """The argument page behind a feature: same opening, same closing."""
+    text = path.read_text()
+    here = lambda msg: bad(path, msg)
+
+    if "is the argument behind" not in text:
+        here("does not open with the standing line naming the feature it "
+             "argues for")
+    if f"\n## {LIMITS}\n" not in text:
+        here(f"has no `## {LIMITS}` section -- the honest half, and the part "
+             f"a reader came for once they are past the claim")
+    else:
+        # It must be the LAST section: a limit buried in the middle reads as
+        # an aside rather than as the conclusion.
+        heads = re.findall(r"^## (.+)$", text, re.M)
+        if heads and heads[-1] != LIMITS:
+            here(f"`## {LIMITS}` is not the last section (followed by "
+                 f"{heads[-1]!r})")
+    if 'class="tp-next"' not in text:
+        here("has no way onward -- an argument page that ends in prose is a "
+             "dead end, and these are the deepest pages on the site")
+    elif "Back to the feature" not in text:
+        here("its next block does not link back to the feature page")
+
+
 def main() -> int:
     pages = sorted(p for p in FEATURES.glob("*.md") if p.stem != "index")
     problems: list[str] = []
@@ -138,6 +170,8 @@ def main() -> int:
             bad(page, f"no argument page at why/{page.stem}.md")
         elif f"../why/{page.stem}.md" not in body:
             bad(page, "does not link its argument page")
+        else:
+            check_argument(argument, page, bad)
 
     index = FEATURES / "index.md"
     if "{{ feature_plates() }}" not in index.read_text():
