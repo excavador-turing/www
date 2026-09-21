@@ -1,6 +1,7 @@
 ---
 title: Pick a version, from anywhere
 render_macros: true
+since: v2.9.0
 hide:
 - navigation
 - toc

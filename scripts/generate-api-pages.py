@@ -261,8 +261,14 @@ def main() -> int:
             summary = clean(op.get("summary")) or op.get("operationId", "")
             idx.append(f"| {summary} | `{method.upper()}` | [`{path}`]({key}.md#{anchor}) | {title} |")
     idx.append("")
-    (OUTDIR / "index.md").write_text("\n".join(idx) + "\n")
-    written.append(OUTDIR / "index.md")
+    # `operations.md`, NOT `index.md`. As index.md this table resolved to
+    # /reference/api/ -- the same URL as reference/api.md, the prose page
+    # that explains what the API is -- and the directory index won. "The
+    # API" in the nav led here, and the prose page was unreachable on the
+    # live site for weeks. mkdocs --strict does not report two sources
+    # claiming one URL.
+    (OUTDIR / "operations.md").write_text("\n".join(idx) + "\n")
+    written.append(OUTDIR / "operations.md")
 
     print(f"  {len(written)} pages, {total} operations, from bmcd {version}")
     return 0

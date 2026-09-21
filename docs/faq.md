@@ -50,9 +50,9 @@ Encrypt is possible and is the wrong tool here, for three reasons.
 
 ## Which board revisions does it run on?
 
-**v2.5.2**, on the two boards this fork is developed against. **v2.4**, from
-two readers' reports (2026-09-16 and 2026-09-21; the second upgraded from the
-factory image in NAND and set up the Split layout). The other revisions are
+**v2.5.2**, on the two boards this fork is developed against, and **v2.4**,
+from {{ boards.from_readers | title_number | lower }} readers' reports — every
+one dated and recorded on the install guide. The other revisions are
 upstream's compatibility list, not this fork's proof, and the install guide
 says so rather than implying a test matrix that does not exist.
 

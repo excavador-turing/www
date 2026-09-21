@@ -1,6 +1,7 @@
 ---
 title: Fresh, and fixed
 render_macros: true
+since: v2.7.0
 hide:
 - navigation
 - toc

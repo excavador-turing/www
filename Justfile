@@ -118,6 +118,15 @@ description-lint:
 structured-data: build
     ./scripts/structured-data.py
 
+# Every link that leaves the site still answers. Weekly in CI (links.yml);
+# here when you want it now. Needs lychee on the path (devbox has it).
+links: build
+    lychee --no-progress --base https://turingpi.xyz \
+        --exclude '^https://turingpi\.xyz' --exclude-path site/demo \
+        --exclude localhost --exclude 'turingpi\.local' --exclude '192\.168\.' \
+        --accept '200..=204,206,301..=308,429' --timeout 20 --max-retries 2 \
+        'site/**/*.html'
+
 # The index an assistant reads instead of the nav.
 llms:
     ./scripts/llms.py

@@ -64,6 +64,7 @@ COUNTED = {
     "features.count":   r"features, each|things this board does",
     "faults.count":     r"faults still open|open faults|faults are open",
     "roadmap.count":    r"things (?:are )?planned|planned features",
+    "boards.from_readers": r"readers'? reports?|reports? from readers",
     "roadmap.votes":    r"votes (?:have been )?cast",
     "platform.rows":    r"rows where this fork differs|rows against upstream",
 }

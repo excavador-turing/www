@@ -750,3 +750,29 @@ body.tp-demo-open .md-footer { display: none; }
   .md-main:has(.md-post--excerpt) .md-content__inner > .md-pagination { grid-column: 1 / -1; }
   .md-main:has(.tp-hero-band) .md-content__inner > .md-post { max-width: none; }
 }
+
+/* "In this fork since vX" under a feature's title: a tag that is a link,
+   without a link's underline, so it reads as a label and still goes to the
+   release that introduced the feature. */
+.md-typeset a.tp-since { text-decoration: none; }
+.md-typeset a.tp-since small.tp-tag { margin: -0.4rem 0 0.8rem; }
+.md-typeset a.tp-since:hover small.tp-tag { color: var(--md-accent-fg-color); border-color: var(--md-accent-fg-color); }
+
+/* The board record on the install guide: three short columns and one that
+   wraps, so it survives a phone without a sideways scroll. */
+.md-typeset table.tp-boards { font-size: 0.72rem; }
+.md-typeset table.tp-boards th, .md-typeset table.tp-boards td { vertical-align: top; }
+.md-typeset table.tp-boards td:nth-child(-n+3) { white-space: nowrap; }
+.md-typeset table.tp-boards .tp-boards__who { display: block; color: var(--tp-muted); }
+
+/* On a phone the four columns become one card per report: the three short
+   facts on a line, the report under them. A table that scrolls sideways on
+   a phone is a table nobody reads to the end. */
+@media screen and (max-width: 59.9375em) {
+  .md-typeset table.tp-boards thead { display: none; }
+  .md-typeset table.tp-boards, .md-typeset table.tp-boards tbody,
+  .md-typeset table.tp-boards tr, .md-typeset table.tp-boards td { display: block; white-space: normal; }
+  .md-typeset table.tp-boards tr { border-top: 1px solid var(--tp-line); padding: 0.5rem 0; }
+  .md-typeset table.tp-boards td { padding: 0.1rem 0; border: 0; }
+  .md-typeset table.tp-boards td:nth-child(-n+3) { display: inline-block; margin-right: 0.9rem; }
+}

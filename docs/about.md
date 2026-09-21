@@ -105,6 +105,8 @@ description: "Why this fork of the Turing Pi 2 BMC firmware exists: what upstrea
 </div>
 </div>
 
+<p class="tp-provenance">This site counts visits with Cloudflare Web Analytics: cookieless, no consent banner because there is nothing to consent to, and it keeps nothing about you. The token in the page names the site to the beacon and can read nothing.</p>
+
 <div class="tp-next">
 <a href="../features/"><b>What it does →</b><span>{{ features.count }} features, each with the evidence behind it.</span></a>
 <a href="../guides/install/"><b>Put it on your board →</b><span>Install it, and what to read first.</span></a>

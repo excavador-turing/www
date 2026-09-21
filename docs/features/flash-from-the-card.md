@@ -1,6 +1,7 @@
 ---
 title: Flash a module from the card
 render_macros: true
+since: v2.26.0
 hide:
 - navigation
 - toc

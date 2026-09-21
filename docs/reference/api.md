@@ -99,7 +99,7 @@ serves nothing else — so nothing that scrapes it can reach this API.
 Every operation is on its own page, grouped by what it acts on, and every one
 is in the site's search:
 
-- **[Every operation](api/index.md)** — one row per operation, the fastest way in
+- **[Every operation](api/operations.md)** — one row per operation, the fastest way in
 - [The board](api/board.md) · [The nodes](api/nodes.md) · [Firmware](api/firmware.md)
 - [Storage](api/storage.md) · [Network and time](api/network.md) · [Cooling and thermals](api/thermal.md)
 

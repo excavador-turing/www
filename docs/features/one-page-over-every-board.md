@@ -1,6 +1,7 @@
 ---
 title: One page over every board
 render_macros: true
+since: v2.22.0
 hide:
 - navigation
 - toc
