@@ -50,11 +50,30 @@ Encrypt is possible and is the wrong tool here, for three reasons.
 ## Which board revisions does it run on?
 
 **v2.5.2**, on the two boards this fork is developed against. **v2.4**, from
-one reader's report. The other revisions are upstream's compatibility list,
-not this fork's proof, and the install guide says so rather than implying a
-test matrix that does not exist.
+two readers' reports (2026-09-16 and 2026-09-21; the second upgraded from the
+factory image in NAND and set up the Split layout). The other revisions are
+upstream's compatibility list, not this fork's proof, and the install guide
+says so rather than implying a test matrix that does not exist.
 
 [What you need →](guides/install.md)
+
+## The clock says "not synchronised". What now?
+
+Since v2.35.0 the Time card on Settings lists every source chrony knows and
+what it thinks of it, in chrony's own terms. Two states cover nearly every
+report:
+
+- **unresolved** — the board could not look the name up. It has no working
+  resolver, which is what a static address set by hand over SSH leaves
+  behind on this image. Give it one on the Network tab (the address card
+  takes resolvers), or use the server's address instead of its name.
+- **unreachable** — the server never answered: wrong address, a firewall, or
+  a router that does not serve NTP at all.
+
+A server that reports itself unsynchronised (stratum 16) is refused, and the
+card says so; chrony will not take time from it. The pool the image ships
+with is a name too, so a board with no resolver has no source at all — which
+is how "not synchronised" looked before the card could say why.
 
 ## How much of this is written by a machine?
 

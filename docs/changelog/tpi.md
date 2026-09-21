@@ -7,9 +7,25 @@ hide:
 
 The command-line client.
 
-Newest release **v1.9.0**, 20 September 2026. 14 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "v1.9.0 — 20 September 2026"
+???+ note "v1.10.0 — 21 September 2026"
+
+    **Added**
+
+    - **`tpi network address show | apply | confirm | revert`.** The BMC's own
+      address from the command line: `apply --dhcp`, or `apply --static
+      192.168.1.20/24 --gateway 192.168.1.1 --dns 192.168.1.1`, applied and NOT
+      kept until `confirm` reaches the board at the new address -- run it as a
+      new invocation with `--host <new address>`. A confirmation from a shell on
+      the board is refused, as the switch's is. Needs bmcd 2.38.0.
+    - **`tpi ntp` prints what chrony thinks of each source**: state (`selected`,
+      `combined`, `excluded`, `unreachable`, `falseticker`), stratum, how many of
+      the last eight polls answered, the offset -- and, when nothing is selected,
+      one sentence on what `unreachable` and `falseticker` mean. "NOT
+      synchronised" on its own sent a user to Discord with nothing to act on.
+
+??? note "v1.9.0 — 20 September 2026"
 
     **Changed**
 

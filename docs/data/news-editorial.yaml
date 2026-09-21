@@ -80,3 +80,17 @@ v2.23.0:
   title: TLS made usable — named, renewed, and every key served
   capture: captures/login.png
   caption: The login page, behind a certificate a browser will accept.
+
+# Written ahead of the release, as the rules allow; the post appears when
+# v2.35.0 exists.
+v2.35.0:
+  title: A fixed address from the Network tab, and a clock that says why
+  summary: >-
+    The BMC's own address — DHCP or static, with gateway and resolvers — from
+    the Network tab, applied then confirmed at the new address so a typo
+    cannot strand the board. The Time card lists every source with chrony's
+    own verdict, including the one that sent a reader to Discord: a name the
+    board could not resolve. And two 2.4 boards now run this firmware, one
+    upgraded from the factory image in NAND.
+  capture: captures/news/address.png
+  caption: The Network tab — the BMC's address beside its name, with the same apply-then-confirm as the switch.

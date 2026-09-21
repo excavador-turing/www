@@ -234,6 +234,42 @@ describes it.
 The thing worth carrying away: **nothing you can do from this page survives a
 power cycle unless you confirmed it.**
 
+## The board's own address
+
+Once the modules are on their own network, the next thing people change is
+the BMC's address — and until v2.35.0 that meant SSH and a hand-edited
+`/etc/network/interfaces`, which on this image leaves the board with no
+resolver. Now it is a card on the Network tab, beside the hostname.
+
+**DHCP or Static.** The card shows what the bridge has right now — the lease
+or the fixed address, the gateway, the resolvers — and two pills. Static asks
+for the address with its prefix (`192.168.1.20/24`), the gateway, the
+resolvers and a search domain. The board judges the document as you type:
+a gateway off the subnet, the network or broadcast address, or a prefix with
+no room for a host are refused with a sentence; no gateway and no resolver
+are warnings, because they are legal and usually a mistake — without a
+resolver `pool.ntp.org` never resolves.
+
+**The same rule as the switch: apply, then confirm at the new address.** The
+address is how you reach the page you are changing it from. Apply puts it on
+the bridge and starts a window; this page stops answering here; open it at
+the new address and press *Keep it* within the window, or the board puts
+the old address back by itself. A confirmation from a shell on the board is
+refused — it never used the address, so it proves nothing. `tpi` does the
+same: `tpi network address apply --static 192.168.1.20/24 --gateway
+192.168.1.1 --dns 192.168.1.1`, then `tpi --host 192.168.1.20 network
+address confirm <token>` as a new invocation.
+
+**What it never does is bring the bridge down.** `ifdown br0` would take the
+modules' ports out of the bridge for as long as it was down. The address is
+changed on a bridge that stays up, and udhcpc is stopped or started the way
+the boot path does it. Only a confirmed document is written to
+`/etc/network/interfaces` — as the stanza the image already boots from, so
+nothing new runs at boot.
+
+**One change at a time.** A switch layout waiting to be confirmed and an
+address change are two windows; the card says so when the other is pending.
+
 ## What this does not cover
 
 **The BMC's own port is untagged only.** Giving the board's Linux a tagged
