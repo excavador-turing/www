@@ -7,15 +7,15 @@ hide:
 
 <div class="tp-hero-band" markdown>
 <span class="tp-eyebrow">Roadmap</span>
-# 6 things planned. Your vote orders them.
+# 7 things planned. Your vote orders them.
 
 <p>Every card is a GitHub Discussion. Upvote the ones you want and this page reorders itself: the votes are read every hour, so a vote cast now is on the page within one. Not on the list? <a href="https://github.com/excavador-turing/BMC-Firmware/discussions/new?category=ideas">Propose it</a> — a sentence about the problem is enough.</p>
 </div>
 
 <div class="tp-proof">
-<div><b>6</b><span>planned, ordered by votes</span></div>
-<div><b>15</b><span>votes cast, read hourly</span></div>
-<div><b>1</b><span>shipped from this list</span></div>
+<div><b>7</b><span>planned, ordered by votes</span></div>
+<div><b>17</b><span>votes cast, read hourly</span></div>
+<div><b>2</b><span>shipped from this list</span></div>
 </div>
 
 <div class="tp-ideas">
@@ -25,6 +25,7 @@ hide:
 <a class="tp-idea tp-idea--started" href="https://github.com/excavador-turing/BMC-Firmware/discussions/22"><b class="tp-idea__votes">1<small>vote</small></b><span class="tp-idea__title">OpenTelemetry: traces, logs and metrics over OTLP, opt-in</span><span class="tp-idea__what">The board already exposes Prometheus metrics on their own credential-free listener, which is the right thing when the cluster is down.</span><span class="tp-idea__status">Designed, not started</span></a>
 <a class="tp-idea tp-idea--started" href="https://github.com/excavador-turing/BMC-Firmware/discussions/23"><b class="tp-idea__votes">1<small>vote</small></b><span class="tp-idea__title">SD card: checksums computed on the board, upload, rename and move</span><span class="tp-idea__what">The interface can now list what is on the card and say which files can be written to a module (v3.25.0).</span><span class="tp-idea__status">Listing shipped in v3.25.0; the rest is open</span></a>
 <a class="tp-idea tp-idea--open" href="https://github.com/excavador-turing/BMC-Firmware/discussions/26"><b class="tp-idea__votes">1<small>vote</small></b><span class="tp-idea__title">Choose the self-signed certificate&#x27;s key type and validity</span><span class="tp-idea__what">When no operator certificate is installed the board issues its own: EC P-384, real names, 825 days, renewed 30 days out.</span><span class="tp-idea__status">Open</span></a>
+<a class="tp-idea tp-idea--open" href="https://github.com/excavador-turing/BMC-Firmware/discussions/46"><b class="tp-idea__votes">1<small>vote</small></b><span class="tp-idea__title">ACME against a private CA, so the certificate renews itself</span><span class="tp-idea__what">ACME is a protocol, not a company.</span><span class="tp-idea__status">Open</span></a>
 </div>
 
 Something broken rather than missing? [Report it](feedback.md), and read [what is and isn't fixed](reference/known-faults.md) first, because it may already be there with a ticket.
@@ -33,7 +34,8 @@ Something broken rather than missing? [Report it](feedback.md), and read [what i
 
 Voted for, built, released. Each card still opens its discussion.
 <div class="tp-ideas tp-ideas--done">
-<a class="tp-idea tp-idea--shipped" href="https://github.com/excavador-turing/BMC-Firmware/discussions/25"><b class="tp-idea__votes">5<small>votes</small></b><span class="tp-idea__title">VLANs on the board&#x27;s switch, with apply-then-confirm</span><span class="tp-idea__what">VLAN filtering and STP on the RTL8370MB-CG, first in the daemon, then in the interface.</span><span class="tp-idea__status">Shipped in v2.33.0</span></a>
+<a class="tp-idea tp-idea--shipped" href="https://github.com/excavador-turing/BMC-Firmware/discussions/25"><b class="tp-idea__votes">5<small>votes</small></b><span class="tp-idea__title">VLANs on the board&#x27;s switch, with apply-then-confirm</span><span class="tp-idea__what">**VLANs on the board&#x27;s switch — shipped in firmware v2.33.0, with three ways to use them**</span><span class="tp-idea__status">Shipped in v2.33.0</span></a>
+<a class="tp-idea tp-idea--shipped" href="https://github.com/excavador-turing/BMC-Firmware/discussions/45"><b class="tp-idea__votes">1<small>vote</small></b><span class="tp-idea__title">Install a certificate from your own CA</span><span class="tp-idea__what">If you run a private certificate authority — step-ca, your router&#x27;s, your own — you can already trust its root in your browser and get a green padlock on anything it issues.</span><span class="tp-idea__status">Shipped in v2.33.0</span></a>
 </div>
 
 ## Recently shipped

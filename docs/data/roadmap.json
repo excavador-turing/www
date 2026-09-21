@@ -7,8 +7,8 @@
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/25",
    "votes": 5,
    "status": "Shipped in v2.33.0",
-   "status_from": "fallback",
-   "summary": "VLAN filtering and STP on the RTL8370MB-CG, first in the daemon, then in the interface."
+   "status_from": "discussion",
+   "summary": "**VLANs on the board's switch \u2014 shipped in firmware v2.33.0, with three ways to use them**"
   },
   {
    "number": 24,
@@ -43,7 +43,7 @@
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/22",
    "votes": 1,
    "status": "Designed, not started",
-   "status_from": "fallback",
+   "status_from": "discussion",
    "summary": "The board already exposes Prometheus metrics on their own credential-free listener, which is the right thing when the cluster is down."
   },
   {
@@ -52,7 +52,7 @@
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/23",
    "votes": 1,
    "status": "Listing shipped in v3.25.0; the rest is open",
-   "status_from": "fallback",
+   "status_from": "discussion",
    "summary": "The interface can now list what is on the card and say which files can be written to a module (v3.25.0)."
   },
   {
@@ -61,8 +61,26 @@
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/26",
    "votes": 1,
    "status": "Open",
-   "status_from": "default",
+   "status_from": "discussion",
    "summary": "When no operator certificate is installed the board issues its own: EC P-384, real names, 825 days, renewed 30 days out."
+  },
+  {
+   "number": 45,
+   "title": "Install a certificate from your own CA",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/45",
+   "votes": 1,
+   "status": "Shipped in v2.33.0",
+   "status_from": "discussion",
+   "summary": "If you run a private certificate authority \u2014 step-ca, your router's, your own \u2014 you can already trust its root in your browser and get a green padlock on anything it issues."
+  },
+  {
+   "number": 46,
+   "title": "ACME against a private CA, so the certificate renews itself",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/46",
+   "votes": 1,
+   "status": "Open",
+   "status_from": "discussion",
+   "summary": "ACME is a protocol, not a company."
   }
  ]
 }
