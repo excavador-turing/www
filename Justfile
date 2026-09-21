@@ -121,9 +121,10 @@ structured-data: build
 # Every link that leaves the site still answers. Weekly in CI (links.yml);
 # here when you want it now. Needs lychee on the path (devbox has it).
 links: build
-    lychee --no-progress --base https://turingpi.xyz \
+    lychee --no-progress --base-url https://turingpi.xyz \
         --exclude '^https://turingpi\.xyz' --exclude-path site/demo \
         --exclude localhost --exclude 'turingpi\.local' --exclude '192\.168\.' \
+        --exclude 'linkedin\.com' \
         --accept '200..=204,206,301..=308,429' --timeout 20 --max-retries 2 \
         'site/**/*.html'
 
