@@ -19,8 +19,10 @@
     What has actually been run, rather than upstream's compatibility list:
     **v2.5.2** on the two boards this fork is developed against, across the
     upgrades [their own counters record](../reference/gate-history.md); and
-    **v2.4** by one reader, reported on 2026-09-16, who installed from the SD
-    image below and found no crash and no bug. Two boards and one report is
+    **v2.4** by two readers: one on 2026-09-16, who installed from the SD
+    image below and found no crash and no bug; one on 2026-09-21, who went
+    from the factory 2024.05.1 image to v2.34.0 in NAND by uploading the
+    `.tpu` and then set up the Split layout. Two boards and two reports is
     not a test matrix, and this page will not pretend otherwise.
 - The BMC reachable over the network
 - Its root password
