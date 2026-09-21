@@ -740,3 +740,13 @@ body.tp-demo-open .md-footer { display: none; }
    hero-band figure rule above would set it wider than the card. */
 .md-main:has(.tp-hero-band) .md-post--excerpt .md-typeset figure.tp-post-figure { width: 100%; max-width: 100%; margin: 0.2rem 0 0.9rem; }
 .md-main:has(.tp-hero-band) .md-post--excerpt figure.tp-post-figure img { box-shadow: none; }
+
+/* The news index on a wide screen: two columns of posts. One 740px column
+   beside 900px of nothing was the first version. The hero and the page
+   numbers span both; the cards start under the hero. */
+@media screen and (min-width: 76.25em) {
+  .md-main:has(.md-post--excerpt) .md-content__inner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.2rem; align-items: start; }
+  .md-main:has(.md-post--excerpt) .md-content__inner > header,
+  .md-main:has(.md-post--excerpt) .md-content__inner > .md-pagination { grid-column: 1 / -1; }
+  .md-main:has(.tp-hero-band) .md-content__inner > .md-post { max-width: none; }
+}
