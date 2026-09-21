@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-UI release and what changed in it: 33 entries, newest v3.34.1, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-UI release and what changed in it: 34 entries, newest v3.35.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,31 @@ hide:
 
 The web interface the board serves.
 
-Newest release **v3.34.1**, 21 September 2026. 33 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v3.35.0**, 21 September 2026. 34 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "v3.34.1 — 21 September 2026"
+???+ note "v3.35.0 — 21 September 2026"
+
+    **Added**
+
+    - **The demo can be *used*, not only read, on the one card whose subject is
+      time passing.** Every write in the demo is refused -- a captured board
+      cannot be changed -- and for the address card that made the feature
+      unshowable: apply, a window running, a confirmation that must arrive over
+      the new address, and the old address coming back by itself are a sequence,
+      and a fixture can only hold one frozen frame of it. The demo now answers
+      `validate`, `PUT`, `confirm` and `revert` from a state machine it keeps in
+      memory (`src/demo/address.ts`), so a reader can apply an address, watch the
+      countdown, keep it -- or say nothing and watch the board put the old one
+      back.
+
+      **The card is unchanged.** The interface still keeps no copy of the
+      daemon's rules: the new file is the demo's stand-in for the *board*, the
+      thing on the other side of the wire, and it exists only under
+      `VITE_DEMO=1`. Its refusals and warnings are `address_document.rs`'s own
+      words, so what the demo says is what a board would say. Nothing persists; a
+      reload starts again from the captured fixture.
+
+??? note "v3.34.1 — 21 September 2026"
 
     **Fixed**
 

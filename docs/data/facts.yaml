@@ -3,7 +3,7 @@
 # Every number this site quotes about itself, with where it came
 # from. Pages read it through the macros plugin: {{ gate.updates }},
 # never 26. scripts/facts-lint.py fails a build that types one.
-generated: 2026-09-22
+generated: 2026-09-21
 gate:
   source: "reference/gate-history.md, written by `just refresh-gate-history <board>` from the board's own bmcd_firmware_promotion_total counter"
   as_of: 2026-09-12
@@ -20,12 +20,12 @@ releases:
     newest: 2.38.0
     count: 40
   ui:
-    newest: v3.34.1
-    count: 33
+    newest: v3.35.0
+    count: 34
   tpi:
     newest: v1.10.0
     count: 15
-  total: 120
+  total: 121
 features:
   source: docs/features/*.md -- a feature is a page
   count: 11
