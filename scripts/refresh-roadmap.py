@@ -265,11 +265,15 @@ def recent(n: int = 5) -> str:
     if not page.exists():
         return "_Run `just refresh-changelog` first._"
     rows = re.findall(r'^\?\?\?\+? note "([^"]+)"', page.read_text(), re.M)
+    # A release covered by another's post links to that post.
+    posts_map = ROOT / "docs" / "data" / "news-posts.json"
+    slug_of = json.loads(posts_map.read_text()) if posts_map.exists() else {}
     out = ['<div class="tp-releases">']
     for row in rows[:n]:
         ver, _, when = row.partition(" — ")
         when = when.replace(" (not released)", "").replace(" (pre-release)", "")
-        out.append(f'<a href="news/{html.escape(ver)}/"><b>{html.escape(ver)}'
+        slug = slug_of.get(ver, ver)
+        out.append(f'<a href="news/{html.escape(slug)}/"><b>{html.escape(ver)}'
                    f"</b><span>{html.escape(when)}</span></a>")
     out.append("</div>")
     return "\n".join(out)

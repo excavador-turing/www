@@ -20,15 +20,19 @@ v2.33.0:
   capture: captures/news/switch.png
   caption: The Network tab — the switch as a table, a preset to start from, and Apply beside Try it, which undoes itself.
 
+# One post for two releases a day apart: the second only carries the
+# picker to the board, and on its own it would have been a post about
+# four buttons.
 v2.34.0:
-  title: Pick a module with one click
+  covers: [v2.33.0]
+  title: The switch gets VLANs, the board asks for a password, and a module is one click
   summary: >-
-    Console, USB and Flash each asked which module with a drop-down that
-    unfolded to show four fixed entries. They now show the four side by side,
-    the chosen one green — on the board and in the fleet, which render the
-    same components.
-  capture: captures/news/console-picker.png
-  caption: The Console tab — Node 1 to 4 as pills, where a drop-down used to be.
+    VLANs on the board's own switch, tried before they are kept; a certificate
+    endpoint; a board still on the factory password now insists you change it
+    before it will do anything else; and Console, USB and Flash pick a module
+    with one click instead of a drop-down.
+  capture: captures/news/switch.png
+  caption: The Network tab — the switch as a table, a preset to start from, and Apply beside Try it, which undoes itself.
 
 # Older releases, with the captures the site already had. Each picture is the
 # tab the release changed, captured off a board at the time; captions say

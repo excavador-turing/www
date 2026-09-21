@@ -5,10 +5,10 @@
   <link href="https://turingpi.xyz/feed.xml" rel="self"/>
   <link href="https://turingpi.xyz/news/"/>
   <id>https://turingpi.xyz/feed.xml</id>
-  <updated>2026-09-20T00:00:00Z</updated>
+  <updated>2026-09-21T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
-    <title>Firmware v2.34.0: Pick a module with one click</title>
+    <title>Firmware v2.34.0: The switch gets VLANs, the board asks for a password, and a module is one click</title>
     <link href="https://turingpi.xyz/news/v2.34.0/"/>
     <id>tag:turingpi.xyz,2026-09-21:firmware/2.34.0</id>
     <updated>2026-09-21T00:00:00Z</updated>
@@ -24,7 +24,7 @@
   </entry>
   <entry>
     <title>Firmware v2.33.0: The board's switch gets VLANs, and the board asks for a password</title>
-    <link href="https://turingpi.xyz/news/v2.33.0/"/>
+    <link href="https://turingpi.xyz/news/v2.34.0/"/>
     <id>tag:turingpi.xyz,2026-09-20:firmware/2.33.0</id>
     <updated>2026-09-20T00:00:00Z</updated>
     <content type="text">Pins **bmcd 2.37.0**, **BMC-UI 3.30.0** and **tpi 1.9.0** — the first release
