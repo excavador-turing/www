@@ -45,6 +45,7 @@ feature:
       href: ../pick-a-version/
       text: Pick a version, from anywhere
       note: Where the image the gate judges comes from.
+description: "A new BMC image boots on trial and is kept only when the board answers properly afterwards, so a bad flash undoes itself without a trip to the rack."
 ---
 
 {{ feature_screen() }}

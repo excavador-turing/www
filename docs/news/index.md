@@ -3,6 +3,7 @@ title: News
 hide:
   - navigation
   - toc
+description: "What shipped in each Turing Pi 2 BMC firmware release and what it changed for the person using the board, newest first, with the interface pictured."
 ---
 
 <div class="tp-hero-band" markdown>

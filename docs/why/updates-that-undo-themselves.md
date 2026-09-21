@@ -1,5 +1,6 @@
 ---
 title: Updates that undo themselves
+description: "Why a new image boots on trial, what promoting on boot alone cost upstream's users, and what the gate has recorded since."
 ---
 
 # Updates that undo themselves

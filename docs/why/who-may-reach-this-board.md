@@ -1,5 +1,6 @@
 ---
 title: Who may reach this board
+description: "Why the password and the trusted proxy are both shown on the page that asks for one, and what a hidden default costs."
 ---
 
 # Who may reach this board

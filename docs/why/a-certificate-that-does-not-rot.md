@@ -1,5 +1,6 @@
 ---
 title: A certificate that does not rot
+description: "Why the BMC issues and renews its own certificate, what upstream's did instead, and the measurements behind both."
 ---
 
 # A certificate that does not rot

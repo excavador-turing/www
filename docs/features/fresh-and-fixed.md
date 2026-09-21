@@ -45,6 +45,7 @@ feature:
       href: ../pick-a-version/
       text: Pick a version, from anywhere
       note: Why upstream's two catalogues disagree by a release.
+description: "A longterm kernel and a supported Buildroot under the Turing Pi 2 BMC, with named faults from the stock firmware taken out."
 ---
 
 {{ feature_screen() }}

@@ -1,4 +1,5 @@
 ---
+description: "Every bmcd release and what changed in it: 40 entries, newest 2.38.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---

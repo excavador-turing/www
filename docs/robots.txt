@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# The two demo panes are application shells loaded in a frame by the front
+# page, not pages. Their text is one board's captured data.
+Disallow: /demo/fork/
+Disallow: /demo/stock/
+
+# Every page, with when it last changed.
+Sitemap: https://turingpi.xyz/sitemap.xml

@@ -1,4 +1,5 @@
 ---
+description: "Every BMC-Firmware release and what changed in it: 32 entries, newest v2.35.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---

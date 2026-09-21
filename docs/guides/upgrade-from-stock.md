@@ -1,3 +1,7 @@
+---
+description: "Move a Turing Pi 2 from the stock firmware to this fork, what changes on the board, and why the stock updater would downgrade you afterwards."
+---
+
 # Upgrading from stock firmware
 
 What changes on your board, what it costs, and how to go back.

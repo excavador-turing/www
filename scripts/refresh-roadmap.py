@@ -177,9 +177,13 @@ def render(items: list[dict], as_of: str) -> str:
     total = sum(i["votes"] for i in items)
     when = dt.date.fromisoformat(as_of).strftime("%-d %B %Y")
     propose = f"https://github.com/{ORG}/{REPO}/discussions/new?category=ideas"
+    desc = (f"What is planned for the Turing Pi 2 BMC firmware and what has "
+            f"shipped: {len(planned)} open ideas ordered by your vote, "
+            f"proposed and voted on in GitHub Discussions.")
     lines = [
         "---",
         "title: Roadmap",
+        f"description: {json.dumps(desc)}",
         "hide:",
         "  - navigation",
         "  - toc",

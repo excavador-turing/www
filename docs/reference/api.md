@@ -1,3 +1,7 @@
+---
+description: "The Turing Pi 2 BMC HTTP API: how to authenticate, the two spellings a board answers, and where the generated operation reference lives."
+---
+
 # The API
 
 The BMC serves an HTTP API, and this is its description. It is not written by

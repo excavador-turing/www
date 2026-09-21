@@ -3,6 +3,7 @@ hide:
   - navigation
   - toc
 render_macros: true
+description: "Why this fork of the Turing Pi 2 BMC firmware exists: what upstream shipped, what it left broken on real hardware, and what runs instead."
 ---
 
 <div class="tp-hero-band tp-one-screen" markdown>

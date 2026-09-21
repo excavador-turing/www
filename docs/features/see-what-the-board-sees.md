@@ -45,6 +45,7 @@ feature:
       href: ../the-board-describes-itself/
       text: The board describes its own API
       note: Where the readings on this page come from.
+description: "The Turing Pi 2 board temperature, the fan step and the trip that explains it, plus every reading the stock firmware never described."
 ---
 
 {{ feature_screen() }}

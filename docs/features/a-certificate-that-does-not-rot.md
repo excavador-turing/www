@@ -45,6 +45,7 @@ feature:
       href: ../who-may-reach-this-board/
       text: Who may reach this board
       note: The other half of the board's access story.
+description: "The BMC issues its own HTTPS certificate with a name your browser accepts, renews it before it expires, and never overwrites one you installed."
 ---
 
 {{ feature_screen() }}

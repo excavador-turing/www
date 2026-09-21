@@ -1,3 +1,7 @@
+---
+description: "Install this firmware on your own Turing Pi 2: which file to take, flashing over the network or from the SD card, and what to check afterwards."
+---
+
 # Installing on your own board
 
 !!! danger "Read this part"

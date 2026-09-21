@@ -4,6 +4,8 @@ hide:
   - toc
 search:
   exclude: true
+description: "The BMC interface running in your browser on a real board's captured data, so you can click through every tab before you flash anything."
+robots: "noindex, follow"
 ---
 
 # Try it

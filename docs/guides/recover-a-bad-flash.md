@@ -1,3 +1,7 @@
+---
+description: "Get a Turing Pi 2 BMC back after a bad firmware flash: what the board undoes by itself, and the recovery paths for when it cannot."
+---
+
 # Recover a bad flash
 
 What to do when a firmware update goes wrong, in the order the board itself

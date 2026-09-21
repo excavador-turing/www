@@ -46,6 +46,7 @@ feature:
       href: ../a-certificate-that-does-not-rot/
       text: A certificate that does not rot
       note: The certificate the board serves on that connection.
+description: "The BMC password and the trusted proxy that may speak for a user, both readable and both changeable from the page that asks you for one."
 ---
 
 {{ feature_screen() }}

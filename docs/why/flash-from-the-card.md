@@ -1,5 +1,6 @@
 ---
 title: Flash a module from the card
+description: "Why the board decides which SD-card files can be written to a module, and what the two flash bugs behind this were."
 ---
 
 # Flash a module from the card

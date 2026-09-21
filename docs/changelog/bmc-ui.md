@@ -1,4 +1,5 @@
 ---
+description: "Every BMC-UI release and what changed in it: 33 entries, newest v3.34.1, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---

@@ -59,6 +59,50 @@ RELEASE = re.compile(
     r"^##\s*\[(?P<ver>[^\]]+)\]\s*(?:[—–-]\s*(?P<date>\d{4}-\d{2}-\d{2}))?\s*$",
     re.M)
 
+# A page's own `<meta name="description">`.
+#
+# Without one, Material repeats `site_description` on every page, so all 91
+# said "A fork of the Turing Pi 2 BMC firmware, and what it changes" -- which
+# is then what a search result, a link preview and an AI summary of any page
+# say. These pages are generated, so their description is generated too: the
+# text is already there, it only has to survive the trip into an attribute.
+#
+# 160 characters because that is roughly where a result snippet is cut; longer
+# is not wrong, it is just not read. `scripts/description-lint.py` holds every
+# page to the same rule.
+DESC_LIMIT = 160
+
+# Below this a description is a label: it says nothing the title did not.
+# `scripts/description-lint.py` holds the same floor.
+DESC_FLOOR = 40
+
+
+def meta_description(text: str, fallback: str = "") -> str:
+    """One plain sentence, no markdown, short enough to be shown whole."""
+    s = re.sub(r"<[^>]+>", " ", text or "")
+    s = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", s)   # a link keeps its words
+    # Asterisks and backticks only. An underscore is markdown emphasis about
+    # once in these changelogs and part of an identifier the rest of the time
+    # -- stripping it turned bmcd_firmware_last_promotion_timestamp_seconds
+    # into one unreadable word.
+    s = re.sub(r"[*`]+", "", s)
+    s = s.replace("--", "\u2014")
+    s = " ".join(s.split())
+    # A lead lifted out of a sentence can leave its separator stranded.
+    s = re.sub(r"\s*[:;,]\s*\.", ".", s)
+    s = re.sub(r"[:;,]$", ".", s)
+    if not s:
+        s = " ".join((fallback or "").split())
+    if len(s) <= DESC_LIMIT:
+        return s
+    cut = s[:DESC_LIMIT]
+    # Prefer ending where a sentence ends; otherwise end on a whole word.
+    stop = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
+    if stop > DESC_LIMIT // 2:
+        return cut[:stop + 1].strip()
+    return cut[:cut.rfind(" ")].rstrip(",;:\u2014-") + "\u2026"
+
+
 # Keep a Changelog's categories -- Added, Changed, Fixed, Removed -- are H3
 # in the source. Demoting them put an H5 inside a collapsed block, which
 # Material renders smaller than the body text under it, and which would put
@@ -186,7 +230,12 @@ def render(slug: str, repo: str, blurb: str) -> dict:
     # No table of contents: the page is a list of collapsed releases, and the
     # only headings it has are the ones inside a release body -- so the
     # contents read "Note, Confirmed" and named nothing a reader wanted.
-    lines = ["---", "hide:", "  - toc", "---", "",
+    newest_ver = newest["version"] if newest else ""
+    desc = (f"Every {repo} release and what changed in it: {len(shipped)} "
+            f"entries" + (f", newest {newest_ver}" if newest_ver else "") +
+            ", taken from the repository's own CHANGELOG.md.")
+    lines = ["---", f"description: {json.dumps(meta_description(desc))}",
+             "hide:", "  - toc", "---", "",
              f"# {repo}", "", blurb, ""]
     if newest:
         lines += [
@@ -266,6 +315,9 @@ def write_index(summary: list[dict]) -> pathlib.Path:
     idx = [
         "---",
         "title: Changelogs",
+        "description: \"What changed in every release of the firmware, the "
+        "daemon, the interface and the command line, from each repository's "
+        "own CHANGELOG.md.\"",
         "hide:",
         "  - toc",
         "---",
@@ -386,6 +438,13 @@ def split_item(text: str) -> tuple[str, str, str]:
         parts = re.split(r"(?<=[.!?])\s+", text.strip(), maxsplit=1)
         lead, body = parts[0].rstrip("."), (parts[1] if len(parts) > 1 else "")
     body = re.sub(r"\s*\n\s*", " ", body)
+    # A lead the sentence runs straight out of -- "**bmcd v2.19.0 -> v2.23.0**,
+    # four releases:" -- left the comma behind when the lead was lifted out,
+    # and the item rendered as "**bmcd v2.19.0 -> v2.23.0.** , four releases:".
+    # Two posts carried that on the live site; the description made it
+    # impossible to ignore, because a result snippet cannot hide it behind a
+    # bullet.
+    body = body.lstrip(",;: ")
     # "**A Certificates section in the README**: what the board issues..."
     # -- the lead ends in a colon and the sentence continues in lower case,
     # which reads fine inline and wrong under a heading.
@@ -509,9 +568,6 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
             title += " (pre-release)"
         elif not rel:
             title += " (not released)"
-        lines = ["---", f"title: {json.dumps(title)}", f"date: {when}",
-                 f"slug: {e['version']}", "---", ""]
-
         raw = e["body"] or ""
         parsed = e["source"] == "changelog"
         notes, cats = parse_entry(raw) if parsed else ([raw], {})
@@ -519,16 +575,43 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         # No lede: the entry opens with a label and a list. The first item's
         # lead is what the release did, so it is the summary rather than a
         # bare version number.
-        first_lead = ""
+        first_lead, first_item = "", ""
         for cat in cats:                  # in the entry's own order
             for it in cats.get(cat, []):
                 if "text" in it:
-                    first_lead = split_item(it["text"])[0] + "."
+                    lead, short, _ = split_item(it["text"])
+                    first_lead = lead + "."
+                    first_item = f"{lead}. {short}".strip()
                     break
             if first_lead:
                 break
         summary_text = (meta.get("summary") or lede or first_lead
                         or f"Firmware {e['version']}.")
+
+        # The front matter is written here, after the summary exists, because
+        # the description IS the summary -- the post's own first sentence,
+        # not the site's tagline. `image` is what a link preview shows, so a
+        # post with a capture unfurls as that capture in a chat window.
+        # Some early entries open with nothing but the pins they moved
+        # ("bmcd v2.19.0 -> v2.23.0."), which is a fine first line above a
+        # list and a useless result snippet. When the summary is that thin,
+        # the first item's lead -- what the release actually did -- is added
+        # behind it. The post's visible summary is left alone; only the
+        # description grows.
+        desc_source = summary_text
+        if len(meta_description(desc_source)) < DESC_FLOOR and first_item:
+            # The entry opens with nothing but the pins it moved -- fine as a
+            # first line above a list, useless as a result snippet. The first
+            # item carries the same lead AND the sentence that says what the
+            # release did, so it replaces the summary here. Only the
+            # description changes; the post's visible opening is left alone.
+            desc_source = first_item
+        lines = ["---", f"title: {json.dumps(title)}", f"date: {when}",
+                 f"slug: {e['version']}",
+                 f"description: {json.dumps(meta_description(desc_source, title))}"]
+        if meta.get("capture"):
+            lines.append(f"image: {json.dumps(meta['capture'])}")
+        lines += ["---", ""]
         lines += [summary_text.strip(), ""]
 
         # The picture sits above the fold on purpose: the news index shows
@@ -638,6 +721,24 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
                   "[the roadmap](../../roadmap.md) · "
                   "[follow by feed](../../feed.xml)"]
         p = NEWS / f"{e['bare']}.md"
+        # Last resort for a release whose own entry is a pin list and whose
+        # substance arrives from the components it carries: the first item
+        # heading in the finished body says what shipped. Done here because
+        # the carried entries are only rendered by this point.
+        if len(meta_description(desc_source)) < DESC_FLOOR:
+            body_text = "\n".join(lines)
+            m = re.search(r"^### +(.+?)\s*$\n+(?!\?\?\?|#)(\S.*?)\s*$",
+                          body_text, re.M) or re.search(
+                          r"^### +(.+?)\s*$", body_text, re.M)
+            if m:
+                head = re.sub(r'<small class="tp-tag">.*?</small>', "",
+                              m.group(1)).strip().rstrip(".:")
+                if m.lastindex and m.lastindex > 1:
+                    head = f"{head}: {m.group(2).strip()}"
+                at = next(i for i, l in enumerate(lines)
+                          if l.startswith("description: "))
+                lines[at] = ("description: " + json.dumps(
+                    meta_description(f"{summary_text.strip()} {head}.", title)))
         p.write_text("\n".join(lines).rstrip() + "\n")
         written.append(p)
     # A release that vanished from the changelog takes its post with it.

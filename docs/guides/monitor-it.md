@@ -1,3 +1,7 @@
+---
+description: "Scrape the Turing Pi 2 BMC's own metrics into Prometheus and get a dashboard of temperature, fan, power and update history."
+---
+
 # Monitor it
 
 The board publishes [32 metric families](../reference/metrics.md). This page is

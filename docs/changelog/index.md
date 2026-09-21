@@ -1,5 +1,6 @@
 ---
 title: Changelogs
+description: "What changed in every release of the firmware, the daemon, the interface and the command line, from each repository's own CHANGELOG.md."
 hide:
   - toc
 ---

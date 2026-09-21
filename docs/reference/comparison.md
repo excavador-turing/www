@@ -1,3 +1,7 @@
+---
+description: "What upstream's Turing Pi 2 BMC firmware does and what this fork does instead, set side by side, with where each difference was measured."
+---
+
 # Upstream, and this fork
 
 Every number here was measured on a running board or read from a live server,

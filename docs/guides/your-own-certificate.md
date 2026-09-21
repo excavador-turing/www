@@ -1,6 +1,7 @@
 ---
 title: Your own certificate
 render_macros: true
+description: "Install your own HTTPS certificate on the Turing Pi 2 BMC from the interface, the command line or the API, and what the board will refuse."
 ---
 
 # Your own certificate

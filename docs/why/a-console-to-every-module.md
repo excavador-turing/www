@@ -1,5 +1,6 @@
 ---
 title: A console to every module
+description: "Why a serial console in the browser needs a replayed scrollback, what it costs, and how the fork's console was proved."
 ---
 
 # A console to every module

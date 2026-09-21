@@ -1,3 +1,7 @@
+---
+description: "What this fork has fixed, what is still open, and what upstream never fixed, each entry with where and when it was measured."
+---
+
 # What is and isn't fixed
 
 A fork that lists only what it improved is advertising. This page is the other

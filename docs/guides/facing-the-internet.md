@@ -1,6 +1,7 @@
 ---
 title: Should the board face the internet?
 render_macros: true
+description: "Why a Turing Pi 2 BMC should not face the internet, what an exposed board gives away, and how to reach yours from outside without exposing it."
 ---
 
 # Should the board face the internet?

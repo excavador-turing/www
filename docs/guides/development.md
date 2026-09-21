@@ -1,3 +1,7 @@
+---
+description: "Build this BMC firmware yourself: the container build, the override loop for working on the daemon or the interface, and what to run before a change."
+---
+
 # Developing
 
 Three repositories build one image. This page is the loop between changing a

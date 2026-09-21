@@ -44,6 +44,7 @@ feature:
       href: ../updates-that-undo-themselves/
       text: Updates that undo themselves
       note: What happens if the image you are updating to is bad.
+description: "Update the Turing Pi 2 BMC while the four compute modules stay powered and running, measured across every flash on these boards."
 ---
 
 {{ feature_screen() }}

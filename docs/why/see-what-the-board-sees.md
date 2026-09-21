@@ -1,5 +1,6 @@
 ---
 title: See what the board sees
+description: "Why the board's temperature and fan readings belong together, and what upstream's firmware never described."
 ---
 
 # See what the board sees
