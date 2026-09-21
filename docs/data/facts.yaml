@@ -53,10 +53,10 @@ faults:
 roadmap:
   source: docs/data/roadmap.json, written by `just refresh-roadmap` from the Ideas discussions
   as_of: 2026-09-21
-  count: 9
-  shipped: 0
+  count: 7
+  shipped: 2
   votes: 17
-  top: "VLANs on the board's switch, with apply-then-confirm"
+  top: A hardware watchdog, so a hung daemon does not mean a trip to the rack
 platform:
   source: reference/comparison.md, measured on a running board
   rows: 13

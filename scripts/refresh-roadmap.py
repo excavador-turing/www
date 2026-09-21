@@ -59,8 +59,10 @@ query($owner:String!, $name:String!) {
 }
 """
 
-# `Status: Designed, not started` in the opening post. Anything else is prose.
-STATUS = re.compile(r"^\s*Status:\s*(?P<text>.+?)\s*$", re.M | re.I)
+# `Status: Designed, not started` in the opening post, bare or in backticks
+# -- the posted lines are in backticks, and the first version of this read
+# every one of them as "Open". Anything else is prose.
+STATUS = re.compile(r"^\s*`?Status:\s*(?P<text>.+?)`?\s*$", re.M | re.I)
 
 # `Summary: one line` in the opening post, when the author wants to choose it.
 SUMMARY = re.compile(r"^\s*Summary:\s*(?P<text>.+?)\s*$", re.M | re.I)
