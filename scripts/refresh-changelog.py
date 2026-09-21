@@ -662,6 +662,23 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
                   "entry, taken apart; the whole entry is a click away under "
                   "each one.", ""]
 
+        # A clip, when the editorial entry names one. Below the fold on
+        # purpose: the index shows the still picture, which is also what a
+        # link preview unfurls, and only a reader who opened the post pays
+        # for the video -- `preload="none"` means the poster and nothing
+        # else until they press play. Muted and playsinline because a page
+        # that makes noise at a reader has lost them.
+        if meta.get("video"):
+            vid = meta["video"]
+            poster = meta.get("capture", "")
+            caption = meta.get("video_caption", "")
+            lines += ['<figure class="tp-post-figure" markdown>',
+                      f'<video controls muted playsinline preload="none"'
+                      + (f' poster="../../assets/{poster}"' if poster else "")
+                      + f' src="../../assets/{vid}"></video>',
+                      f"<figcaption>{caption}</figcaption>" if caption else "",
+                      "</figure>", ""]
+
         # Notes that are not the lede -- a blockquote warning, a paragraph
         # about what the release is -- keep their place before the items.
         for n in notes[1:] if lede else notes:
