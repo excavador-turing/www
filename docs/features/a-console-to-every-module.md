@@ -1,6 +1,7 @@
 ---
 title: A console to every module
 render_macros: true
+since: v2.13.0
 hide:
 - navigation
 - toc

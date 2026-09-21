@@ -1,0 +1,75 @@
+# Every link that leaves this site still answers.
+#
+# The site points at upstream's repository and its documentation, at GitHub
+# discussions, at Cloudflare's and Buildroot's docs, and nothing checked any
+# of them. Every other gate here exists because something rotted unnoticed;
+# a dead link is the same failure with a longer fuse, and the reader who
+# meets it is the one who trusted the page.
+#
+# Weekly, not on every pull request: the answer depends on somebody else's
+# server, and a check that goes red because a third party had a bad minute
+# is a check people learn to ignore. Internal links are already the build's
+# business (`mkdocs build --strict`), so they are excluded and only the
+# outside is asked.
+name: Links
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"     # Monday morning, Europe
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+
+      - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: requirements.txt
+
+      - name: build the site, so generated pages and the footer are checked too
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
+          .venv/bin/mkdocs build --strict
+
+      - name: every outside link answers
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          # --base-url turns the built pages' relative links into
+          # turingpi.xyz URLs, and the exclude then drops them: the outside
+          # is the question. The demo panes are somebody else's bundle.
+          # LinkedIn answers 999 to anything that is not a browser, on the
+          # first run and every run; it is the one link checked by hand.
+          args: >-
+            --no-progress
+            --base-url https://turingpi.xyz
+            --exclude '^https://turingpi\.xyz'
+            --exclude-path site/demo
+            --exclude 'localhost'
+            --exclude 'turingpi\.local'
+            --exclude '192\.168\.'
+            --exclude 'linkedin\.com'
+            --accept '200..=204,206,301..=308,429'
+            --timeout 20
+            --max-retries 2
+            --max-concurrency 8
+            'site/**/*.html'
+          fail: true
+          format: markdown
+          output: links.md
+
+      - name: the report, if anything failed
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: links
+          path: links.md
+          if-no-files-found: ignore

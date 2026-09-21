@@ -1,5 +1,6 @@
 ---
 description: "Install this firmware on your own Turing Pi 2: which file to take, flashing over the network or from the SD card, and what to check afterwards."
+render_macros: true
 ---
 
 # Installing on your own board
@@ -18,16 +19,16 @@ description: "Install this firmware on your own Turing Pi 2: which file to take,
 
 ## What you need
 
-- A Turing Pi 2, revision **v2.4, v2.5, v2.5.1 or v2.5.2**.
+- A Turing Pi 2, revision **v2.4, v2.5, v2.5.1 or v2.5.2** — upstream's
+  compatibility list. What has actually been run is the record below: the
+  two boards this fork is developed against, across the upgrades
+  [their own counters record](../reference/gate-history.md), and every
+  report a reader has sent. It is a record, not a test matrix, and this page
+  will not pretend otherwise. Ran it on a board not listed?
+  [Say so](../feedback.md) and it goes in.
 
-    What has actually been run, rather than upstream's compatibility list:
-    **v2.5.2** on the two boards this fork is developed against, across the
-    upgrades [their own counters record](../reference/gate-history.md); and
-    **v2.4** by two readers: one on 2026-09-16, who installed from the SD
-    image below and found no crash and no bug; one on 2026-09-21, who went
-    from the factory 2024.05.1 image to v2.34.0 in NAND by uploading the
-    `.tpu` and then set up the Split layout. Two boards and two reports is
-    not a test matrix, and this page will not pretend otherwise.
+    {{ board_reports() }}
+
 - The BMC reachable over the network
 - Its root password
 

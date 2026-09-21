@@ -1,0 +1,38 @@
+# Every board this firmware is known to have run on, one entry per report.
+#
+# The install guide and the FAQ used to say this in prose, rewritten by hand
+# each time a reader wrote in -- "two readers, one on 2026-09-16, one on
+# 2026-09-21" -- which is the kind of sentence that is true on the day it is
+# typed and wrong by the next Discord thread. This is the record; the pages
+# render it (`board_reports()` in main.py) and `facts.py` counts it.
+#
+# A report says what was actually run, with its date and where it was said.
+# It is not a compatibility list: the revisions upstream claims are on the
+# install page in their own words, marked as upstream's claim and not this
+# fork's proof. Never add a revision here without a board that ran it.
+#
+# Fields: revision, firmware (what was installed), date (ISO), how (the
+# path taken), source (who, and where they said so -- readers are not named
+# unless they asked to be), outcome (one sentence, their words where
+# possible).
+
+- revision: v2.5.2
+  firmware: every release since v2.7.0
+  date: 2026-09-21
+  how: over the network, `.tpu` on the SD card, both boards on every release
+  source: the two boards this fork is developed against (bmc-1, bmc-2)
+  outcome: every update the gate has recorded, on the gate-history page
+
+- revision: v2.4
+  firmware: not recorded
+  date: 2026-09-16
+  how: installed from the SD-card image
+  source: a reader, Turing Pi Discord
+  outcome: no crash and no bug found
+
+- revision: v2.4
+  firmware: v2.34.0
+  date: 2026-09-21
+  how: factory 2024.05.1 image in NAND, updated by uploading the `.tpu`
+  source: a reader, Turing Pi Discord
+  outcome: ran, then set up the Split switch layout; the static-address and clock questions that came out of it are in the v2.35.0 news post

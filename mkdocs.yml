@@ -72,7 +72,7 @@ nav:
           - Command line: reference/cli.md
           - Metrics: reference/metrics.md
           - The API: reference/api.md
-          - Every operation: reference/api/index.md
+          - Every operation: reference/api/operations.md
           - What each release's API had: reference/api-history.md
           - The board: reference/api/board.md
           - The nodes: reference/api/nodes.md

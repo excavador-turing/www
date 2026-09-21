@@ -1,6 +1,7 @@
 ---
 title: The board describes its own API
 render_macros: true
+since: v2.10.0
 hide:
 - navigation
 - toc

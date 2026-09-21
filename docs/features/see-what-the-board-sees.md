@@ -1,6 +1,7 @@
 ---
 title: See what the board sees
 render_macros: true
+since: v2.7.0
 hide:
 - navigation
 - toc

@@ -33,7 +33,7 @@ Both are documented rather than one being pretended away.
 ## Three things are generated from it, not written
 
 **This site's API reference.** Every page under
-[the API reference](../reference/api/index.md) is emitted from the committed
+[the API reference](../reference/api/operations.md) is emitted from the committed
 document by `just refresh-api`. They are never hand-edited — a page saying
 something the board does not do would be the exact failure the document
 exists to prevent.

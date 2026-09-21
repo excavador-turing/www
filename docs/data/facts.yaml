@@ -3,7 +3,7 @@
 # Every number this site quotes about itself, with where it came
 # from. Pages read it through the macros plugin: {{ gate.updates }},
 # never 26. scripts/facts-lint.py fails a build that types one.
-generated: 2026-09-21
+generated: 2026-09-22
 gate:
   source: "reference/gate-history.md, written by `just refresh-gate-history <board>` from the board's own bmcd_firmware_promotion_total counter"
   as_of: 2026-09-12
@@ -41,6 +41,13 @@ features:
     - update-without-touching-your-nodes
     - updates-that-undo-themselves
     - who-may-reach-this-board
+boards:
+  source: docs/data/boards.yaml -- one entry per report, rendered by board_reports()
+  reports: 3
+  from_readers: 2
+  revisions:
+    - v2.4
+    - v2.5.2
 faults:
   source: "reference/known-faults.md, the headings under `## Open`"
   count: 5

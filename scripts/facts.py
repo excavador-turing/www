@@ -42,6 +42,8 @@ import datetime as dt
 import json
 import pathlib
 import re
+
+import yaml
 import subprocess
 import sys
 
@@ -119,6 +121,16 @@ def features() -> dict:
                    if p.stem != "index")
     return {"source": "docs/features/*.md -- a feature is a page",
             "count": len(pages), "pages": pages}
+
+
+def boards() -> dict:
+    """Which board revisions this firmware has been seen running on."""
+    reports = yaml.safe_load((DOCS / "data" / "boards.yaml").read_text()) or []
+    revisions = sorted({str(r.get("revision", "")) for r in reports if r.get("revision")})
+    readers = sum(1 for r in reports if "reader" in str(r.get("source", "")))
+    return {"source": "docs/data/boards.yaml -- one entry per report, rendered by board_reports()",
+            "reports": len(reports), "from_readers": readers,
+            "revisions": revisions}
 
 
 def faults() -> dict:
@@ -244,6 +256,7 @@ def main() -> int:
         "gate": gate(),
         "releases": releases(),
         "features": features(),
+        "boards": boards(),
         "faults": faults(),
         "roadmap": roadmap(),
         "platform": platform(),
@@ -273,6 +286,8 @@ def main() -> int:
           f"(as of {g['as_of']})")
     print(f"  releases: {r['total']} across four components")
     print(f"  features: {f['count']} pages")
+    print(f"  boards: {data['boards']['reports']} reports, "
+          f"revisions {', '.join(data['boards']['revisions'])}")
     print(f"  faults: {data['faults']['count']} open")
     print(f"  roadmap: {data['roadmap']['count']} planned, "
           f"{data['roadmap'].get('votes', 0)} votes")

@@ -57,7 +57,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-chapter__show" markdown>
-![The board's own About tab, naming the firmware, daemon and interface it is running.](assets/captures/about.png)
+![The board's own About tab, naming the firmware, daemon and interface it is running.](assets/captures/about.png){ loading=lazy }
 <figcaption>Read off the board on {{ gate.as_of }}, not counted by hand.</figcaption>
 </figure>
 
@@ -82,7 +82,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-chapter__show" markdown>
-![The four compute modules, powered and counted in uptime, across a BMC upgrade.](assets/captures/nodes.png)
+![The four compute modules, powered and counted in uptime, across a BMC upgrade.](assets/captures/nodes.png){ loading=lazy }
 <figcaption>Every module exactly as it was, uptime unbroken.</figcaption>
 </figure>
 
@@ -107,7 +107,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-chapter__show" markdown>
-![Both boards on one page, each answering for itself.](assets/captures/fleet.png)
+![Both boards on one page, each answering for itself.](assets/captures/fleet.png){ loading=lazy }
 <figcaption>A board that is down costs you its card and nothing else.</figcaption>
 </figure>
 
@@ -132,7 +132,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-chapter__show" markdown>
-![The board's About tab: kernel, daemon, interface and firmware, each a version you can check against a release.](assets/captures/info.png)
+![The board's About tab: kernel, daemon, interface and firmware, each a version you can check against a release.](assets/captures/info.png){ loading=lazy }
 <figcaption>What the board says it is running, every part of it checkable.</figcaption>
 </figure>
 
@@ -172,7 +172,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 <div class="tp-what-grid">
 
 <a class="tp-what" href="https://turingpi.com/" rel="noopener">
-<img src="assets/turing-pi-2-hand.jpg" alt="A hand placing a compute module onto a Turing Pi 2 board that already carries three">
+<img loading="lazy" src="assets/turing-pi-2-hand.jpg" alt="A hand placing a compute module onto a Turing Pi 2 board that already carries three">
 <span class="tp-what__text"><b>What is a Turing Pi?</b><span class="tp-what__body"> A mini-ITX board carrying four compute modules — Raspberry Pi CM4, Turing RK1 or Nvidia Jetson — with their network switch, power, and a small management computer on the board itself. That computer, the BMC, is what this firmware runs on: it powers the modules, flashes them and hands you their consoles. Made by Turing Machines — </span><span class="tp-what__link">turingpi.com →</span></span>
 </a>
 

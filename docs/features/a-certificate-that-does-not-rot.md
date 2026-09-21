@@ -1,6 +1,7 @@
 ---
 title: A certificate that does not rot
 render_macros: true
+since: v2.23.0
 hide:
 - navigation
 - toc

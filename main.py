@@ -118,11 +118,26 @@ def define_env(env):
                 f'{esc(str(p.get("as_of", "")))}.'
                 for p in f.get("proofs", [])) + "</p>"
 
+        # Which firmware first carried this. The site describes the newest
+        # release; a reader on an older board could not tell which of the
+        # eleven features their board has. The tag links to the release's
+        # own post where there is one, else to the firmware changelog.
+        since = str(meta.get("since") or "").strip()
+        since_tag = ""
+        if since:
+            posts = _news_posts()
+            href = (f"../../news/{esc(posts[since])}/" if since in posts
+                    else "../../changelog/firmware/")
+            since_tag = (f'<a class="tp-since" href="{href}">'
+                         f'<small class="tp-tag">in this fork since {esc(since)}'
+                         f'</small></a>')
+
         return f"""
 <section class="tp-feature" data-screen="feature">
 <div class="tp-feature__say">
 <span class="tp-eyebrow">Feature</span>
 <h1>{esc(title)}</h1>
+{since_tag}
 <p class="lede">{esc(f.get("lede", ""))}</p>
 <div class="tp-proof">{proofs}</div>
 {provenance}
@@ -134,6 +149,38 @@ def define_env(env):
 </figure>
 </section>
 """.strip()
+
+    @env.macro
+    def board_reports():
+        """Every board this firmware is known to have run on, as a table.
+
+        From docs/data/boards.yaml, so the install guide and the FAQ stop
+        carrying a hand-typed sentence that is stale by the next report.
+        """
+        esc = html.escape
+        reports = _board_reports()
+        if not reports:
+            return "<p><em>No reports recorded.</em></p>"
+        # Four columns, not six: at laptop width six clipped the last two
+        # behind a scrollbar, which is the worst place for "who said so".
+        # The three facts that are a word each stay columns; the report
+        # itself -- how, outcome, who -- is one cell that may wrap.
+        def report(r):
+            cap = lambda s: s[:1].upper() + s[1:]
+            how = _md_inline(esc(cap(str(r.get("how", "")).rstrip("."))))
+            outcome = esc(cap(str(r.get("outcome", "")).rstrip(".")))
+            who = esc(str(r.get("source", "")))
+            return (f"{how}. {outcome}."
+                    f' <span class="tp-boards__who">{who}</span>')
+        rows = "".join(
+            f"<tr><td><b>{esc(str(r.get('revision', '')))}</b></td>"
+            f"<td>{esc(str(r.get('firmware', '')))}</td>"
+            f"<td>{esc(str(r.get('date', '')))}</td>"
+            f"<td>{report(r)}</td></tr>"
+            for r in reports)
+        return ('<table class="tp-boards"><thead><tr><th>Revision</th>'
+                '<th>Firmware</th><th>Date</th><th>Report</th></tr></thead>'
+                '<tbody>' + rows + '</tbody></table>')
 
     @env.macro
     def comparison_table():
@@ -314,3 +361,14 @@ def _faq_entities(path: pathlib.Path) -> list[dict]:
             a = a[:FAQ_ANSWER_CAP].rsplit(" ", 1)[0] + "\u2026"
         out.append({"q": question, "a": a})
     return out
+
+
+def _news_posts() -> dict:
+    """version -> post slug, as refresh-changelog.py writes it."""
+    p = ROOT / "docs" / "data" / "news-posts.json"
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
+def _board_reports() -> list[dict]:
+    p = ROOT / "docs" / "data" / "boards.yaml"
+    return yaml.safe_load(p.read_text()) or [] if p.exists() else []

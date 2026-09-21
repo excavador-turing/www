@@ -26,7 +26,7 @@ your board is; the references are there when a guide sends you to one.
 <div markdown>
 ## Reference
 
-- **[The API](../reference/api.md)** — OpenAPI 3.1, served by the board; [every operation](../reference/api/index.md) on one page
+- **[The API](../reference/api.md)** — OpenAPI 3.1, served by the board; [every operation](../reference/api/operations.md) on one page
 - **[Command line](../reference/cli.md)** — `tpi`, which reaches every endpoint above
 - **[Metrics](../reference/metrics.md)** — every family the board exposes
 - **[Upstream vs this fork](../reference/comparison.md)** — row by row, with evidence, including where upstream is ahead

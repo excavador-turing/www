@@ -621,7 +621,9 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
             cap = meta["capture"]
             caption = meta.get("caption", "")
             lines += ['<figure class="tp-post-figure" markdown>',
-                      f"![{caption}](../../assets/{cap})",
+                      # Lazy: on the index this figure is one of ten, and the
+                      # browser fetches the ones near the viewport first.
+                      f"![{caption}](../../assets/{cap}){{ loading=lazy }}",
                       f"<figcaption>{caption}</figcaption>" if caption else "",
                       "</figure>", ""]
         lines += ["<!-- more -->", ""]

@@ -23,6 +23,7 @@ the four roles pointing at four different places, and that the capture exists.
 """
 from __future__ import annotations
 
+import json
 import pathlib
 import re
 import sys
@@ -88,6 +89,10 @@ def check_argument(path: pathlib.Path, feature: pathlib.Path, bad) -> None:
         here("its next block does not link back to the feature page")
 
 
+POSTS_FILE = ROOT / "docs" / "data" / "news-posts.json"
+POSTS = json.loads(POSTS_FILE.read_text()) if POSTS_FILE.exists() else {}
+
+
 def main() -> int:
     pages = sorted(p for p in FEATURES.glob("*.md") if p.stem != "index")
     problems: list[str] = []
@@ -115,6 +120,18 @@ def main() -> int:
         s = len((f.get("summary") or "").split())
         if not 1 <= s <= SUMMARY_MAX:
             bad(page, f"index summary is {s} words, wanted 1-{SUMMARY_MAX}")
+
+        # The release that first carried it. Checked against the posts the
+        # news generator wrote, so a typo cannot claim a release that never
+        # existed -- "never claim what a release does not carry" is the
+        # site's oldest rule.
+        since = str(meta.get("since") or "").strip()
+        if not since:
+            bad(page, "no `since:` in the front matter; say which firmware "
+                      "release first carried this")
+        elif since not in POSTS:
+            bad(page, f"`since: {since}` names no firmware release the news "
+                      f"knows of")
 
         order = f.get("order")
         if order is None:

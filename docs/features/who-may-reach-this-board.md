@@ -1,6 +1,7 @@
 ---
 title: Who may reach this board
 render_macros: true
+since: v2.28.0
 hide:
 - navigation
 - toc

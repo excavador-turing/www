@@ -1,6 +1,7 @@
 ---
 title: Updates that undo themselves
 render_macros: true
+since: v2.7.0
 hide:
 - navigation
 - toc

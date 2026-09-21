@@ -1,6 +1,7 @@
 ---
 title: Update the BMC without touching your nodes
 render_macros: true
+since: v2.7.0
 hide:
 - navigation
 - toc
