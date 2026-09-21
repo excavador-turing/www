@@ -162,7 +162,14 @@ def define_env(env):
         text = re.sub(r"^(Added|Changed|Fixed|Removed|Deprecated|Security)"
                       r"\s*[-*]\s*", "", text)
         first = re.split(r"(?<=[.!?])\s+", text)[0]
-        ver = html.escape(str(meta.get("title", "")).replace("Firmware ", ""))
+        # The version is the post's slug. Its title is editorial when someone
+        # wrote one -- the day this read the version out of the title, the
+        # front page said "Firmware The switch gets VLANs..." -- and an
+        # editorial title is the better sentence, so it wins over the lede.
+        ver = html.escape(str(meta.get("slug", path.stem)))
+        title = str(meta.get("title", ""))
+        if title and not title.startswith("Firmware "):
+            return f"Firmware <b>{ver}</b>: {html.escape(title.rstrip('.'))}."
         if first.startswith("Pins "):
             return f"Firmware <b>{ver}</b> pins {html.escape(first[5:])}"
         return f"Firmware <b>{ver}</b>: {html.escape(first)}"
