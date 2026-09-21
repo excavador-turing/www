@@ -383,7 +383,7 @@ def split_item(text: str) -> tuple[str, str, str]:
     if m:
         lead, body = m.group("lead").strip().rstrip(".:"), text[m.end():].strip()
     else:
-        parts = re.split(r"(?<=[.!?])\s+", text.strip(), 1)
+        parts = re.split(r"(?<=[.!?])\s+", text.strip(), maxsplit=1)
         lead, body = parts[0].rstrip("."), (parts[1] if len(parts) > 1 else "")
     body = re.sub(r"\s*\n\s*", " ", body)
     # "**A Certificates section in the README**: what the board issues..."
@@ -483,15 +483,28 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
     fw = next(s for s in summary if s["slug"] == "firmware")
     by_repo = {s["repo"]: {e["bare"]: e for e in s["entries"]} for s in summary}
     ed = editorial()
+    # `covers: [v2.33.0]` on v2.34.0: one post for both, two releases a day
+    # apart being one piece of news. The covered release gets no post of its
+    # own; everything that linked to it follows the map written at the end.
+    covered_by = {c: v for v, m in ed.items() for c in (m.get("covers") or [])}
+    by_version = {e["version"]: e for e in fw["entries"]}
     NEWS.mkdir(parents=True, exist_ok=True)
     written = []
+    slug_of: dict[str, str] = {}
     for idx, e in enumerate(fw["entries"]):
+        if e["version"] in covered_by:
+            slug_of[e["version"]] = covered_by[e["version"]]
+            continue
         rel = e.get("released")
         when = (rel.get("publishedAt", "")[:10] if rel else None) or e["date"]
         if not when:
             continue                      # a post has a date, or it is not one
         meta = ed.get(e["version"], {})
-        title = meta.get("title") or f"Firmware {e['version']}"
+        group = [e] + [by_version[c] for c in (meta.get("covers") or [])
+                       if c in by_version]
+        slug_of[e["version"]] = e["version"]
+        title = meta.get("title") or (
+            "Firmware " + " and ".join(g["version"] for g in group))
         if rel and rel.get("isPrerelease"):
             title += " (pre-release)"
         elif not rel:
@@ -530,11 +543,36 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
                       "</figure>", ""]
         lines += ["<!-- more -->", ""]
 
-        comps = carried(fw["entries"], idx, by_repo) if parsed else []
-        pins = [f"[{r} {v}](../../changelog/{SLUG_OF[r]}.md)" for r, v, _ in comps]
-        lines += [f"**Firmware {e['version']}**, {human(when)}"
-                  + (" — the first image to carry " + ", ".join(pins) + "."
-                     if pins else ".")
+        # What the group of releases is the first to carry: each release's
+        # own components, newest release first, one entry per version.
+        comps: list[tuple[str, str, dict]] = []
+        for g in group:
+            if g["source"] != "changelog":
+                continue
+            for r, v, c in carried(fw["entries"], fw["entries"].index(g), by_repo):
+                if (r, v) not in [(x, y) for x, y, _ in comps]:
+                    comps.append((r, v, c))
+        # One pin per component, its newest version, in the order a reader
+        # meets them; the older versions a combined post also carries are
+        # visible as tagged items below.
+        newest: dict[str, str] = {}
+        for r, v, _ in comps:
+            if r not in newest or vtuple(v) > vtuple(newest[r]):
+                newest[r] = v
+        pins = [f"[{r} {newest[r]}](../../changelog/{SLUG_OF[r]}.md)"
+                for _, r, _ in COMPONENTS if r in newest]
+        names = " and ".join(f"**{g['version']}**" for g in group)
+        dates = sorted({(g.get("released") or {}).get("publishedAt", "")[:10]
+                        or g["date"] for g in group if g.get("date") or g.get("released")})
+        if len(dates) == 1:
+            span = human(dates[0])
+        elif dates[0][:7] == dates[-1][:7]:
+            span = f"{int(dates[0][8:])}–{human(dates[-1])}"     # 20–21 September 2026
+        else:
+            span = f"{human(dates[0])} to {human(dates[-1])}"
+        lines += [f"Firmware {names}, {span}"
+                  + (" — the first image" + ("s" if len(group) > 1 else "")
+                     + " to carry " + ", ".join(pins) + "." if pins else ".")
                   + " Every item below is the repository's own changelog "
                   "entry, taken apart; the whole entry is a click away under "
                   "each one.", ""]
@@ -544,12 +582,25 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         for n in notes[1:] if lede else notes:
             if n.strip():
                 lines += [demote(n), ""]
+        for g in group[1:]:
+            g_notes, _ = parse_entry(g["body"] or "") if g["source"] == "changelog" else ([g["body"] or ""], {})
+            # A covered release's lede is its own summary; it reads as a
+            # note under the combined post's, tagged with its version.
+            for n in g_notes:
+                if n.strip():
+                    lines += [demote(n) + f' <small class="tp-tag">{g["version"]}</small>', ""]
 
-        # Category by category, the image's own items first and then each
-        # carried component's, newest component version first.
-        sources = [(None, cats)] + [(f"{r} {v}", parse_entry(c["body"])[1]
-                                     if c["source"] == "changelog" else {})
-                                    for r, v, c in comps]
+        # Category by category: each release's own items, newest release
+        # first and tagged with its version when the post covers several,
+        # then each carried component's, newest component version first.
+        sources = []
+        for g in group:
+            g_cats = parse_entry(g["body"] or "")[1] if g["source"] == "changelog" else {}
+            sources.append((g["version"] if len(group) > 1 else None,
+                            g_cats if g is not e else cats))
+        sources += [(f"{r} {v}", parse_entry(c["body"])[1]
+                     if c["source"] == "changelog" else {})
+                    for r, v, c in comps]
         seen: set[str] = set()
         for cat in CATEGORY_ORDER:
             items = []
@@ -593,6 +644,10 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
     for stale in NEWS.glob("*.md"):
         if stale not in written:
             stale.unlink()
+    # version -> post slug, for the feed and the roadmap's recently-shipped
+    # strip: a covered release links to the post that covers it.
+    (ROOT / "docs" / "data" / "news-posts.json").write_text(
+        json.dumps(slug_of, indent=1) + "\n")
     return written
 
 
@@ -609,6 +664,8 @@ def write_feed(firmware: dict) -> pathlib.Path:
                  .replace(">", "&gt;").replace('"', "&quot;"))
 
     ed = editorial()
+    posts_map = ROOT / "docs" / "data" / "news-posts.json"
+    slug_of = json.loads(posts_map.read_text()) if posts_map.exists() else {}
     site = "https://turingpi.xyz"
     updated = (f"{firmware['newest_date']}T00:00:00Z" if firmware["newest_date"]
                else datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
@@ -629,7 +686,7 @@ def write_feed(firmware: dict) -> pathlib.Path:
                  else f"Firmware {e['version']}")
         out += ["  <entry>",
                 f"    <title>{esc(title)}</title>",
-                f'    <link href="{site}/news/{esc(e["version"])}/"/>',
+                f'    <link href="{site}/news/{esc(slug_of.get(e["version"], e["version"]))}/"/>',
                 f"    <id>tag:turingpi.xyz,{e['date'] or '1970-01-01'}:"
                 f"firmware/{esc(e['bare'])}</id>",
                 f"    <updated>{when}</updated>",
@@ -657,7 +714,10 @@ def main(argv: list[str]) -> int:
         return 2
 
     feed = ROOT / "docs" / "feed.xml"
+    posts_map = ROOT / "docs" / "data" / "news-posts.json"
     before = {p: p.read_text() for p in (*OUTDIR.glob("*.md"), *NEWS.glob("*.md"))}
+    if posts_map.exists():
+        before[posts_map] = posts_map.read_text()
     if feed.exists():
         before[feed] = feed.read_text()
 
@@ -683,13 +743,15 @@ def main(argv: list[str]) -> int:
     if not wanted:
         print(f"  {write_index(summary).relative_to(ROOT)}")
         fw = next(s for s in summary if s["slug"] == "firmware")
-        print(f"  {write_feed(fw).relative_to(ROOT)}: "
-              f"{min(len(fw['entries']), 40)} entries")
         posts = write_news(summary)
         print(f"  {NEWS.relative_to(ROOT)}/: {len(posts)} posts")
+        print(f"  {write_feed(fw).relative_to(ROOT)}: "
+              f"{min(len(fw['entries']), 40)} entries")
 
     if args.check:
         after = {p: p.read_text() for p in (*OUTDIR.glob("*.md"), *NEWS.glob("*.md"))}
+        if posts_map.exists():
+            after[posts_map] = posts_map.read_text()
         if feed.exists():
             after[feed] = feed.read_text()
         stale = sorted(p for p in after if before.get(p) != after[p])

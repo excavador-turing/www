@@ -41,8 +41,8 @@ Voted for, built, released. Each card still opens its discussion.
 One post per firmware release, from the repositories' own changelogs — [all of them](news/index.md), or [by feed](feed.xml).
 
 <div class="tp-releases">
-<a href="news/v2.34.0/"><b>v2.34.0</b><span>21 September 2026</span></a>
-<a href="news/v2.33.0/"><b>v2.33.0</b><span>20 September 2026</span></a>
+<a href="news/v2.34.0/"><b>v2.34.0</b><span>20 September 2026</span></a>
+<a href="news/v2.34.0/"><b>v2.33.0</b><span>20 September 2026</span></a>
 <a href="news/v2.32.0/"><b>v2.32.0</b><span>13 September 2026</span></a>
 <a href="news/v2.31.0/"><b>v2.31.0</b><span>12 September 2026</span></a>
 <a href="news/v2.30.0/"><b>v2.30.0</b><span>12 September 2026</span></a>
@@ -52,7 +52,7 @@ One post per firmware release, from the repositories' own changelogs — [all of
 
 A feature is a ticket in the maintainer's tracker, a Discussion here, and then a page under [Features](features/index.md) with the numbers that prove it — in that order. The [known-faults page](reference/known-faults.md) is the other half of this one: what is wrong today, with the ticket that tracks it. A roadmap that lists only what is coming is advertising.
 
-Votes read 20 September 2026 by `just refresh-roadmap`, which runs every hour.
+Votes read 21 September 2026 by `just refresh-roadmap`, which runs every hour.
 
 <div class="tp-next">
 <a href="news/"><b>What shipped →</b><span>One post per firmware release, newest first.</span></a>
