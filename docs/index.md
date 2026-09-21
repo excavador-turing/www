@@ -3,6 +3,7 @@ hide:
   - navigation
   - toc
 render_macros: true
+description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that take themselves back, VLANs on the board's own switch, a certificate that does not rot."
 ---
 
 <div class="tp-landing" markdown>

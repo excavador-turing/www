@@ -1,3 +1,7 @@
+---
+description: "Every metric the Turing Pi 2 BMC serves at /metrics in Prometheus format, what each family means, and which ones upstream never had."
+---
+
 # Metrics
 
 Upstream's firmware exposes no metrics. This fork serves **40 families**

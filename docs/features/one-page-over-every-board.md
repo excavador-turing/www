@@ -45,6 +45,7 @@ feature:
       href: ../who-may-reach-this-board/
       text: Who may reach this board
       note: The two ways in, and what a trusted proxy buys.
+description: "Drive every Turing Pi 2 in the cluster from one page that holds no credential of its own and never exposes a board to the network."
 ---
 
 {{ feature_screen() }}

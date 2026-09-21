@@ -45,6 +45,7 @@ feature:
       href: ../updates-that-undo-themselves/
       text: Updates that undo themselves
       note: What happens if the version you picked is bad.
+description: "Install firmware from this fork, from upstream or from the SD card, every candidate checksum-verified and compared by version rather than by name."
 ---
 
 {{ feature_screen() }}

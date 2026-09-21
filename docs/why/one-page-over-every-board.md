@@ -1,5 +1,6 @@
 ---
 title: One page over every board
+description: "Why one page over every board holds no credential of its own, and what that rules out for the fleet interface."
 ---
 
 # One page over every board

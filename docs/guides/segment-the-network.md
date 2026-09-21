@@ -1,6 +1,7 @@
 ---
 title: Segment the network
 render_macros: true
+description: "Put the compute modules and the BMC on separate VLANs using the board's own switch, and give the BMC a fixed address or leave it on DHCP."
 ---
 
 # Segment the network

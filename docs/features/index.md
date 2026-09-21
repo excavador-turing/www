@@ -4,6 +4,7 @@ render_macros: true
 hide:
   - navigation
   - toc
+description: "What this firmware does that the stock Turing Pi 2 BMC does not, one page per feature, each with the measurements behind the claim."
 ---
 
 <div class="tp-index" markdown>

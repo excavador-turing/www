@@ -1,3 +1,7 @@
+---
+description: "How to report a fault, propose an idea or send a change to the Turing Pi 2 BMC firmware fork, and what happens to it after you do."
+---
+
 # Contributing
 
 The loop below is how every change in this fork was tested, including on the

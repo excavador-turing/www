@@ -1,3 +1,7 @@
+---
+description: "Every tpi command for a Turing Pi 2: power, flash, console, firmware, the board's own address and its clock, with what each one needs."
+---
+
 # The command line
 
 `tpi` controls a board from a shell. Upstream ships it; this fork extends it to

@@ -1,5 +1,6 @@
 ---
 title: The board describes its own API
+description: "Why the API reference is generated from the board's own OpenAPI document rather than written and kept by hand."
 ---
 
 # The board describes its own API

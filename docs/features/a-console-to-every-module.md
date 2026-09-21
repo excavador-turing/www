@@ -44,6 +44,7 @@ feature:
       href: ../a-certificate-that-does-not-rot/
       text: A certificate that does not rot
       note: Why a console needs a certificate a browser accepts.
+description: "A serial console to each of the four compute modules in the browser, replaying the boot output you were not there to watch."
 ---
 
 {{ feature_screen() }}

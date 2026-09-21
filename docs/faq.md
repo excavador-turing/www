@@ -3,6 +3,7 @@ title: Questions people actually ask
 render_macros: true
 hide:
   - toc
+description: "Can the board face the internet, does this run on a 2.4, why does the clock say not synchronised: the questions people ask, answered in a sentence."
 ---
 
 # Questions people actually ask

@@ -1,5 +1,6 @@
 ---
 title: Update the BMC without touching your nodes
+description: "Why a BMC update leaves the compute modules powered, and the measurements taken across every flash on these boards."
 ---
 
 # Update the BMC without touching your nodes

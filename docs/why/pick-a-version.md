@@ -1,5 +1,6 @@
 ---
 title: Pick a version, from anywhere
+description: "Why firmware candidates are compared numerically and checksum-verified, and what comparing them by name used to do."
 ---
 
 # Pick a version, from anywhere

@@ -45,6 +45,7 @@ feature:
       href: ../pick-a-version/
       text: Pick a version, from anywhere
       note: The card is one of three places firmware can come from.
+description: "Write a node image to a compute module straight from the board's own SD card, with the board saying which files can be written and why the rest cannot."
 ---
 
 {{ feature_screen() }}

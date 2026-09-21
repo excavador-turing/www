@@ -1,6 +1,7 @@
 ---
 hide:
   - toc
+description: "Where to report a fault, ask a question or propose an idea for the Turing Pi 2 BMC firmware, and which door suits which kind of message."
 ---
 
 # Feedback

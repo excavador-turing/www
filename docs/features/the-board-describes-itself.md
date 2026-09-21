@@ -45,6 +45,7 @@ feature:
       href: ../see-what-the-board-sees/
       text: See what the board sees
       note: The readings those operations return.
+description: "The BMC serves its own OpenAPI 3.1 document, so the API reference on this site is generated from the board rather than written by hand."
 ---
 
 {{ feature_screen() }}

@@ -210,7 +210,14 @@ def main() -> int:
         if not ops:
             continue
         total += len(ops)
+        desc = (f"{title.rstrip('.')}: {len(ops)} operations of the Turing Pi 2 "
+                f"BMC HTTP API, generated from bmcd {version}'s own OpenAPI "
+                f"document.")
         lines = [
+            "---",
+            f"description: {json.dumps(desc)}",
+            "---",
+            "",
             f"# {title}",
             "",
             f"Generated from the committed OpenAPI document, **bmcd {version}**. "
@@ -227,6 +234,11 @@ def main() -> int:
     # The index is the "findable in one action" surface, and the landing spot
     # for anyone following an old deep link into the single-page version.
     idx = [
+        "---",
+        "description: \"Every operation of the Turing Pi 2 BMC HTTP API in one "
+        "table: what it does, its method, its path and its group.\"",
+        "---",
+        "",
         "# Every operation",
         "",
         f"Generated from the committed OpenAPI document, **bmcd {version}**. "

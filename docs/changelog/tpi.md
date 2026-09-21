@@ -1,4 +1,5 @@
 ---
+description: "Every tpi release and what changed in it: 15 entries, newest v1.10.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---

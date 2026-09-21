@@ -1,3 +1,7 @@
+---
+description: "Every firmware update these boards have taken and whether the gate promoted or rolled it back, read from the board's own counter."
+---
+
 # The gate's record
 
 Every count on this site comes from here, and this page comes from the board.

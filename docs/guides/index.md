@@ -1,6 +1,7 @@
 ---
 hide:
   - toc
+description: "Every guide and reference for this Turing Pi 2 BMC firmware: install it, upgrade from stock, recover a bad flash, segment the network, monitor it."
 ---
 
 # Documentation

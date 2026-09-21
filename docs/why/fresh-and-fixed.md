@@ -1,6 +1,7 @@
 ---
 title: Fresh, and fixed
 render_macros: true
+description: "Why this firmware moved to a longterm kernel and a supported Buildroot, and the named faults that came out with it."
 ---
 
 # Fresh, and fixed

@@ -21,8 +21,11 @@ links in fixed roles, and a capture that exists.
 from __future__ import annotations
 
 import html
+import json
 import pathlib
 import re
+
+import yaml
 
 # The four things a reader wants next, in the order they want them. Fixed,
 # because the labels were the loudest inconsistency between these pages and
@@ -47,6 +50,23 @@ NUMBER_WORDS = ("zero one two three four five six seven eight nine ten eleven "
 
 def define_env(env):
     """Hook for mkdocs-macros."""
+
+    # The theme's templates render outside this plugin and cannot see its
+    # variables, but `config.extra` they can. Two things are put there for
+    # `overrides/main.html`, which writes the page's structured data:
+    #
+    #   facts  -- so the front page can state the CURRENT firmware version
+    #             without anyone typing it. facts.yaml is the only place that
+    #             number is allowed to live.
+    #   faq    -- the FAQ's questions and answers, so the page can be marked
+    #             up as what it is. Parsed from the page, not kept beside it,
+    #             because a copy is a copy that goes stale.
+    extra = env.conf.setdefault("extra", {})
+    facts_file = ROOT / "docs" / "data" / "facts.yaml"
+    if facts_file.exists():
+        extra["facts"] = yaml.safe_load(facts_file.read_text()) or {}
+    extra["faq"] = _faq_entities(ROOT / "docs" / "faq.md")
+
 
     @env.filter
     def title_number(n):
@@ -253,3 +273,44 @@ def _front_matter(path: pathlib.Path) -> dict:
         return {}
     end = text.index("\n---", 3)
     return yaml.safe_load(text[3:end]) or {}
+
+
+# Structured data for the FAQ: every "## question" with the prose under it.
+#
+# Capped, because an answer here can run to a screen and a rich result shows
+# two lines of it. An answer that is a table or a code block is left out
+# rather than flattened into something that reads as nonsense.
+FAQ_ANSWER_CAP = 600
+
+
+def _faq_entities(path: pathlib.Path) -> list[dict]:
+    if not path.exists():
+        return []
+    text = path.read_text()
+    out: list[dict] = []
+    for m in re.finditer(r"^## +(.+?)\s*$", text, re.M):
+        question = m.group(1).strip()
+        body = text[m.end():]
+        nxt = re.search(r"^## ", body, re.M)
+        body = body[:nxt.start()] if nxt else body
+        answer = []
+        for line in body.splitlines():
+            s = line.strip()
+            if not s:
+                if answer:
+                    break                 # the first paragraph is the answer
+                continue
+            if s.startswith(("#", "|", "```", "!!!", "???", "<", "{", "- ",
+                             "* ", ":")):
+                break
+            answer.append(s)
+        a = " ".join(answer)
+        a = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", a)
+        a = re.sub(r"[*`]+", "", a)
+        a = " ".join(a.split())
+        if len(a) < 40:
+            continue                      # not an answer, whatever it is
+        if len(a) > FAQ_ANSWER_CAP:
+            a = a[:FAQ_ANSWER_CAP].rsplit(" ", 1)[0] + "\u2026"
+        out.append({"q": question, "a": a})
+    return out

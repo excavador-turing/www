@@ -50,7 +50,7 @@ serve:
 # Everything CI checks, in the order CI checks it. Run this before pushing;
 # `checks.yml` runs exactly these and nothing else, and the deploy runs none
 # of them.
-check: facts-check facts-lint feature-lint ribbon-check build screens reach
+check: facts-check facts-lint feature-lint description-lint llms-check ribbon-check build structured-data screens reach
 
 # Prove every screen reads whole, at nine viewports.
 #
@@ -106,6 +106,25 @@ ribbon-check:
 facts-check:
     ./scripts/facts.py --check
 
+# Fail if a page does not say what it is for.
+#
+# Material falls back to site_description when a page has none, so all 91
+# pages told a search result, a link preview and an AI summariser the same
+# sentence about the site and nothing about the page.
+description-lint:
+    ./scripts/description-lint.py
+
+# The JSON-LD in every built page parses and says what is there.
+structured-data: build
+    ./scripts/structured-data.py
+
+# The index an assistant reads instead of the nav.
+llms:
+    ./scripts/llms.py
+
+llms-check:
+    ./scripts/llms.py --check
+
 # Fail if a page types a number the facts file owns.
 #
 # facts.py claimed this script existed from the day it was written -- in its
@@ -155,7 +174,7 @@ refresh-roadmap:
     ./scripts/refresh-roadmap.py
 
 # Everything the hourly job refreshes, in one go.
-refresh: refresh-changelog refresh-roadmap facts
+refresh: refresh-changelog refresh-roadmap facts llms
 
 # Rebuild the fork pane of the demo from a BMC-UI checkout at a tag.
 #   just refresh-demo ../BMC-UI v3.19.0

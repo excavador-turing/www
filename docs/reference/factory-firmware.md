@@ -1,3 +1,7 @@
+---
+description: "What shipped on a factory Turing Pi 2, how to capture it before you flash over it, and which parts of it can be republished."
+---
+
 # The factory firmware
 
 What a stock Turing Pi 2 looks like before any of this fork touches it.

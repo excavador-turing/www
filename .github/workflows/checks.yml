@@ -65,11 +65,24 @@ jobs:
       - name: the feature pages have one shape
         run: .venv/bin/python scripts/feature-lint.py
 
+      # A page with no description of its own is a page that tells every
+      # search result and every link preview about the SITE instead.
+      - name: every page says what it is for
+        run: .venv/bin/python scripts/description-lint.py
+
+      - name: llms.txt matches the nav
+        run: .venv/bin/python scripts/llms.py --check
+
       - name: no capture carries the demo ribbon
         run: .venv/bin/python scripts/crop-ribbon.py --check
 
       - name: build, strict
         run: .venv/bin/mkdocs build --strict
+
+      # Written by a template out of page metadata, so a stray quote breaks
+      # it silently: the page still renders and only a crawler notices.
+      - name: the structured data parses
+        run: .venv/bin/python scripts/structured-data.py
 
       # The demo panes are NOT built here. They are somebody else's bundle,
       # they are proved in the deploy path where they are actually published,
