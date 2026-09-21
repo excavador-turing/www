@@ -7,9 +7,68 @@ hide:
 
 The web interface the board serves.
 
-Newest release **v3.33.0**, 20 September 2026. 31 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v3.34.1**, 21 September 2026. 33 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "v3.33.0 — 20 September 2026"
+???+ note "v3.34.1 — 21 September 2026"
+
+    **Fixed**
+
+    - **The demo build was broken by a fixture that was not JSON.** The capture
+      script read the firmware version with a pattern that wanted a `v`, the
+      board it captured from reported `local`, and `captured.json` got an empty
+      field. v3.34.0 shipped it; the board bundle is unaffected, the demo could
+      not build. The script now takes the version as it is.
+
+??? note "v3.34.0 — 21 September 2026"
+
+    **Added**
+
+    - **The BMC's address, from the Network tab.** An *Address* card beside
+      Hostname: what the bridge has now (the DHCP lease, or the fixed address),
+      DHCP or Static as two pills, and for static the address with its prefix,
+      the gateway, the resolvers and a search domain. Every rule is the board's
+      (`POST /network/address/validate` as you type); the card only checks that
+      what was typed has the shape of an address. **Apply** and **Try it** work as
+      they do for the switch: the address goes on the board and is not kept until
+      a confirmation reaches it -- *at the new address*, which means this page,
+      reloaded there -- or the board puts the old one back by itself. Needs bmcd
+      2.38.0; on an older daemon the card is not shown. Asked for from the
+      Discord on 2026-09-21 by a user who had done it over SSH -- and whose board
+      then had no resolver, which is the next item.
+
+    - **The Time card says what chrony thinks of each source**: selected,
+      combined in, excluded, unreachable, refused for reporting itself
+      unsynchronised, or -- the case that actually happened -- *unresolved*: a
+      name chrony was given and never managed to look up, because the board has
+      no working resolver. Stratum, how many of the last eight polls answered, the
+      offset, and which ones are yours. When nothing is selected it says what the
+      states mean. "NOT synchronised" alone sent a user to Discord with nothing to
+      act on; his `chronyc sources` was empty. Needs bmcd 2.38.0.
+
+    **Changed**
+
+    - **"Reset network" is now "Reset the switch chip"**, because that is what it
+      does -- `rtl_reset()` -- and it never touched the address. The confirmation
+      says what it costs: every port drops for a moment.
+
+    **Fixed**
+
+    - **A countdown that could not count.** The daemon serialises a moment as
+      `{secs_since_epoch, nanos_since_epoch}`, and the switch card did
+      `new Date(...)` on it -- an Invalid Date, a countdown of NaN. One converter
+      in the API layer takes either form; both cards use it.
+
+    - **The Time and Hostname boxes are no longer blank on a second visit.** Both
+      cards seeded their text box from `""` and relied on a "value changed"
+      re-seed to fill it once the query answered. When the answer was already in
+      the cache at mount -- any return to the tab within the query's stale window
+      -- nothing had changed, so nothing fired, and the box stayed empty until a
+      refresh cleared the cache. Reported from a 2.4 board on 2026-09-21: "the
+      Time box is blank; refresh loads the server I saved". Reproduced in the demo
+      on the hostname card (first visit `turingpi`, away and back: blank) and gone
+      after seeding the draft from the query.
+
+??? note "v3.33.0 — 20 September 2026"
 
     **Fixed**
 
