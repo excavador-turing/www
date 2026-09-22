@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-UI release and what changed in it: 35 entries, newest v3.36.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-UI release and what changed in it: 36 entries, newest v3.37.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,26 @@ hide:
 
 The web interface the board serves.
 
-Newest release **v3.36.0**, 22 September 2026. 35 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v3.37.0**, 22 September 2026. 36 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "v3.36.0 — 22 September 2026"
+???+ note "v3.37.0 — 22 September 2026"
+
+    **Changed**
+
+    - **Installing a firmware image now says what it is doing, and for how
+      long.** The daemon does the whole install inside one request — download
+      the image, check its sum, write it to the spare slot, arm the next boot —
+      and answers only when it is done. Until now the page showed a greyed
+      Install button for the whole of that and nothing else, and a reader on
+      Discord wondered whether to refresh (he did not need to; nothing is armed
+      until the board says staged, and now the page says that too). The
+      candidate's button reads *Installing…* and a status line beneath the list
+      gives "about 26 s, now at N" — the same shape as the reboot banner, and the
+      number is measured the same way: a real install on board B, v2.37.0 from
+      GitHub, 26 s wall on 2026-09-23. Past it the line says the board is still
+      working and that a slow link takes longer, rather than looking stuck.
+
+??? note "v3.36.0 — 22 September 2026"
 
     **Fixed**
 

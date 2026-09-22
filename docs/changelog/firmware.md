@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 34 entries, newest v2.37.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 35 entries, newest v2.38.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.37.0**, 22 September 2026. 34 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.38.0**, 22 September 2026. 35 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,32 @@ Newest release **v2.37.0**, 22 September 2026. 34 in total. Each entry is this r
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.37.0 — 22 September 2026"
+???+ note "v2.38.0 — 22 September 2026"
+
+    Pins **BMC-UI 3.37.0**. bmcd stays at 2.38.2 and tpi at 1.10.0. One change,
+    from a reader who had just done an update for the first time.
+
+    **Changed**
+
+    - **The Firmware tab now says what the board is doing while it installs.**
+      Installing from a source took about half a minute of silence — a greyed
+      button and nothing else — because the daemon does the whole job inside one
+      request (download the image, check its sum, write it to the spare slot,
+      arm the next boot) and answers when it is done. A reader wondered whether
+      to refresh; he did not need to, and now the page says so: the button reads
+      *Installing…* and a status line counts "about 26 s, now at N", the number
+      measured on a real board like the reboot banner's. Past it the line says
+      the board is still working and that a slow link takes longer. Nothing is
+      armed until the board says staged, and the page says that too.
+
+      This is also the first release built with the new CI: the cross-toolchain
+      comes prebuilt from an image, the Rust packages from a compiler cache, and
+      a firmware build takes about eleven minutes instead of twenty-four. Nothing
+      in the image changes because of that — the compiler is the same binary,
+      built from the same defconfig in the same container — and both boards
+      here are the check.
+
+??? note "v2.37.0 — 22 September 2026"
 
     Pins **BMC-UI 3.36.0**. bmcd stays at 2.38.2 and tpi at 1.10.0. One fix, and
     it is the one a new board meets first.
