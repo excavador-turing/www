@@ -113,3 +113,16 @@ v2.36.0:
     exited 0. One reader found both, the day after v2.35.0 shipped, on a
     board that simply had no DNS. Boards the old stanza was already written
     to repair themselves.
+
+# v2.37.0 -- the password form could not be typed into, reported as #48 by a
+# user who had to fall back to SSH. The release also carries the gate that
+# would have caught it.
+v2.37.0:
+  title: The password form could not be typed into, and nothing noticed
+  summary: >-
+    Three boxes that looked normal, focused normally, and refused every
+    character — including on the page a board shows before it will do
+    anything else, so a board on its factory password could not be taken
+    off it from a browser at all. Reported by a user who worked it out and
+    used SSH instead. The release also carries the gate that would have
+    caught it: the interface's CI now types into every box of every tab.

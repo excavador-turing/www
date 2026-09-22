@@ -48,6 +48,26 @@ Encrypt is possible and is the wrong tool here, for three reasons.
 
 [All of it →](guides/your-own-certificate.md)
 
+## The password form will not let me type. Is my board broken?
+
+No, and it was not you. Every release from v2.28.0 to v2.36.0 had a fault
+in the shared text field that made password boxes read-only: the keystroke
+arrived and the interface put the old value straight back, silently.
+**v2.37.0 fixes it.**
+
+Until you can install that, change the password over SSH — it is the same
+account the interface means:
+
+```console
+$ ssh root@BMC
+$ passwd
+```
+
+On a board still using the password it shipped with, that also clears the
+page which blocks the rest of the interface. Nothing needs undoing
+afterwards. The full account is in
+[what is and isn't fixed](reference/known-faults.md).
+
 ## Which board revisions does it run on?
 
 **v2.5.2**, on the two boards this fork is developed against, and **v2.4**,
