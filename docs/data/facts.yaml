@@ -3,7 +3,7 @@
 # Every number this site quotes about itself, with where it came
 # from. Pages read it through the macros plugin: {{ gate.updates }},
 # never 26. scripts/facts-lint.py fails a build that types one.
-generated: 2026-09-22
+generated: 2026-09-23
 gate:
   source: "reference/gate-history.md, written by `just refresh-gate-history <board>` from the board's own bmcd_firmware_promotion_total counter"
   as_of: 2026-09-12
@@ -14,18 +14,18 @@ gate:
 releases:
   source: "docs/changelog/*.md, written by `just refresh-changelog` from each repository's CHANGELOG.md"
   firmware:
-    newest: v2.37.0
-    count: 34
+    newest: v2.38.0
+    count: 35
   bmcd:
     newest: 2.38.2
     count: 42
   ui:
-    newest: v3.36.0
-    count: 35
+    newest: v3.37.0
+    count: 36
   tpi:
     newest: v1.10.0
     count: 15
-  total: 126
+  total: 128
 features:
   source: docs/features/*.md -- a feature is a page
   count: 11
@@ -59,7 +59,7 @@ faults:
     - There is no watchdog
 roadmap:
   source: docs/data/roadmap.json, written by `just refresh-roadmap` from the Ideas discussions
-  as_of: 2026-09-22
+  as_of: 2026-09-23
   count: 7
   shipped: 2
   votes: 17

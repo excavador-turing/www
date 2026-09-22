@@ -92,8 +92,15 @@ Measured on the run described above:
 | | |
 |---|---|
 | Transfer of 36.12 MiB | 26.6 s |
+| Install from a source in the Firmware tab, until it says staged | 26 s |
 | Reboot, until the board answers again | 48 s |
 | Compute modules disturbed | **none** |
+
+The install row is the daemon downloading the image from the source,
+checking its sum, writing it to the spare slot and arming the next boot,
+all inside one request; from v2.38.0 the page shows that count while it
+runs, the way it shows the reboot's. Nothing is armed until it says staged,
+so refreshing the page mid-install changes nothing.
 
 That last row deserves a caveat rather than a promise. The board's network
 switch is driven by the BMC, so a BMC reboot is expected to interrupt the
