@@ -271,6 +271,28 @@ nothing new runs at boot.
 **One change at a time.** A switch layout waiting to be confirmed and an
 address change are two windows; the card says so when the other is pending.
 
+### What survives a reboot, and how
+
+Two files, two different lives. The stanza is written to
+`/etc/network/interfaces`, which lives on the overlay and is what the boot
+path reads: the address, the gateway and the bridge come back from it. The
+resolvers do not live in a file that survives — `/etc/resolv.conf` on this
+image is a link into a memory filesystem, empty at every boot, filled by
+whoever brings the bridge up. On DHCP that is the lease; on a static address
+it is an `up` hook in the stanza, which prints the resolvers the moment the
+bridge is up. A static address without resolvers in its stanza therefore has
+none after a reboot, however carefully they were typed into `resolv.conf`.
+
+That hook had a fault in **v2.35.0**: it carried a `#` (the tag the DHCP
+client puts on its own resolv.conf lines, kept so a later lease can replace
+them), and the board's `ifup` reads `#` anywhere on a line as a comment. The
+hook was cut off, the shell refused it, and `ifup br0` failed at every boot
+— after the address was already on the bridge, so the board came up
+reachable and mute. **v2.36.0** spells the character so the hook survives,
+and on its first start rewrites any stanza v2.35.0 left behind and writes the
+missing resolvers. Measured on a board before it shipped; reported from
+another, on 2026-09-22, by the reader whose report shaped v2.35.0.
+
 ## What this does not cover
 
 **The BMC's own port is untagged only.** Giving the board's Linux a tagged

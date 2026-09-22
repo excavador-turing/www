@@ -76,6 +76,17 @@ card says so; chrony will not take time from it. The pool the image ships
 with is a name too, so a board with no resolver has no source at all — which
 is how "not synchronised" looked before the card could say why.
 
+**If it was fine until a reboot**, and the address is static: on this image
+`/etc/resolv.conf` is a link into a memory filesystem and starts empty at
+every boot; the address card's stanza rebuilds it as the bridge comes up.
+Firmware **v2.35.0** wrote that stanza with a `#` in it, which the board's
+`ifup` reads as a comment, so the rebuild failed silently at every boot and
+the resolvers were gone by the time you looked — reported from a 2.4 board
+on 2026-09-22. **v2.36.0** fixes the stanza and repairs a board that
+v2.35.0 already wrote, the first time its daemon starts. If you wrote a
+`resolv.conf` into the overlay by hand to get past it, it does no harm and
+is no longer needed.
+
 ## How much of this is written by a machine?
 
 Some of it, and the parts that matter are read line by line — the API, the

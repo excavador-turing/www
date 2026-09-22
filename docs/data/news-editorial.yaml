@@ -99,3 +99,15 @@ v2.35.0:
     alone, so the board puts the old address back by itself.
   capture: captures/news/address.png
   caption: The Network tab — the BMC's address beside its name, with the same apply-then-confirm as the switch.
+
+# v2.36.0 -- the resolver hook. The address card's stanza carried a '#', the
+# board's ifup read it as a comment, and a static address lost its resolvers
+# at every reboot. One reader found it the day after v2.35.0 shipped.
+v2.36.0:
+  title: The resolvers survive a reboot now
+  summary: >-
+    The address card's stanza carried a `#` that the board's ifup read as a
+    comment, so a static address came up after every reboot with no
+    resolvers and a clock that could not find its server. Found by the same
+    reader a day after v2.35.0 shipped; fixed, and repaired on any board the
+    old stanza had already been written to.
