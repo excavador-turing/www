@@ -92,5 +92,10 @@ v2.35.0:
     own verdict, including the one that sent a reader to Discord: a name the
     board could not resolve. And two 2.4 boards now run this firmware, one
     upgraded from the factory image in NAND.
+  video: captures/news/address-apply.mp4
+  video_caption: >-
+    Recorded in this site's own demo: a static address typed in, applied,
+    and kept only after the page confirms it. Then the same change left
+    alone, so the board puts the old address back by itself.
   capture: captures/news/address.png
   caption: The Network tab — the BMC's address beside its name, with the same apply-then-confirm as the switch.
