@@ -104,10 +104,12 @@ v2.35.0:
 # board's ifup read it as a comment, and a static address lost its resolvers
 # at every reboot. One reader found it the day after v2.35.0 shipped.
 v2.36.0:
-  title: The resolvers survive a reboot now
+  title: Two ways a board with no DNS failed to mention it
   summary: >-
-    The address card's stanza carried a `#` that the board's ifup read as a
-    comment, so a static address came up after every reboot with no
-    resolvers and a clock that could not find its server. Found by the same
-    reader a day after v2.35.0 shipped; fixed, and repaired on any board the
-    old stanza had already been written to.
+    A static address came back from every reboot with no resolvers, because
+    the stanza that rebuilds them carried a `#` the board's ifup read as a
+    comment. And the firmware check said "nothing new" rather than "I could
+    not reach anything", because the updater printed an empty list and
+    exited 0. One reader found both, the day after v2.35.0 shipped, on a
+    board that simply had no DNS. Boards the old stanza was already written
+    to repair themselves.

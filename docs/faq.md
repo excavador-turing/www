@@ -76,6 +76,11 @@ card says so; chrony will not take time from it. The pool the image ships
 with is a name too, so a board with no resolver has no source at all — which
 is how "not synchronised" looked before the card could say why.
 
+**If the firmware check also says nothing**, the two have one cause. Until
+v2.36.0 a source the board could not reach was reported as offering nothing
+rather than as unreachable, so a board with no resolver showed an empty
+catalogue and no error. It says which source failed and why now.
+
 **If it was fine until a reboot**, and the address is static: on this image
 `/etc/resolv.conf` is a link into a memory filesystem and starts empty at
 every boot; the address card's stanza rebuilds it as the bridge comes up.
