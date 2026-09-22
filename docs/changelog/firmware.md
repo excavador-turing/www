@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 33 entries, newest v2.36.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 34 entries, newest v2.37.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.36.0**, 22 September 2026. 33 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.37.0**, 22 September 2026. 34 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,31 @@ Newest release **v2.36.0**, 22 September 2026. 33 in total. Each entry is this r
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.36.0 — 22 September 2026"
+???+ note "v2.37.0 — 22 September 2026"
+
+    Pins **BMC-UI 3.36.0**. bmcd stays at 2.38.2 and tpi at 1.10.0. One fix, and
+    it is the one a new board meets first.
+
+    **Fixed**
+
+    - **The password form would not accept typing, in any of its three boxes.**
+      The interface's shared text field dropped the change handler for password
+      inputs, and a React field that holds its value but cannot report a change
+      is read-only: every keystroke was reverted, silently, with markup that
+      looks perfect. It hit the password card on Access **and the page a board
+      still on its shipped password shows instead of everything else** — so such
+      a board could not be taken off that password from a browser at all, only
+      over SSH. Logging in was unaffected, which is why it went unnoticed: that
+      form reads the page on submit rather than holding state.
+
+      Reported as [#48](https://github.com/excavador-turing/BMC-Firmware/issues/48)
+      by a user on v2.34.0, and present since long before this fork. The release
+      also adds the gate that would have caught it: the interface's CI now types
+      into every visible box of every tab and fails on one that does not keep
+      what was typed. Nothing that existed could see it — it builds, it lints,
+      it renders, and the page-length gate measures height.
+
+??? note "v2.36.0 — 22 September 2026"
 
     Pins **bmcd 2.38.2** and **BMC-UI 3.35.0**; tpi stays at 1.10.0. Two fixes,
     both from one report the day after v2.35.0 shipped, by the same reader whose
