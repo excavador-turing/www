@@ -85,6 +85,35 @@ in. The board needs its power cut. That is the situation a hardware watchdog
 would fix, and this firmware does not arm one yet — see
 [what is and isn't fixed](../reference/known-faults.md).
 
+## If you gave the board an address you cannot reach
+
+The address card should make this impossible: an address goes on the bridge
+and is kept only when you confirm from it, and a wrong one is put back by
+itself. This section is for the two ways round that — a file edited by hand
+over SSH, or a card change confirmed from an address that then stopped being
+reachable (a VLAN change on the router, a moved cable).
+
+The board has a **safe mode**, documented by upstream: hold **KEY1** for five
+seconds while powering on, or after releasing **BMC_RESET**, and it boots
+with every change on the overlay set aside — factory network settings, so
+DHCP on `br0`, SSH on, the factory password — without deleting anything. A
+plain reboot afterwards brings the overlay back exactly as it was.
+([Failsafe boot](https://docs.turingpi.com/docs/turing-pi2-bmc-failsafe-boot),
+upstream's page.)
+
+From safe mode, over SSH, the file the boot path reads is on the overlay:
+
+```console
+$ mount_overlay
+$ vi /mnt/overlay/upper/etc/network/interfaces   # fix it, or delete it for DHCP
+$ reboot
+```
+
+Deleting it is the image's default, which is DHCP. Do not edit
+`/etc/resolv.conf` on this image to fix a resolver: it is a link into memory
+and is empty at every boot. The resolvers belong in the stanza, where the
+address card puts them, and the boot path writes them from there.
+
 ## If the board will not boot at all
 
 The SD card is the recovery path. Every release publishes a `.img` alongside

@@ -99,3 +99,17 @@ v2.35.0:
     alone, so the board puts the old address back by itself.
   capture: captures/news/address.png
   caption: The Network tab — the BMC's address beside its name, with the same apply-then-confirm as the switch.
+
+# v2.36.0 -- the resolver hook. The address card's stanza carried a '#', the
+# board's ifup read it as a comment, and a static address lost its resolvers
+# at every reboot. One reader found it the day after v2.35.0 shipped.
+v2.36.0:
+  title: Two ways a board with no DNS failed to mention it
+  summary: >-
+    A static address came back from every reboot with no resolvers, because
+    the stanza that rebuilds them carried a `#` the board's ifup read as a
+    comment. And the firmware check said "nothing new" rather than "I could
+    not reach anything", because the updater printed an empty list and
+    exited 0. One reader found both, the day after v2.35.0 shipped, on a
+    board that simply had no DNS. Boards the old stanza was already written
+    to repair themselves.

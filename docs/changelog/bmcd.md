@@ -1,5 +1,5 @@
 ---
-description: "Every bmcd release and what changed in it: 40 entries, newest 2.38.0, taken from the repository's own CHANGELOG.md."
+description: "Every bmcd release and what changed in it: 42 entries, newest 2.38.2, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,60 @@ hide:
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.38.0**, 21 September 2026. 40 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.38.2**, 22 September 2026. 42 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "2.38.0 — 21 September 2026"
+???+ note "2.38.2 — 22 September 2026"
+
+    **Fixed**
+
+    - **A firmware source that could not be reached reported nothing rather
+      than a failure.** `list_remote` read the updater's stdout and ignored how
+      the process ended. `tpi-selfupdate --list` printed `{"releases":[]}` and
+      exited 0 when it could not reach the source, putting the real reason on
+      stderr where nothing read it -- so on a board with no resolver every
+      remote source came back with no candidates and no error, and the firmware
+      page rendered that as "nothing new". Reported from a 2.4 board on
+      2026-09-22 as "checking github for updated firmware also fails silently",
+      and reproduced on board B: with an empty `/etc/resolv.conf`, four sources,
+      zero candidates, zero errors, and `curl: (6) Could not resolve host` on
+      the updater's stderr.
+
+      The exit status is now read **before** the output. The updater is fixed in
+      firmware v2.36.0 to exit non-zero and print nothing; this is the other
+      half, so the next script that fails cheerfully cannot put the page back to
+      lying. A failure with nothing on stderr now names the exit code instead of
+      saying "no output", which was the only sentence the page had to show.
+
+??? note "2.38.1 — 22 September 2026"
+
+    **Fixed**
+
+    - **A static address lost its resolvers at every reboot, and `ifup br0`
+      failed at every boot.** The `up` hook 2.38.0 wrote into
+      `/etc/network/interfaces` carried a literal `#` -- the `# br0` tag udhcpc
+      uses on resolv.conf lines -- and ifupdown-ng reads `#` anywhere on a line
+      as the start of a comment. The hook was cut off mid-string, `/bin/sh`
+      refused the unterminated quote, and `ifup` exited 1 for `br0`. The address
+      was already on the bridge by then, so the board came up reachable, with an
+      empty `/etc/resolv.conf` (a symlink into tmpfs, fresh every boot) and a
+      clock that could not resolve its server. Reported from a 2.4 board on
+      2026-09-22 by the reader whose report shaped 2.38.0; he had found the
+      workaround of writing a regular `resolv.conf` into the overlay by hand.
+
+      The hook now spells the hash as `\043`, which busybox printf turns back
+      into `#`; the file it writes is byte-for-byte what it was meant to be, and
+      udhcpc's filter still recognises the lines as its own. Measured on board
+      B: the old hook fails with "unterminated quoted string", the new one
+      writes the file and `ifup` exits 0.
+
+      **Boards that 2.38.0 already wrote are repaired at the first start of this
+      daemon**: a file this daemon wrote that is not what this version renders
+      is rewritten (same document, corrected hook), and a static address whose
+      resolvers are missing from `/etc/resolv.conf` gets them written then --
+      bmcd starts after the network does, so this is exactly the moment the
+      failed hook left empty. A file written by hand is never touched.
+
+??? note "2.38.0 — 21 September 2026"
 
     **Added**
 
