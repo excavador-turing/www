@@ -126,3 +126,15 @@ v2.37.0:
     off it from a browser at all. Reported by a user who worked it out and
     used SSH instead. The release also carries the gate that would have
     caught it: the interface's CI now types into every box of every tab.
+
+# v2.38.0 -- a reader's suggestion after doing an update once: the page said
+# nothing while the board installed. Interface only; the daemon is unchanged.
+v2.38.0:
+  title: The page now says what the board is doing while it installs
+  summary: >-
+    Installing from the Firmware tab took about half a minute of silence —
+    a greyed button and nothing else — and a reader wondered whether to
+    refresh. Now the button says Installing and a status line counts
+    "about 26 s, now at N", measured on a real board like the reboot
+    banner's number. Nothing is armed until the board says staged, and the
+    page says that too.
