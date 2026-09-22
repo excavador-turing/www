@@ -127,6 +127,40 @@ userspace dies stays dead until someone cuts its power.
 
 ## Fixed, and worth knowing about
 
+### The password form would not accept typing
+
+**Affected every release from v2.28.0 to v2.36.0; fixed in v2.37.0
+([#48](https://github.com/excavador-turing/BMC-Firmware/issues/48)).** The
+three boxes of the password form looked normal, focused normally, and
+refused every character. Nothing was reported, because from the browser's
+point of view nothing went wrong: the keystroke arrived and the interface
+put the old value straight back.
+
+The cause is one clause in the shared text field, which dropped the
+change handler for password inputs. A React field that holds its own value
+and cannot report a change is read-only by construction. The file input is
+in the same clause for a real reason — its visible box is written by the
+hidden one beside it — and password was swept in with it, in a commit that
+predates this fork.
+
+**What it cost.** The password card on the Access tab, from v2.28.0. And
+from v2.33.0 the page a board still on its shipped password shows instead
+of everything else, which means such a board could not be taken off that
+password from a browser at all — only over SSH, with `passwd`. That is how
+it was found and reported.
+
+**Why nothing caught it.** It compiles, it lints, it renders, and the
+page-length gate measures height. Logging in was unaffected, so the one
+password box anybody used daily was the one that could not break: that form
+reads the page on submit rather than holding state.
+
+The interface's CI now types into every visible box of every tab in a real
+browser and fails on one that does not keep what was typed. It was checked
+against the unfixed component, where it names exactly those three boxes,
+and against a real board before and after the fix — the demo build and the
+bundle a board serves are different builds, and only the second one
+answers for a board.
+
 ### Every board shipped with the same password, and kept it
 
 **Fixed in the next release (SQU-275).** A board leaves the factory as `root` /
