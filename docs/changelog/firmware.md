@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 32 entries, newest v2.35.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 33 entries, newest v2.36.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.35.0**, 21 September 2026. 32 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.36.0**, 22 September 2026. 33 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,56 @@ Newest release **v2.35.0**, 21 September 2026. 32 in total. Each entry is this r
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.35.0 — 21 September 2026"
+???+ note "v2.36.0 — 22 September 2026"
+
+    Pins **bmcd 2.38.2** and **BMC-UI 3.35.0**; tpi stays at 1.10.0. Two fixes,
+    both from one report the day after v2.35.0 shipped, by the same reader whose
+    report shaped it, on the same 2.4 board: a static address that lost its
+    resolvers at every reboot, and a firmware check that said "nothing new" on a
+    board that could not resolve anything at all. They share a cause — the board
+    had no DNS — and neither of them said so.
+
+    **Fixed**
+
+    - **A static address came back from every reboot with no resolvers.** The
+      stanza the address card writes carried a `#` — the tag the DHCP client
+      puts on its own resolv.conf lines, kept so a later lease can replace them
+      — and the board's `ifup` reads `#` anywhere on a line as a comment. The
+      hook that rebuilds `/etc/resolv.conf` (a link into memory on this image,
+      empty at every boot) was cut off, the shell refused it, and `ifup br0`
+      failed at every boot after the address was already on the bridge. The
+      board came up reachable, with a clock that could not find its server. The
+      hook now spells the character so it survives; a board the old stanza was
+      already written to is repaired the first time this daemon starts, without
+      waiting for the address to be changed again.
+
+    - **A firmware source it could not reach said "nothing new".**
+      `tpi-selfupdate --list` calls `die` when curl cannot reach the source, and
+      `die` exits — but on the left of a pipe it exits only its own subshell.
+      The JSON array had already been opened, the loop then read nothing, and
+      the script closed the array and exited 0: a well-formed `"releases":[]`
+      with the real reason on stderr, which nobody was reading. bmcd took that
+      as "this source offers nothing" and the firmware page said there was no
+      update, on a board that simply had no DNS. Reported alongside the clock,
+      from the same board; reproduced on board B with an empty `resolv.conf` —
+      four sources, no candidates, no errors.
+
+      Both listing branches now collect into a variable first, where a non-zero
+      exit is visible, and print nothing on stdout unless they succeeded.
+      `tests/listing.sh` stubs `curl` and covers it in dash, busybox ash and
+      sh; run against the original script it reports five failures, which is
+      how it was checked. bmcd 2.38.2 is the other half: it reads the exit
+      status before the output, so the next script that fails cheerfully cannot
+      put the page back to lying.
+
+    **Changed**
+
+    - **BMC-UI 3.35.0 changes nothing on a board.** It teaches the site's demo
+      to run the address flow — apply, the window, confirm, revert — so a
+      reader can try it. Pinned because a release ships the latest of every
+      component, the rule this image has kept since v2.26.0.
+
+??? note "v2.35.0 — 21 September 2026"
 
     Pins **bmcd 2.38.0**, **BMC-UI 3.34.1** and **tpi 1.10.0**. All three come
     from one Discord report on 2026-09-21: a user on a 2.4 board — the second
