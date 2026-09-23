@@ -8,6 +8,37 @@
   <updated>2026-09-23T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.39.0</title>
+    <link href="https://turingpi.xyz/news/v2.39.0/"/>
+    <id>tag:turingpi.xyz,2026-09-23:firmware/2.39.0</id>
+    <updated>2026-09-23T00:00:00Z</updated>
+    <content type="text">Pins **bmcd 2.38.3** and **BMC-UI 3.38.0**; tpi stays at 1.10.0. One bug,
+from a reader who named a VLAN.
+
+### Fixed
+
+- **Naming a VLAN greyed out *Try it* and *Apply*, under a line blaming the
+  board.** Type a word beside a VLAN number in the switch card and the
+  buttons went grey with *&quot;This board cannot check a configuration before
+  it is applied.&quot;* — a sentence true of neither the board nor the layout.
+  The daemon had refused the request over a corner of how it reads one:
+  `validate` and `PUT` accept either a preset or a whole document, and the
+  type that says &quot;either&quot; buffers the body before deciding; in the buffered
+  form a map key `&quot;50&quot;` never becomes the number the names table is keyed
+  by. So a document with no names read fine and a document with one name
+  was refused, on both endpoints, on every release since names existed
+  (v2.33.0). Reported as
+  [#59](https://github.com/excavador-turing/BMC-Firmware/issues/59) and
+  reproduced on a board with the same document twice.
+
+  bmcd 2.38.3 reads the names by their wire form, so both paths agree, with
+  a test that fails on the old code with the reporter's exact message. And
+  BMC-UI 3.38.0 stops standing one sentence in for two failures: a rejected
+  request now shows the daemon's own words — *&quot;The board refused the
+  question rather than the layout: …&quot;* — and *cannot check* is kept for the
+  one case it was written for, no answer at all.</content>
+  </entry>
+  <entry>
     <title>Firmware v2.38.0: The page now says what the board is doing while it installs</title>
     <link href="https://turingpi.xyz/news/v2.38.0/"/>
     <id>tag:turingpi.xyz,2026-09-23:firmware/2.38.0</id>

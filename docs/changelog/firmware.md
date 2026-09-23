@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 35 entries, newest v2.38.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 36 entries, newest v2.38.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.38.0**, 22 September 2026. 35 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.38.0**, 22 September 2026. 36 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,35 @@ Newest release **v2.38.0**, 22 September 2026. 35 in total. Each entry is this r
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.38.0 — 22 September 2026"
+???+ note "v2.39.0 — 23 September 2026 (not released)"
+
+    Pins **bmcd 2.38.3** and **BMC-UI 3.38.0**; tpi stays at 1.10.0. One bug,
+    from a reader who named a VLAN.
+
+    **Fixed**
+
+    - **Naming a VLAN greyed out *Try it* and *Apply*, under a line blaming the
+      board.** Type a word beside a VLAN number in the switch card and the
+      buttons went grey with *"This board cannot check a configuration before
+      it is applied."* — a sentence true of neither the board nor the layout.
+      The daemon had refused the request over a corner of how it reads one:
+      `validate` and `PUT` accept either a preset or a whole document, and the
+      type that says "either" buffers the body before deciding; in the buffered
+      form a map key `"50"` never becomes the number the names table is keyed
+      by. So a document with no names read fine and a document with one name
+      was refused, on both endpoints, on every release since names existed
+      (v2.33.0). Reported as
+      [#59](https://github.com/excavador-turing/BMC-Firmware/issues/59) and
+      reproduced on a board with the same document twice.
+
+      bmcd 2.38.3 reads the names by their wire form, so both paths agree, with
+      a test that fails on the old code with the reporter's exact message. And
+      BMC-UI 3.38.0 stops standing one sentence in for two failures: a rejected
+      request now shows the daemon's own words — *"The board refused the
+      question rather than the layout: …"* — and *cannot check* is kept for the
+      one case it was written for, no answer at all.
+
+??? note "v2.38.0 — 22 September 2026"
 
     Pins **BMC-UI 3.37.0**. bmcd stays at 2.38.2 and tpi at 1.10.0. One change,
     from a reader who had just done an update for the first time.

@@ -1,5 +1,5 @@
 ---
-description: "Every bmcd release and what changed in it: 42 entries, newest 2.38.2, taken from the repository's own CHANGELOG.md."
+description: "Every bmcd release and what changed in it: 43 entries, newest 2.38.3, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,33 @@ hide:
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.38.2**, 22 September 2026. 42 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.38.3**, 23 September 2026. 43 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "2.38.2 — 22 September 2026"
+???+ note "2.38.3 — 23 September 2026"
+
+    **Fixed**
+
+    - **A switch document with a VLAN name was refused by `validate` and by
+      `PUT`, as "did not match any variant of untagged enum Proposal".** The
+      same document with `names: {}` passed. Both endpoints accept either a
+      preset or a whole document, and the type that says "either" is
+      `#[serde(untagged)]`, which buffers the body before choosing; in the
+      buffered form a map key `"50"` is a string that never becomes the `u16`
+      the names table is keyed by — while a direct read of the struct converts
+      it, which is why every unit test of the document passed. From the day
+      names existed. Reported as
+      [BMC-Firmware#59](https://github.com/excavador-turing/BMC-Firmware/issues/59)
+      by a reader whose interface greyed out *Try it* and *Apply* and told him
+      his board could not check a layout; reproduced on a board with the same
+      document twice.
+
+      Names are now read from their wire form — string keys, parsed here — so
+      both paths agree, and a key that is not a VLAN id is refused by name
+      rather than as "no variant matched". A test feeds a named document through
+      `Proposal` and through the flattened `PUT` body; on the old code it fails
+      with the reporter's exact message.
+
+??? note "2.38.2 — 22 September 2026"
 
     **Fixed**
 

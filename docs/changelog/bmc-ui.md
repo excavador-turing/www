@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-UI release and what changed in it: 36 entries, newest v3.37.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-UI release and what changed in it: 37 entries, newest v3.38.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,25 @@ hide:
 
 The web interface the board serves.
 
-Newest release **v3.37.0**, 22 September 2026. 36 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v3.38.0**, 23 September 2026. 37 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "v3.37.0 — 22 September 2026"
+???+ note "v3.38.0 — 23 September 2026"
+
+    **Changed**
+
+    - **A refused validate request shows the daemon's words, not "this board
+      cannot check".** The switch card showed one sentence for two different
+      failures: a daemon with no validate endpoint, and a daemon that has one and
+      rejected the request as malformed. Only the first means "cannot check"; the
+      second says why in its body. A reader who named a VLAN got the sentence
+      ([BMC-Firmware#59](https://github.com/excavador-turing/BMC-Firmware/issues/59))
+      and went looking at his board revision, when the daemon had refused the
+      request over how it reads names — fixed in bmcd 2.38.3. From now on a
+      rejected request reads *"The board refused the question rather than the
+      layout: …"* with the daemon's reason, so the next reader is told which it
+      was.
+
+??? note "v3.37.0 — 22 September 2026"
 
     **Changed**
 

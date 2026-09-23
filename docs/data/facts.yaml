@@ -15,17 +15,17 @@ releases:
   source: "docs/changelog/*.md, written by `just refresh-changelog` from each repository's CHANGELOG.md"
   firmware:
     newest: v2.38.0
-    count: 35
-  bmcd:
-    newest: 2.38.2
-    count: 42
-  ui:
-    newest: v3.37.0
     count: 36
+  bmcd:
+    newest: 2.38.3
+    count: 43
+  ui:
+    newest: v3.38.0
+    count: 37
   tpi:
     newest: v1.10.0
     count: 15
-  total: 128
+  total: 131
 features:
   source: docs/features/*.md -- a feature is a page
   count: 11
