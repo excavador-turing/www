@@ -138,3 +138,17 @@ v2.38.0:
     "about 26 s, now at N", measured on a real board like the reboot
     banner's number. Nothing is armed until the board says staged, and the
     page says that too.
+
+# v2.39.0 -- a reader named a VLAN and the switch card refused to check the
+# layout, blaming his board. bmcd 2.38.3 + BMC-UI 3.38.0.
+v2.39.0:
+  title: Naming a VLAN greyed out Try it and Apply, and blamed the board
+  summary: >-
+    Type a word beside a VLAN number and the switch card said "this board
+    cannot check a configuration before it is applied" — a line that was
+    true of neither the board nor the layout. The daemon had refused the
+    request over a corner of how it reads one, on every release since
+    names existed. Fixed in the daemon, with a test that fails on the old
+    code; and the card now repeats the daemon's own words when a request is
+    refused, instead of a sentence that sends people looking at their
+    board revision.

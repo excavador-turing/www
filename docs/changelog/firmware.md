@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 36 entries, newest v2.38.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 36 entries, newest v2.39.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.38.0**, 22 September 2026. 36 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.39.0**, 23 September 2026. 36 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,7 @@ Newest release **v2.38.0**, 22 September 2026. 36 in total. Each entry is this r
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.39.0 — 23 September 2026 (not released)"
+???+ note "v2.39.0 — 23 September 2026"
 
     Pins **bmcd 2.38.3** and **BMC-UI 3.38.0**; tpi stays at 1.10.0. One bug,
     from a reader who named a VLAN.
