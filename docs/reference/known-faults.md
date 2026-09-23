@@ -127,6 +127,40 @@ userspace dies stays dead until someone cuts its power.
 
 ## Fixed, and worth knowing about
 
+### Naming a VLAN made the switch card refuse to check the layout
+
+**Affected v2.33.0 to v2.38.0; fixed in v2.39.0
+([#59](https://github.com/excavador-turing/BMC-Firmware/issues/59)).** Type
+a name beside a VLAN in the switch card and *Try it* and *Apply* greyed out,
+under the line *"This board cannot check a configuration before it is
+applied."* Clear the name and they came back. A reader took the line at its
+word and asked whether his board revision lacked the feature. It did not;
+the daemon had refused the question.
+
+The cause is a corner of how the daemon reads a request. `validate` and
+`PUT` accept either a preset or a whole document, and the type that says
+"either" makes the parser buffer the body before deciding. In the buffered
+form a map key `"50"` is a string that never becomes the number the names
+table is keyed by — so a document with no names read fine, and a document
+with one name was refused as *"did not match any variant"*, on both
+endpoints, from the day names existed. Reproduced on a board with the same
+document twice: `names: {}` accepted, `names: {"1": "test"}` refused.
+
+The daemon now reads the names by their wire form — string keys, parsed —
+so both paths agree. A test feeds a named document through the "either"
+type and fails on the old code with the reporter's exact message. Checked
+on a board after the flash: the reporter's exact request answers 200. (A
+key that is not a VLAN id at all still gets the generic "did not match any
+variant" through the endpoint rather than a message naming the key; no
+client sends one, and the earlier draft of this entry claimed otherwise.)
+
+**And the line was wrong to say what it said.** The interface showed the
+same sentence for a daemon with no validate endpoint and for a daemon that
+had one and rejected the request; only the first means "cannot check". From
+BMC-UI 3.38.0 a rejected request shows the daemon's own words instead —
+*"The board refused the question rather than the layout: …"* — so the next
+reader is told which it was.
+
 ### The password form would not accept typing
 
 **Affected every release from v2.28.0 to v2.36.0; fixed in v2.37.0

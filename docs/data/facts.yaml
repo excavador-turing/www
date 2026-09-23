@@ -14,7 +14,7 @@ gate:
 releases:
   source: "docs/changelog/*.md, written by `just refresh-changelog` from each repository's CHANGELOG.md"
   firmware:
-    newest: v2.38.0
+    newest: v2.39.0
     count: 36
   bmcd:
     newest: 2.38.3
