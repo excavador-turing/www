@@ -40,9 +40,10 @@ from `tpi metrics show`. Both are gone.
 The scrape config is on the [metrics reference](../reference/metrics.md#scraping-it).
 Two things about it are easy to get wrong:
 
-- The certificate on the board is expired, so `insecure_skip_verify` is
-  required today. That is a [known fault](../reference/known-faults.md), not a
-  design choice.
+- It is plain HTTP on port 9110 — no `scheme: https`, no `tls_config`, no
+  token. An earlier version of this page said the board's expired certificate
+  forced `insecure_skip_verify`; that was the old `:443` endpoint, gone since
+  v2.15.0, and the sentence outlived it.
 - Set the `instance` label deliberately. It follows the board's hostname, so
   renaming the board splits its history in two, and renaming back does not
   rejoin them.
@@ -53,6 +54,50 @@ In Grafana: **Dashboards → New → Import**, upload the file, and pick your
 Prometheus-compatible datasource when it asks for `DS_PROMETHEUS`. It works
 against Prometheus, VictoriaMetrics and Mimir; nothing in it is specific to
 one of them.
+
+### The data source is the scraper, not the board
+
+The board serves a page of numbers; it does not store them and it cannot
+answer a query. Grafana's Prometheus data source has to point at whatever
+**scrapes** the board — a Prometheus server, VictoriaMetrics, Mimir — and
+never at the board itself. The chain is:
+
+```
+board :9110  ──scraped by──▶  Prometheus :9090  ──queried by──▶  Grafana
+```
+
+So the URL in *Connections → Data sources → Prometheus* is the scraper's,
+typically `http://<prometheus host>:9090`. If you put the board's address
+there, *Save & test* fails and Grafana's log says
+**`failed to get Prometheus heuristics`** — Grafana asked the URL a question
+only a Prometheus server can answer, and got the metrics page instead. The
+`curl` you ran against `:9110` returning data is exactly what it should do,
+and is not the thing Grafana needs.
+
+If you have Grafana and nothing scraping yet, the smallest Prometheus that
+will do is one container and one file. `prometheus.yml`:
+
+```yaml
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: turingpi-bmc
+    static_configs:
+      - targets: ["192.168.1.59:9110"]   # your board
+        labels:
+          instance: bmc-1                  # your name for it
+```
+
+```console
+$ docker run -d --name prometheus -p 9090:9090 \
+    -v "$PWD/prometheus.yml:/etc/prometheus/prometheus.yml" prom/prometheus
+```
+
+Then the data source URL is `http://<the host running that container>:9090`
+— `http://prometheus:9090` if Grafana runs in the same Compose network,
+`http://localhost:9090` if both run on the same machine outside containers.
+Confirm the scrape before blaming the dashboard: `http://<host>:9090/targets`
+should list `turingpi-bmc` as **UP**.
 
 ## What it shows
 
