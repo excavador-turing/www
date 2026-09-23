@@ -68,6 +68,17 @@ page which blocks the rest of the interface. Nothing needs undoing
 afterwards. The full account is in
 [what is and isn't fixed](reference/known-faults.md).
 
+## Grafana's Save & test fails with "failed to get Prometheus heuristics". What is wrong?
+
+The data source URL points at the board. The board serves a page of numbers on
+port 9110 and cannot answer queries; Grafana needs a Prometheus server (or
+VictoriaMetrics, or Mimir) that *scrapes* the board, and its URL is that
+server's — `http://<prometheus host>:9090` — never the board's. That `curl`
+against `:9110` returns data is correct and is not what Grafana is asking
+for. The [monitoring guide](guides/monitor-it.md#the-data-source-is-the-scraper-not-the-board)
+has the one-container Prometheus for people who have Grafana and nothing
+scraping yet.
+
 ## Which board revisions does it run on?
 
 **v2.5.2**, on the two boards this fork is developed against, and **v2.4**,
