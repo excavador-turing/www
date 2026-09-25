@@ -20,4 +20,4 @@ These four version together. The firmware image carries a `bmcd`, a `BMC-UI` and
 
 New firmware releases come through [the feed](../feed.xml). What is planned rather than done is on the [roadmap](../roadmap.md), ordered by votes.
 
-Refreshed 24 September 2026 by `just refresh-changelog`.
+Refreshed 25 September 2026 by `just refresh-changelog`.
