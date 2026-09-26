@@ -3,7 +3,7 @@
 # Every number this site quotes about itself, with where it came
 # from. Pages read it through the macros plugin: {{ gate.updates }},
 # never 26. scripts/facts-lint.py fails a build that types one.
-generated: 2026-09-25
+generated: 2026-09-26
 gate:
   source: "reference/gate-history.md, written by `just refresh-gate-history <board>` from the board's own bmcd_firmware_promotion_total counter"
   as_of: 2026-09-12
@@ -59,7 +59,7 @@ faults:
     - There is no watchdog
 roadmap:
   source: docs/data/roadmap.json, written by `just refresh-roadmap` from the Ideas discussions
-  as_of: 2026-09-25
+  as_of: 2026-09-26
   count: 7
   shipped: 2
   votes: 18
