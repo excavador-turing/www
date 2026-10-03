@@ -70,7 +70,7 @@ $ step ca certificate bmc-1.lan bmc.crt bmc.key
 
 Three ways, and they do the same thing:
 
-* **The Security tab**, under *Install your own* — paste the certificate and
+* **The Security page**, under *Install your own* — paste the certificate and
   its key.
 * **`tpi tls install --cert cert.pem --key key.pem`**, from any machine that
   can reach the board.

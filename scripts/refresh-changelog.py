@@ -340,7 +340,7 @@ def write_index(summary: list[dict]) -> pathlib.Path:
         "</div>",
         "",
         "These four version together. The firmware image carries a `bmcd`, a "
-        "`BMC-UI` and a `tpi`, and the board's About tab names all four — so a "
+        "`BMC-UI` and a `tpi`, and the board's Dashboard names all four — so a "
         "firmware version is the one to quote when reporting anything.",
         "",
         "New firmware releases come through [the feed](../feed.xml). What is "

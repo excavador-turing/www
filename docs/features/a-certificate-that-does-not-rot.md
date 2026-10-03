@@ -11,11 +11,9 @@ feature:
   summary: Named, renewed before it expires, and it refuses to overwrite one you installed.
   lede: Stock firmware serves a certificate no browser will accept, valid for thirty days, and never replaces
     it. This one is named after the board, renews itself, and will not overwrite yours.
-  capture: login.png
-  alt: The login page the certificate protects. On stock firmware no browser would accept the certificate
-    in front of it.
-  caption: The login page the certificate protects. On stock firmware no browser would accept the certificate
-    in front of it.
+  capture: security.png
+  alt: "The Security page, showing the certificate the board serves: who issued it, its key and when it expires. On stock firmware no browser would accept the certificate in front of it."
+  caption: "The Security page: the certificate the board serves, who issued it, its key and when it expires. On stock firmware no browser would accept the certificate in front of it."
   proofs:
   - n: '825'
     of: days of validity, renewed 30 days before it ends
@@ -33,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The interface the certificate protects.
+      note: The Security page, with the certificate the board serves.
     do:
       href: ../../guides/install/
       text: Do it on your board

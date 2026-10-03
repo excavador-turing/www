@@ -11,11 +11,9 @@ feature:
   summary: A longterm kernel, a supported Buildroot, and six named faults taken out.
   lede: Upstream's last release was February 2025, on a kernel that is not a longterm release and a Buildroot
     that is end of life. This fork tracks both and has taken out six named faults.
-  capture: about.png
-  alt: 'What the board says it is running: kernel, daemon, interface and firmware, each a version you
-    can check against a release.'
-  caption: 'The board''s About tab: kernel, daemon, interface and firmware, each a version you can check
-    against a release.'
+  capture: dashboard.png
+  alt: "The Dashboard: the board's facts and, in the Software card, the firmware, daemon, kernel and interface it is running, each a version you can check against a release."
+  caption: "The Dashboard's Software card: firmware, daemon, kernel and interface, each a version you can check against a release."
   proofs:
   - n: '6.12'
     of: LTS kernel, against upstream's 6.8
@@ -33,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The About tab, naming every component's version.
+      note: The Dashboard, naming every component's version.
     do:
       href: ../../guides/upgrade-from-stock/
       text: Do it on your board

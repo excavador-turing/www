@@ -11,10 +11,9 @@ feature:
   summary: Patching the management computer leaves the four compute modules powered.
   lede: Upstream power-cycles all four compute modules to patch the management computer beside them. This
     fork leaves their rails alone, so updating the board does not take the cluster down.
-  capture: nodes.png
-  alt: The four compute modules, powered and counted in uptime. A BMC upgrade leaves every one of them
-    exactly like this.
-  caption: The four compute modules, powered and counted in uptime, across a BMC upgrade.
+  capture: power-control.png
+  alt: "The Power Control page: the four compute modules, each switched on and counted in uptime. A BMC upgrade leaves every one of them exactly like this."
+  caption: "The four compute modules on the Power Control page, powered and counted in uptime, across a BMC upgrade."
   proofs:
   - n: '0'
     of: modules power-cycled by a BMC update
@@ -32,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The Nodes tab, with every module powered and counted.
+      note: The Power Control page, with every module powered and counted.
     do:
       href: ../../guides/upgrade-from-stock/
       text: Do it on your board

@@ -251,7 +251,7 @@ jobs:
               { "id": "bmc-1", "name": "bmc-1 (board A)", "note": "hive-1 … hive-4" },
               { "id": "bmc-2", "name": "bmc-2 (board B)", "note": "hive-5 … hive-8" }
             ],
-            "supportedBmcd": { "min": "2.20.0", "max": "2.34.0" }
+            "supportedBmcd": { "min": "2.20.0", "max": "2.38.3" }
           }
           JSON
           python3 scripts/demo-ribbon.py

@@ -21,10 +21,10 @@ feature:
     of: hostname exposed for the whole estate
     source: the fleet interface as shipped in BMC-UI 3.29.0
     as_of: '2026-09-13'
-  - n: '9'
-    of: tabs per board, the same ones a board serves
-    source: the fleet interface as shipped in BMC-UI 3.29.0
-    as_of: '2026-09-13'
+  - n: '11'
+    of: pages per board, the same ones a board serves
+    source: the fleet interface as shipped in BMC-UI 4.0.0
+    as_of: '2026-10-03'
   - n: '0'
     of: credentials held by the page
     source: the fleet interface as shipped in BMC-UI 3.29.0
@@ -55,7 +55,7 @@ description: "Drive every Turing Pi 2 in the cluster from one page that holds no
 
 ## The argument
 
-The page renders each board's own tabs from the same data layer the board's page uses, so the two cannot drift apart. It holds no credential: a gateway in front of it authenticates the operator and presents a client certificate the board trusts, which is why no board needs to be reachable from anywhere else.
+The page renders each board's own pages from the same data layer the board's page uses, so the two cannot drift apart. It holds no credential: a gateway in front of it authenticates the operator and presents a client certificate the board trusts, which is why no board needs to be reachable from anywhere else.
 
 [The full argument, with every measurement →](../why/one-page-over-every-board.md)
 

@@ -12,10 +12,8 @@ feature:
   lede: Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release.
     Here the source is a setting, and every candidate arrives with its checksum.
   capture: sources.png
-  alt: 'Where this board looks for firmware: this fork, upstream''s two catalogues and the SD card, with
-    the checksum each publisher does or does not ship.'
-  caption: 'Where a board looks for firmware: this fork, upstream''s two catalogues and the SD card, with
-    the checksum each publishes.'
+  alt: "Firmware sources: where this board looks for firmware, which are this fork, the SD card and upstream's two catalogues."
+  caption: "Firmware sources, opened from the Firmware page: this fork, the SD card and upstream's two catalogues."
   proofs:
   - n: '3'
     of: 'kinds of source: this fork, upstream, the card'
@@ -33,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The firmware sources, with what each one publishes.
+      note: The firmware sources, opened from the Firmware page.
     do:
       href: ../../guides/upgrade-from-stock/
       text: Do it on your board

@@ -33,7 +33,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-hero__show" markdown>
-![The Firmware tab: the running slot, the image the board can fall back to, and when the gate last promoted one.](assets/captures/firmware.png)
+![The Firmware page: the running slot, the image the board can fall back to, and when the gate last promoted one.](assets/captures/firmware.png)
 </figure>
 
 </section>
@@ -57,7 +57,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-chapter__show" markdown>
-![The board's own About tab, naming the firmware, daemon and interface it is running.](assets/captures/about.png){ loading=lazy }
+![The board's own Dashboard, naming the firmware, daemon and interface it is running.](assets/captures/dashboard.png){ loading=lazy }
 <figcaption>Read off the board on {{ gate.as_of }}, not counted by hand.</figcaption>
 </figure>
 
@@ -82,7 +82,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-chapter__show" markdown>
-![The four compute modules, powered and counted in uptime, across a BMC upgrade.](assets/captures/nodes.png){ loading=lazy }
+![The four compute modules on the Power Control page, powered and counted in uptime, across a BMC upgrade.](assets/captures/power-control.png){ loading=lazy }
 <figcaption>Every module exactly as it was, uptime unbroken.</figcaption>
 </figure>
 
@@ -99,7 +99,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 
 <div class="tp-proof">
 <div><b>1</b><span>hostname for the whole estate</span></div>
-<div><b>9</b><span>tabs per board, the same ones the board serves</span></div>
+<div><b>11</b><span>pages per board, the same ones the board serves</span></div>
 <div><b>0</b><span>credentials held by the page</span></div>
 </div>
 
@@ -132,7 +132,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 
 <figure class="tp-chapter__show" markdown>
-![The board's About tab: kernel, daemon, interface and firmware, each a version you can check against a release.](assets/captures/info.png){ loading=lazy }
+![The Dashboard's Software card: kernel, daemon, interface and firmware, each a version you can check against a release.](assets/captures/dashboard.png){ loading=lazy }
 <figcaption>What the board says it is running, every part of it checkable.</figcaption>
 </figure>
 

@@ -31,7 +31,9 @@ page is the transition itself.
     Buildroot 2025.02.17, kernel **6.12.109 LTS**. The daemon and the
     interface have moved on since — the
     [changelog](../changelog/index.md) is the live answer — but the tabs and
-    the kernel are what this page is about.
+    the kernel are what this page is about. Since BMC-UI 4.0.0 the tabs are a
+    sidebar and the pages have new names; the capture shows the interface as it
+    was then.
 
 The full stock interface, tab by tab, is [its own
 page](../reference/factory-firmware.md), captured before this board was
@@ -92,7 +94,7 @@ Measured on the run described above:
 | | |
 |---|---|
 | Transfer of 36.12 MiB | 26.6 s |
-| Install from a source in the Firmware tab, until it says staged | 26 s |
+| Install from a source on the Firmware page, until it says staged | 26 s |
 | Reboot, until the board answers again | 48 s |
 | Compute modules disturbed | **none** |
 
