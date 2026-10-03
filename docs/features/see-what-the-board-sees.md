@@ -11,11 +11,9 @@ feature:
   summary: The temperature sensor upstream never described, and a fan that says why it is where it is.
   lede: The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing
     could read it and the fan ran against nothing.
-  capture: info.png
-  alt: 'The Overview: temperature and the trip that explains the fan''s step, beside storage, load, memory
-    and the clock.'
-  caption: 'The Overview: temperature and the trip that explains the fan''s step, beside storage, load,
-    memory and the clock.'
+  capture: cooling.png
+  alt: "The Cooling page: the BMC's temperature against the points where the fan steps up, and the fan's own step and mode."
+  caption: "The Cooling page: the BMC's temperature against the points where the fan steps up, with the fan's step and mode below it."
   proofs:
   - n: '5'
     of: trip points the fan follows
@@ -33,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The Overview tab, with real readings from a board.
+      note: The Cooling page, with real readings from a board.
     do:
       href: ../../guides/monitor-it/
       text: Do it on your board

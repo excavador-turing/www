@@ -12,10 +12,8 @@ feature:
   lede: Upstream promotes a new image the moment it boots, which proves the kernel started and nothing
     else. Here an image boots on trial and is kept only if the board answers properly afterwards.
   capture: firmware.png
-  alt: 'The Firmware tab: the running slot, the image it can fall back to, and when the gate last promoted
-    one.'
-  caption: 'The Firmware tab: the running slot, the image it can fall back to, and when the gate last
-    promoted one.'
+  alt: "The Firmware page: the running slot, the image it can fall back to, and when the gate last promoted one."
+  caption: "The Firmware page: the running slot, the image it can fall back to, and when the gate last promoted one."
   proofs:
   - n: '26'
     of: updates taken on this board
@@ -33,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The Firmware tab, answering from a real board's data.
+      note: The Firmware page, answering from a real board's data.
     do:
       href: ../../guides/install/
       text: Do it on your board

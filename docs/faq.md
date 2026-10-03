@@ -41,7 +41,7 @@ browser once and every certificate it issues is trusted — which is also the
 only fix for the serial console, because a click-through exception is not
 applied to a WebSocket.
 
-Getting your certificate onto the board is a control now — the Security tab,
+Getting your certificate onto the board is a control now — the Security page,
 `tpi tls install`, or the API — and it takes effect without a restart.
 Automatic renewal over ACME is still on [the roadmap](roadmap.md). Let's
 Encrypt is possible and is the wrong tool here, for three reasons.
@@ -91,13 +91,13 @@ says so rather than implying a test matrix that does not exist.
 
 ## The clock says "not synchronised". What now?
 
-Since v2.35.0 the Time card on Settings lists every source chrony knows and
+Since v2.35.0 the Time card on the Maintenance page lists every source chrony knows and
 what it thinks of it, in chrony's own terms. Two states cover nearly every
 report:
 
 - **unresolved** — the board could not look the name up. It has no working
   resolver, which is what a static address set by hand over SSH leaves
-  behind on this image. Give it one on the Network tab (the address card
+  behind on this image. Give it one on the Network page (the address card
   takes resolvers), or use the server's address instead of its name.
 - **unreachable** — the server never answered: wrong address, a firewall, or
   a router that does not serve NTP at all.

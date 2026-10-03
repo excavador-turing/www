@@ -12,9 +12,8 @@ feature:
   lede: Reaching a compute module's serial console used to mean a USB adapter and three jumper wires.
     The BMC is already wired to all four, so this fork puts them in the browser.
   capture: console.png
-  alt: A module's console in the browser, opened on the scrollback the daemon kept before the tab was.
-  caption: A module's console in the browser, opened on the scrollback the daemon kept before the tab
-    was.
+  alt: "A module's console on the Console page, with its reader state, Clear, Redraw and Reconnect."
+  caption: "A module's console in the browser, on the Console page."
   proofs:
   - n: '4'
     of: consoles, one per module
@@ -32,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The Console tab, replaying a real recording.
+      note: The Console page, replaying a recording.
     do:
       href: ../../reference/cli/
       text: Do it on your board

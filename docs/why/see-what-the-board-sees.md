@@ -118,10 +118,12 @@ not be able to power off a node.
 
 ## Where the reading lives
 
-On Board Health, beside load and memory, since BMC-UI 3.26.0. Before that it
-was on the Settings tab inside the fan card — a reading filed with a control,
-so someone asking "is this board hot?" opened the tab called Board Health,
-found five other health numbers, and concluded the board could not tell them.
+On the Cooling page, and as a row on the Dashboard, since BMC-UI 4.0.0. Before
+that it was on Board Health, beside load and memory, from BMC-UI 3.26.0; and
+before that on the Settings tab inside the fan card — a reading filed with a
+control, so someone asking "is this board hot?" opened the tab called Board
+Health, found five other health numbers, and concluded the board could not
+tell them.
 
 It shows the temperature, the fan's step, and the trip point that explains the
 step, because a step with no reason beside it reads as arbitrary:
@@ -130,8 +132,9 @@ step, because a step with no reason beside it reads as arbitrary:
 Temperature   53.8 °C   fan step 5 of 6   above the 45 °C trip
 ```
 
-The slider that commands the fan stays on Settings. The control belongs there.
-The reading does not.
+The control that commands the fan was kept apart from the reading on purpose.
+Since BMC-UI 4.0.0 they are two cards on the same Cooling page, the reading
+first.
 
 ## What it does not cover
 
@@ -139,4 +142,4 @@ The board reads its own temperature; it does not act on it. There is no `critica
 
 And a reading is not a record. These numbers are what the board says now; keeping them means [scraping the metrics port](../guides/monitor-it.md), which is a separate thing to run.
 
-<div class="tp-next tp-next--argument"><a href="../../features/see-what-the-board-sees/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The Overview tab, with real readings from a board.</span></a><a href="../guides/monitor-it/"><b>Do it on your board →</b><span>The metrics port, a scrape config and the dashboard.</span></a><a href="../reference/metrics/"><b>The evidence →</b><span>Every family the board can measure, catalogued.</span></a><a href="../the-board-describes-itself/"><b>The board describes its own API →</b><span>Where the readings on this page come from.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="../../features/see-what-the-board-sees/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="../#demo/fork"><b>See it in the demo →</b><span>The Cooling page, with real readings from a board.</span></a><a href="../guides/monitor-it/"><b>Do it on your board →</b><span>The metrics port, a scrape config and the dashboard.</span></a><a href="../reference/metrics/"><b>The evidence →</b><span>Every family the board can measure, catalogued.</span></a><a href="../the-board-describes-itself/"><b>The board describes its own API →</b><span>Where the readings on this page come from.</span></a></div>

@@ -25,7 +25,7 @@
 
   The picture is always a capture of the interface, never a drawing and never
   a crop: the same rule the rest of the site is held to. A post uses the
-  capture its editorial entry names; everything else uses the Nodes tab.
+  capture its editorial entry names; everything else uses the Power Control page.
 
   DOES NOT ADD -- Material's `social` plugin, which would draw a card per
   page. It needs Cairo and Pango in CI, and a drawn card says less than a
@@ -42,7 +42,7 @@
 #}
 {% set og_title = config.site_name if page and page.is_homepage else (page.title | striptags if page and page.title else config.site_name) %}
 {% set og_desc = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
-{% set og_image = base ~ '/assets/' ~ page.meta.image if page and page.meta and page.meta.image else base ~ '/assets/captures/nodes.png' %}
+{% set og_image = base ~ '/assets/' ~ page.meta.image if page and page.meta and page.meta.image else base ~ '/assets/captures/power-control.png' %}
 
 {% block extrahead %}
   {{ super() }}

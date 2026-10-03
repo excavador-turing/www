@@ -240,7 +240,7 @@ power cycle unless you confirmed it.**
 Once the modules are on their own network, the next thing people change is
 the BMC's address — and until v2.35.0 that meant SSH and a hand-edited
 `/etc/network/interfaces`, which on this image leaves the board with no
-resolver. Now it is a card on the Network tab, beside the hostname.
+resolver. Now it is a card on the Network page, beside the hostname.
 
 **DHCP or Static.** The card shows what the bridge has right now — the lease
 or the fixed address, the gateway, the resolvers — and two pills. Static asks

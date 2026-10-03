@@ -109,7 +109,7 @@ would describe something that is not being served.
 
 **It does not issue a certificate your own authority signed** — but it no
 longer stands in the way of one. Installing your own is a control on the
-Security tab, `tpi tls install`, or the API, and the board refuses a pair that
+Security page, `tpi tls install`, or the API, and the board refuses a pair that
 does not match, has expired or does not name it, having written nothing.
 [The whole story is its own guide](../guides/your-own-certificate.md).
 

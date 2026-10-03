@@ -11,11 +11,9 @@ feature:
   summary: What is on the board's own SD card, what can be written to a module, and why the rest cannot.
   lede: A 2 GB image is usually already on the board's own SD card. Installing it meant typing its path
     from memory into a field, and finding out minutes later whether you had.
-  capture: sdcard.png
-  alt: 'The picker on bmc-1: what is on the card, what can be written to a module, and how much room is
-    left.'
-  caption: 'The picker on a board: what is on the card, what can be written to a module, and how much
-    room is left.'
+  capture: flash-node.png
+  alt: "The Flash Node page: choose a node, then Choose from the SD card to list what is on the card and which images a module can be written from."
+  caption: "The Flash Node page, with Choose from the SD card beside the file field."
   proofs:
   - n: '16'
     of: entries listed off a real card
@@ -33,7 +31,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The flash picker, listing a real card's contents.
+      note: The Flash Node page, where the card's contents are listed.
     do:
       href: ../../reference/cli/
       text: Do it on your board

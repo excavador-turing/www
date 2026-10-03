@@ -37,15 +37,17 @@ v2.34.0:
 # Older releases, with the captures the site already had. Each picture is the
 # tab the release changed, captured off a board at the time; captions say
 # what the picture shows, not what the release did -- the post does that.
+# They are kept in captures/history/ because BMC-UI 4.0.0 replaced the
+# interface they show: a post describes what was true when it was written.
 
 v2.32.0:
   title: A module armed for USB boot says so
-  capture: captures/nodes.png
+  capture: captures/history/nodes.png
   caption: The Nodes tab — each module's liveness line, where an armed USB-boot pin now shows.
 
 v2.31.0:
   title: The console stops replaying its scrollback twice
-  capture: captures/console.png
+  capture: captures/history/console.png
   caption: The serial console — Reconnect keeps the terminal and adds only what it has not shown.
 
 v2.30.0:
@@ -53,32 +55,32 @@ v2.30.0:
 
 v2.28.0:
   title: Who may reach this board, from the interface that asks for the password
-  capture: captures/access.png
+  capture: captures/history/access.png
   caption: The Access card — who may reach this board, and by which route.
 
 v2.27.0:
   title: The latest of all three, and the SD card listed
-  capture: captures/about.png
+  capture: captures/history/about.png
   caption: The About tab — daemon, interface and command line, each at its newest release.
 
 v2.26.0:
   title: Choose an image off the SD card
-  capture: captures/sdcard.png
+  capture: captures/history/sdcard.png
   caption: The flash form's picker — what is on the card, and which entries can be written to a module.
 
 v2.25.0:
   title: The install confirmation is a modal
-  capture: captures/firmware.png
+  capture: captures/history/firmware.png
   caption: The Firmware tab — the candidates, and a confirmation that no longer scrolls off the page.
 
 v2.24.0:
   title: Everything current — the daemon, the interface and the CLI
-  capture: captures/info.png
+  capture: captures/history/info.png
   caption: The About tab — kernel, daemon, interface and firmware, each a version you can check.
 
 v2.23.0:
   title: TLS made usable — named, renewed, and every key served
-  capture: captures/login.png
+  capture: captures/history/login.png
   caption: The login page, behind a certificate a browser will accept.
 
 # Written ahead of the release, as the rules allow; the post appears when
@@ -152,3 +154,20 @@ v2.39.0:
     code; and the card now repeats the daemon's own words when a request is
     refused, instead of a sentence that sends people looking at their
     board revision.
+
+# v2.40.0 -- the first release whose interface was drawn by someone outside the
+# project: Sven van Ginkel's redesign, BMC-UI#46. Interface only; bmcd 2.38.3
+# and tpi 1.10.0 are unchanged. Two addresses are gone and the post says so.
+v2.40.0:
+  title: The web interface, redesigned by Sven van Ginkel
+  summary: >-
+    The tab strip is now a sidebar, and every page is redrawn. Sven van Ginkel
+    ([@svenvg93](https://github.com/svenvg93)) contributed the whole redesign
+    as [BMC-UI#46](https://github.com/excavador-turing/BMC-UI/pull/46): a
+    Dashboard that takes in the About page, Power Control where Nodes was,
+    and Cooling and Switch as pages of their own. Nothing the interface asks
+    the daemon changed. Bookmarks to `/nodes` and `/about` no longer land
+    anywhere — they show "page not found" — and Power Control and the
+    Dashboard are where to look instead.
+  capture: captures/power-control.png
+  caption: The Power Control page — the four modules, each with its switch, Restart and uptime, beside the sidebar that replaced the tab strip.

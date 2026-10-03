@@ -13,10 +13,8 @@ feature:
   lede: 'There are two ways into a board running this firmware: a local password, and a proxy holding
     a certificate the board trusts. Neither used to be visible from the interface, nor changeable there.'
   capture: access.png
-  alt: 'The access card on Settings: how you got in, the password for the local account, and the certificate
-    authority a proxy must hold to name you.'
-  caption: 'The access card on Settings: how you got in, the password for the local account, and the certificate
-    authority a proxy must hold.'
+  alt: "The Security page: the password for the local account, the board's certificate, and the trusted proxy whose certificate authority may name an operator."
+  caption: "The Security page: the password for the local account, the board's certificate, and the trusted proxy it will accept an operator's name from."
   proofs:
   - n: '2'
     of: ways in, both now visible
@@ -34,7 +32,7 @@ feature:
     demo:
       href: ../../#demo/fork
       text: See it in the demo
-      note: The access card on Settings, from captured data.
+      note: The Security page, from captured data.
     do:
       href: ../../guides/install/
       text: Do it on your board
