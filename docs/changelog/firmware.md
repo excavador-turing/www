@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 37 entries, newest v2.40.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 38 entries, newest v2.41.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.40.0**, 3 October 2026. 37 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.41.0**, 6 October 2026. 38 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,36 @@ Newest release **v2.40.0**, 3 October 2026. 37 in total. Each entry is this repo
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.40.0 — 3 October 2026"
+???+ note "v2.41.0 — 6 October 2026"
+
+    Pins **bmcd 2.38.4** and **BMC-UI 4.0.1**; tpi stays at 1.10.0. One fix,
+    from a reader on the Turing Pi Discord.
+
+    **Fixed**
+
+    - **After an upgrade the browser could keep running the old interface.** A
+      reader upgraded to v2.40.0 and saw the upgrade page report a problem, the
+      password page appear, and the nodes shown as off, until they cleared their
+      browser's cache. The board served its web pages without saying how long a
+      browser may keep them, so browsers kept the old page by their own guess,
+      and when that old page asked for its files, which the new firmware no
+      longer has, the board answered with the new page instead of "not found".
+      The old interface ran half-broken against the new board.
+
+      bmcd 2.38.4 tells the browser to check the page on every visit (cheaply,
+      with an ETag), lets it keep the numbered files under `/assets/` for a year,
+      and answers a missing file with "not found". BMC-UI 4.0.1 reloads itself
+      once when one of its files fails to load, so a browser holding an old copy
+      lands on the current interface, and shows a Reload button rather than
+      looping if that is not enough. The fleet's web server gets the same rules.
+
+      **Upgrading from v2.40.0 or older:** your browser may still hold the old
+      page once more after this upgrade, because that old page was cached under
+      the old rules. If anything looks wrong, reload the page once
+      (Ctrl+Shift+R, or Cmd+Shift+R on a Mac). From this version on, upgrades
+      do not need that.
+
+??? note "v2.40.0 — 3 October 2026"
 
     Pins **BMC-UI 4.0.0**; bmcd stays at 2.38.3 and tpi at 1.10.0. The web
     interface, redesigned.

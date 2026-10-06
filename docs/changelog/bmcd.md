@@ -1,5 +1,5 @@
 ---
-description: "Every bmcd release and what changed in it: 43 entries, newest 2.38.3, taken from the repository's own CHANGELOG.md."
+description: "Every bmcd release and what changed in it: 44 entries, newest 2.38.4, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,27 @@ hide:
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.38.3**, 23 September 2026. 43 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.38.4**, 6 October 2026. 44 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "2.38.3 — 23 September 2026"
+???+ note "2.38.4 — 6 October 2026"
+
+    **Fixed**
+
+    - **After an upgrade the browser could keep running the old interface, and
+      the page then broke: a password-change page, nodes shown as off, a failed
+      upgrade flow, until the browser cache was cleared.** The daemon sent
+      `index.html` with no cache instruction, so browsers guessed how long to
+      keep it (a fraction of its age, hours or days) and never asked again. The
+      old page then asked for script files the new firmware no longer has, and
+      was answered with the web page itself instead of a script, which the
+      browser refuses to run. Now `index.html` is always checked again (a cheap
+      "unchanged" answer when it is), the built files under `/assets/` are kept
+      for a year because their names change with their content, and a file under
+      `/assets/` that does not exist answers 404 rather than the web page. Pages
+      such as `/power-control` still open the interface on a reload, and the API
+      is untouched. Reported by a reader on the Turing Pi Discord.
+
+??? note "2.38.3 — 23 September 2026"
 
     **Fixed**
 
