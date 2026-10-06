@@ -73,20 +73,23 @@ and lands back on what you had.
 
 Every release also ships a `-sdcard-*.img`. **That card is an installer, not a
 way to try a version.** Written as it comes and put in the board, it offers a
-fresh installation of the firmware, and a fresh installation is a factory
-reset. For upgrades, use the `.tpu` — through the web interface's Firmware
-page, `tpi firmware` or `tpi-selfupdate`, as above. Those replace the root
-filesystem and keep the overlay, so the password, the certificate and the
-settings survive. The card is for recovery, or for a reset you mean to do.
+fresh installation of the firmware. For upgrades, use the `.tpu` — through the
+web interface's Firmware page, `tpi firmware` or `tpi-selfupdate`, as above.
+It replaces the root filesystem and always kept the overlay, so the password,
+the certificate and the settings survive. The card is for recovery, or for a
+reset you mean to do.
 
-!!! warning "Installing from the card erases the password, the certificate and the settings"
-    The installer formats the board's whole UBI partition and writes back only
-    the bootloader environment and the root filesystem. The overlay volume goes
-    with it: the root password returns to `turing`, the board generates a new
-    self-signed certificate, and the network, NTP, fan and node settings are
-    gone. This is how the installer from Turing Pi's own tree behaves, and
-    this fork's card inherits it. A fix that keeps them is in progress; I will
-    not name a release for it until it is in one.
+!!! warning "Cards from v2.41.0 and earlier erase the password, the certificate and the settings"
+    Until v2.41.0 the installer formatted the board's whole UBI partition and
+    wrote back only the bootloader environment and the root filesystem. The
+    overlay volume went with it: the root password returned to `turing`, the
+    board generated a new self-signed certificate, and the network, NTP, fan
+    and node settings were gone. That is how the installer from Turing Pi's own
+    tree behaves, and this fork's card inherited it. **From v2.42.0 the card
+    keeps the overlay** when the installer can verify that the volume is intact
+    and that the board will attach it afterwards. When it cannot, it erases as
+    before and says why on the serial console. A card you wrote from v2.41.0 or
+    earlier still erases, so write a fresh one.
 
 ```console
 $ xz -d tp2-bmc-firmware-sdcard-v2.32.0.img.xz
@@ -94,13 +97,23 @@ $ sudo dd if=tp2-bmc-firmware-sdcard-v2.32.0.img of=/dev/sdX bs=4M status=progre
 ```
 
 Insert the card and power-cycle the board. The installer then prints on the
-serial console that it will **erase all user data** and wait for confirmation,
-and it waits forever without one. Confirm either by typing `CONFIRM` at the
-prompt, or by pressing one of the front panel buttons (POWER or RESET), or the
-KEY1 button on the board, three times in a row. Most people have no serial
+serial console what it is about to do (keep the settings, or erase everything
+and why) and waits for confirmation, forever if it gets none. Confirm either by
+typing `CONFIRM` at the prompt, or by pressing one of the front panel buttons
+(POWER or RESET), or the KEY1 button on the board, three times in a row. The
+presses proceed with whatever the prompt said. Most people have no serial
 console attached and see only the LEDs, so the three presses are the realistic
 route. If you did not mean to install, pull the card and power-cycle: nothing
 has been written until you confirm.
+
+### Forcing a factory reset
+
+To reset the board on purpose, put a file named `factory-reset.txt` on the
+card's first (FAT) partition, next to `install.txt`. Its contents are ignored.
+Windows hides extensions by default, so `factory-reset.txt.txt` is accepted
+too. Or type `ERASE` instead of `CONFIRM` at the serial prompt. Either way the
+installer erases the overlay: the password returns to `turing`, the
+certificate is regenerated, and the settings go.
 
 ### Booting from the card without installing
 
@@ -121,8 +134,14 @@ how the switch and VLAN work will be done, with the USB-OTG console attached,
 because a wrong network configuration on a card boot is a power cycle away
 from being gone.
 
-*Checked against the firmware source, 2026-10-06; I have not yet run a card
-through the installer on a board to time it.*
+*Checked 2026-10-06 in simulation, not yet on a board. The installer's unit
+tests run on a simulated NAND. In CI, a real Linux 6.8 kernel's `nandsim` with
+the board's geometry (2 KiB page, 128 KiB eraseblock, 256 MiB) takes a board
+built the way the firmware builds it, installs over it, attaches it with the
+kernel, and mounts the kept UBIFS with every file's checksum matching and the
+volume still writable. It also covers a second install, a factory reset, no
+overlay, a corrupt superblock and the overlay at other volume ids. I have not
+yet run a card through the installer on a physical board.*
 
 ## Afterwards
 

@@ -68,6 +68,22 @@ page which blocks the rest of the interface. Nothing needs undoing
 afterwards. The full account is in
 [what is and isn't fixed](reference/known-faults.md).
 
+## Why did my password and certificate reset after I upgraded?
+
+If you upgraded from an SD card, that is why. The card is an installer, and
+through v2.41.0 it erased everything on the board: the password went back to
+`turing`, a new self-signed certificate was made, and the network, NTP, fan and
+node settings went with them. **v2.42.0 fixes it:** the card now keeps them
+when it can verify them, and says on the serial console when it cannot.
+
+If you used the `.tpu` (the web interface's Firmware page, `tpi firmware`), the
+settings were never touched, so something else is going on. To check which you
+did: a card install makes the board show the installer's prompt on the serial
+console, or wait on the front panel buttons, before it came back. To reset on
+purpose with the new card, put `factory-reset.txt` next to `install.txt`.
+
+[The card, step by step →](guides/install.md#from-an-sd-card-the-installer)
+
 ## Grafana's Save & test fails with "failed to get Prometheus heuristics". What is wrong?
 
 The data source URL points at the board. The board serves a page of numbers on

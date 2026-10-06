@@ -171,3 +171,13 @@ v2.40.0:
     Dashboard are where to look instead.
   capture: captures/power-control.png
   caption: The Power Control page — the four modules, each with its switch, Restart and uptime, beside the sidebar that replaced the tab strip.
+
+# v2.42.0 -- firmware only; bmcd 2.38.4, BMC-UI 4.0.1 and tpi 1.10.0 are
+# unchanged. No interface change, so no capture.
+v2.42.0:
+  title: The SD card keeps the board's password, certificate and settings
+  summary: >-
+    Installing from the SD card used to be a factory reset: the password back to
+    `turing`, a new self-signed certificate, the settings gone. The installer
+    now keeps them when it can verify they are intact, and a `factory-reset.txt`
+    on the card forces a reset when you want one.

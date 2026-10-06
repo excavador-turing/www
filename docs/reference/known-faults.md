@@ -127,6 +127,30 @@ userspace dies stays dead until someone cuts its power.
 
 ## Fixed, and worth knowing about
 
+### Installing from the SD card reset the password, the certificate and the settings
+
+**Affected every release up to and including v2.41.0; fixed in v2.42.0.** The
+card is an installer, and the installer formatted the board's whole UBI
+partition, so a card install was a factory reset: the root password went back
+to `turing`, the board generated a new self-signed certificate, and the
+network, NTP, fan and node settings were gone. The installer is upstream's, and
+every release of this fork shipped it unchanged. Someone upgrading from a card
+instead of the `.tpu` reported it on Discord as "password reset back and new
+self signed cert". The `.tpu` upgrade always kept the settings.
+
+From v2.42.0 the installer is this fork's own
+([BMC-Installer](https://github.com/excavador-turing/BMC-Installer)). It keeps
+the board's `overlay` volume when it can verify the volume is intact and that
+the kernel will attach it, and refuses to keep anything the kernel's own UBI
+checks would reject. Otherwise it erases as before and says why on the serial
+console. A `factory-reset.txt` file on the card, or typing `ERASE` at the
+prompt, forces the reset. A card written from v2.41.0 or earlier still erases.
+[The install page](../guides/install.md#from-an-sd-card-the-installer) has the
+steps.
+
+*Verified 2026-10-06 in simulation (the kernel's `nandsim` in CI), not yet
+through an SD card on a physical board.*
+
 ### Naming a VLAN made the switch card refuse to check the layout
 
 **Affected v2.33.0 to v2.38.0; fixed in v2.39.0

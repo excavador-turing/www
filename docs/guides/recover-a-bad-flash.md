@@ -128,13 +128,16 @@ $ sha256sum -c SHA256SUMS --ignore-missing
 Write it to a card, put the card in the board, and power it on. Verify the
 checksum first — this is the image that runs when nothing else does.
 
-!!! warning "As written, the card is an installer and erases the settings"
+!!! warning "The card is an installer; before v2.42.0 it erased the settings"
     The card boots the installer, which asks for confirmation (type `CONFIRM`
     on the serial console, or press POWER, RESET or KEY1 three times in a
-    row) and then **erases all user data**: the password returns to `turing`,
-    the certificate is regenerated, and the network, NTP, fan and node
-    settings are gone. When the board will not boot at all that is usually the
-    price of getting it back. A fix that keeps the settings is in progress.
+    row). **From v2.42.0 it keeps the password, the certificate and the
+    settings** when it can verify they are intact, and otherwise erases and
+    says why on the serial console. A card from v2.41.0 or earlier **erases
+    all user data**: the password returns to `turing`, the certificate is
+    regenerated, and the network, NTP, fan and node settings are gone. To force
+    a reset with a new card, put `factory-reset.txt` next to `install.txt`, or
+    type `ERASE` at the prompt.
 
     To boot from the card *without* installing, delete or rename `install.txt`
     on the card's first (FAT) partition first. The NAND is then untouched, and
