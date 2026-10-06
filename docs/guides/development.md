@@ -51,7 +51,7 @@ Output lands in `dist/`:
 
 ```
 tp2-bmc-firmware-ota-local.tpu       the OTA package
-tp2-bmc-firmware-sdcard-local.img    a recovery SD image
+tp2-bmc-firmware-sdcard-local.img    a recovery SD image (an installer: see install)
 ```
 
 ### Building one package
