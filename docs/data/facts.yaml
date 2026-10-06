@@ -14,8 +14,8 @@ gate:
 releases:
   source: "docs/changelog/*.md, written by `just refresh-changelog` from each repository's CHANGELOG.md"
   firmware:
-    newest: v2.41.0
-    count: 38
+    newest: v2.42.0
+    count: 39
   bmcd:
     newest: 2.38.4
     count: 44
@@ -25,7 +25,7 @@ releases:
   tpi:
     newest: v1.10.0
     count: 15
-  total: 136
+  total: 137
 features:
   source: docs/features/*.md -- a feature is a page
   count: 11
