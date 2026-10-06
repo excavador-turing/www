@@ -88,9 +88,6 @@ settings survive. The card is for recovery, or for a reset you mean to do.
     this fork's card inherits it. A fix that keeps them is in progress; I will
     not name a release for it until it is in one.
 
-    If someone reported "the password reset and the certificate changed after
-    I upgraded", this is the first thing to check: was it done from a card?
-
 ```console
 $ xz -d tp2-bmc-firmware-sdcard-v2.32.0.img.xz
 $ sudo dd if=tp2-bmc-firmware-sdcard-v2.32.0.img of=/dev/sdX bs=4M status=progress conv=fsync
