@@ -54,7 +54,8 @@ same on purpose.) Remove the volume and let the firmware make a new one:
 Then set the password again and reboot once more to check it persists. The
 details, and the route without SSH, are in
 [the known-faults entry](../reference/known-faults.md#the-board-forgets-everything-at-every-reboot).
-The repair is not yet confirmed by the reader who reported it.
+On the reader's board the volume mounted again with no errors; that a new
+password survives the next reboot is the last check, not yet reported.
 
 ## If an update is staged and you have changed your mind
 

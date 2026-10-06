@@ -156,7 +156,20 @@ power-on also enters safe mode, on purpose; `/proc/cmdline` then says
 
 My guess at the cause is a power cut while UBIFS was writing. That is one
 report, and I have not reproduced it. As far as I know it is not specific to
-v2.4.
+v2.4. The flash's own counters, below, make a single interrupted write more
+likely than failing flash.
+
+The firmware does not warn when this happens yet. Fixing that is planned; I am
+not promising a version.
+
+To check your flash, read its error counters:
+
+```console
+# grep . /sys/class/mtd/mtd*/ecc_failures /sys/class/mtd/mtd*/corrected_bits /sys/class/mtd/mtd*/bad_blocks
+```
+
+On the reader's board they were clean: `ecc_failures` 0, `corrected_bits` 1,
+`bad_blocks` 1.
 
 The repair is the firmware's own first-boot path: when no `overlay` volume
 exists at boot, `mount_overlay` creates a new one. Over SSH as root:
@@ -177,7 +190,12 @@ next to `install.txt`. A plain card install from v2.42.0 does **not** help: it
 keeps the settings volume when its UBIFS superblock is intact, and here the
 damage is deeper.
 
-*The repair has not yet been confirmed on the reader's board. No ticket yet.*
+*2026-10-07: the repair is confirmed on the reader's board as far as the
+volume goes. After `ubirmvol` and a reboot, `/dev/ubi0_2` is mounted at
+`/mnt/overlay` as `ubifs`, `/` uses `upperdir=/mnt/overlay/upper`, and the
+kernel log shows UBI attaching with `corrupted PEBs: 0` and UBIFS creating a
+fresh 26 MiB `overlay` with no errors. The flash counters were clean. Still to
+be reported: that a newly set password survives the next reboot.*
 
 ## Fixed, and worth knowing about
 
