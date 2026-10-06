@@ -155,7 +155,7 @@ repository's own, not a summary, and there is a feed.
 
 <div class="tp-next">
 <a href="features/"><b>What it does →</b><span>{{ features.count }} features, each with the measurement behind it.</span></a>
-<a href="guides/install/"><b>Put it on your board →</b><span>Install, or try it from an SD card first.</span></a>
+<a href="guides/install/"><b>Put it on your board →</b><span>Install over the network, or recover from an SD card.</span></a>
 <a href="reference/known-faults/"><b>What is not fixed →</b><span>{{ faults.count }} open faults, each with a ticket.</span></a>
 <a href="roadmap/"><b>Vote on what comes next →</b><span>Ordered by the votes it has.</span></a>
 </div>

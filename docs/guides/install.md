@@ -1,5 +1,5 @@
 ---
-description: "Install this firmware on your own Turing Pi 2: which file to take, flashing over the network or from the SD card, and what to check afterwards."
+description: "Install this firmware on your own Turing Pi 2: which file to take, flashing over the network or from the SD card installer, and what to check afterwards."
 render_macros: true
 ---
 
@@ -69,34 +69,63 @@ and lands back on what you had.
     through the stock web interface's **Firmware Upgrade** tab, with the
     published SHA-256 in the checksum field.
 
-## From an SD card, without touching the NAND
+## From an SD card: the installer
 
-Every release also ships a `-sdcard-*.img`, and the board boots from a card
-when one is present. Nothing is written to the board's own storage, so this
-is the way to try a version without committing to it — and the way back when
-something on the NAND has gone wrong.
+Every release also ships a `-sdcard-*.img`. **That card is an installer, not a
+way to try a version.** Written as it comes and put in the board, it offers a
+fresh installation of the firmware, and a fresh installation is a factory
+reset. For upgrades, use the `.tpu` — through the web interface's Firmware
+page, `tpi firmware` or `tpi-selfupdate`, as above. Those replace the root
+filesystem and keep the overlay, so the password, the certificate and the
+settings survive. The card is for recovery, or for a reset you mean to do.
+
+!!! warning "Installing from the card erases the password, the certificate and the settings"
+    The installer formats the board's whole UBI partition and writes back only
+    the bootloader environment and the root filesystem. The overlay volume goes
+    with it: the root password returns to `turing`, the board generates a new
+    self-signed certificate, and the network, NTP, fan and node settings are
+    gone. This is how the installer from Turing Pi's own tree behaves, and
+    this fork's card inherits it. A fix that keeps them is in progress; I will
+    not name a release for it until it is in one.
+
+    If someone reported "the password reset and the certificate changed after
+    I upgraded", this is the first thing to check: was it done from a card?
 
 ```console
 $ xz -d tp2-bmc-firmware-sdcard-v2.32.0.img.xz
 $ sudo dd if=tp2-bmc-firmware-sdcard-v2.32.0.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```
 
-Insert the card, power-cycle the board, and it comes up on the image from the
-card. The interface looks the same; `tpi info` reports the version you wrote.
+Insert the card and power-cycle the board. The installer then prints on the
+serial console that it will **erase all user data** and wait for confirmation,
+and it waits forever without one. Confirm either by typing `CONFIRM` at the
+prompt, or by pressing one of the front panel buttons (POWER or RESET), or the
+KEY1 button on the board, three times in a row. Most people have no serial
+console attached and see only the LEDs, so the three presses are the realistic
+route. If you did not mean to install, pull the card and power-cycle: nothing
+has been written until you confirm.
 
-Two things to know before you rely on it:
+### Booting from the card without installing
+
+The installer runs because a file named `install.txt` is on the card's first
+partition, the FAT one. Delete it, or rename it, after writing the image and
+before inserting the card, and the board boots from the card instead:
 
 - **The NAND is untouched.** Pull the card, power-cycle, and the board is back
-  on whatever was installed before — including a stock board that has never
-  seen this fork.
+  on whatever was installed before, including a stock board that has never
+  seen this fork. This is the way to try a version without committing to it.
 - **Your settings do not follow.** The overlay that holds the hostname, the
-  NTP servers, the fan mode and the certificate lives on the board, not on the
-  card, so a card boot starts from defaults.
+  NTP servers, the fan mode and the certificate lives on the board's NAND. A
+  card boot creates its own overlay partition on the card on first boot and
+  starts from defaults.
 
 This is also the path to take for anything that can strand the board. It is
 how the switch and VLAN work will be done, with the USB-OTG console attached,
 because a wrong network configuration on a card boot is a power cycle away
 from being gone.
+
+*Checked against the firmware source, 2026-10-06; I have not yet run a card
+through the installer on a board to time it.*
 
 ## Afterwards
 

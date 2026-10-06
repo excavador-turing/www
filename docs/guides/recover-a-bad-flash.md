@@ -125,9 +125,21 @@ $ curl -LO https://github.com/excavador-turing/BMC-Firmware/releases/download/v2
 $ sha256sum -c SHA256SUMS --ignore-missing
 ```
 
-Write it to a card, put the card in the board, and hold KEY1 while powering
-on. Verify the checksum first — this is the image that runs when nothing else
-does.
+Write it to a card, put the card in the board, and power it on. Verify the
+checksum first — this is the image that runs when nothing else does.
+
+!!! warning "As written, the card is an installer and erases the settings"
+    The card boots the installer, which asks for confirmation (type `CONFIRM`
+    on the serial console, or press POWER, RESET or KEY1 three times in a
+    row) and then **erases all user data**: the password returns to `turing`,
+    the certificate is regenerated, and the network, NTP, fan and node
+    settings are gone. When the board will not boot at all that is usually the
+    price of getting it back. A fix that keeps the settings is in progress.
+
+    To boot from the card *without* installing, delete or rename `install.txt`
+    on the card's first (FAT) partition first. The NAND is then untouched, and
+    so are its settings. See
+    [Installing on your own board](install.md#from-an-sd-card-the-installer).
 
 !!! warning "Cutting power hard-cuts the compute modules"
     Everything above this section leaves the modules running. Pulling the
