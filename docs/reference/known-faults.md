@@ -125,6 +125,60 @@ userspace dies stays dead until someone cuts its power.
 
 *Tracked as SQU-106, and it is the most valuable unbuilt thing on the list.*
 
+### The board forgets everything at every reboot
+
+*Reported 2026-10-07, by one reader, on a v2.4 board running v2.42.0.*
+
+The symptom is the factory-password page and a new self-signed certificate
+after a reboot, and again after the next one. Nothing you change survives. It is
+easy to mistake for the old card-install reset (below), because an upgrade
+is the usual reason the BMC reboots.
+
+To check, log in over SSH as root:
+
+```console
+# mount | grep ' / '
+overlay on / type overlay (...,upperdir=/tmp/safemode/upper,workdir=/tmp/safemode/work)
+# dmesg | grep -i ubifs
+UBIFS error (ubi0:2): ubifs_recover_leb: LEB 16 scanning failed
+```
+
+`upperdir=/tmp/safemode/upper` means the root filesystem's writable layer is in
+RAM. The cause, from reading the firmware's `/sbin/preinit` and
+`/sbin/mount_overlay`: at boot, preinit mounts the UBI volume `overlay` (UBIFS)
+at `/mnt/overlay` and uses it as that writable layer. If the mount fails, it
+enters safe mode without saying so: the layer becomes a tmpfs, the root
+password is the factory `turing`, a fresh certificate is generated, and nothing
+survives a reboot. So every reboot is a factory reset. The board gives no
+warning today; the factory-password page is the only sign. Holding KEY1 at
+power-on also enters safe mode, on purpose; `/proc/cmdline` then says
+`safemode`, and that is not this fault.
+
+My guess at the cause is a power cut while UBIFS was writing. That is one
+report, and I have not reproduced it. As far as I know it is not specific to
+v2.4.
+
+The repair is the firmware's own first-boot path: when no `overlay` volume
+exists at boot, `mount_overlay` creates a new one. Over SSH as root:
+
+```console
+# ubirmvol /dev/ubi0 -N overlay
+# reboot
+```
+
+The settings in the damaged volume are already unreadable, so nothing readable
+is lost. You can try a read-only rescue first, `mkdir /tmp/old && mount -t ubifs -o ro /dev/ubi0_2 /tmp/old`,
+but expect it to fail the same way. After the reboot, set the password again,
+check that `mount | grep /mnt/overlay` shows `ubifs`, and reboot once more to
+confirm it persists.
+
+Without SSH, install from an SD card from v2.42.0 with a `factory-reset.txt`
+next to `install.txt`. A plain card install from v2.42.0 does **not** help: it
+keeps the settings volume when its UBIFS superblock is intact, and here the
+damage is deeper.
+
+*The repair has not yet been confirmed on the reader's board. No ticket yet.*
+
 ## Fixed, and worth knowing about
 
 ### Installing from the SD card reset the password, the certificate and the settings
