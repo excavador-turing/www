@@ -38,6 +38,24 @@ The log is `/mnt/overlay/postupdate.log`, and it survives the rollback it
 describes — both firmware images mount that volume, which is the whole reason
 the note is written there instead of `/var/log`, which is a tmpfs.
 
+## If the board comes up but forgets its settings at every reboot
+
+If the password is `turing` and the certificate is new after every reboot, the
+settings volume may be damaged and the board is running from RAM. Over SSH:
+`mount | grep ' / '` shows `upperdir=/tmp/safemode/upper`, and
+`dmesg | grep -i ubifs` shows a UBIFS error. (Holding KEY1 at power-on does the
+same on purpose.) Remove the volume and let the firmware make a new one:
+
+```console
+# ubirmvol /dev/ubi0 -N overlay
+# reboot
+```
+
+Then set the password again and reboot once more to check it persists. The
+details, and the route without SSH, are in
+[the known-faults entry](../reference/known-faults.md#the-board-forgets-everything-at-every-reboot).
+The repair is not yet confirmed by the reader who reported it.
+
 ## If an update is staged and you have changed your mind
 
 ```console

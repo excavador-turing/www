@@ -115,6 +115,10 @@ too. Or type `ERASE` instead of `CONFIRM` at the serial prompt. Either way the
 installer erases the overlay: the password returns to `turing`, the
 certificate is regenerated, and the settings go.
 
+Since v2.42.0 the card keeps the settings volume, including a damaged one. A
+board that forgets its settings at every reboot needs `factory-reset.txt`; see
+[the known-faults entry](../reference/known-faults.md#the-board-forgets-everything-at-every-reboot).
+
 ### Booting from the card without installing
 
 The installer runs because a file named `install.txt` is on the card's first

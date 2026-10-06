@@ -77,10 +77,23 @@ node settings went with them. **v2.42.0 fixes it:** the card now keeps them
 when it can verify them, and says on the serial console when it cannot.
 
 If you used the `.tpu` (the web interface's Firmware page, `tpi firmware`), the
-settings were never touched, so something else is going on. To check which you
-did: a card install makes the board show the installer's prompt on the serial
-console, or wait on the front panel buttons, before it came back. To reset on
-purpose with the new card, put `factory-reset.txt` next to `install.txt`.
+settings are not touched by the upgrade, so the other cause is more likely: the
+settings volume is damaged and the board falls back to a factory state in RAM at
+**every** reboot. An upgrade is only when you notice, because that is when the
+BMC reboots. To tell them apart:
+
+- After a card install from v2.41.0 or earlier, the reset happens once, at
+  install time, and the new password then survives reboots. The board showed
+  the installer's prompt on the serial console, or waited on the front panel
+  buttons, before it came back.
+- With a damaged volume, the reset repeats at every reboot. Over SSH,
+  `mount | grep ' / '` shows `upperdir=/tmp/safemode/upper`, and
+  `dmesg | grep -i ubifs` shows a UBIFS error. This is
+  [a known fault](reference/known-faults.md#the-board-forgets-everything-at-every-reboot) with a repair.
+
+Holding KEY1 at power-on is a deliberate safe mode and also gives the factory
+password; that is expected. To reset on purpose with the new card, put
+`factory-reset.txt` next to `install.txt`.
 
 [The card, step by step →](guides/install.md#from-an-sd-card-the-installer)
 
