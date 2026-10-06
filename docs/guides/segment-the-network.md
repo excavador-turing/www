@@ -231,8 +231,9 @@ needs no network at all. [Recovering a bad flash](recover-a-bad-flash.md)
 describes it.
 
 **5. An SD-card boot** from a released image, the last exit for anything else.
-Delete `install.txt` from the card first, or the card installs and erases the
-board's settings: [Installing on your own board](install.md#from-an-sd-card-the-installer).
+Delete `install.txt` from the card first, or the card installs. A card from
+v2.42.0 keeps the board's settings when it can verify them; an older one erases
+them: [Installing on your own board](install.md#from-an-sd-card-the-installer).
 
 The thing worth carrying away: **nothing you can do from this page survives a
 power cycle unless you confirmed it.**
