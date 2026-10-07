@@ -60,7 +60,7 @@ faults:
     - The board forgets everything at every reboot
 roadmap:
   source: docs/data/roadmap.json, written by `just refresh-roadmap` from the Ideas discussions
-  as_of: 2026-10-06
+  as_of: 2026-10-07
   count: 7
   shipped: 2
   votes: 18
