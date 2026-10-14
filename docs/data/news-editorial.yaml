@@ -181,3 +181,13 @@ v2.42.0:
     `turing`, a new self-signed certificate, the settings gone. The installer
     now keeps them when it can verify they are intact, and a `factory-reset.txt`
     on the card forces a reset when you want one.
+
+# v2.43.0 -- bmcd 2.39.0 and BMC-UI 4.1.0; tpi 1.10.0 is unchanged. The fixes
+# are behaviour and error text, no new page, so no capture.
+v2.43.0:
+  title: The web interface checks the image again, and flashes from the SD card
+  summary: >-
+    Since BMC-UI 3.25.0 the web interface skipped the image CRC check on every
+    module flash, and flashing from a file on the SD card failed with a 411.
+    Both are fixed: the check runs unless you tick "Skip CRC", and the card
+    file is read by the daemon itself.

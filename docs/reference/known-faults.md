@@ -199,6 +199,44 @@ be reported: that a newly set password survives the next reboot.*
 
 ## Fixed, and worth knowing about
 
+### The web interface skipped the image check on every module flash
+
+**Affected BMC-UI 3.25.0 through 4.0.1, which is firmware v2.26.0 to v2.42.0;
+fixed in v2.43.0.** Flashing a module from the web interface never checked the
+image's CRC, whatever the "Skip CRC" box said. The interface always sent
+`skip_crc`, true or false, and the daemon looked only at whether the key was
+there, not at its value.
+
+BMC-UI 4.1.0 sends `skip_crc` only when the box is ticked, and bmcd 2.39.0 reads
+its value. `tpi` was not affected: it sends `skip_crc` only when asked.
+
+If you flashed modules from the web interface on those releases and have any
+doubt about an image, flash it again after upgrading, or compare the file with
+its published checksum before you do. If you use `tpi`, nothing changes. In the
+same release a sha256 given for an image already on the board (the SD card or
+`local`) is verified; before, it was accepted and ignored, and only uploads and
+URLs were checked.
+
+*The range is measured from the tags: v2.26.0 is the first firmware tag whose
+`bmc-ui.mk` pins BMC-UI v3.25.0, and v2.42.0 is the last, pinning v4.0.1.
+Checked 2026-10-15.*
+
+### Flashing a module from the SD card failed with 411
+
+**Affected BMC-UI 3.25.0 through 4.0.1, firmware v2.26.0 to v2.42.0; fixed in
+v2.43.0.** Choosing an image on the card and pressing flash was refused with
+`411` and *Invalid `length` query parameter*. The interface sent the card's file
+as if it were an upload, and the daemon rightly wanted a length. A user report
+on Discord is how I learned of it.
+
+From v2.43.0 the interface asks the daemon to read the file from the card
+(`sdcard=1&file=<path>`), confined to the card, and the progress bar shows a
+real percentage. The picker's Choose button also stays on screen with a long
+filename, and a failed flash says why in words rather than raw JSON.
+
+Before the fix the way round was the command line, which always worked:
+`tpi flash --local /mnt/sdcard/<file> -n N`.
+
 ### Installing from the SD card reset the password, the certificate and the settings
 
 **Affected every release up to and including v2.41.0; fixed in v2.42.0.** The
