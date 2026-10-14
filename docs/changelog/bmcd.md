@@ -1,5 +1,5 @@
 ---
-description: "Every bmcd release and what changed in it: 44 entries, newest 2.38.4, taken from the repository's own CHANGELOG.md."
+description: "Every bmcd release and what changed in it: 45 entries, newest 2.39.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,43 @@ hide:
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.38.4**, 6 October 2026. 44 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.39.0**, 14 October 2026. 45 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "2.38.4 — 6 October 2026"
+???+ note "2.39.0 — 14 October 2026"
+
+    **Added**
+
+    - **A node can be flashed from an image on the SD card, by the path the card
+      listing gives.** `opt=set&type=flash&node=<0..3>&sdcard=1&file=<path>` takes
+      `file` as the path relative to the card that `GET /sdcard/files` returns,
+      and it is confined to the card the way the listing is: an absolute path, a
+      `..` that leaves the card, a symlink that points out of it, a missing file,
+      a directory and an unmounted card are each refused with a 400 and a message
+      saying which. It cannot be combined with `local` or a URL. Until now the
+      listing offered paths that nothing could take back. `local` is unchanged
+      (an absolute path, not confined, as `tpi flash --local` uses it); it is now
+      documented as such, next to `sdcard`, in the OpenAPI document, which also
+      describes the flash parameters for the first time. The firmware upgrade
+      shares the same code and accepts `sdcard` too. A file on the card cannot
+      be named under `os_upgrade/`, which an upgrade empties before it stages.
+      `sha256` is now checked for `sdcard` and `local` flashes, as it is for
+      uploads and URLs; before, it was accepted and ignored. `local=0` no longer
+      counts as `local`, and a card file named `httpd.img` is no longer taken for
+      a URL.
+
+    **Fixed**
+
+    - **`skip_crc=false` skipped the CRC check.** The flag was read by whether the
+      key was present, not by its value, so `skip_crc=false` and `skip_crc=0`
+      turned verification off. The web interface has sent `skip_crc=false` on every
+      flash since BMC-UI 3.25.0, so every node flash started from the web
+      interface skipped the check. Now `skip_crc` skips only when it is present
+      with an empty value or `1`, `true`, `yes`, `on` (any case), which keeps
+      `tpi`'s key-only `skip_crc` working; `0`, `false`, `no`, `off` and an absent
+      key verify; any other value is refused with 400 "Invalid `skip_crc` value".
+      Reported by a user on Discord.
+
+??? note "2.38.4 — 6 October 2026"
 
     **Fixed**
 

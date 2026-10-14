@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 39 entries, newest v2.42.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 40 entries, newest v2.42.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.42.0**, 6 October 2026. 39 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.42.0**, 6 October 2026. 40 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,36 @@ Newest release **v2.42.0**, 6 October 2026. 39 in total. Each entry is this repo
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.42.0 — 6 October 2026"
+???+ note "v2.43.0 — 15 October 2026 (not released)"
+
+    bmcd 2.39.0 and BMC-UI 4.1.0; tpi 1.10.0 is unchanged.
+
+    **Fixed**
+
+    - **Flashing a node from an image on the SD card works from the web
+      interface.** It never did since BMC-UI 3.25.0: choosing an image on the card
+      and pressing flash was refused with 411 "Invalid `length` query parameter".
+      The interface now asks the daemon to read the file from the card, and the
+      progress bar shows a real percentage. Reported by a user on Discord.
+    - **The web interface skipped the image CRC check on every node flash since
+      BMC-UI 3.25.0.** It sent `skip_crc=false`, and the daemon read the key's
+      presence rather than its value. The check now runs unless "Skip CRC" is
+      ticked (BMC-UI 4.1.0 sends `skip_crc` only then; bmcd 2.39.0 reads the
+      value).
+    - **A sha256 given for an image on the BMC or the SD card is now verified.** It
+      was accepted and ignored; only uploads and URLs were checked.
+    - **The SD-card picker's "Choose" button stays visible,** on desktop and phone;
+      a long filename no longer pushes it out of the dialog.
+    - **A failed flash says why in words** instead of showing the daemon's raw JSON.
+
+    **Added**
+
+    - bmcd: `sdcard=1&file=<path>` flashes a node (or upgrades the firmware) from a
+      file on the card, confined to the card; an absolute path, a `..` or symlink
+      leaving the card, a missing file, a directory and an unmounted card are
+      refused with a 400 that says which.
+
+??? note "v2.42.0 — 6 October 2026"
 
     bmcd 2.38.4, BMC-UI 4.0.1 and tpi 1.10.0 are unchanged; what changed is the
     SD-card installer and the scripts around it.

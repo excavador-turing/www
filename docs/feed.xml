@@ -8,6 +8,38 @@
   <updated>2026-10-06T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.43.0</title>
+    <link href="https://turingpi.xyz/news/v2.43.0/"/>
+    <id>tag:turingpi.xyz,2026-10-15:firmware/2.43.0</id>
+    <updated>2026-10-15T00:00:00Z</updated>
+    <content type="text">bmcd 2.39.0 and BMC-UI 4.1.0; tpi 1.10.0 is unchanged.
+
+### Fixed
+
+- **Flashing a node from an image on the SD card works from the web
+  interface.** It never did since BMC-UI 3.25.0: choosing an image on the card
+  and pressing flash was refused with 411 &quot;Invalid `length` query parameter&quot;.
+  The interface now asks the daemon to read the file from the card, and the
+  progress bar shows a real percentage. Reported by a user on Discord.
+- **The web interface skipped the image CRC check on every node flash since
+  BMC-UI 3.25.0.** It sent `skip_crc=false`, and the daemon read the key's
+  presence rather than its value. The check now runs unless &quot;Skip CRC&quot; is
+  ticked (BMC-UI 4.1.0 sends `skip_crc` only then; bmcd 2.39.0 reads the
+  value).
+- **A sha256 given for an image on the BMC or the SD card is now verified.** It
+  was accepted and ignored; only uploads and URLs were checked.
+- **The SD-card picker's &quot;Choose&quot; button stays visible,** on desktop and phone;
+  a long filename no longer pushes it out of the dialog.
+- **A failed flash says why in words** instead of showing the daemon's raw JSON.
+
+### Added
+
+- bmcd: `sdcard=1&amp;file=&lt;path&gt;` flashes a node (or upgrades the firmware) from a
+  file on the card, confined to the card; an absolute path, a `..` or symlink
+  leaving the card, a missing file, a directory and an unmounted card are
+  refused with a 400 that says which.</content>
+  </entry>
+  <entry>
     <title>Firmware v2.42.0: The SD card keeps the board's password, certificate and settings</title>
     <link href="https://turingpi.xyz/news/v2.42.0/"/>
     <id>tag:turingpi.xyz,2026-10-06:firmware/2.42.0</id>
