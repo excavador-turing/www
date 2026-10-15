@@ -191,3 +191,13 @@ v2.43.0:
     module flash, and flashing from a file on the SD card failed with a 411.
     Both are fixed: the check runs unless you tick "Skip CRC", and the card
     file is read by the daemon itself.
+
+# v2.44.0 -- bmcd 2.40.0. Error text and the failed-flash cleanup, no new
+# page, so no capture.
+v2.44.0:
+  title: Flashing names what is in the way
+  summary: >-
+    Flashing now waits up to 15 seconds for the module to show up on USB, and
+    when it does not, the error lists the other USB devices on the node and
+    says a card in the mini-PCIe slot may be the cause. A failed or cancelled
+    flash powers the node off and puts the USB route back.

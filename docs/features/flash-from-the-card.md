@@ -55,6 +55,8 @@ description: "Write a node image to a compute module straight from the board's o
 
 The interface never decides what is flashable. It asks the board, and the board answers per entry with a reason -- too small, wrong magic, a directory -- so the list and the refusals come from the same place that would do the writing.
 
+A module in node 1 or 2 will not flash while a USB card sits in that node's mini-PCIe slot; see [the FAQ](../faq.md#flashing-a-module-in-slot-1-or-2-fails-with-usb-interface-not-found-why).
+
 [The full argument, with every measurement →](../why/flash-from-the-card.md)
 
 </div>
