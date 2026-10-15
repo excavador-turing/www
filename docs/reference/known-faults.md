@@ -100,6 +100,39 @@ into maskrom before installing.
 
 *Tracked as SQU-105.*
 
+### Flashing a module in slot 1 or 2 fails when a mini-PCIe card uses USB
+
+*Hardware; no firmware fix. Reported 2026-10-15.*
+
+`tpi flash` and the interface's flash page fail on node 1 or 2 with
+"Compute module's USB interface not found or supported" when a USB device sits
+in that node's mini-PCIe slot. The report that found it was an RK1 in slot 2 on
+a v2.4 board with a Zigbee stick in the slot. The board's `dmesg` showed the
+module's high-speed enumeration failing again and again with `error -71`, then
+"unable to enumerate", while a full-speed non-Rockchip device (`1a86:7523`, a
+CH340) on the same lines enumerated without trouble. A VID:PID that is not
+Rockchip's, next to `error -71`, is the signature.
+
+The cause, as far as I can tell: the mini-PCIe slots of nodes 1 and 2 carry
+USB 2.0, and a device there shares the USB pair the BMC uses to flash the
+module. Two devices on one pair and the module cannot enumerate. This is
+electrical. The BMC has no control over the slot's power, reset or USB lines on
+v2.4 or v2.5; v2.5 has a per-node USB hub on the BMC side, but the clash is on
+the node side of its port. **This rests on the one report and on the firmware
+source and factory tests. I have not seen a schematic that confirms it.**
+
+Two ways round it:
+
+- Power the node off, remove the mini-PCIe USB card, flash, and put it back.
+- Move the module to slot 3 or 4 and flash it there.
+
+**v2.44.0 changes the message, not the hardware.** Flashing waits up to 15 s
+for the module's USB boot device, where it used to look once, a second after
+power-on. When the device does not appear, the error names the other USB
+devices it saw on the node and says that a device in the node's mini-PCIe slot
+may be in the way. A failed or cancelled flash now powers the node off and
+restores the USB route, instead of leaving the node in flashing mode.
+
 ### Nothing shuts the board down if it overheats
 
 The thermal zone declares four `active` trips — 20, 45, 60 and 70 °C, each

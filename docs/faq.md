@@ -108,6 +108,14 @@ for. The [monitoring guide](guides/monitor-it.md#the-data-source-is-the-scraper-
 has the one-container Prometheus for people who have Grafana and nothing
 scraping yet.
 
+## Flashing a module in slot 1 or 2 fails with "USB interface not found". Why?
+
+Look at the mini-PCIe slot of that node. The slots of nodes 1 and 2 carry USB 2.0, and a USB device in one of them (an LTE modem, a Zigbee stick, a serial card) appears to share the USB pair the board uses to flash the module. With two devices on one pair the module cannot enumerate, and the flash stops with "Compute module's USB interface not found or supported". The board's kernel log shows the module failing with `error -71` and then "unable to enumerate".
+
+Power the node off, take the mini-PCIe card out, flash, and put it back. Or move the module to slot 3 or 4 for the flash; those slots have no mini-PCIe USB. From v2.44.0 the error says what it saw instead: it names the other USB devices on the node's lines and says that a device in the node's mini-PCIe slot may be in the way.
+
+This comes from one user report on Discord (2026-10-15) and from reading the firmware source and the factory tests, not from a schematic, so I call it likely, not proven. [The entry in known faults](reference/known-faults.md#flashing-a-module-in-slot-1-or-2-fails-when-a-mini-pcie-card-uses-usb) has the details.
+
 ## Which board revisions does it run on?
 
 **v2.5.2**, on the two boards this fork is developed against, and **v2.4**,
