@@ -1,5 +1,5 @@
 ---
-description: "Every BMC-Firmware release and what changed in it: 40 entries, newest v2.43.0, taken from the repository's own CHANGELOG.md."
+description: "Every BMC-Firmware release and what changed in it: 41 entries, newest v2.44.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,7 +8,7 @@ hide:
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.43.0**, 15 October 2026. 40 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.44.0**, 15 October 2026. 41 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](../feed.xml).
 
@@ -20,7 +20,30 @@ Newest release **v2.43.0**, 15 October 2026. 40 in total. Each entry is this rep
 
     `SHA256SUMS` lists bare filenames, so run it from the directory holding the files. Upstream publishes no checksums at all, on either of its two catalogues — see [upstream vs this fork](../reference/comparison.md).
 
-???+ note "v2.43.0 — 15 October 2026"
+???+ note "v2.44.0 — 15 October 2026"
+
+    bmcd 2.40.0; BMC-UI 4.1.0 and tpi 1.10.0 are unchanged.
+
+    **Changed**
+
+    - **Flashing a node waits up to 15 s for the module's USB boot device** instead
+      of looking once, a second after power-on, and giving up. A module that
+      enumerates slowly, or that fails high-speed enumeration and is retried by the
+      kernel, was refused with "Compute module's USB interface not found or
+      supported"; the daemon now looks every 250 ms. Found from a user report on
+      Discord.
+    - **When the boot device does not appear, the error names what is in the
+      way.** It lists the other USB devices seen on the node's lines (root hubs
+      excluded), with a hint: a USB device in the mini-PCIe slot of node 1 or 2
+      shares the USB lines used for flashing, so remove it, or flash the module in
+      slot 3 or 4.
+
+    **Fixed**
+
+    - **A failed or cancelled flash now powers the node off and restores the USB
+      route,** and cancelling stops the wait for the boot device at once.
+
+??? note "v2.43.0 — 15 October 2026"
 
     bmcd 2.39.0 and BMC-UI 4.1.0; tpi 1.10.0 is unchanged.
 

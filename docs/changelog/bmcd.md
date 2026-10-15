@@ -1,5 +1,5 @@
 ---
-description: "Every bmcd release and what changed in it: 45 entries, newest 2.39.0, taken from the repository's own CHANGELOG.md."
+description: "Every bmcd release and what changed in it: 46 entries, newest 2.40.0, taken from the repository's own CHANGELOG.md."
 hide:
   - toc
 ---
@@ -8,9 +8,33 @@ hide:
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.39.0**, 14 October 2026. 45 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
-???+ note "2.39.0 — 14 October 2026"
+???+ note "2.40.0 — 15 October 2026"
+
+    **Changed**
+
+    - **Flashing waits up to 15 s for the module's USB boot device, and names
+      what is in the way when it does not appear.** It used to look at the bus
+      once, a second after power-on, and give up with "Compute module's USB
+      interface not found or supported". A module that enumerates slowly, or that
+      fails high-speed enumeration and is retried by the kernel, was refused for
+      that. It now looks every 250 ms. If nothing turns up the error says so for
+      the node (numbered as users see it) and lists the other USB devices seen on
+      the node's lines, root hubs excluded, with a hint that a device in the
+      mini-PCIe slot of nodes 1 and 2 shares the USB pair used for flashing. On a
+      board with a fanout hub a supported device on the wrong port is still
+      reported as such. Found from a user report on Discord, where a Zigbee
+      stick (`1a86:7523`) in node 2's slot kept an RK1 from enumerating.
+    - **A cancelled flash stops waiting at once, and a flash that never starts
+      puts the node back.** The wait for the boot device honours the cancel
+      token, so a cancel (or a client that gave up) no longer leaves a worker
+      polling for up to 15 s against a restarted flash. When the device does not
+      appear, the node is powered off and USB restored exactly as after any other
+      failed flash, instead of staying powered in flashing mode while the error
+      tells the user to retry; the original error is the one returned.
+
+??? note "2.39.0 — 14 October 2026"
 
     **Added**
 

@@ -8,6 +8,32 @@
   <updated>2026-10-15T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.44.0: Flashing names what is in the way</title>
+    <link href="https://turingpi.xyz/news/v2.44.0/"/>
+    <id>tag:turingpi.xyz,2026-10-15:firmware/2.44.0</id>
+    <updated>2026-10-15T00:00:00Z</updated>
+    <content type="text">bmcd 2.40.0; BMC-UI 4.1.0 and tpi 1.10.0 are unchanged.
+
+### Changed
+
+- **Flashing a node waits up to 15 s for the module's USB boot device** instead
+  of looking once, a second after power-on, and giving up. A module that
+  enumerates slowly, or that fails high-speed enumeration and is retried by the
+  kernel, was refused with &quot;Compute module's USB interface not found or
+  supported&quot;; the daemon now looks every 250 ms. Found from a user report on
+  Discord.
+- **When the boot device does not appear, the error names what is in the
+  way.** It lists the other USB devices seen on the node's lines (root hubs
+  excluded), with a hint: a USB device in the mini-PCIe slot of node 1 or 2
+  shares the USB lines used for flashing, so remove it, or flash the module in
+  slot 3 or 4.
+
+### Fixed
+
+- **A failed or cancelled flash now powers the node off and restores the USB
+  route,** and cancelling stops the wait for the boot device at once.</content>
+  </entry>
+  <entry>
     <title>Firmware v2.43.0: The web interface checks the image again, and flashes from the SD card</title>
     <link href="https://turingpi.xyz/news/v2.43.0/"/>
     <id>tag:turingpi.xyz,2026-10-15:firmware/2.43.0</id>
@@ -1291,28 +1317,5 @@ it comes back.
 - First release built entirely in `excavador-turing`. Firmware sources point at
   this fork; `tpi-selfupdate` follows.
 - bmcd 2.10.0, `tpi` 1.1.0, BMC-UI 3.7.0.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.7.0</title>
-    <link href="https://turingpi.xyz/news/v2.7.0/"/>
-    <id>tag:turingpi.xyz,2026-09-08:firmware/2.7.0</id>
-    <updated>2026-09-08T00:00:00Z</updated>
-    <content type="text">### Added
-
-- Re-cut of the fork's work under the new organisation, carrying the versions
-  the board was already running so that no board-visible version goes
-  backwards.
-
-### Changed
-
-- Kernel 6.12.109 LTS (upstream: 6.8, never a longterm release).
-- Buildroot 2025.02.17 LTS (upstream: 2024.05.1, end of life).
-- Health-gated A/B promotion: a new image boots tentatively and is kept only
-  if the daemon answers and every compute module's switch port is present.
-  Otherwise the board reboots onto the image it had.
-- A firmware update no longer power-cycles the compute modules.
-- The board temperature is exposed through `thermal_zone0`, and the kernel
-  drives the fan from it instead of a fixed persisted speed.
-- `SHA256SUMS` published per release and verified on download.</content>
   </entry>
 </feed>
