@@ -235,13 +235,14 @@ extra:
         - {text: The code, href: "https://github.com/excavador-turing"}
         - {text: Contributing, href: contributing/}
 
-  # Cloudflare Web Analytics beacon token. Public by design: it names the
-  # site to the beacon and reads nothing (cookieless, no consent banner).
-  # The value is a Pulumi stack output in opwerm/nexus, scope cloudflare,
-  # export webAnalyticsToken-turingpi.xyz; empty means no beacon is emitted
-  # (overrides/main.html checks). GitHub's own panel keeps fourteen days;
-  # this keeps history, for one question: is anyone arriving, from where.
-  cloudflare_beacon: "c6b63bc6a4b14ad9ac85b01f2af1b8bd"
+  # Cloudflare Web Analytics beacon token -- EMPTY on purpose. turingpi.xyz
+  # is proxied by Cloudflare, and its Web Analytics site uses automatic
+  # setup: Cloudflare adds the beacon to every page at its edge, so the site
+  # emits none of its own (Cloudflare skips its beacon while the page carries
+  # one). The old snippet site (token c6b63bc6...) keeps the history up to
+  # 2026-10-26. Set a token here only if the domain ever stops being
+  # proxied; empty means no beacon is emitted (overrides/main.html checks).
+  cloudflare_beacon: ""
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/excavador-turing
