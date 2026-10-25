@@ -3,7 +3,10 @@
 {#
   Two things this override adds, and one it deliberately does not.
 
-  ADDS -- Cloudflare Web Analytics.
+  ADDS -- Cloudflare Web Analytics, but only when `extra.cloudflare_beacon`
+  is set. Today it is empty: the domain is proxied and Cloudflare adds the
+  beacon at its edge (automatic setup), so this block stays for a domain
+  that is not proxied.
 
   Cookieless, no consent banner, and the token below is public by design --
   it identifies the site to Cloudflare's beacon and cannot read anything. It

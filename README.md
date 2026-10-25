@@ -137,7 +137,7 @@ docs/            the site
   why/           the full argument behind each feature
   changelog/     generated from each repository's CHANGELOG.md
   news/          one post per firmware release, generated from the same; Material's blog plugin lists them
-overrides/       the footer, and the analytics beacon
+overrides/       the footer, and the analytics beacon (off: Cloudflare adds it)
 main.py          macros: the feature template and the index
 scripts/         every generator and every check
 ```
