@@ -1,0 +1,89 @@
+---
+// Screen one of a feature page: the claim, its numbers, the picture --
+// main.py's feature_screen(), from the page's own `feature:` and `since:`.
+//
+// Each of the eleven pages carries its data in front matter and this renders
+// it, so the shape is the same by construction; scripts/feature-lint.py
+// checks the content (lede length, three dated proofs, four next links).
+import { newsPosts } from '../../lib/data';
+import { feature } from '../../lib/feature';
+
+// The four things a reader wants next, in the order they want them. Fixed,
+// because the labels were the loudest inconsistency between these pages.
+const ROLES = ['demo', 'do', 'evidence', 'related'] as const;
+
+interface Props {
+  /** The page's front matter: MDX's own `frontmatter`, passed through, so
+   *  this renders wherever the page does -- in a route, or in llms-full.txt. */
+  page: { title: string; feature?: unknown; since?: unknown };
+}
+
+const { page } = Astro.props;
+if (!page.feature) throw new Error(`"${page.title}": <FeatureScreen /> on a page with no feature: block`);
+const f = feature.parse(page.feature);
+const sinceRaw = page.since;
+const title = f.title ?? page.title;
+
+// The next links are written relative to the page, as they were for MkDocs;
+// resolved here against the page's own URL, as a browser would.
+const here = new URL(Astro.url.pathname, 'https://turingpi.invalid');
+const absolute = (href: string) => {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('/')) return href;
+  const u = new URL(href, here);
+  return u.pathname + u.search + u.hash;
+};
+const next = ROLES.flatMap((role) => (f.next[role] ? [f.next[role]] : []));
+
+// The proof strip's provenance, once, under the numbers: where every proof
+// agrees on its source and date -- they usually do -- one line, not three.
+const sources = new Set(f.proofs.map((p) => `${p.source}\u0000${p.as_of}`));
+const provenance =
+  sources.size === 1
+    ? `${f.proofs[0]?.source ?? ''}, ${f.proofs[0]?.as_of ?? ''}.`
+    : f.proofs.map((p) => `${p.of}: ${p.source}, ${p.as_of}.`).join(' ');
+
+// Which firmware first carried this, linked to the release's own post where
+// there is one, else to the firmware changelog.
+const since = String(sinceRaw ?? '').trim();
+const sinceHref = since && newsPosts[since] ? `/news/${newsPosts[since]}/` : '/changelog/firmware/';
+---
+
+<section class="tp-feature" data-screen="feature">
+  <div class="tp-feature__say">
+    <span class="tp-eyebrow">Feature</span>
+    <h1>{title}</h1>
+    {
+      since && (
+        <a class="tp-since" href={sinceHref}>
+          <small class="tp-tag">in this fork since {since}</small>
+        </a>
+      )
+    }
+    <p class="lede">{f.lede}</p>
+    <div class="tp-proof">
+      {
+        f.proofs.map((p) => (
+          <div>
+            <b>{p.n}</b>
+            <span>{p.of}</span>
+          </div>
+        ))
+      }
+    </div>
+    <p class="tp-provenance">{provenance}</p>
+    <div class="tp-next">
+      {
+        next.map((link) => (
+          <a href={absolute(link.href)}>
+            <b>{link.text} →</b>
+            <span>{link.note}</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+  <figure class="tp-feature__show">
+    <img src={`/assets/captures/${f.capture}`} alt={f.alt ?? f.caption} />
+    <figcaption>{f.caption}</figcaption>
+  </figure>
+</section>

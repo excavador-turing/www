@@ -1,0 +1,34 @@
+---
+// About's "what changed", rendered from the page that measures it
+// (main.py's comparison_table()): the upstream-vs-fork rows of
+// reference/comparison, read from that page in the content collection when
+// the site is built. Two hand-kept tables of the same claim had drifted
+// apart; now there is one table, and the count facts.yaml states is checked
+// against it, so the two cannot drift silently either.
+import { getEntry } from 'astro:content';
+import { facts } from '../../lib/data';
+import { comparisonRows } from '../../lib/comparison';
+import { inlineMarkdown } from '../../lib/inline';
+
+const page = await getEntry('docs', 'reference/comparison');
+if (!page?.body) throw new Error('<ComparisonTable />: reference/comparison is not in the docs collection');
+const rows = comparisonRows(page.body);
+const stated = (facts.platform as { rows?: number } | undefined)?.rows;
+if (stated !== undefined && stated !== rows.length) {
+  throw new Error(
+    `comparison has ${rows.length} rows and facts.yaml says ${stated}: run \`just facts\` and commit the result`,
+  );
+}
+---
+
+<div class="tp-vs">
+  {
+    rows.map(([label, them, us]) => (
+      <div class="tp-vs__row">
+        <div class="tp-vs__what" set:html={inlineMarkdown(label)} />
+        <div class="tp-vs__them" set:html={inlineMarkdown(them) || '—'} />
+        <div class="tp-vs__us" set:html={inlineMarkdown(us) || '—'} />
+      </div>
+    ))
+  }
+</div>

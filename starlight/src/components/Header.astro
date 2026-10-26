@@ -1,0 +1,31 @@
+---
+// Material's header, the way this site used it: the title, search and
+// links on a dark bar, and under it a strip of tabs -- one per top-level
+// entry of the nav, linking to its first page, the current one underlined
+// in lime. The tabs ARE the site's navigation (mkdocs.yml: the selling pages
+// hide the sidebar, so without them the only way onward was the cards on
+// the page). They stay on a phone, where Material had a drawer: Starlight's
+// menu only exists on pages with a sidebar, and the selling pages have none.
+import Default from '@astrojs/starlight/components/Header.astro';
+import { tabs } from '../lib/tabs';
+
+const { sidebar } = Astro.locals.starlightRoute;
+const items = tabs(sidebar, Astro.url.pathname);
+---
+
+<div class="tp-header">
+  <div class="tp-header__bar"><Default /></div>
+  <nav class="tp-tabs" aria-label="Sections">
+    <ul>
+      {
+        items.map((t) => (
+          <li>
+            <a href={t.href} aria-current={t.current ? 'true' : undefined}>
+              {t.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>

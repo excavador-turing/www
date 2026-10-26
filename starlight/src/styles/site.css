@@ -1,88 +1,471 @@
 /*
- * What Starlight needs to show the converted pages legibly. Not a port of
- * Material's look: docs/stylesheets/landing.css is loaded as it is on the
- * live site (astro.config.mjs head), and its tp-* rules do most of the
- * layout. The visual pass is a later phase; this keeps phase 1 readable.
+ * The chrome around the pages: what Material for MkDocs drew and Starlight
+ * draws differently. landing.css (the port of docs/stylesheets/landing.css)
+ * styles the pages' own tp-* layouts; this file makes the frame look like
+ * the site it replaces -- Roboto, a black header with a strip of tabs, blue
+ * links, light headings, Material's collapsible blocks and buttons -- rather
+ * than like a Starlight template.
+ *
+ * Starlight's own styles are all in cascade layers, so a rule here wins
+ * over them by being unlayered, not by out-specifying them.
  */
 
-/* The board's palette: near-black chrome, a lime accent (mkdocs.yml). */
+/* ---- type and colour -------------------------------------------------- */
+
+/* Material's fonts (mkdocs.yml leaves `theme.font` at its default), served
+   from this site rather than from Google: the @fontsource packages, pinned. */
 :root {
-  --sl-color-accent-low: #2a3300;
-  --sl-color-accent: #8bab00;
-  --sl-color-accent-high: #d4f264;
-}
-:root[data-theme='light'] {
-  --sl-color-accent-low: #eef8c4;
-  --sl-color-accent: #5c7300;
-  --sl-color-accent-high: #2f3b00;
+  --sl-font: 'Roboto';
+  --sl-font-mono: 'Roboto Mono';
+  /* Material's typeset: wider than Starlight's 45rem column. */
+  --sl-content-width: 54rem;
+  /* The header is two rows, the bar and the tabs: 96px, Material's two
+     2.4rem rows, so a screen that fit under Material's header fits here
+     (scripts/screens.py measures it). */
+  --tp-bar-h: 3.25rem;
+  --tp-tabs-h: 2.75rem;
+  --sl-nav-height: calc(var(--tp-bar-h) + var(--tp-tabs-h));
 }
 
-/* pymdownx.details: the collapsed "whole entry" blocks. */
-.sl-markdown-content details.note {
-  border-inline-start: 0.25rem solid var(--sl-color-blue);
-  background: var(--sl-color-blue-low);
-  padding: 0.5rem 1rem;
+/* Links are Material's indigo, as on every page of the live site; the
+   board's lime is for emphasis (the tabs, the proof strips), not for text. */
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e8eaf6;
+  --sl-color-accent: #4051b5;
+  --sl-color-accent-high: #2b3a8f;
+  --sl-color-text-accent: #4051b5;
 }
-.sl-markdown-content details.note > summary {
-  cursor: pointer;
+:root,
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #1d2244;
+  --sl-color-accent: #6c7fd8;
+  --sl-color-accent-high: #c3cbf5;
+  --sl-color-text-accent: #8a9cf4;
+}
+
+/* Material's headings: light, smaller than Starlight's, and the page title
+   grey (its typeset: h1 2em at 300, h2 1.5625em at 300, h3 1.25em at 400).
+   The tp-* layouts set their own, more specifically, in landing.css. */
+.sl-markdown-content :is(h1, h2):not(:where(.not-content *)) {
+  font-weight: 300;
+}
+.sl-markdown-content h3:not(:where(.not-content *)) {
+  font-weight: 400;
+}
+.sl-markdown-content :is(h2, .sl-heading-wrapper.level-h2) {
+  font-size: 1.5625rem;
+}
+.sl-markdown-content :is(h3, .sl-heading-wrapper.level-h3) {
+  font-size: 1.25rem;
+}
+.content-panel h1#_top {
+  font-size: 2rem;
+  font-weight: 300;
+  color: color-mix(in srgb, var(--sl-color-white) 60%, transparent);
+}
+
+/* Material's links are not underlined; the colour says it. */
+.sl-markdown-content a:not(:where(.not-content *)) {
+  text-decoration: none;
+}
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+  text-decoration: underline;
+}
+
+/* ---- the header: a black bar, and the tabs under it -------------------- */
+/* (The tabs show on every screen; below 50rem a page with a sidebar also
+   has Starlight's menu, which holds the whole nav, as Material's drawer did.) */
+
+/* Black in both schemes (mkdocs.yml: primary black), so the header carries
+   Starlight's dark palette whatever the page's. */
+.page > .header {
+  padding: 0;
+  border-bottom: 0;
+  background-color: #000;
+  color-scheme: dark;
+  --sl-color-white: #fff;
+  --sl-color-gray-1: #eceef2;
+  --sl-color-gray-2: #c0c2c7;
+  --sl-color-gray-3: #888b96;
+  --sl-color-gray-4: #545861;
+  --sl-color-gray-5: #353841;
+  --sl-color-gray-6: #24272f;
+  --sl-color-black: #17181c;
+  --sl-color-bg-nav: #000;
+  --sl-color-hairline-shade: #000;
+  --sl-color-text-accent: var(--tp-lime);
+  box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.4rem rgba(0, 0, 0, 0.2);
+}
+.tp-header {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.tp-header__bar {
+  height: var(--tp-bar-h);
+  flex: none;
+  padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
+}
+:root[data-has-sidebar] .tp-header__bar {
+  padding-inline-end: calc(var(--sl-nav-gap) + var(--sl-nav-pad-x) + var(--sl-menu-button-size));
+}
+@media (min-width: 50rem) {
+  :root[data-has-sidebar] .tp-header__bar {
+    padding-inline-end: var(--sl-nav-pad-x);
+  }
+}
+.tp-header .site-title {
+  color: #fff;
+  font-weight: 700;
+}
+/* On a phone too: Material had a drawer there, and Starlight's menu exists
+   only on pages with a sidebar -- the front page, Features and News have
+   none, so without the tabs a phone could not leave them. They scroll
+   sideways when they do not fit. */
+.tp-tabs {
+  height: var(--tp-tabs-h);
+  padding-inline: var(--sl-nav-pad-x);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.tp-tabs ul {
+  display: flex;
+  gap: clamp(1.1rem, 2.5vw, 1.75rem);
+  scrollbar-width: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+.tp-tabs a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  opacity: 0.72;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tp-tabs a:hover,
+.tp-tabs a[aria-current='true'] {
+  opacity: 1;
+}
+.tp-tabs a[aria-current='true'] {
+  box-shadow: inset 0 -2px 0 var(--tp-lime);
+}
+
+/* The phone menu's button sits in the bar, not across the bar and tabs. */
+.sidebar button[popovertarget] {
+  top: calc((var(--tp-bar-h) - var(--sl-menu-button-size)) / 2);
+}
+
+/* ---- the sidebar: the current tab's pages only, on a wide screen -------- */
+
+@media (min-width: 50rem) {
+  .tp-sidebar[data-tab] ul.top-level > li {
+    display: none;
+  }
+  .tp-sidebar[data-tab='1'] ul.top-level > li:nth-child(1),
+  .tp-sidebar[data-tab='2'] ul.top-level > li:nth-child(2),
+  .tp-sidebar[data-tab='3'] ul.top-level > li:nth-child(3),
+  .tp-sidebar[data-tab='4'] ul.top-level > li:nth-child(4),
+  .tp-sidebar[data-tab='5'] ul.top-level > li:nth-child(5),
+  .tp-sidebar[data-tab='6'] ul.top-level > li:nth-child(6),
+  .tp-sidebar[data-tab='7'] ul.top-level > li:nth-child(7),
+  .tp-sidebar[data-tab='8'] ul.top-level > li:nth-child(8),
+  .tp-sidebar[data-tab='9'] ul.top-level > li:nth-child(9) {
+    display: block;
+  }
+  /* The tab's own group: its name as a small label, not a fold, and its
+     pages at the top level. */
+  .tp-sidebar[data-tab] ul.top-level > li > details > summary {
+    font-size: var(--sl-text-sm);
+    font-weight: 700;
+    color: var(--sl-color-gray-3);
+    pointer-events: none;
+  }
+  .tp-sidebar[data-tab] ul.top-level > li > details > summary .caret {
+    display: none;
+  }
+  .tp-sidebar[data-tab] ul.top-level > li > details > ul {
+    margin-inline-start: 0;
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
+/* The current page in blue type, as Material marks it, not a filled bar. */
+.tp-sidebar a[aria-current='page'],
+.tp-sidebar a[aria-current='page']:hover {
+  background: none;
+  color: var(--sl-color-text-accent);
   font-weight: 600;
 }
 
-/* The blog index, until the blog itself arrives in phase 2. */
-.tp-posts article.tp-post {
-  border-block-end: 1px solid var(--sl-color-hairline);
-  padding-block-end: 1rem;
-}
-.tp-post__meta {
-  color: var(--sl-color-gray-3);
-  font-size: var(--sl-text-sm);
-}
-.tp-pagination {
-  display: flex;
-  gap: 0.75rem;
-  margin-block-start: 2rem;
-}
-.tp-pagination__current {
-  font-weight: 700;
-}
-
-/* overrides/partials/footer.html */
-.tp-footer {
-  margin-block-start: 3rem;
-  border-block-start: 1px solid var(--sl-color-hairline);
-  padding-block: 2rem;
-  font-size: var(--sl-text-sm);
-}
-.tp-footer__inner {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-}
-.tp-footer__brand,
-.tp-footer__col {
+/* A post's sidebar (Sidebar.astro): the way back and the date. */
+.tp-post-aside {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-}
-.tp-footer__col ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.tp-footer__legal {
-  display: flex;
-  flex-wrap: wrap;
   gap: 1rem;
-  justify-content: space-between;
-  margin-block-start: 1.5rem;
+  font-size: var(--sl-text-sm);
+}
+.tp-post-aside a {
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+}
+.tp-post-aside a:hover {
+  color: var(--sl-color-text-accent);
+}
+.tp-post-aside b {
+  display: block;
   color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-xs);
+  margin-bottom: 0.25rem;
 }
-.tp-footer__social {
+.tp-post-aside__back {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+@media (min-width: 50rem) {
+  .tp-sidebar--post .tp-sidebar__nav {
+    display: none;
+  }
+}
+@media (max-width: 49.99rem) {
+  .tp-post-aside {
+    display: none;
+  }
+}
+
+/* ---- pages whose layout carries its own H1 ------------------------------ */
+
+/* The title panel holds only the #_top anchor (PageTitle.astro's <span>,
+   where a page writes its own H1): no padding, no rule under it. */
+.content-panel:has(> .sl-container > span#_top:only-child) {
+  padding: 0;
+}
+.content-panel:has(> .sl-container > span#_top:only-child) + .content-panel {
+  border-top: 0;
+}
+
+/* The tp-* layouts set their own spacing; Starlight's "a gap between any
+   two blocks" would push every cell of a grid down. */
+.sl-markdown-content
+  :is(
+    .tp-landing, .tp-view, .tp-screen, .tp-hero__say, .tp-chapter__say, .tp-proof, .tp-actions,
+    .tp-news, .tp-news__grid, .tp-news__col, .tp-what-grid, .tp-what, .tp-dest, .tp-bar,
+    .tp-feature, .tp-feature__say, .tp-next, .tp-plates, .tp-plate, .tp-vs, .tp-vs__row,
+    .tp-index, .tp-index__head, .tp-hero-band, .tp-maker, .tp-maker__who, .tp-maker__links,
+    .tp-ideas, .tp-releases, .tp-posts, .tp-post, figure
+  )
+  > * {
+  margin-top: 0;
+}
+.sl-markdown-content
+  :is(.tp-hero, .tp-chapter, .tp-hero-band, .tp-index__head, .tp-feature, .tp-news)
+  .sl-anchor-link {
+  display: none;
+}
+.sl-markdown-content :is(.tp-landing, .tp-hero-band, .tp-feature, .tp-index, .tp-maker) a {
+  text-decoration: none;
+}
+.sl-markdown-content :is(.tp-landing, .tp-hero-band, .tp-index__head, .tp-news) .sl-heading-wrapper {
+  /* The layouts style their h1/h2 as children; the wrapper Starlight puts
+     round a heading for its anchor link would sit in between. */
+  display: contents;
+}
+.sl-markdown-content :is(.tp-landing, .tp-hero-band, .tp-index__head, .tp-news) .sl-heading-wrapper > :first-child {
+  display: block;
+  padding-inline-end: 0;
+}
+
+/* Wide pages. The front page and the pages that open with a hero band set
+   their own width (landing.css); a feature page and the Features index sit
+   in Material's 61rem grid, which is 1220px whatever the root size. */
+.main-pane:has(:is(.tp-landing, .tp-hero-band, .tp-feature, .tp-index)) .content-panel {
+  padding-inline: 0;
+}
+.main-pane:has(:is(.tp-feature, .tp-index)) .content-panel .sl-container {
+  margin: 0 auto;
+  padding: 0 1rem 2.5rem;
+  max-width: 1220px;
+}
+.main-pane:has(:is(.tp-feature, .tp-index, .tp-hero-band)) footer .meta {
+  display: none;
+}
+
+/* ---- Material's pieces --------------------------------------------------- */
+
+/* A figure is centred on its picture, its caption italic and no wider than
+   a line of comfortable reading (Material's typeset, 24rem at 20px). */
+.sl-markdown-content figure {
+  margin-inline: auto;
+  max-width: 100%;
+}
+.sl-markdown-content figcaption {
+  font-style: italic;
+  max-width: 30rem;
+  margin-inline: auto;
+}
+
+/* .md-button: the hero's two buttons, and any page's attr_list button. */
+.sl-markdown-content a.md-button {
+  display: inline-block;
+  padding: 0.625em 2em;
+  border: 0.125rem solid currentColor;
+  border-radius: 0.125rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--sl-color-text-accent);
+  transition: color 125ms, background-color 125ms, border-color 125ms;
+}
+.sl-markdown-content a.md-button--primary {
+  background: var(--sl-color-text-accent);
+  border-color: var(--sl-color-text-accent);
+  color: var(--sl-color-white);
+}
+
+/* pymdownx.details: the collapsed blocks -- three hundred and fifty of them
+   hold a changelog entry each. Material's look: a coloured rule on the left,
+   a tinted title row, a chevron that turns. */
+.sl-markdown-content details:is(.note, .tip, .warning, .danger, .info, .abstract) {
+  padding-inline-start: 0;
+  border: 1px solid var(--tp-line);
+  border-inline-start: 0.25rem solid var(--tp-admon, #448aff);
+  border-radius: 0.375rem;
+  font-size: var(--sl-text-sm);
+}
+.sl-markdown-content details.note {
+  /* landing.css greys the note's frame; its rule is the board's lime. */
+  --tp-admon: var(--tp-lime);
+}
+.sl-markdown-content details.tip {
+  --tp-admon: #00bfa5;
+}
+.sl-markdown-content details.warning {
+  --tp-admon: #ff9100;
+}
+.sl-markdown-content details.danger {
+  --tp-admon: #ff1744;
+}
+.sl-markdown-content details > summary {
+  position: relative;
+  margin-inline-start: 0;
+  cursor: pointer;
+  list-style: none;
+  padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--tp-admon, #448aff) 10%, transparent);
+}
+.sl-markdown-content details > summary::-webkit-details-marker {
+  display: none;
+}
+.sl-markdown-content details > summary::before {
+  content: none;
+}
+.sl-markdown-content details[open] > summary {
+  margin-bottom: 0.75rem;
+}
+.sl-markdown-content details > summary::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 0.75rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-70%) rotate(-45deg);
+  transition: transform 150ms ease;
+  opacity: 0.6;
+}
+.sl-markdown-content details[open] > summary::after {
+  transform: translateY(-50%) rotate(45deg);
+}
+.sl-markdown-content details > :not(summary) {
+  margin-inline: 0.75rem;
+}
+.sl-markdown-content details > :last-child:not(summary) {
+  margin-bottom: 0.75rem;
+}
+.sl-markdown-content details.note > summary {
+  background: var(--tp-plate);
+}
+.sl-markdown-content details.note[open] > summary {
+  border-bottom: 1px solid var(--tp-line);
+}
+
+/* Material's admonitions: a white box with a coloured rule on the left and
+   a tinted title row, not Starlight's filled panel. */
+.starlight-aside {
+  padding: 0;
+  border: 1px solid var(--tp-line);
+  border-inline-start: 0.25rem solid var(--sl-color-asides-border);
+  border-radius: 0.25rem;
+  background: var(--sl-color-bg);
+  font-size: var(--sl-text-sm);
+}
+.starlight-aside__title {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-white);
+  background: color-mix(in srgb, var(--sl-color-asides-border) 10%, transparent);
+}
+.starlight-aside__icon {
+  color: var(--sl-color-asides-border);
+}
+.starlight-aside__content {
+  padding: 0.75rem;
+}
+
+/* The board reports table: the short columns never wrap, their heads
+   neither (Starlight lets a cell break anywhere). */
+.sl-markdown-content table.tp-boards th {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+/* landing.css draws a lime rule over each h2 on these pages. Here an h2 sits
+   inline inside Starlight's anchor wrapper, so the wrapper carries the rule
+   and the spacing, and the rule spans the column as it does on the live site. */
+.main-pane:has(.tp-hero-band) .sl-markdown-content .sl-heading-wrapper.level-h2 {
+  margin: 3rem 0 0.875rem;
+  padding-top: 1.75rem;
+  border-top: 3px solid var(--tp-lime);
+}
+.main-pane:has(.tp-post__meta--page) .sl-markdown-content .sl-heading-wrapper.level-h2 {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 3px solid var(--tp-lime);
+}
+.main-pane:has(.tp-hero-band, .tp-post__meta--page) .sl-markdown-content .sl-heading-wrapper.level-h2 > h2 {
+  margin: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* A post's date, under its title. */
+.tp-post__meta--page {
+  margin-top: 0.5rem;
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+}
+
+/* The news index's page numbers (Material's md-pagination). */
+.tp-pagination {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  margin-block-start: 2rem;
 }
-.tp-footer__social svg {
-  width: 1.1rem;
-  height: 1.1rem;
-  fill: currentColor;
+.tp-pagination > * {
+  min-width: 2rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  text-align: center;
+}
+.tp-pagination__current {
+  background: var(--tp-plate);
+  font-weight: 700;
 }

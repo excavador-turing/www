@@ -544,6 +544,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/roboto-mono@npm:5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource/roboto-mono@npm:5.3.0"
+  checksum: 10c0/f76e6273b1019a6420fcb8ed284d14ebc8b307469d98dbcf8497d1d4eec03f5786414064176cc018a67089dc5e9e85b68770ddb5e56d71ecb8b8b1dfd92cd4e9
+  languageName: node
+  linkType: hard
+
+"@fontsource/roboto@npm:5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource/roboto@npm:5.3.0"
+  checksum: 10c0/68420d2c669ba05f0ea466343151c6d2efff85b05cedbf0f990c58635d86035cae5e7c4904db9abc7b9fd21c5ad179788243ec9dff0c30dfab90679ae2d226f9
+  languageName: node
+  linkType: hard
+
 "@iconify/types@npm:^2.0.0":
   version: 2.0.0
   resolution: "@iconify/types@npm:2.0.0"
@@ -4991,6 +5005,8 @@ __metadata:
   dependencies:
     "@astrojs/markdown-satteri": "npm:0.4.5"
     "@astrojs/starlight": "npm:0.42.7"
+    "@fontsource/roboto": "npm:5.3.0"
+    "@fontsource/roboto-mono": "npm:5.3.0"
     astro: "npm:7.4.2"
     astro-mermaid: "npm:2.2.0"
     mermaid: "npm:12.2.0"
@@ -4998,6 +5014,7 @@ __metadata:
     sharp: "npm:0.35.5"
     starlight-links-validator: "npm:0.27.0"
     starlight-llms-txt: "npm:0.12.0"
+    yaml: "npm:2.9.1"
   languageName: unknown
   linkType: soft
 
@@ -5375,7 +5392,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.8.3, yaml@npm:^2.9.1":
+"yaml@npm:2.9.1, yaml@npm:^2.8.3, yaml@npm:^2.9.1":
   version: 2.9.1
   resolution: "yaml@npm:2.9.1"
   bin:

@@ -10,7 +10,7 @@
 //
 // markdown.extensions.toc.slugify (unicode=False) and toc.unique, ported.
 
-function slugify(value) {
+export function slugify(value) {
   const ascii = value.normalize('NFKD').replace(/[^\x00-\x7f]/g, '');
   return ascii
     .replace(/[^\w\s-]/g, '')
@@ -19,7 +19,7 @@ function slugify(value) {
     .replace(/[-\s]+/g, '-');
 }
 
-function unique(id, ids) {
+export function unique(id, ids) {
   while (ids.has(id) || !id) {
     const m = /^(.*)_([0-9]+)$/.exec(id);
     id = m ? `${m[1]}_${Number(m[2]) + 1}` : `${id}_1`;

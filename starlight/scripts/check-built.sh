@@ -10,11 +10,29 @@ dist=${1:-starlight/dist}
 fail=0
 bad() { echo "check-built: $*" >&2; fail=1; }
 
-for f in index.html 404.html llms.txt llms-full.txt sitemap.xml sitemap-index.xml robots.txt \
+for f in index.html 404.html llms.txt sitemap.xml sitemap-index.xml robots.txt \
          feed.xml stylesheets/landing.css features/index.html news/index.html \
          news/page/2/index.html reference/api/index.html; do
   [ -s "$dist/$f" ] || bad "missing or empty: $f"
 done
+
+# /llms.txt: astro.config.mjs's `llmsTxt` switch. starlight-llms-txt writes
+# llms-full.txt beside it; without that, it must be the curated index,
+# byte for byte what scripts/llms.py wrote.
+if [ ! -e "$dist/llms-full.txt" ] && ! cmp -s "$dist/llms.txt" docs/llms.txt; then
+  bad "llms.txt is neither starlight-llms-txt's (no llms-full.txt) nor docs/llms.txt"
+fi
+
+# The feed: refresh-changelog.py writes it, and it is served as written, at
+# the address the live site's <head> announces. Every entry links a post
+# that this build has.
+if ! cmp -s "$dist/feed.xml" docs/feed.xml; then
+  bad "feed.xml is not docs/feed.xml byte for byte"
+fi
+while read -r href; do
+  path=${href#https://turingpi.xyz}
+  [ -s "$dist${path}index.html" ] || bad "feed.xml links $href, which this build does not have"
+done < <(grep -oE '<link href="https://turingpi\.xyz/news/[^"]*"' "$dist/feed.xml" | sed -E 's/<link href="([^"]*)"/\1/')
 
 # Search: Pagefind's index and its entry point.
 [ -s "$dist/pagefind/pagefind.js" ] || bad "no Pagefind entry point in $dist/pagefind"

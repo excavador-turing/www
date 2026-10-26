@@ -260,3 +260,16 @@ site-parity:
 
 # What CI runs for the Starlight build (site.yaml).
 site-check: site-build site-parity
+
+# Every screen of the Starlight build at nine viewports, as `just screens`
+# measures the MkDocs one: same script, same baseline, the other build.
+# A report for now; phase 3 makes it a gate. Needs `just site-build`.
+site-screens:
+    ./scripts/screens.py --site starlight/dist
+
+# The hourly refresh, then the Starlight build's inputs from it: what the
+# Pages job will run once it is retargeted (phase 4). The generators still
+# write docs/; the converter carries their pages into the content collection
+# and their data -- facts.yaml, boards.yaml, news-posts.json, roadmap.json --
+# into starlight/src/data/, where the components read it at build time.
+site-refresh: refresh site-convert

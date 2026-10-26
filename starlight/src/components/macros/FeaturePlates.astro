@@ -1,0 +1,31 @@
+---
+// The Features index, from the pages themselves (main.py's feature_plates()):
+// one plate per page under features/ that has a `feature:` block, in its
+// `order`, with the page's own summary. A new feature page is a new plate.
+import { getCollection } from 'astro:content';
+
+const pages = (
+  await getCollection('docs', (e) => /^features\/[^/]+$/.test(e.id) && e.data.feature !== undefined)
+)
+  .map((e) => ({
+    slug: e.id.slice('features/'.length),
+    title: e.data.feature!.title ?? e.data.title,
+    summary: e.data.feature!.summary,
+    icon: e.data.feature!.icon,
+    order: e.data.feature!.order,
+  }))
+  // By order, then title -- Python's sort, which compares code points.
+  .sort((a, b) => a.order - b.order || (a.title < b.title ? -1 : a.title > b.title ? 1 : 0));
+---
+
+<div class="tp-plates">
+  {
+    pages.map((p) => (
+      <a class="tp-plate" href={`/features/${p.slug}/`}>
+        {p.icon && <img src={`/assets/icons/${p.icon}`} alt="" />}
+        <b>{p.title}</b>
+        <span>{p.summary}</span>
+      </a>
+    ))
+  }
+</div>

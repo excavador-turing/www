@@ -1,0 +1,46 @@
+---
+// Every board this firmware is known to have run on, as a table: data/
+// boards.yaml, rendered as main.py's board_reports() did. Four columns, not
+// six: at laptop width six clipped the last two behind a scrollbar, which is
+// the worst place for "who said so". The report itself -- how, outcome,
+// who -- is one cell that may wrap.
+import { boardReports } from '../../lib/data';
+import { inlineMarkdown } from '../../lib/inline';
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const trim = (s: unknown) => cap(String(s ?? '')).replace(/\.+$/, '');
+---
+
+{
+  boardReports.length === 0 ? (
+    <p>
+      <em>No reports recorded.</em>
+    </p>
+  ) : (
+    <table class="tp-boards">
+      <thead>
+        <tr>
+          <th>Revision</th>
+          <th>Firmware</th>
+          <th>Date</th>
+          <th>Report</th>
+        </tr>
+      </thead>
+      <tbody>
+        {boardReports.map((r) => (
+          <tr>
+            <td>
+              <b>{String(r.revision ?? '')}</b>
+            </td>
+            <td>{String(r.firmware ?? '')}</td>
+            <td>{String(r.date ?? '')}</td>
+            <td>
+              <Fragment set:html={inlineMarkdown(trim(r.how))} />. {trim(r.outcome)}.{' '}
+              <span class="tp-boards__who">{String(r.source ?? '')}</span>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
