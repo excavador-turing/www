@@ -50,7 +50,7 @@ serve:
 # Everything CI checks, in the order CI checks it. Run this before pushing;
 # `checks.yml` runs exactly these and nothing else, and the deploy runs none
 # of them.
-check: facts-check facts-lint feature-lint description-lint llms-check ribbon-check build structured-data screens reach
+check: facts-check facts-lint feature-lint description-lint llms-check ribbon-check build links-internal structured-data screens reach
 
 # Prove every screen reads whole, at nine viewports.
 #
@@ -117,6 +117,14 @@ description-lint:
 # The JSON-LD in every built page parses and says what is there.
 structured-data: build
     ./scripts/structured-data.py
+
+# Every internal link in the built site lands on a page or file.
+#
+# `mkdocs build --strict` checks Markdown links and nothing else; a link in
+# raw HTML is resolved by the browser against the served URL, and 62 of them
+# were 404s on the live site until this existed.
+links-internal: build
+    ./scripts/internal-links.py
 
 # Every link that leaves the site still answers. Weekly in CI (links.yml);
 # here when you want it now. Needs lychee on the path (devbox has it).

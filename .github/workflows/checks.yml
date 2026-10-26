@@ -79,6 +79,11 @@ jobs:
       - name: build, strict
         run: .venv/bin/mkdocs build --strict
 
+      # strict only checks Markdown links; a link in raw HTML is resolved by
+      # the browser against the served URL, and 62 were 404s on the live site.
+      - name: every internal link lands on a file
+        run: .venv/bin/python scripts/internal-links.py
+
       # Written by a template out of page metadata, so a stray quote breaks
       # it silently: the page still renders and only a crawler notices.
       - name: the structured data parses
