@@ -82,15 +82,17 @@ the only one.
 
 ### The deploy publishes; it does not judge
 
-`pages.yml` builds and deploys. `checks.yml` runs every check, on pull
-requests. Make Checks a required check on `main`: it is the only thing between
-a bad layout and the live site.
+`publish.yaml` builds the site with Starlight and deploys it: on every push
+to `main`, and every hour after committing whatever the repositories moved
+(the refresh). Every `just site-check` gate runs before the deploy, and the
+`published` job fails unless turingpi.xyz then serves that exact build.
+`checks.yml` and `site.yaml` run the checks on pull requests. Make them
+required on `main`: they are what stands between a bad layout and the live
+site.
 
-`publish.yaml` is the Starlight build's publish path, waiting for the switch:
-the demo panes, every `just site-check` gate and the Pages artifact on every
-push, hour and dispatch, and a deploy only on a dispatch from `main` with
-`deploy: true`. Its refresh is a dry run; `pages.yml` makes the hourly commit
-until the switch moves it.
+`pages.yml` is the MkDocs workflow, kept only as the rollback until MkDocs is
+retired: `gh workflow disable publish.yaml`, then `gh workflow run
+pages.yml`.
 
 > The screen gate used to be 132 seconds of a 178-second deploy, while
 > building the site took 3. Publishing a typo waited two minutes on a browser

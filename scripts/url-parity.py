@@ -32,13 +32,20 @@ same-commit MkDocs build shares with this one is reported as "moved since
 the live deploy" and does not fail; one this build has alone does. Without
 --mkdocs every difference counts.
 
+--reference site/ reads the reference from that MkDocs build on disk instead
+of from turingpi.xyz: its sitemap.xml, its pages, its files. That is the
+gate once Starlight IS the live site (phase 4b), when the live site can no
+longer tell the port from itself and every DELIBERATE entry would read as
+stale. URLs still resolve against --site, so an absolute link to
+https://turingpi.xyz/... counts as this site's.
+
 Material's own theme files (assets/javascripts, assets/stylesheets, the
 favicon, the search index) are counted separately: Starlight brings its own
 and nothing links to Material's from outside.
 
 usage: scripts/url-parity.py [--dist starlight/dist] [--site https://turingpi.xyz]
-                             [--sitemap URL|FILE] [--mkdocs site] [--markdown FILE]
-                             [--json FILE] [--strict]
+                             [--sitemap URL|FILE] [--mkdocs site | --reference site]
+                             [--markdown FILE] [--json FILE] [--strict]
 """
 from __future__ import annotations
 
@@ -142,6 +149,14 @@ def fetch(url: str, timeout: float = 30) -> tuple[str, bytes | None]:
         except (urllib.error.URLError, TimeoutError, ConnectionError):
             pass
     return "error", None
+
+
+def reader(root: pathlib.Path):
+    """fetch(), answered from a built site on disk: ("ok", body) or ("404", None)."""
+    def read(url: str) -> tuple[str, bytes | None]:
+        f = dist_file(root, urllib.parse.unquote(urllib.parse.urlsplit(url).path))
+        return ("ok", f.read_bytes()) if f.is_file() else ("404", None)
+    return read
 
 
 class Head(html.parser.HTMLParser):
@@ -264,6 +279,9 @@ def main() -> int:
     ap.add_argument("--mkdocs", help="the MkDocs build of the same commit (site/): "
                     "a difference it shares is content that moved since the live "
                     "deploy, not a port fault")
+    ap.add_argument("--reference", help="a built site on disk to compare against "
+                    "instead of the live one (the MkDocs build of the same commit, "
+                    "once Starlight is what is live)")
     ap.add_argument("--markdown", help="also write the report here (e.g. $GITHUB_STEP_SUMMARY)")
     ap.add_argument("--json", help="write the full findings here")
     ap.add_argument("--strict", action="store_true",
@@ -272,6 +290,15 @@ def main() -> int:
     dist = pathlib.Path(args.dist)
     site = args.site.rstrip("/")
     mk = pathlib.Path(args.mkdocs) if args.mkdocs else None
+    ref = pathlib.Path(args.reference) if args.reference else None
+    if ref and mk:
+        print("url-parity: --reference is the same-commit build; --mkdocs adds nothing", file=sys.stderr)
+        return 2
+    if ref and not (ref / "index.html").is_file():
+        print(f"url-parity: no build at {ref}; run `just build` first", file=sys.stderr)
+        return 2
+    get = reader(ref) if ref else fetch
+    label = f"{site}, as the MkDocs build in {ref}/ serves it" if ref else site
     if not (dist / "index.html").is_file():
         print(f"url-parity: no build at {dist}; run `just site-build` first", file=sys.stderr)
         return 2
@@ -280,7 +307,7 @@ def main() -> int:
         return 2
     read_at = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    src = args.sitemap or f"{site}/sitemap.xml"
+    src = args.sitemap or (str(ref / "sitemap.xml") if ref else f"{site}/sitemap.xml")
     if pathlib.Path(src).is_file():
         raw = pathlib.Path(src).read_bytes()
     else:
@@ -311,7 +338,7 @@ def main() -> int:
 
     # -- live pages: head and references --------------------------------------
     def live(p):
-        return p, fetch(site + p)
+        return p, get(site + p)
     with cf.ThreadPoolExecutor(8) as ex:
         live_pages = dict(ex.map(live, paths))
     unreadable = [p for p, (status, _) in live_pages.items() if status == "error"]
@@ -384,7 +411,7 @@ def main() -> int:
     assets |= {p for p in lfs if not p.startswith(("/demo/fork/", "/demo/fleet/"))}
 
     def asset(p):
-        return p, fetch(site + urllib.parse.quote(p))
+        return p, get(site + urllib.parse.quote(p))
     with cf.ThreadPoolExecutor(8) as ex:
         live_assets = dict(ex.map(asset, sorted(assets)))
     same, differ, missing_assets, live_missing, pointers = [], [], [], [], []
@@ -419,11 +446,13 @@ def main() -> int:
     n_moved = sum(map(len, head_moved.values()))
     out = []
     w = out.append
-    w("## URL parity: Starlight build vs " + site)
+    w("## URL parity: Starlight build vs " + label)
     w("")
-    w(f"Reference: **{site}**, read {read_at}. "
+    w(f"Reference: **{label}**, read {read_at}. "
       + (f"A difference the same commit's MkDocs build (`{args.mkdocs}`) shares is "
          "content that moved since the live deploy, and does not fail. " if mk else
+         "The reference is the same commit's MkDocs build, so every difference "
+         "counts. " if ref else
          "No same-commit MkDocs build given, so every difference counts. ")
       + ("**Gate (--strict).**" if args.strict else "Report only."))
     w("")
@@ -508,7 +537,8 @@ def main() -> int:
             fh.write(report)
     if args.json:
         pathlib.Path(args.json).write_text(json.dumps({
-            "reference": {"site": site, "read_at": read_at, "mkdocs": args.mkdocs},
+            "reference": {"site": site, "read_at": read_at, "mkdocs": args.mkdocs,
+                          "build": args.reference},
             "pages": {"live": len(paths), "missing": missing_pages,
                       "removed_in_commit": moved_pages, "extra": extra_pages},
             "assets": {"checked": len(assets), "same": same, "differ": differ,

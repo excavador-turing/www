@@ -9,7 +9,7 @@ name: Checks
 # way: a layout regression should stop a merge, not a publish, because by the
 # time a publish is running the change is already on main.
 #
-# So: this blocks merges, `pages.yml` publishes, and neither waits on the
+# So: this blocks merges, `publish.yaml` publishes, and neither waits on the
 # other. Make this job required on main in branch protection -- it is the only
 # thing standing between a bad layout and the live site now.
 on:

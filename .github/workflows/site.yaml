@@ -1,10 +1,9 @@
 name: Site (Starlight)
 
 # The Starlight build of turingpi.xyz, proved on every pull request and on
-# main -- and published NOWHERE. `pages.yml` still builds and deploys the
-# live site with MkDocs, `checks.yml` still judges it, and neither is touched
-# by this file. There is no deploy job here on purpose: publish.yaml is the
-# publish path, with the demo panes and the same gates (phase 4a).
+# main. There is no deploy job here on purpose: publish.yaml publishes, with
+# the demo panes and the same gates. `checks.yml` still judges the MkDocs
+# build, which stays until MkDocs is retired as parity's reference.
 #
 # Phase 3: every check the MkDocs build passes runs here against this build,
 # and parity with the live site is a gate. `just site-check` runs the same
@@ -18,9 +17,10 @@ name: Site (Starlight)
 #            needs to tell a port fault from content that moved;
 #   screens  every page at nine viewports in headless Chrome: nothing
 #            clipped, nothing stretched, every screen fits;
-#   parity   every URL, asset (sha256), head tag and anchor turingpi.xyz
-#            serves, against the build. Fails on anything not in the
-#            script's list of deliberate fixes. The job summary is the report.
+#   parity   every URL, asset (sha256), head tag and anchor the MkDocs build
+#            of the same commit serves, against this build. Fails on
+#            anything not in the script's list of deliberate fixes. The job
+#            summary is the report.
 on:
   pull_request:
   workflow_dispatch:
@@ -99,9 +99,8 @@ jobs:
       - name: every page is within two clicks of the front page
         run: devbox run -- python3 scripts/reach.py --site starlight/dist
 
-      # Parity's tie-breaker: a difference from the live site that this
-      # commit's MkDocs build shares is content that moved since the last
-      # deploy, not something the port got wrong.
+      # Parity's reference: the live site is the Starlight build itself
+      # since the switch, and cannot tell the port from itself.
       - name: the MkDocs build of this commit
         run: devbox run -- mkdocs build --strict
 
@@ -178,10 +177,9 @@ jobs:
           name: mkdocs-site
           path: site
 
-      # Standard library only, so the runner's own Python will do. The live
-      # site is the reference, read when this runs; the summary says when.
-      - name: every URL, asset, head tag and anchor the live site serves
-        run: python3 scripts/url-parity.py --strict --mkdocs site --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
+      # Standard library only, so the runner's own Python will do.
+      - name: every URL, asset, head tag and anchor the MkDocs build serves
+        run: python3 scripts/url-parity.py --strict --reference site --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: ${{ !cancelled() }}

@@ -227,11 +227,11 @@ demo-fork-latest checkout:
     echo "$tag" > docs/demo/fork/VERSION
 
 # ---------------------------------------------------------------------------
-# The Starlight build, in starlight/ -- phase 1 of moving off Material for
-# MkDocs, which is in maintenance mode. It builds the whole site from the same
-# docs/ and deploys nothing: MkDocs above is still what turingpi.xyz serves,
-# and `site.yaml` only proves the new build in CI. Not `site/`, because that is
-# MkDocs's output directory and `mkdocs build` empties it.
+# The Starlight build, in starlight/: what turingpi.xyz serves since phase 4b
+# of moving off Material for MkDocs, which is in maintenance mode. It still
+# builds from docs/ through the converter; MkDocs above stays as parity's
+# reference and the rollback until it is retired. Not `site/`, because that
+# is MkDocs's output directory and `mkdocs build` empties it.
 
 # Install the Starlight build's dependencies exactly as the lockfile says.
 site-install:
@@ -256,7 +256,7 @@ site-dev: site-install site-convert
 
 # Everything the Starlight build must pass before it can replace MkDocs: every
 # check `just check` runs, each against this build where it judges what was
-# built, and URL parity with the live site as a gate. The one local command
+# built, and URL parity with the MkDocs build as a gate. The one local command
 # for the new build; `site.yaml` runs exactly these. The four source checks
 # are the MkDocs ones, unchanged: both builds read the same docs/.
 site-check: facts-check facts-lint feature-lint ribbon-check site-build site-description-lint site-llms-check site-links-internal site-structured-data site-screens site-reach site-parity
@@ -294,15 +294,15 @@ site-reach: site-build
 site-screens: site-build
     ./scripts/screens.py --site starlight/dist
 
-# Every URL, asset, head tag and anchor turingpi.xyz serves, against
-# starlight/dist: a gate. A difference the same commit's MkDocs build shares
-# is content that moved since the live deploy and does not fail; the
-# deliberate fixes are listed, with reasons, in the script (DELIBERATE).
+# Every URL, asset, head tag and anchor the MkDocs build of this commit
+# serves, against starlight/dist: a gate. Not against turingpi.xyz, which is
+# the Starlight build itself since the switch. The deliberate fixes are
+# listed, with reasons, in the script (DELIBERATE).
 site-parity: site-build build
-    ./scripts/url-parity.py --strict --mkdocs site
+    ./scripts/url-parity.py --strict --reference site
 
-# The hourly refresh, then the Starlight build's inputs from it: what the
-# Pages job will run once it is retargeted (phase 4). The generators still
+# The hourly refresh, then the Starlight build's inputs from it: what
+# publish.yaml's refresh job runs before it commits. The generators still
 # write docs/; the converter carries their pages into the content collection
 # and their data -- facts.yaml, boards.yaml, news-posts.json, roadmap.json --
 # into starlight/src/data/, where the components read it at build time.
