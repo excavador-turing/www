@@ -1,16 +1,20 @@
 ---
 title: Roadmap
-description: "What is planned for the Turing Pi 2 BMC firmware and what has shipped: 7 open ideas ordered by your vote, proposed and voted on in GitHub Discussions."
-hide:
-  - navigation
-  - toc
+description: 'What is planned for the Turing Pi 2 BMC firmware and what has shipped: 7 open ideas ordered by your vote, proposed and voted on in GitHub Discussions.'
+slug: roadmap
+template: splash
+tableOfContents: false
+tp:
+  hideTitle: true
 ---
 
-<div class="tp-hero-band" markdown>
+<div class="tp-hero-band">
+
 <span class="tp-eyebrow">Roadmap</span>
 # 7 things planned. Your vote orders them.
 
 <p>Every card is a GitHub Discussion. Upvote the ones you want and this page reorders itself: the votes are read every hour, so a vote cast now is on the page within one. Not on the list? <a href="https://github.com/excavador-turing/BMC-Firmware/discussions/new?category=ideas">Propose it</a> — a sentence about the problem is enough.</p>
+
 </div>
 
 <div class="tp-proof">
@@ -29,7 +33,7 @@ hide:
 <a class="tp-idea tp-idea--open" href="https://github.com/excavador-turing/BMC-Firmware/discussions/46"><b class="tp-idea__votes">1<small>vote</small></b><span class="tp-idea__title">ACME against a private CA, so the certificate renews itself</span><span class="tp-idea__what">ACME is a protocol, not a company.</span><span class="tp-idea__status">Open</span></a>
 </div>
 
-Something broken rather than missing? [Report it](feedback.md), and read [what is and isn't fixed](reference/known-faults.md) first, because it may already be there with a ticket.
+Something broken rather than missing? [Report it](/feedback/), and read [what is and isn't fixed](/reference/known-faults/) first, because it may already be there with a ticket.
 
 ## Shipped from this list
 
@@ -41,7 +45,7 @@ Voted for, built, released. Each card still opens its discussion.
 
 ## Recently shipped
 
-One post per firmware release, from the repositories' own changelogs — [all of them](news/index.md), or [by feed](feed.xml).
+One post per firmware release, from the repositories' own changelogs — [all of them](/news/), or [by feed](/feed.xml).
 
 <div class="tp-releases">
 <a href="/news/v2.44.0/"><b>v2.44.0</b><span>15 October 2026</span></a>
@@ -53,7 +57,7 @@ One post per firmware release, from the repositories' own changelogs — [all of
 
 ## How a thing gets from here to there
 
-A feature is a ticket in the maintainer's tracker, a Discussion here, and then a page under [Features](features/index.md) with the numbers that prove it — in that order. The [known-faults page](reference/known-faults.md) is the other half of this one: what is wrong today, with the ticket that tracks it. A roadmap that lists only what is coming is advertising.
+A feature is a ticket in the maintainer's tracker, a Discussion here, and then a page under [Features](/features/) with the numbers that prove it — in that order. The [known-faults page](/reference/known-faults/) is the other half of this one: what is wrong today, with the ticket that tracks it. A roadmap that lists only what is coming is advertising.
 
 Votes read 26 October 2026 by `just refresh-roadmap`, which runs every hour.
 

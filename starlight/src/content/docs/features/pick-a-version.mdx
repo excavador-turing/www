@@ -1,19 +1,18 @@
 ---
 title: Pick a version, from anywhere
-render_macros: true
-since: v2.9.0
-hide:
-- navigation
-- toc
+description: Install firmware from this fork, from upstream or from the SD card, every candidate checksum-verified and compared by version rather than by name.
+slug: features/pick-a-version
+template: splash
+tableOfContents: false
 feature:
+  title: Pick a version, from anywhere
   order: 9
   icon: versions.svg
   summary: This fork, upstream, or the SD card, every candidate checksum-verified and compared numerically.
-  lede: Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release.
-    Here the source is a setting, and every candidate arrives with its checksum.
+  lede: Upstream ships one hard-coded firmware source, and its two catalogues disagree by a whole release. Here the source is a setting, and every candidate arrives with its checksum.
   capture: sources.png
-  alt: "Firmware sources: where this board looks for firmware, which are this fork, the SD card and upstream's two catalogues."
-  caption: "Firmware sources, opened from the Firmware page: this fork, the SD card and upstream's two catalogues."
+  alt: 'Firmware sources: where this board looks for firmware, which are this fork, the SD card and upstream''s two catalogues.'
+  caption: 'Firmware sources, opened from the Firmware page: this fork, the SD card and upstream''s two catalogues.'
   proofs:
   - n: '3'
     of: 'kinds of source: this fork, upstream, the card'
@@ -44,17 +43,23 @@ feature:
       href: ../updates-that-undo-themselves/
       text: Updates that undo themselves
       note: What happens if the version you picked is bad.
-description: "Install firmware from this fork, from upstream or from the SD card, every candidate checksum-verified and compared by version rather than by name."
+since: v2.9.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 Versions are compared numerically, so 2.10 is not older than 2.9 -- which a string comparison says and which upstream's own updater believes. A source that publishes no checksum is labelled TLS only rather than treated as verified, because trusting a transport is not the same as verifying bytes.
 
-[The full argument, with every measurement →](../why/pick-a-version.md)
+[The full argument, with every measurement →](/why/pick-a-version/)
+
 
 </div>

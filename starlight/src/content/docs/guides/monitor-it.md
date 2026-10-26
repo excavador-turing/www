@@ -1,16 +1,18 @@
 ---
-description: "Scrape the Turing Pi 2 BMC's own metrics into Prometheus and get a dashboard of temperature, fan, power and update history."
+title: Monitor it
+description: Scrape the Turing Pi 2 BMC's own metrics into Prometheus and get a dashboard of temperature, fan, power and update history.
+slug: guides/monitor-it
 ---
 
-# Monitor it
-
-The board publishes [32 metric families](../reference/metrics.md). This page is
+The board publishes [32 metric families](/reference/metrics/). This page is
 the shortest path from that to a screen you can look at, and a description of
 what the screen is for.
 
-<div class="grid" markdown>
+<div class="grid">
 
-[Download the dashboard :material-download:](https://raw.githubusercontent.com/excavador-turing/BMC-Firmware/hive/dashboards/turingpi-bmc.json){ .md-button .md-button--primary }
+
+<a href="https://raw.githubusercontent.com/excavador-turing/BMC-Firmware/hive/dashboards/turingpi-bmc.json" class="md-button md-button--primary">Download the dashboard :material-download:</a>
+
 
 </div>
 
@@ -37,7 +39,7 @@ from `tpi metrics show`. Both are gone.
 
 ## 2. Scrape the board
 
-The scrape config is on the [metrics reference](../reference/metrics.md#scraping-it).
+The scrape config is on the [metrics reference](/reference/metrics/#scraping-it).
 Two things about it are easy to get wrong:
 
 - It is plain HTTP on port 9110 — no `scheme: https`, no `tls_config`, no
@@ -133,7 +135,7 @@ counters by `kind` silently matches nothing.
 ### The thermal loop
 
 *Temperature against fan step* is the whole
-[thermal argument](../features/see-what-the-board-sees.md) in one graph: the
+[thermal argument](/features/see-what-the-board-sees/) in one graph: the
 governor raising the step as the board crosses a trip point, and the
 temperature responding. A fan step with no visible reason is the thing this
 fork set out to remove.
@@ -153,7 +155,7 @@ memory fell 0.88 MB a minute while the daemon's own resident set sat at 18.7 MB
 and did not move. That flat line ruled out `bmcd`, which five separate
 reproductions had failed to convict, and the process table then gave up the
 answer immediately: the mDNS responder, at 33.8 MB and climbing. See
-[what is and isn't fixed](../reference/known-faults.md).
+[what is and isn't fixed](/reference/known-faults/).
 
 Beside it is **Threads**, and the pairing is what makes either useful: a heap
 leak grows the resident set while the thread count stays flat, whereas a leaked
@@ -166,7 +168,7 @@ alert below would have paged before either outage rather than after.
 ### The gate's record
 
 *Promotions* and *Rollbacks* count what the
-[health gate](../features/updates-that-undo-themselves.md) decided at each
+[health gate](/features/updates-that-undo-themselves/) decided at each
 boot. Before these existed, that record lived only in
 `/mnt/overlay/postupdate.log` — which is to say it was readable only on a
 board that answers, and the case you most want it for is the one where the
@@ -176,17 +178,18 @@ A rollback is not a fault. It is the gate working. But an unexpected step on
 that graph is worth reading the log for, and the log survives the reboot it
 describes.
 
-!!! note "`promoted` is derived, not counted"
-    The gate writes no single line meaning *kept*, so promotions are attempts
-    minus rollbacks. A board whose power is cut mid-gate therefore counts as
-    promoted. The alternative was a metric that undercounts silently, which is
-    worse than one whose definition is written down.
+:::note[`promoted` is derived, not counted]
+The gate writes no single line meaning *kept*, so promotions are attempts
+minus rollbacks. A board whose power is cut mid-gate therefore counts as
+promoted. The alternative was a metric that undercounts silently, which is
+worse than one whose definition is written down.
+:::
 
 ## Alerting
 
 Nothing here ships alert rules. Two conditions are worth writing yourself:
 
-```promql
+```txt
 # The BMC stopped answering, but its modules did not.
 up{job="turingpi-bmc"} == 0
 

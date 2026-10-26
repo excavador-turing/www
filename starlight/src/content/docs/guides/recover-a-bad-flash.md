@@ -1,8 +1,8 @@
 ---
-description: "Get a Turing Pi 2 BMC back after a bad firmware flash: what the board undoes by itself, and the recovery paths for when it cannot."
+title: Recover a bad flash
+description: 'Get a Turing Pi 2 BMC back after a bad firmware flash: what the board undoes by itself, and the recovery paths for when it cannot.'
+slug: guides/recover-a-bad-flash
 ---
-
-# Recover a bad flash
 
 What to do when a firmware update goes wrong, in the order the board itself
 tries them.
@@ -53,7 +53,7 @@ same on purpose.) Remove the volume and let the firmware make a new one:
 
 Then set the password again and reboot once more to check it persists. The
 details, and the route without SSH, are in
-[the known-faults entry](../reference/known-faults.md#the-board-forgets-everything-at-every-reboot).
+[the known-faults entry](/reference/known-faults/#the-board-forgets-everything-at-every-reboot).
 On the reader's board the volume mounted again with no errors; that a new
 password survives the next reboot is the last check, not yet reported.
 
@@ -102,7 +102,7 @@ $ for p in 22 80 443; do nc -z -w3 <bmc> $p && echo "$p open" || echo "$p closed
 If the kernel answers and every port is closed, there is no remote path back
 in. The board needs its power cut. That is the situation a hardware watchdog
 would fix, and this firmware does not arm one yet — see
-[what is and isn't fixed](../reference/known-faults.md).
+[what is and isn't fixed](/reference/known-faults/).
 
 ## If you gave the board an address you cannot reach
 
@@ -147,23 +147,25 @@ $ sha256sum -c SHA256SUMS --ignore-missing
 Write it to a card, put the card in the board, and power it on. Verify the
 checksum first — this is the image that runs when nothing else does.
 
-!!! warning "The card is an installer; before v2.42.0 it erased the settings"
-    The card boots the installer, which asks for confirmation (type `CONFIRM`
-    on the serial console, or press POWER, RESET or KEY1 three times in a
-    row). **From v2.42.0 it keeps the password, the certificate and the
-    settings** when it can verify they are intact, and otherwise erases and
-    says why on the serial console. A card from v2.41.0 or earlier **erases
-    all user data**: the password returns to `turing`, the certificate is
-    regenerated, and the network, NTP, fan and node settings are gone. To force
-    a reset with a new card, put `factory-reset.txt` next to `install.txt`, or
-    type `ERASE` at the prompt.
+:::caution[The card is an installer; before v2.42.0 it erased the settings]
+The card boots the installer, which asks for confirmation (type `CONFIRM`
+on the serial console, or press POWER, RESET or KEY1 three times in a
+row). **From v2.42.0 it keeps the password, the certificate and the
+settings** when it can verify they are intact, and otherwise erases and
+says why on the serial console. A card from v2.41.0 or earlier **erases
+all user data**: the password returns to `turing`, the certificate is
+regenerated, and the network, NTP, fan and node settings are gone. To force
+a reset with a new card, put `factory-reset.txt` next to `install.txt`, or
+type `ERASE` at the prompt.
 
-    To boot from the card *without* installing, delete or rename `install.txt`
-    on the card's first (FAT) partition first. The NAND is then untouched, and
-    so are its settings. See
-    [Installing on your own board](install.md#from-an-sd-card-the-installer).
+To boot from the card *without* installing, delete or rename `install.txt`
+on the card's first (FAT) partition first. The NAND is then untouched, and
+so are its settings. See
+[Installing on your own board](/guides/install/#from-an-sd-card-the-installer).
+:::
 
-!!! warning "Cutting power hard-cuts the compute modules"
-    Everything above this section leaves the modules running. Pulling the
-    board's power does not. If they are running anything that would rather be
-    shut down cleanly, do that first.
+:::caution[Cutting power hard-cuts the compute modules]
+Everything above this section leaves the modules running. Pulling the
+board's power does not. If they are running anything that would rather be
+shut down cleanly, do that first.
+:::

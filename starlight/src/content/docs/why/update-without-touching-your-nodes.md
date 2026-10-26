@@ -1,11 +1,12 @@
 ---
 title: Update the BMC without touching your nodes
-description: "Why a BMC update leaves the compute modules powered, and the measurements taken across every flash on these boards."
+description: Why a BMC update leaves the compute modules powered, and the measurements taken across every flash on these boards.
+slug: why/update-without-touching-your-nodes
+tp:
+  ogTitle: Update without touching your nodes
 ---
 
-# Update the BMC without touching your nodes
-
-This is the argument behind [Update the BMC without touching your nodes](../features/update-without-touching-your-nodes.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [Update the BMC without touching your nodes](/features/update-without-touching-your-nodes/), with the measurements that back it. The feature page is the short version.
 
 ## Why upstream cycles them at all
 
@@ -28,7 +29,7 @@ during and after it, with no interruption to its power.
 Staging is separate from applying, too. Writing a new image arms the next
 boot and changes nothing else; the board only moves when you reboot it. Right
 up to that moment the whole thing is reversible with one `fw_setenv` — and
-once it does move, [the image has to prove itself](../features/updates-that-undo-themselves.md)
+once it does move, [the image has to prove itself](/features/updates-that-undo-themselves/)
 before it is kept.
 
 ## Measured on a nine-node cluster
@@ -46,7 +47,7 @@ control plane.
 
 The honest detail: the network switch on the board *is* driven by the BMC, so
 a BMC reboot does interrupt the modules' **links**, even though their power is
-untouched — [the switch ports are visible per module](../reference/api/network.md)
+untouched — [the switch ports are visible per module](/reference/api/network/)
 if you want to watch it happen. On this run the reboot was quick enough that no node's kubelet
 noticed. That is a property of the measurement, not a guarantee — a slower
 boot could cross a readiness threshold, and this page says so rather than
@@ -60,4 +61,4 @@ The prediction is recorded on the ticket beside the result, because a
 project that only publishes its correct predictions is not measuring
 anything.
 
-<div class="tp-next tp-next--argument"><a href="../../features/update-without-touching-your-nodes/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Power Control page, with every module powered and counted.</span></a><a href="/guides/upgrade-from-stock/"><b>Do it on your board →</b><span>Coming from stock firmware, step by step.</span></a><a href="/reference/comparison/"><b>The evidence →</b><span>This row and twelve others, each with its method.</span></a><a href="../updates-that-undo-themselves/"><b>Updates that undo themselves →</b><span>What happens if the image you are updating to is bad.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/update-without-touching-your-nodes/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Power Control page, with every module powered and counted.</span></a><a href="/guides/upgrade-from-stock/"><b>Do it on your board →</b><span>Coming from stock firmware, step by step.</span></a><a href="/reference/comparison/"><b>The evidence →</b><span>This row and twelve others, each with its method.</span></a><a href="/why/updates-that-undo-themselves/"><b>Updates that undo themselves →</b><span>What happens if the image you are updating to is bad.</span></a></div>

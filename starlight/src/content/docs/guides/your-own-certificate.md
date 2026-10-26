@@ -1,10 +1,8 @@
 ---
 title: Your own certificate
-render_macros: true
-description: "Install your own HTTPS certificate on the Turing Pi 2 BMC from the interface, the command line or the API, and what the board will refuse."
+description: Install your own HTTPS certificate on the Turing Pi 2 BMC from the interface, the command line or the API, and what the board will refuse.
+slug: guides/your-own-certificate
 ---
-
-# Your own certificate
 
 The board serves HTTPS from the moment it boots, with a certificate it issued
 itself. Your browser does not trust it, because nothing told your browser to.
@@ -32,7 +30,7 @@ a certificate your own authority issued.
 Accepting the browser's warning works for every tab except one. **The serial
 console will still refuse to connect**, because a click-through exception is
 not applied to WebSocket handshakes, and the console is a WebSocket. That is
-[a known fault](../reference/known-faults.md), and everything below fixes it
+[a known fault](/reference/known-faults/), and everything below fixes it
 as a side effect.
 
 ## Trust your own authority, once
@@ -83,11 +81,12 @@ refuses with the reason if any of that is wrong, having written nothing.
 **It takes effect on the next connection, with no restart.** Open sessions are
 not dropped, including the one that installed it.
 
-!!! tip "The key is never written to a log"
+:::tip[The key is never written to a log]
 
-    This takes a JSON body on its own path rather than the legacy
-    query-string interface, which records every mutating call. `tpi tls reset`
-    puts the board back on a certificate it issues itself.
+This takes a JSON body on its own path rather than the legacy
+query-string interface, which records every mutating call. `tpi tls reset`
+puts the board back on a certificate it issues itself.
+:::
 
 Whatever you install is what the board serves. Every key type is covered by a
 test that performs a real handshake against the real acceptor, over both
@@ -105,7 +104,7 @@ plan.
 ACME is a protocol, not a company. A private CA speaks it on your own network,
 answers the challenge over your own LAN, and issues from your own root. An
 ACME client on the board, pointed at your directory URL, would renew without
-anyone watching. That is [on the roadmap](../roadmap.md) too.
+anyone watching. That is [on the roadmap](/roadmap/) too.
 
 Until it exists, the working answer is the one a reader of this project
 already runs: `acme.sh` in a cron job on the board itself, pointed at a local
@@ -124,7 +123,7 @@ board management controller it is not, for three reasons:
 
 **The board would hold a credential that can edit your DNS zone.** On a device
 that can reflash four computers, whose local processes are
-[still trusted without a credential](../reference/known-faults.md). A DNS
+[still trusted without a credential](/reference/known-faults/). A DNS
 credential is not a small secret; it is the one that can be used to obtain
 certificates for everything else you own.
 
@@ -160,8 +159,8 @@ CA, are the two things that were kept.
 [step]: https://smallstep.com/docs/step-ca/
 
 <div class="tp-next">
-<a href="../../features/a-certificate-that-does-not-rot/"><b>What the board issues itself →</b><span>The certificate that does not rot, with its measurements.</span></a>
-<a href="../../features/who-may-reach-this-board/"><b>Who may reach this board →</b><span>The password, and the proxy a certificate can name.</span></a>
-<a href="../../reference/known-faults/"><b>Why the console refuses →</b><span>The fault this page fixes as a side effect.</span></a>
-<a href="../../roadmap/"><b>Vote on the two that are missing →</b><span>Installing your own, and renewing it over ACME.</span></a>
+<a href="/features/a-certificate-that-does-not-rot/"><b>What the board issues itself →</b><span>The certificate that does not rot, with its measurements.</span></a>
+<a href="/features/who-may-reach-this-board/"><b>Who may reach this board →</b><span>The password, and the proxy a certificate can name.</span></a>
+<a href="/reference/known-faults/"><b>Why the console refuses →</b><span>The fault this page fixes as a side effect.</span></a>
+<a href="/roadmap/"><b>Vote on the two that are missing →</b><span>Installing your own, and renewing it over ACME.</span></a>
 </div>

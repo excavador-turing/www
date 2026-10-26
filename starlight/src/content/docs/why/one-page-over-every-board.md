@@ -1,11 +1,10 @@
 ---
 title: One page over every board
-description: "Why one page over every board holds no credential of its own, and what that rules out for the fleet interface."
+description: Why one page over every board holds no credential of its own, and what that rules out for the fleet interface.
+slug: why/one-page-over-every-board
 ---
 
-# One page over every board
-
-This is the argument behind [One page over every board](../features/one-page-over-every-board.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [One page over every board](/features/one-page-over-every-board/), with the measurements that back it. The feature page is the short version.
 
 ## Everything the board's own interface can do
 
@@ -70,8 +69,8 @@ is to fix the cluster when the cluster is broken.
 That is also why client certificates are *requested* and not *required*. A
 browser on the management network presents none and reaches the login page as
 it always did — the same interface, with
-[its own console per module](../features/a-console-to-every-module.md) and
-[the sensors it can read](../features/see-what-the-board-sees.md). What shrinks is the
+[its own console per module](/features/a-console-to-every-module/) and
+[the sensors it can read](/features/see-what-the-board-sees/). What shrinks is the
 exposure machinery per board, not the firmware.
 
 ## A board that is down costs you its card
@@ -82,17 +81,17 @@ on reporting. That is not a nicety: the times you most want a page over every
 board are the times one of them is not answering.
 
 Boards on different firmware are normal here and always will be — which is
-what [picking a version per board](../features/pick-a-version.md) makes possible — so
+what [picking a version per board](/features/pick-a-version/) makes possible — so
 every reading is allowed to be absent, and a board running a daemon outside
 the range the page was built against says so in a banner rather than
 breaking. The readings themselves come from
-[the description the board publishes](../features/the-board-describes-itself.md), so the
+[the description the board publishes](/features/the-board-describes-itself/), so the
 page cannot ask for a field the daemon does not have.
 
 ## What it does not cover
 
-The page holds no credential, which is the point, and also the limit: it can only be as safe as the gateway in front of it. Nothing here authenticates anybody — that is [the proxy's job](../features/who-may-reach-this-board.md), and a board reached some other way is still trusted locally without one, which is [an open fault](../reference/known-faults.md).
+The page holds no credential, which is the point, and also the limit: it can only be as safe as the gateway in front of it. Nothing here authenticates anybody — that is [the proxy's job](/features/who-may-reach-this-board/), and a board reached some other way is still trusted locally without one, which is [an open fault](/reference/known-faults/).
 
 It also shows one estate. There is no multi-tenancy, no per-board permission, and no audit of who pressed what beyond each board's own log.
 
-<div class="tp-next tp-next--argument"><a href="../../features/one-page-over-every-board/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fleet"><b>See it in the demo →</b><span>Two boards on one page, from a real board's capture.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install the firmware each board in the fleet runs.</span></a><a href="/reference/known-faults/"><b>The evidence →</b><span>What is still not fixed, including where trust is assumed.</span></a><a href="../who-may-reach-this-board/"><b>Who may reach this board →</b><span>The two ways in, and what a trusted proxy buys.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/one-page-over-every-board/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fleet"><b>See it in the demo →</b><span>Two boards on one page, from a real board's capture.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install the firmware each board in the fleet runs.</span></a><a href="/reference/known-faults/"><b>The evidence →</b><span>What is still not fixed, including where trust is assumed.</span></a><a href="/why/who-may-reach-this-board/"><b>Who may reach this board →</b><span>The two ways in, and what a trusted proxy buys.</span></a></div>

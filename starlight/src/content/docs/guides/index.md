@@ -1,38 +1,46 @@
 ---
-hide:
-  - toc
-description: "Every guide and reference for this Turing Pi 2 BMC firmware: install it, upgrade from stock, recover a bad flash, segment the network, monitor it."
+title: Documentation
+description: 'Every guide and reference for this Turing Pi 2 BMC firmware: install it, upgrade from stock, recover a bad flash, segment the network, monitor it.'
+slug: guides
+tableOfContents: false
+tp:
+  htmlTitle: Overview
+  ogTitle: Overview
 ---
-
-# Documentation
 
 A Guide instructs, a Reference lists. Start with the guide that matches where
 your board is; the references are there when a guide sends you to one.
 
-<div class="tp-cols" markdown>
+<div class="tp-cols">
 
-<div markdown>
+
+<div>
+
 ## Guides
 
-- **[Install](install.md)** — putting this on your own board
-- **[Upgrading from stock](upgrade-from-stock.md)** — from the firmware it shipped with, and what to expect on the way
-- **[Recover a bad flash](recover-a-bad-flash.md)** — what to do when it goes wrong
-- **[Should it face the internet?](facing-the-internet.md)** — no, and what to expose instead
-- **[Your own certificate](your-own-certificate.md)** — a green padlock, a working console, and why not Let's Encrypt
-- **[Monitor it](monitor-it.md)** — the metrics port, a scrape config, the dashboard
-- **[Developing](development.md)** — build it, and iterate without cutting a release
+- **[Install](/guides/install/)** — putting this on your own board
+- **[Upgrading from stock](/guides/upgrade-from-stock/)** — from the firmware it shipped with, and what to expect on the way
+- **[Recover a bad flash](/guides/recover-a-bad-flash/)** — what to do when it goes wrong
+- **[Should it face the internet?](/guides/facing-the-internet/)** — no, and what to expose instead
+- **[Your own certificate](/guides/your-own-certificate/)** — a green padlock, a working console, and why not Let's Encrypt
+- **[Monitor it](/guides/monitor-it/)** — the metrics port, a scrape config, the dashboard
+- **[Developing](/guides/development/)** — build it, and iterate without cutting a release
+
 </div>
 
-<div markdown>
+<div>
+
 ## Reference
 
-- **[The API](../reference/api.md)** — OpenAPI 3.1, served by the board; [every operation](../reference/api/operations.md) on one page
-- **[Command line](../reference/cli.md)** — `tpi`, which reaches every endpoint above
-- **[Metrics](../reference/metrics.md)** — every family the board exposes
-- **[Upstream vs this fork](../reference/comparison.md)** — row by row, with evidence, including where upstream is ahead
-- **[The factory firmware](../reference/factory-firmware.md)** — what a board ships with, captured
-- **[What is and isn't fixed](../reference/known-faults.md)** — the honest list, with tickets
-- **[Changelog](../changelog/index.md)** — every release of every component
+- **[The API](/reference/api/)** — OpenAPI 3.1, served by the board; [every operation](/reference/api/operations/) on one page
+- **[Command line](/reference/cli/)** — `tpi`, which reaches every endpoint above
+- **[Metrics](/reference/metrics/)** — every family the board exposes
+- **[Upstream vs this fork](/reference/comparison/)** — row by row, with evidence, including where upstream is ahead
+- **[The factory firmware](/reference/factory-firmware/)** — what a board ships with, captured
+- **[What is and isn't fixed](/reference/known-faults/)** — the honest list, with tickets
+- **[Changelog](/changelog/)** — every release of every component
+
 </div>
+
 
 </div>

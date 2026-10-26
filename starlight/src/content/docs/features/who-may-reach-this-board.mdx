@@ -1,20 +1,18 @@
 ---
 title: Who may reach this board
-render_macros: true
-since: v2.28.0
-hide:
-- navigation
-- toc
+description: The BMC password and the trusted proxy that may speak for a user, both readable and both changeable from the page that asks you for one.
+slug: features/who-may-reach-this-board
+template: splash
+tableOfContents: false
 feature:
+  title: Who may reach this board
   order: 8
   icon: access.svg
-  summary: The password and the trusted proxy, both readable and both changeable from the page that asks
-    for one.
-  lede: 'There are two ways into a board running this firmware: a local password, and a proxy holding
-    a certificate the board trusts. Neither used to be visible from the interface, nor changeable there.'
+  summary: The password and the trusted proxy, both readable and both changeable from the page that asks for one.
+  lede: 'There are two ways into a board running this firmware: a local password, and a proxy holding a certificate the board trusts. Neither used to be visible from the interface, nor changeable there.'
   capture: access.png
-  alt: "The Security page: the password for the local account, the board's certificate, and the trusted proxy whose certificate authority may name an operator."
-  caption: "The Security page: the password for the local account, the board's certificate, and the trusted proxy it will accept an operator's name from."
+  alt: 'The Security page: the password for the local account, the board''s certificate, and the trusted proxy whose certificate authority may name an operator.'
+  caption: 'The Security page: the password for the local account, the board''s certificate, and the trusted proxy it will accept an operator''s name from.'
   proofs:
   - n: '2'
     of: ways in, both now visible
@@ -45,17 +43,23 @@ feature:
       href: ../a-certificate-that-does-not-rot/
       text: A certificate that does not rot
       note: The certificate the board serves on that connection.
-description: "The BMC password and the trusted proxy that may speak for a user, both readable and both changeable from the page that asks you for one."
+since: v2.28.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 These take a JSON body on their own path rather than joining the legacy interface, because every mutating call there is recorded with its whole query string -- which would put a password in a log file, in clear, for ever. What is logged is the action and the actor, never the secret. The current password is required even from an operator a proxy vouched for.
 
-[The full argument, with every measurement →](../why/who-may-reach-this-board.md)
+[The full argument, with every measurement →](/why/who-may-reach-this-board/)
+
 
 </div>

@@ -1,13 +1,14 @@
 ---
-title: Changelogs
-description: "What changed in every release of the firmware, the daemon, the interface and the command line, from each repository's own CHANGELOG.md."
-hide:
-  - toc
+title: Every component's changelog
+description: What changed in every release of the firmware, the daemon, the interface and the command line, from each repository's own CHANGELOG.md.
+slug: changelog
+tableOfContents: false
+tp:
+  htmlTitle: Changelogs
+  ogTitle: Every component
 ---
 
-# Every component's changelog
-
-What changed in each release, taken from each repository's own `CHANGELOG.md`. For the same history as one post per firmware release, newest first, read [the news](../news/index.md).
+What changed in each release, taken from each repository's own `CHANGELOG.md`. For the same history as one post per firmware release, newest first, read [the news](/news/).
 
 <div class="tp-plates">
 <a class="tp-plate" href="/changelog/firmware/"><b>BMC-Firmware</b><span>The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.</span><span class="tp-plate__meta">v2.44.0 · 15 October 2026 · 41 releases</span></a>
@@ -18,6 +19,6 @@ What changed in each release, taken from each repository's own `CHANGELOG.md`. F
 
 These four version together. The firmware image carries a `bmcd`, a `BMC-UI` and a `tpi`, and the board's Dashboard names all four — so a firmware version is the one to quote when reporting anything.
 
-New firmware releases come through [the feed](../feed.xml). What is planned rather than done is on the [roadmap](../roadmap.md), ordered by votes.
+New firmware releases come through [the feed](/feed.xml). What is planned rather than done is on the [roadmap](/roadmap/), ordered by votes.
 
 Refreshed 26 October 2026 by `just refresh-changelog`.

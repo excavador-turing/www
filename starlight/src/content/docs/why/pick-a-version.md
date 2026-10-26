@@ -1,14 +1,13 @@
 ---
 title: Pick a version, from anywhere
-description: "Why firmware candidates are compared numerically and checksum-verified, and what comparing them by name used to do."
+description: Why firmware candidates are compared numerically and checksum-verified, and what comparing them by name used to do.
+slug: why/pick-a-version
 ---
 
-# Pick a version, from anywhere
-
-This is the argument behind [Pick a version, from anywhere](../features/pick-a-version.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [Pick a version, from anywhere](/features/pick-a-version/), with the measurements that back it. The feature page is the short version.
 
 This fork makes the sources a setting, and shows you what each one offers —
-and whichever you pick, [a bad image undoes itself](../features/updates-that-undo-themselves.md)
+and whichever you pick, [a bad image undoes itself](/features/updates-that-undo-themselves/)
 rather than costing you a trip to the rack.
 
 ## Every source, with what it is worth
@@ -117,7 +116,7 @@ one: trusting the transport is not verifying the bytes, and neither upstream
 route publishes a checksum at all.
 
 And picking a version is not judging it. Whether the image you chose is any
-good is [the gate's question](../features/updates-that-undo-themselves.md),
+good is [the gate's question](/features/updates-that-undo-themselves/),
 after it boots.
 
-<div class="tp-next tp-next--argument"><a href="../../features/pick-a-version/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The firmware sources, with what each one publishes.</span></a><a href="/guides/upgrade-from-stock/"><b>Do it on your board →</b><span>Move off stock, and what to expect on the way.</span></a><a href="/reference/comparison/"><b>The evidence →</b><span>The two upstream catalogues, and what each returns.</span></a><a href="../updates-that-undo-themselves/"><b>Updates that undo themselves →</b><span>What happens if the version you picked is bad.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/pick-a-version/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The firmware sources, with what each one publishes.</span></a><a href="/guides/upgrade-from-stock/"><b>Do it on your board →</b><span>Move off stock, and what to expect on the way.</span></a><a href="/reference/comparison/"><b>The evidence →</b><span>The two upstream catalogues, and what each returns.</span></a><a href="/why/updates-that-undo-themselves/"><b>Updates that undo themselves →</b><span>What happens if the version you picked is bad.</span></a></div>

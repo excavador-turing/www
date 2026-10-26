@@ -1,8 +1,8 @@
 ---
-description: "What this fork has fixed, what is still open, and what upstream never fixed, each entry with where and when it was measured."
+title: What is and isn't fixed
+description: What this fork has fixed, what is still open, and what upstream never fixed, each entry with where and when it was measured.
+slug: reference/known-faults
 ---
-
-# What is and isn't fixed
 
 A fork that lists only what it improved is advertising. This page is the other
 half: what is wrong with this firmware today, measured, with the ticket that
@@ -37,7 +37,7 @@ Two ways round it, both of which work today:
   be trusted.
 * **Reach the board through a proxy that terminates TLS on a certificate your
   browser already trusts.** That is what [one page over every
-  board](../features/one-page-over-every-board.md) does.
+  board](/features/one-page-over-every-board/) does.
 
 *The interface says this now, in the panel under the console. It cannot detect
 the case — a browser reports no reason for a failed handshake — so it names
@@ -288,7 +288,7 @@ the kernel will attach it, and refuses to keep anything the kernel's own UBI
 checks would reject. Otherwise it erases as before and says why on the serial
 console. A `factory-reset.txt` file on the card, or typing `ERASE` at the
 prompt, forces the reset. A card written from v2.41.0 or earlier still erases.
-[The install page](../guides/install.md#from-an-sd-card-the-installer) has the
+[The install page](/guides/install/#from-an-sd-card-the-installer) has the
 steps.
 
 *Verified 2026-10-06 in simulation (the kernel's `nandsim` in CI), not yet
@@ -368,7 +368,7 @@ answers for a board.
 `turing`. It is printed in the quick-start guide, it is identical on every
 board anyone has bought, and nothing ever asked for it to be changed — on a
 project whose own front page says [a board should not face the
-internet](../guides/facing-the-internet.md). Upstream has had an issue open
+internet](/guides/facing-the-internet/). Upstream has had an issue open
 about it since 2023.
 
 Until the password is changed, the board now answers **403 to every API call**
@@ -488,7 +488,7 @@ answer was sitting in the daemon's own database unexported.
 `/metrics` now carries `bmcd_node_usb_boot_armed`, one sample per module.
 Alert on it lasting more than a few minutes and the page reaches whoever armed
 it while they still remember doing so; the
-[metrics reference](metrics.md#compute-modules) has the rule. Finish a flash
+[metrics reference](/reference/metrics/#compute-modules) has the rule. Finish a flash
 with `tpi usb device -n N` and it never arms at all.
 
 *Tracked as SQU-213.*
@@ -534,7 +534,7 @@ lives on the overlay, so it survived every firmware upgrade this fork had
 shipped up to that point.
 
 Three things were wrong at once, and all three are covered by
-[a certificate that does not rot](../features/a-certificate-that-does-not-rot.md):
+[a certificate that does not rot](/features/a-certificate-that-does-not-rot/):
 the generation script now issues EC P-384 with real names and **825 days** of
 validity, reissues **30 days** before expiry rather than only when the file is
 missing, and refuses to touch a certificate it did not issue. Fifteen
@@ -593,18 +593,19 @@ compared the two on size alone. On a board with no swap and no watchdog, how a
 long-running daemon behaves over hours deserved a look as well, and did not get
 one.
 
-!!! note "How it was found, and why it took two outages"
-    The daemon was the obvious suspect and the wrong one. Five reproductions
-    drove `bmcd` on a workstation — 183,702 requests across every endpoint,
-    278,000 metrics scrapes, forced catalogue refreshes — and every one came
-    back clean, because `bmcd` was innocent.
+:::note[How it was found, and why it took two outages]
+The daemon was the obvious suspect and the wrong one. Five reproductions
+drove `bmcd` on a workstation — 183,702 requests across every endpoint,
+278,000 metrics scrapes, forced catalogue refreshes — and every one came
+back clean, because `bmcd` was innocent.
 
-    What settled it was
-    [`bmcd_process_resident_bytes`](../guides/monitor-it.md), added the night
-    before for exactly this. Board memory fell 0.88 MB a minute while the
-    daemon's own resident set sat at 18.7 MB and never moved. One flat line
-    ended the search, and the process table then took about a minute to
-    read.
+What settled it was
+[`bmcd_process_resident_bytes`](/guides/monitor-it/), added the night
+before for exactly this. Board memory fell 0.88 MB a minute while the
+daemon's own resident set sat at 18.7 MB and never moved. One flat line
+ended the search, and the process table then took about a minute to
+read.
+:::
 
 *Tracked as SQU-175, with the outage itself as SQU-172.*
 
@@ -636,7 +637,7 @@ had **never worked in any release** because its argument collided with the
 `--version` flag.
 
 All fixed by 1.2.2, each verified against a board. The examples on the
-[command line](cli.md) page are now real output.
+[command line](/reference/cli/) page are now real output.
 
 ### The firmware page froze
 

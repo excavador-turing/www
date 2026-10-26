@@ -1,11 +1,10 @@
 ---
 title: See what the board sees
-description: "Why the board's temperature and fan readings belong together, and what upstream's firmware never described."
+description: Why the board's temperature and fan readings belong together, and what upstream's firmware never described.
+slug: why/see-what-the-board-sees
 ---
 
-# See what the board sees
-
-This is the argument behind [See what the board sees](../features/see-what-the-board-sees.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [See what the board sees](/features/see-what-the-board-sees/), with the measurements that back it. The feature page is the short version.
 
 This fork adds the sensor to the device tree and lets the kernel's thermal
 governor drive the fan from it. That is a two-line change with a consequence
@@ -76,14 +75,15 @@ older daemon there is no switch and the plain slider stays, under its note
 admitting the governor undoes it. A control that visibly fails is worse than
 one that admits it cannot.
 
-!!! warning "What is not underneath you"
-    This board declares no `critical` trip. Nothing shuts it down if it gets
-    hot — with the governor running or paused. So a held fan is taken back
-    automatically above the zone's hottest `active` trip, 70 °C here, read
-    from the trips rather than written down as a number.
+:::caution[What is not underneath you]
+This board declares no `critical` trip. Nothing shuts it down if it gets
+hot — with the governor running or paused. So a held fan is taken back
+automatically above the zone's hottest `active` trip, 70 °C here, read
+from the trips rather than written down as a number.
 
-    That is a daemon doing it, not a kernel, which is a weaker guarantee than
-    it sounds. See [what is and isn't fixed](../reference/known-faults.md).
+That is a daemon doing it, not a kernel, which is a weaker guarantee than
+it sounds. See [what is and isn't fixed](/reference/known-faults/).
+:::
 
 ## Read from the board, never written into a client
 
@@ -99,7 +99,7 @@ then it is a confident lie.
 ## A catalogue, not a number
 
 Upstream exposes no metrics at all. This fork serves
-[a catalogue of them](../reference/metrics.md):
+[a catalogue of them](/reference/metrics/):
 temperatures and the cooling state, per-port switch traffic and errors, node
 power and uptime, NAND wear, memory and load, the clock's discipline and
 offset, the firmware slots, and the health gate's own record.
@@ -109,12 +109,13 @@ no credential. Adding metrics behind the root password would have been worse
 than having none — a scrape config is a file on another machine, and it should
 not be able to power off a node.
 
-!!! note "One of these is about this fork's own mistakes"
-    `bmcd_process_resident_bytes` was added on 2026-09-09, the night a board
-    ran out of memory and stopped answering. The board-level memory metric
-    could show *that* it was being consumed and not *by what*, so the
-    diagnosis had to be argued from timing. One number closes that gap. See
-    [what is and isn't fixed](../reference/known-faults.md).
+:::note[One of these is about this fork's own mistakes]
+`bmcd_process_resident_bytes` was added on 2026-09-09, the night a board
+ran out of memory and stopped answering. The board-level memory metric
+could show *that* it was being consumed and not *by what*, so the
+diagnosis had to be argued from timing. One number closes that gap. See
+[what is and isn't fixed](/reference/known-faults/).
+:::
 
 ## Where the reading lives
 
@@ -138,8 +139,8 @@ first.
 
 ## What it does not cover
 
-The board reads its own temperature; it does not act on it. There is no `critical` trip, so nothing shuts the board down if it overheats — a held fan is taken back by the daemon above the hottest active trip, which is a weaker guarantee than a kernel doing it. That is [an open fault](../reference/known-faults.md), not a setting.
+The board reads its own temperature; it does not act on it. There is no `critical` trip, so nothing shuts the board down if it overheats — a held fan is taken back by the daemon above the hottest active trip, which is a weaker guarantee than a kernel doing it. That is [an open fault](/reference/known-faults/), not a setting.
 
-And a reading is not a record. These numbers are what the board says now; keeping them means [scraping the metrics port](../guides/monitor-it.md), which is a separate thing to run.
+And a reading is not a record. These numbers are what the board says now; keeping them means [scraping the metrics port](/guides/monitor-it/), which is a separate thing to run.
 
-<div class="tp-next tp-next--argument"><a href="../../features/see-what-the-board-sees/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Cooling page, with real readings from a board.</span></a><a href="/guides/monitor-it/"><b>Do it on your board →</b><span>The metrics port, a scrape config and the dashboard.</span></a><a href="/reference/metrics/"><b>The evidence →</b><span>Every family the board can measure, catalogued.</span></a><a href="../the-board-describes-itself/"><b>The board describes its own API →</b><span>Where the readings on this page come from.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/see-what-the-board-sees/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Cooling page, with real readings from a board.</span></a><a href="/guides/monitor-it/"><b>Do it on your board →</b><span>The metrics port, a scrape config and the dashboard.</span></a><a href="/reference/metrics/"><b>The evidence →</b><span>Every family the board can measure, catalogued.</span></a><a href="/why/the-board-describes-itself/"><b>The board describes its own API →</b><span>Where the readings on this page come from.</span></a></div>

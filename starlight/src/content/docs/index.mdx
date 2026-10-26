@@ -1,16 +1,21 @@
 ---
-hide:
-  - navigation
-  - toc
-render_macros: true
-description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that take themselves back, VLANs on the board's own switch, a certificate that does not rot."
+title: Home
+description: 'A maintained fork of the Turing Pi 2 BMC firmware: updates that take themselves back, VLANs on the board''s own switch, a certificate that does not rot.'
+slug: index
+template: splash
+tableOfContents: false
+tp:
+  hideTitle: true
 ---
 
-<div class="tp-landing" markdown>
+import { Fact, NewsLede } from '~/components/macros';
+
+<div class="tp-landing">
+
 
 <div class="tp-bar" hidden="hidden">
 <a class="tp-back" href="#overview">← Overview</a>
-<span class="tp-bar__note">Readings are real, captured off a board; controls refuse and say why; the console replays a recording. <a href="about/">What is and isn't real</a> · <a href="demo/fork/" target="_blank" rel="noopener">full size</a></span>
+<span class="tp-bar__note">Readings are real, captured off a board; controls refuse and say why; the console replays a recording. <a href="/about/">What is and isn't real</a> · <a href="/demo/fork/" target="_blank" rel="noopener">full size</a></span>
 <nav class="tp-seg tp-panes" aria-label="Which interface">
 <a href="#demo/stock" data-pane="stock">Stock firmware</a>
 <a href="#demo/fork" data-pane="fork">This fork</a>
@@ -18,29 +23,38 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </nav>
 </div>
 
-<section class="tp-view tp-view--home" markdown>
+<section class="tp-view tp-view--home">
 
-<section class="tp-screen tp-hero" data-screen="hero" markdown>
 
-<div class="tp-hero__say" markdown>
+<section class="tp-screen tp-hero" data-screen="hero">
+
+
+<div class="tp-hero__say">
+
 
 # Flash it wrong and lose nothing
 
 <p class="lede">Firmware for the Turing Pi 2 that boots a new image on trial and takes it back if the board does not come back right. Upstream stopped in February 2025.</p>
 
-<div class="tp-actions"><a class="md-button md-button--primary" href="#demo/fork">Try it, live</a> <a class="md-button" href="guides/install/">Install it</a></div>
+<div class="tp-actions"><a class="md-button md-button--primary" href="#demo/fork">Try it, live</a> <a class="md-button" href="/guides/install/">Install it</a></div>
+
 
 </div>
 
-<figure class="tp-hero__show" markdown>
-![The Firmware page: the running slot, the image the board can fall back to, and when the gate last promoted one.](assets/captures/firmware.png)
+<figure class="tp-hero__show">
+
+![The Firmware page: the running slot, the image the board can fall back to, and when the gate last promoted one.](/assets/captures/firmware.png)
+
 </figure>
+
 
 </section>
 
-<section class="tp-screen tp-chapter" data-screen="rollback" markdown>
+<section class="tp-screen tp-chapter" data-screen="rollback">
 
-<div class="tp-chapter__say" markdown>
+
+<div class="tp-chapter__say">
+
 <span class="tp-eyebrow">Updates that undo themselves</span>
 
 ## A bad image takes itself back
@@ -48,24 +62,30 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 <p>Upstream promotes a new image the moment it boots, which proves the kernel started and nothing else. Here it boots on trial and is kept only if the board comes back right. It has said no once, on purpose, to a tampered image — in about 35 seconds.</p>
 
 <div class="tp-proof">
-<div><b>{{ gate.promoted }}</b><span>updates taken on this board</span></div>
-<div><b>{{ gate.rolled_back }}</b><span>rolled back by the board itself</span></div>
-<div><b>{{ gate.rack_trips }}</b><span>trips to the rack</span></div>
+<div><b><Fact of="gate.promoted" /></b><span>updates taken on this board</span></div>
+<div><b><Fact of="gate.rolled_back" /></b><span>rolled back by the board itself</span></div>
+<div><b><Fact of="gate.rack_trips" /></b><span>trips to the rack</span></div>
 </div>
 
-<a class="tp-why" href="features/updates-that-undo-themselves/">How the gate decides →</a>
+<a class="tp-why" href="/features/updates-that-undo-themselves/">How the gate decides →</a>
+
 </div>
 
-<figure class="tp-chapter__show" markdown>
-![The board's own Dashboard, naming the firmware, daemon and interface it is running.](assets/captures/dashboard.png){ loading=lazy }
-<figcaption>Read off the board on {{ gate.as_of }}, not counted by hand.</figcaption>
+<figure class="tp-chapter__show">
+
+<img src="/assets/captures/dashboard.png" alt="The board&#x27;s own Dashboard, naming the firmware, daemon and interface it is running." loading="lazy" />
+<figcaption>Read off the board on <Fact of="gate.as_of" />, not counted by hand.</figcaption>
+
 </figure>
+
 
 </section>
 
-<section class="tp-screen tp-chapter tp-chapter--flip" data-screen="nodes" markdown>
+<section class="tp-screen tp-chapter tp-chapter--flip" data-screen="nodes">
 
-<div class="tp-chapter__say" markdown>
+
+<div class="tp-chapter__say">
+
 <span class="tp-eyebrow">Update without touching your nodes</span>
 
 ## Patch the BMC, leave the cluster alone
@@ -78,19 +98,25 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 <div><b>48 s</b><span>for the board itself to come back</span></div>
 </div>
 
-<a class="tp-why" href="features/update-without-touching-your-nodes/">What upstream does instead →</a>
+<a class="tp-why" href="/features/update-without-touching-your-nodes/">What upstream does instead →</a>
+
 </div>
 
-<figure class="tp-chapter__show" markdown>
-![The four compute modules on the Power Control page, powered and counted in uptime, across a BMC upgrade.](assets/captures/power-control.png){ loading=lazy }
+<figure class="tp-chapter__show">
+
+<img src="/assets/captures/power-control.png" alt="The four compute modules on the Power Control page, powered and counted in uptime, across a BMC upgrade." loading="lazy" />
 <figcaption>Every module exactly as it was, uptime unbroken.</figcaption>
+
 </figure>
+
 
 </section>
 
-<section class="tp-screen tp-chapter" data-screen="fleet" markdown>
+<section class="tp-screen tp-chapter" data-screen="fleet">
 
-<div class="tp-chapter__say" markdown>
+
+<div class="tp-chapter__say">
+
 <span class="tp-eyebrow">One page over every board</span>
 
 ## Every board on one page, and none of them exposed
@@ -103,89 +129,109 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 <div><b>0</b><span>credentials held by the page</span></div>
 </div>
 
-<a class="tp-why" href="features/one-page-over-every-board/">Why a board is never exposed →</a>
+<a class="tp-why" href="/features/one-page-over-every-board/">Why a board is never exposed →</a>
+
 </div>
 
-<figure class="tp-chapter__show" markdown>
-![Both boards on one page, each answering for itself.](assets/captures/fleet.png){ loading=lazy }
+<figure class="tp-chapter__show">
+
+<img src="/assets/captures/fleet.png" alt="Both boards on one page, each answering for itself." loading="lazy" />
 <figcaption>A board that is down costs you its card and nothing else.</figcaption>
+
 </figure>
+
 
 </section>
 
-<section class="tp-screen tp-chapter tp-chapter--flip" data-screen="maintained" markdown>
+<section class="tp-screen tp-chapter tp-chapter--flip" data-screen="maintained">
 
-<div class="tp-chapter__say" markdown>
+
+<div class="tp-chapter__say">
+
 <span class="tp-eyebrow">Fresh, and fixed</span>
 
 ## Software that is still maintained
 
-<p>Upstream's last release was {{ platform.upstream_last_version }}, in February 2025, on a kernel that is not a longterm release and a Buildroot that is end of life. This fork tracks both, and has taken out six named faults — including the one that killed this board twice in a day.</p>
+<p>Upstream's last release was <Fact of="platform.upstream_last_version" />, in February 2025, on a kernel that is not a longterm release and a Buildroot that is end of life. This fork tracks both, and has taken out six named faults — including the one that killed this board twice in a day.</p>
 
 <div class="tp-proof">
-<div><b>{{ platform.kernel.fork.split()[0] }}</b><span>kernel, against upstream's 6.8</span></div>
-<div><b>{{ releases.total }}</b><span>releases across four components</span></div>
-<div><b>{{ faults.count }}</b><span>faults still open, each with a ticket</span></div>
+<div><b><Fact of="platform.kernel.fork" filters="first_word" /></b><span>kernel, against upstream's 6.8</span></div>
+<div><b><Fact of="releases.total" /></b><span>releases across four components</span></div>
+<div><b><Fact of="faults.count" /></b><span>faults still open, each with a ticket</span></div>
 </div>
 
-<a class="tp-why" href="reference/comparison/">Every row, with its measurement →</a>
+<a class="tp-why" href="/reference/comparison/">Every row, with its measurement →</a>
+
 </div>
 
-<figure class="tp-chapter__show" markdown>
-![The Dashboard's Software card: kernel, daemon, interface and firmware, each a version you can check against a release.](assets/captures/dashboard.png){ loading=lazy }
+<figure class="tp-chapter__show">
+
+<img src="/assets/captures/dashboard.png" alt="The Dashboard&#x27;s Software card: kernel, daemon, interface and firmware, each a version you can check against a release." loading="lazy" />
 <figcaption>What the board says it is running, every part of it checkable.</figcaption>
+
 </figure>
 
+
 </section>
 
-<section class="tp-screen tp-chapter tp-chapter--news" data-screen="news" markdown>
+<section class="tp-screen tp-chapter tp-chapter--news" data-screen="news">
 
-<div class="tp-news" markdown>
+
+<div class="tp-news">
+
 <span class="tp-eyebrow">What's new</span>
 
-## {{ releases.firmware.newest }} shipped, {{ roadmap.count }} things planned
+## <Fact of="releases.firmware.newest" /> shipped, <Fact of="roadmap.count" /> things planned
 
-<div class="tp-news__grid" markdown>
+<div class="tp-news__grid">
 
-<div class="tp-news__col" markdown>
+
+<div class="tp-news__col">
+
 <b>Just shipped</b>
-<p>{{ news_lede() }}</p>
-<a href="news/">Everything that changed →</a> <a href="feed.xml">Follow by feed →</a>
+<p><NewsLede /></p>
+<a href="/news/">Everything that changed →</a> <a href="/feed.xml">Follow by feed →</a>
+
 </div>
 
-<div class="tp-news__col" markdown>
+<div class="tp-news__col">
+
 <b>Decided by vote</b>
-<p>{{ roadmap.count }} things are planned and {{ roadmap.votes }} votes have been cast. Leading: <b>{{ roadmap.top }}</b>.</p>
-<a href="roadmap/">Vote on what comes next →</a> <a href="feedback/">Propose something →</a>
+<p><Fact of="roadmap.count" /> things are planned and <Fact of="roadmap.votes" /> votes have been cast. Leading: <b><Fact of="roadmap.top" /></b>.</p>
+<a href="/roadmap/">Vote on what comes next →</a> <a href="/feedback/">Propose something →</a>
+
+</div>
+
+
 </div>
 
 </div>
-</div>
+
 
 </section>
 
-<section class="tp-screen tp-chapter tp-chapter--what" data-screen="what" markdown>
+<section class="tp-screen tp-chapter tp-chapter--what" data-screen="what">
 
-<!-- No `markdown` attribute: python-markdown wraps a raw block child in a
+
+{/* No `markdown` attribute: python-markdown wraps a raw block child in a
      <p>, and the anchor below then shrank to fit its contents -- 468px of a
-     1368px row, with the paragraph beside a third of the screen of white. -->
+     1368px row, with the paragraph beside a third of the screen of white. */}
 <div class="tp-what-grid">
-
 <a class="tp-what" href="https://turingpi.com/" rel="noopener">
-<img loading="lazy" src="assets/turing-pi-2-hand.jpg" alt="A hand placing a compute module onto a Turing Pi 2 board that already carries three">
+<img loading="lazy" src="/assets/turing-pi-2-hand.jpg" alt="A hand placing a compute module onto a Turing Pi 2 board that already carries three" />
 <span class="tp-what__text"><b>What is a Turing Pi?</b><span class="tp-what__body"> A mini-ITX board carrying four compute modules — Raspberry Pi CM4, Turing RK1 or Nvidia Jetson — with their network switch, power, and a small management computer on the board itself. That computer, the BMC, is what this firmware runs on: it powers the modules, flashes them and hands you their consoles. Made by Turing Machines — </span><span class="tp-what__link">turingpi.com →</span></span>
 </a>
-
 <div class="tp-dest">
 <a class="tp-dest__card" href="#demo/fork"><b>Live demo</b><span>Stock and this fork, side by side, answering from a real board's data.</span></a>
-<a class="tp-dest__card" href="features/"><b>Features</b><span>{{ features.count }} of them, each with the measurement behind it.</span></a>
-<a class="tp-dest__card" href="guides/"><b>Documentation</b><span>Install, upgrade, recover, monitor, and the full API.</span></a>
-<a class="tp-dest__card" href="about/"><b>About</b><span>Why the fork exists, and what is still not fixed.</span></a>
+<a class="tp-dest__card" href="/features/"><b>Features</b><span><Fact of="features.count" /> of them, each with the measurement behind it.</span></a>
+<a class="tp-dest__card" href="/guides/"><b>Documentation</b><span>Install, upgrade, recover, monitor, and the full API.</span></a>
+<a class="tp-dest__card" href="/about/"><b>About</b><span>Why the fork exists, and what is still not fixed.</span></a>
+</div>
 </div>
 
-</div>
 
 </section>
+
 
 </section>
 
@@ -197,49 +243,7 @@ description: "A maintained fork of the Turing Pi 2 BMC firmware: updates that ta
 </div>
 </section>
 
-<script>
-(function () {
-  var root = document.querySelector('.tp-landing');
-  if (!root || root.dataset.wired) return;
-  root.dataset.wired = '1';
-  function apply () {
-    var h = location.hash.replace(/^#/, '');
-    var demo = h.indexOf('demo') === 0;
-    var pane = demo ? (h.split('/')[1] || 'fork') : null;
-    root.querySelector('.tp-view--home').hidden = demo;
-    root.querySelector('.tp-view--demo').hidden = !demo;
-    root.querySelector('.tp-bar').hidden = !demo;
-    // The footer belongs to the page, not to the demo: a sitemap under a
-    // framed interface puts a scrollbar on the one view whose whole job is
-    // to be as large as the screen allows.
-    document.body.classList.toggle('tp-demo-open', demo);
-    root.querySelectorAll('.tp-panes a').forEach(function (a) {
-      a.setAttribute('aria-current', a.dataset.pane === pane ? 'true' : 'false');
-    });
-    root.querySelectorAll('.tp-stage [data-pane]').forEach(function (el) {
-      var on = el.dataset.pane === pane;
-      el.hidden = !on;
-      if (on && el.tagName === 'IFRAME' && !el.getAttribute('src')) el.setAttribute('src', el.dataset.src);
-    });
-    if (!demo && h === 'overview') window.scrollTo(0, 0);
-  }
-  // Material's instant loading owns every click on the page. A same-page
-  // hash link must stay a hash change, not become a fetch of the page it is
-  // already on -- which is what "#" alone turned into once the page had been
-  // opened with a hash. Capture phase, so this runs before Material's
-  // listener on the body and the click never reaches it.
-  root.addEventListener('click', function (e) {
-    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
-    if (!a) return;
-    var u = new URL(a.getAttribute('href'), location.href);
-    if (u.origin !== location.origin || u.pathname !== location.pathname || !u.hash) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (location.hash !== u.hash) location.hash = u.hash; else apply();
-  }, true);
-  window.addEventListener('hashchange', apply);
-  apply();
-})();
-</script>
+<script set:html={"\n(function () {\n  var root = document.querySelector('.tp-landing');\n  if (!root || root.dataset.wired) return;\n  root.dataset.wired = '1';\n  function apply () {\n    var h = location.hash.replace(/^#/, '');\n    var demo = h.indexOf('demo') === 0;\n    var pane = demo ? (h.split('/')[1] || 'fork') : null;\n    root.querySelector('.tp-view--home').hidden = demo;\n    root.querySelector('.tp-view--demo').hidden = !demo;\n    root.querySelector('.tp-bar').hidden = !demo;\n    // The footer belongs to the page, not to the demo: a sitemap under a\n    // framed interface puts a scrollbar on the one view whose whole job is\n    // to be as large as the screen allows.\n    document.body.classList.toggle('tp-demo-open', demo);\n    root.querySelectorAll('.tp-panes a').forEach(function (a) {\n      a.setAttribute('aria-current', a.dataset.pane === pane ? 'true' : 'false');\n    });\n    root.querySelectorAll('.tp-stage [data-pane]').forEach(function (el) {\n      var on = el.dataset.pane === pane;\n      el.hidden = !on;\n      if (on && el.tagName === 'IFRAME' && !el.getAttribute('src')) el.setAttribute('src', el.dataset.src);\n    });\n    if (!demo && h === 'overview') window.scrollTo(0, 0);\n  }\n  // Material's instant loading owns every click on the page. A same-page\n  // hash link must stay a hash change, not become a fetch of the page it is\n  // already on -- which is what \"#\" alone turned into once the page had been\n  // opened with a hash. Capture phase, so this runs before Material's\n  // listener on the body and the click never reaches it.\n  root.addEventListener('click', function (e) {\n    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;\n    if (!a) return;\n    var u = new URL(a.getAttribute('href'), location.href);\n    if (u.origin !== location.origin || u.pathname !== location.pathname || !u.hash) return;\n    e.preventDefault();\n    e.stopPropagation();\n    if (location.hash !== u.hash) location.hash = u.hash; else apply();\n  }, true);\n  window.addEventListener('hashchange', apply);\n  apply();\n})();\n"} />
+
 
 </div>

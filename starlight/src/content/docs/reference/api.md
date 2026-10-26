@@ -1,8 +1,8 @@
 ---
-description: "The Turing Pi 2 BMC HTTP API: how to authenticate, the two spellings a board answers, and where the generated operation reference lives."
+title: The API
+description: 'The Turing Pi 2 BMC HTTP API: how to authenticate, the two spellings a board answers, and where the generated operation reference lives.'
+slug: reference/api
 ---
-
-# The API
 
 The BMC serves an HTTP API, and this is its description. It is not written by
 hand: the daemon emits it, so it describes the code rather than somebody's
@@ -71,37 +71,39 @@ Two schemes, both described in the document. A bearer token from
 `POST /api/bmc/authenticate`, or HTTP basic with the board's root credentials.
 
 Requests from the board itself skip authentication entirely. That is a
-[known fault](known-faults.md), not a feature, and since v2.14.0 it at least
+[known fault](/reference/known-faults/), not a feature, and since v2.14.0 it at least
 leaves an audit line saying so.
 
 `/metrics` is separate: since v2.15.0 it is served on
-[its own port with no credential at all](metrics.md), and that listener
+[its own port with no credential at all](/reference/metrics/), and that listener
 serves nothing else — so nothing that scrapes it can reach this API.
 
-!!! note "Which version this is"
-    Rendered from **bmcd 2.34.0**, fetched from that release rather than
-    written here. Refresh it with `just refresh-api v2.28.0` in the `www`
-    repository; the diff is then the API change, which is the point of
-    committing it rather than fetching at build time.
+:::note[Which version this is]
+Rendered from **bmcd 2.34.0**, fetched from that release rather than
+written here. Refresh it with `just refresh-api v2.28.0` in the `www`
+repository; the diff is then the API change, which is the point of
+committing it rather than fetching at build time.
+:::
 
-!!! tip "On an older board?"
-    These pages describe the newest release. [What each release's API
-    had](api-history.md) lists, for every published version, which operations
-    it carried — generated from the `openapi.json` each release publishes, so
-    it cannot drift from them.
+:::tip[On an older board?]
+These pages describe the newest release. [What each release's API
+had](/reference/api-history/) lists, for every published version, which operations
+it carried — generated from the `openapi.json` each release publishes, so
+it cannot drift from them.
 
 
-    A board running something else serves its own document at
-    `GET /api/bmc/openapi.json`, and that one is authoritative for that board.
+A board running something else serves its own document at
+`GET /api/bmc/openapi.json`, and that one is authoritative for that board.
+:::
 
 ## The operations
 
 Every operation is on its own page, grouped by what it acts on, and every one
 is in the site's search:
 
-- **[Every operation](api/operations.md)** — one row per operation, the fastest way in
-- [The board](api/board.md) · [The nodes](api/nodes.md) · [Firmware](api/firmware.md)
-- [Storage](api/storage.md) · [Network and time](api/network.md) · [Cooling and thermals](api/thermal.md)
+- **[Every operation](/reference/api/operations/)** — one row per operation, the fastest way in
+- [The board](/reference/api/board/) · [The nodes](/reference/api/nodes/) · [Firmware](/reference/api/firmware/)
+- [Storage](/reference/api/storage/) · [Network and time](/reference/api/network/) · [Cooling and thermals](/reference/api/thermal/)
 
 These pages are generated from the committed document by
 `scripts/generate-api-pages.py`, which `just refresh-api` runs. They are not

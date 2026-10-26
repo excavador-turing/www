@@ -1,19 +1,18 @@
 ---
 title: Fresh, and fixed
-render_macros: true
-since: v2.7.0
-hide:
-- navigation
-- toc
+description: A longterm kernel and a supported Buildroot under the Turing Pi 2 BMC, with named faults from the stock firmware taken out.
+slug: features/fresh-and-fixed
+template: splash
+tableOfContents: false
 feature:
+  title: Fresh, and fixed
   order: 4
   icon: fresh.svg
   summary: A longterm kernel, a supported Buildroot, and six named faults taken out.
-  lede: Upstream's last release was February 2025, on a kernel that is not a longterm release and a Buildroot
-    that is end of life. This fork tracks both and has taken out six named faults.
+  lede: Upstream's last release was February 2025, on a kernel that is not a longterm release and a Buildroot that is end of life. This fork tracks both and has taken out six named faults.
   capture: dashboard.png
-  alt: "The Dashboard: the board's facts and, in the Software card, the firmware, daemon, kernel and interface it is running, each a version you can check against a release."
-  caption: "The Dashboard's Software card: firmware, daemon, kernel and interface, each a version you can check against a release."
+  alt: 'The Dashboard: the board''s facts and, in the Software card, the firmware, daemon, kernel and interface it is running, each a version you can check against a release.'
+  caption: 'The Dashboard''s Software card: firmware, daemon, kernel and interface, each a version you can check against a release.'
   proofs:
   - n: '6.12'
     of: LTS kernel, against upstream's 6.8
@@ -44,17 +43,23 @@ feature:
       href: ../pick-a-version/
       text: Pick a version, from anywhere
       note: Why upstream's two catalogues disagree by a release.
-description: "A longterm kernel and a supported Buildroot under the Turing Pi 2 BMC, with named faults from the stock firmware taken out."
+since: v2.7.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 A longterm kernel matters here because the board is a management computer: it is the thing you reach for when the cluster is broken, so it is the thing that must not need attention itself. The six faults are named on the comparison page with the release that fixed each, including the mDNS responder that killed this board twice in one day.
 
-[The full argument, with every measurement →](../why/fresh-and-fixed.md)
+[The full argument, with every measurement →](/why/fresh-and-fixed/)
+
 
 </div>

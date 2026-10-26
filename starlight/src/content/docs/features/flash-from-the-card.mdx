@@ -1,19 +1,18 @@
 ---
 title: Flash a module from the card
-render_macros: true
-since: v2.26.0
-hide:
-- navigation
-- toc
+description: Write a node image to a compute module straight from the board's own SD card, with the board saying which files can be written and why the rest cannot.
+slug: features/flash-from-the-card
+template: splash
+tableOfContents: false
 feature:
+  title: Flash a module from the card
   order: 7
   icon: sdcard.svg
   summary: What is on the board's own SD card, what can be written to a module, and why the rest cannot.
-  lede: A 2 GB image is usually already on the board's own SD card. Installing it meant typing its path
-    from memory into a field, and finding out minutes later whether you had.
+  lede: A 2 GB image is usually already on the board's own SD card. Installing it meant typing its path from memory into a field, and finding out minutes later whether you had.
   capture: flash-node.png
-  alt: "The Flash Node page: choose a node, then Choose from the SD card to list what is on the card and which images a module can be written from."
-  caption: "The Flash Node page, with Choose from the SD card beside the file field."
+  alt: 'The Flash Node page: choose a node, then Choose from the SD card to list what is on the card and which images a module can be written from.'
+  caption: The Flash Node page, with Choose from the SD card beside the file field.
   proofs:
   - n: '16'
     of: entries listed off a real card
@@ -44,19 +43,25 @@ feature:
       href: ../pick-a-version/
       text: Pick a version, from anywhere
       note: The card is one of three places firmware can come from.
-description: "Write a node image to a compute module straight from the board's own SD card, with the board saying which files can be written and why the rest cannot."
+since: v2.26.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 The interface never decides what is flashable. It asks the board, and the board answers per entry with a reason -- too small, wrong magic, a directory -- so the list and the refusals come from the same place that would do the writing.
 
-A module in node 1 or 2 will not flash while a USB card sits in that node's mini-PCIe slot; see [the FAQ](../faq.md#flashing-a-module-in-slot-1-or-2-fails-with-usb-interface-not-found-why).
+A module in node 1 or 2 will not flash while a USB card sits in that node's mini-PCIe slot; see [the FAQ](/faq/#flashing-a-module-in-slot-1-or-2-fails-with-usb-interface-not-found-why).
 
-[The full argument, with every measurement →](../why/flash-from-the-card.md)
+[The full argument, with every measurement →](/why/flash-from-the-card/)
+
 
 </div>

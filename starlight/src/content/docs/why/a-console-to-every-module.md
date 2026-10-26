@@ -1,11 +1,10 @@
 ---
 title: A console to every module
-description: "Why a serial console in the browser needs a replayed scrollback, what it costs, and how the fork's console was proved."
+description: Why a serial console in the browser needs a replayed scrollback, what it costs, and how the fork's console was proved.
+slug: why/a-console-to-every-module
 ---
 
-# A console to every module
-
-This is the argument behind [A console to every module](../features/a-console-to-every-module.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [A console to every module](/features/a-console-to-every-module/), with the measurements that back it. The feature page is the short version.
 
 Four tabs, one per module. No adapter, no header, nothing on the desk.
 
@@ -65,6 +64,6 @@ running out of memory.
 Keeping a longer history means writing it somewhere, and the overlay is
 UBI on a NAND with five free eraseblocks. Sending the lines off the board
 with `syslogd -R` is the answer that scales, and it is
-[one line of configuration](../reference/known-faults.md).
+[one line of configuration](/reference/known-faults/).
 
-<div class="tp-next tp-next--argument"><a href="../../features/a-console-to-every-module/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Console page, replaying a recording.</span></a><a href="/reference/cli/"><b>Do it on your board →</b><span>The same consoles from a shell, through tpi.</span></a><a href="/reference/known-faults/"><b>The evidence →</b><span>Including the console fault fixed in v2.31.0.</span></a><a href="../a-certificate-that-does-not-rot/"><b>A certificate that does not rot →</b><span>Why a console needs a certificate a browser accepts.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/a-console-to-every-module/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Console page, replaying a recording.</span></a><a href="/reference/cli/"><b>Do it on your board →</b><span>The same consoles from a shell, through tpi.</span></a><a href="/reference/known-faults/"><b>The evidence →</b><span>Including the console fault fixed in v2.31.0.</span></a><a href="/why/a-certificate-that-does-not-rot/"><b>A certificate that does not rot →</b><span>Why a console needs a certificate a browser accepts.</span></a></div>

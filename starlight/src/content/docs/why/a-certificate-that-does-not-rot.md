@@ -1,11 +1,10 @@
 ---
 title: A certificate that does not rot
-description: "Why the BMC issues and renews its own certificate, what upstream's did instead, and the measurements behind both."
+description: Why the BMC issues and renews its own certificate, what upstream's did instead, and the measurements behind both.
+slug: why/a-certificate-that-does-not-rot
 ---
 
-# A certificate that does not rot
-
-This is the argument behind [A certificate that does not rot](../features/a-certificate-that-does-not-rot.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [A certificate that does not rot](/features/a-certificate-that-does-not-rot/), with the measurements that back it. The feature page is the short version.
 
 A BMC is reachable before it is enrolled in anything, so it has to speak TLS
 on its own from the first boot. That certificate is not a formality: it is
@@ -99,11 +98,12 @@ the metric cannot disagree with the listener about which certificate is in
 use — replacing the file without restarting is exactly when a fresh read
 would describe something that is not being served.
 
-!!! note "Why no series is better than a zero"
-    A daemon that cannot make sense of the date reports **nothing** rather
-    than `0`. Zero reads as 1 January 1970, which is comfortably expired, and
-    would fire every alert ever written against that metric on a board whose
-    certificate is fine.
+:::note[Why no series is better than a zero]
+A daemon that cannot make sense of the date reports **nothing** rather
+than `0`. Zero reads as 1 January 1970, which is comfortably expired, and
+would fire every alert ever written against that metric on a board whose
+certificate is fine.
+:::
 
 ## What it does not cover
 
@@ -111,7 +111,7 @@ would describe something that is not being served.
 longer stands in the way of one. Installing your own is a control on the
 Security page, `tpi tls install`, or the API, and the board refuses a pair that
 does not match, has expired or does not name it, having written nothing.
-[The whole story is its own guide](../guides/your-own-certificate.md).
+[The whole story is its own guide](/guides/your-own-certificate/).
 
 **It does not renew a certificate somebody else issued.** A private authority
 that hands out 24-hour certificates — which is what step-ca does by default —
@@ -124,4 +124,4 @@ the gateway in front of the fleet already verifies each board against a named
 CA, and the cost was a signing service with standing access to every board.
 The guide above records that decision beside the two things that were kept.
 
-<div class="tp-next tp-next--argument"><a href="../../features/a-certificate-that-does-not-rot/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The interface the certificate protects.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install the firmware that issues it.</span></a><a href="/reference/known-faults/"><b>The evidence →</b><span>Including the console's certificate requirement.</span></a><a href="../who-may-reach-this-board/"><b>Who may reach this board →</b><span>The other half of the board's access story.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/a-certificate-that-does-not-rot/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The interface the certificate protects.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install the firmware that issues it.</span></a><a href="/reference/known-faults/"><b>The evidence →</b><span>Including the console's certificate requirement.</span></a><a href="/why/who-may-reach-this-board/"><b>Who may reach this board →</b><span>The other half of the board's access story.</span></a></div>
