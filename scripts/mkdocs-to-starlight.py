@@ -7,20 +7,26 @@ module, the blog plugin's posts -- and writes what Starlight needs:
 
   starlight/src/content/docs/   one .md (or .mdx) page per MkDocs page
   starlight/public/             every non-Markdown file under docs/, byte for byte
+  starlight/src/data/           docs/data/ and the curated llms.txt, which the
+                                components and routes read at build time
   starlight/src/generated/      sidebar, footer and per-page SEO data, as JSON
 
-All three are git-ignored and rewritten on every run: the output is a pure
-function of docs/, mkdocs.yml, main.py and the git history (for the
-"last updated" dates), so running it twice changes nothing.
+All four are git-ignored and rewritten on every run: the output is a pure
+function of docs/, mkdocs.yml and the git history (for the "last updated"
+dates), so running it twice changes nothing.
 
 The rules that matter, and why:
 
   * Every URL MkDocs serves is the URL Starlight serves. Links are rewritten
     to absolute paths so the links validator can check them, never to new
     places.
-  * Pages that opt into macros (`render_macros: true`) are rendered here with
-    Jinja2 and the repository's own main.py, exactly as mkdocs-macros would,
-    so the output is plain Markdown.
+  * Pages that opt into macros (`render_macros: true`) are NOT rendered here.
+    Each `{{ ... }}` becomes the Astro component that does what main.py's
+    macro does (starlight/src/components/macros/), and the page becomes .mdx:
+    the numbers and lists are read from src/data/ and the content collection
+    when the site is built, so they are as fresh as the data, and after the
+    switch the converted page is the source with no Python behind it. An
+    expression with no component is an error.
   * A Markdown extension this script does not know is an error, not a
     silent pass-through: an admonition that renders as literal `!!!` text is
     a broken page that builds green.
@@ -32,7 +38,6 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import html
-import importlib.util
 import json
 import os
 import pathlib
@@ -40,23 +45,18 @@ import re
 import shutil
 import subprocess
 import sys
-import unicodedata
 
-import jinja2
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-
-MONTHS = ("January February March April May June July August September "
-          "October November December").split()
 
 # Front matter keys MkDocs pages carry, and what becomes of each. A key not
 # listed here stops the conversion: it means a page grew a meaning this
 # script does not carry yet.
 KNOWN_META = {
     "title", "description", "hide", "render_macros", "search", "robots",
-    # Feature pages: consumed by main.py's feature_screen() at render time.
+    # Feature pages: passed through for FeatureScreen and FeaturePlates.
     "feature", "since",
     # Blog posts: date, URL, and the Open Graph picture.
     "date", "slug", "image",
@@ -67,13 +67,39 @@ KNOWN_META = {
 # here; an unknown one is an error rather than a guess.
 ASIDE = {"note": "note", "tip": "tip", "warning": "caution", "danger": "danger"}
 
-# Files under docs/ that a Starlight plugin generates at the same address.
-# Astro serves the public file, skips the plugin's route and says so with a
-# [WARN], which the strict build refuses. Which of the two the site should
-# serve is the owner's call (the PR asks); until then the plugin's.
-PLUGIN_OWNED = {
-    "llms.txt": "starlight-llms-txt writes /llms.txt (scripts/llms.py's is the live one)",
+# Files under docs/ that are not copied to public/ as they are, because a
+# route serves them: astro.config.mjs's `llmsTxt` switch decides whether
+# /llms.txt is this curated file (scripts/llms.py, what the live site serves)
+# or starlight-llms-txt's. A public file at a route's address is served over
+# the route with a [WARN], which the strict build refuses -- so the file goes
+# to src/data/ and the route serves it.
+ROUTED = {
+    "llms.txt": "src/data/llms.txt",
 }
+
+# The macros main.py defines, and the component that does each one's job.
+# The flag: the component writes the page's H1 itself, so Starlight's is not
+# printed (tp.hideTitle).
+MACRO_COMPONENTS = {
+    # The page's front matter goes in: `frontmatter` is MDX's own, so the
+    # component renders wherever the page does, in a route or in a plugin
+    # that renders entries on their own (starlight-llms-txt).
+    "feature_screen": ("FeatureScreen page={frontmatter}", True),
+    "feature_plates": ("FeaturePlates", False),
+    "board_reports": ("BoardReports", False),
+    "comparison_table": ("ComparisonTable", False),
+    "news_lede": ("NewsLede", False),
+}
+# Jinja filters a fact may pass through; <Fact filters="..."> applies them
+# in order (starlight/src/lib/facts.mjs). `.split()[0]` is the filter
+# `first_word`.
+FACT_FILTERS = {"title_number", "lower"}
+# Where the components live, through the `~` alias in starlight/tsconfig.json.
+MACROS_IMPORT = "~/components/macros"
+
+# Elements HTML closes by itself and JSX does not: <img> is <img /> in MDX.
+VOID_TAGS = ("img", "br", "hr", "source", "input", "wbr", "area", "col", "embed",
+             "link", "meta", "track")
 
 # Code fence languages Material's Pygments knows and Shiki does not.
 LANG = {"promql": "txt"}
@@ -185,88 +211,101 @@ def split_front_matter(text: str) -> tuple[dict, str]:
 
 
 # --------------------------------------------------------------------------
-# Macros: the repository's own main.py, under a minimal mkdocs-macros env
+# Macros: each `{{ ... }}` becomes a component
 # --------------------------------------------------------------------------
 
-class _File:
-    def __init__(self, src):
-        self.src_uri = src
-        self.src_path = src
+EXPR_RE = re.compile(r"\{\{-?\s*(.*?)\s*-?\}\}", re.S)
+CALL_RE = re.compile(r"(\w+)\(\)(?:\s*\|\s*indent\(\s*\d+\s*\))?")
+FACT_RE = re.compile(r"([a-z_]\w*(?:\.\w+)*?)(\.split\(\)\[0\])?((?:\s*\|\s*\w+)*)")
 
 
-class _Page:
-    def __init__(self, src, url, title, meta, base):
-        self.file = _File(src)
-        self.url = url.lstrip("/")
-        self.title = title
-        self.meta = meta
-        self.canonical_url = base + url
-        self.is_homepage = url == "/"
+def load_facts(conf: dict) -> dict:
+    """The include_yaml files mkdocs-macros puts at the top level of the
+    template variables; facts.yaml is the only one."""
+    facts: dict = {}
+    for el in macros_config(conf).get("include_yaml", []):
+        key, fname = next(iter(el.items())) if isinstance(el, dict) else (None, el)
+        p = ROOT / fname
+        if p.is_file():
+            data = yaml.safe_load(p.read_text()) or {}
+            facts.update({key: data} if key else data)
+    return facts
 
 
-class MacrosEnv:
-    """What main.py's define_env(env) touches: variables, macro, filter, conf
-    and page. mkdocs-macros puts config.extra and the include_yaml files at
-    the top level of the template variables, and the page's own front matter
-    over them, which is what render() does here."""
+class Componentize:
+    """`{{ gate.promoted }}` -> <Fact of="gate.promoted" />, and
+    `{{ feature_screen() }}` -> <FeatureScreen />.
 
-    def __init__(self, conf: dict, mconf: dict):
-        self.conf = conf
-        self.variables: dict = {}
-        self.macros: dict = {}
-        self.filters: dict = {}
-        self.page = None
-        self.variables.update(conf.get("extra") or {})
-        for el in mconf.get("include_yaml", []):
-            key, fname = (next(iter(el.items())) if isinstance(el, dict) else (None, el))
-            p = ROOT / fname
-            if p.is_file():
-                data = yaml.safe_load(p.read_text()) or {}
-                self.variables.update({key: data} if key else data)
-        self.variables["config"] = conf
-        # mkdocs-macros' default on_undefined is "keep": an unknown name is
-        # left in the page as written, never silently emptied.
-        self.jinja = jinja2.Environment(undefined=jinja2.DebugUndefined)
+    mkdocs-macros expands Jinja before Markdown, inside code spans too: a
+    fact quoted as `{{ faults.count }}` prints the number in code type, so it
+    becomes <code><Fact .../></code>. Inside a fenced block it would be
+    expanded as well -- the reason macros are opt-in per page -- and no page
+    does that on purpose, so it is an error here."""
 
-    def macro(self, fn=None, name=None):
-        def reg(f):
-            self.macros[name or f.__name__] = f
-            return f
-        return reg(fn) if fn else reg
+    def __init__(self, where: str, facts: dict):
+        self.where = where
+        self.facts = facts
+        self.used: set[str] = set()
+        self.renders_h1 = False
 
-    def filter(self, fn=None, name=None):
-        def reg(f):
-            self.filters[name or f.__name__] = f
-            return f
-        return reg(fn) if fn else reg
+    def fact(self, path: str) -> None:
+        v = self.facts
+        for key in path.split("."):
+            if not isinstance(v, dict) or key not in v:
+                raise ConvertError(f"{self.where}: {{{{ {path} }}}} names no fact in facts.yaml")
+            v = v[key]
+        if isinstance(v, (dict, list)):
+            raise ConvertError(f"{self.where}: {{{{ {path} }}}} is not a single value")
 
-    def finish(self):
-        self.jinja.globals.update(self.macros)
-        self.jinja.filters.update(self.filters)
+    def expr(self, expr: str) -> str:
+        m = CALL_RE.fullmatch(expr)
+        if m:
+            name = m.group(1)
+            if name not in MACRO_COMPONENTS:
+                raise ConvertError(f"{self.where}: macro {name}() has no component")
+            comp, h1 = MACRO_COMPONENTS[name]
+            self.used.add(comp.split()[0])
+            self.renders_h1 |= h1
+            return f"<{comp} />"
+        m = FACT_RE.fullmatch(expr)
+        if m:
+            path, first, pipes = m.groups()
+            filters = [f.strip() for f in pipes.split("|") if f.strip()]
+            bad = [f for f in filters if f not in FACT_FILTERS]
+            if bad:
+                raise ConvertError(f"{self.where}: {{{{ {expr} }}}}: no filter {bad[0]}")
+            if first:
+                filters.insert(0, "first_word")
+            self.fact(path)
+            self.used.add("Fact")
+            f = f' filters="{" ".join(filters)}"' if filters else ""
+            return f'<Fact of="{path}"{f} />'
+        raise ConvertError(f"{self.where}: {{{{ {expr} }}}} has no component")
 
-    def render(self, body: str, page: _Page) -> str:
-        self.page = page
-        variables = dict(self.variables)
-        variables["page"] = page
-        variables.update(page.meta)
-        return self.jinja.from_string(body).render(**variables)
-
-
-def load_macros(conf: dict) -> MacrosEnv | None:
-    mconf = macros_config(conf)
-    env = MacrosEnv(conf, mconf)
-    module = mconf.get("module_name")
-    if module:
-        spec = importlib.util.spec_from_file_location(module, ROOT / f"{module}.py")
-        mod = importlib.util.module_from_spec(spec)
-        sys.path.insert(0, str(ROOT))
-        try:
-            spec.loader.exec_module(mod)
-        finally:
-            sys.path.pop(0)
-        mod.define_env(env)
-    env.finish()
-    return env
+    def __call__(self, body: str) -> str:
+        if re.search(r"\{%", body):
+            raise ConvertError(f"{self.where}: Jinja statements ({{% ... %}}) are not converted")
+        lines, out, i = body.split("\n"), [], 0
+        while i < len(lines):
+            m = FENCE_RE.match(lines[i])
+            if m:
+                fence = m.group(2)
+                j = i + 1
+                while j < len(lines) and not re.match(
+                        rf"^\s*{re.escape(fence[0])}{{{len(fence)},}}\s*$", lines[j]):
+                    j += 1
+                block = lines[i:j + 1]
+                if any(EXPR_RE.search(l) for l in block):
+                    raise ConvertError(f"{self.where}: a macro inside a fenced block")
+                out.extend(block)
+                i = j + 1
+                continue
+            line = lines[i]
+            # `{{ x }}` in a code span: the value, in code type.
+            line = re.sub(r"(?<!`)`(\{\{[^`]*?\}\})`(?!`)", r"<code>\1</code>", line)
+            out.append(EXPR_RE.sub(lambda m: self.expr(m.group(1).strip()), line))
+            i += 1
+        return "\n".join(out)
 
 
 # --------------------------------------------------------------------------
@@ -577,7 +616,8 @@ def rewrite_inline(text: str, links: Links) -> str:
         attrs = _attr_list(spec)
         if bang:
             alt = html.escape(masked.restore(label))
-            return f'<img src="{html.escape(href)}" alt="{alt}" {_attrs_html(attrs)}>'.replace(" >", ">")
+            # Self-closed, which HTML ignores and MDX requires.
+            return f'<img src="{html.escape(href)}" alt="{alt}" {_attrs_html(attrs)} />'.replace("  ", " ")
         return f'<a href="{html.escape(href)}" {_attrs_html(attrs)}>{label}</a>'
 
     t = LINK_RE.sub(link, t)
@@ -599,14 +639,42 @@ def rewrite_inline(text: str, links: Links) -> str:
 
 
 # --------------------------------------------------------------------------
-# Headings: python-markdown's slugs, for the title and the blog index
+# MDX: what a page needs before MDX will read it as the HTML it was
 # --------------------------------------------------------------------------
 
-def pymd_slug(value: str) -> str:
-    value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
-    value = re.sub(r"[^\w\s-]", "", value).strip().lower()
-    return re.sub(r"[-\s]+", "-", value)
+def mdx_safe(where: str, text: str) -> str:
+    """Raw HTML that python-markdown passes through and MDX parses as JSX.
 
+    Three things differ, and each is rewritten: an HTML comment is a JSX
+    comment, a void element is self-closed, and an inline <script> keeps its
+    body as a string (`set:html`), because its braces are JavaScript, not MDX
+    expressions. Anything else MDX would misread -- a stray brace, `<` that
+    opens no tag, an autolink -- stops the conversion (check_mdx)."""
+    masked = Masked(text)
+    t = masked.text
+
+    def comment(m):
+        body = m.group(1)
+        if "*/" in body:
+            raise ConvertError(f"{where}: an HTML comment holds */")
+        return "{/*" + body + "*/}"
+    t = re.sub(r"<!--(.*?)-->", comment, t, flags=re.S)
+
+    def script(m):
+        attrs, body = m.group(1) or "", m.group(2)
+        if re.search(r"\bsrc=", attrs):
+            raise ConvertError(f"{where}: <script src> is not converted")
+        return f"<script{attrs} set:html={{{json.dumps(masked.restore(body))}}} />"
+    t = re.sub(r"<script(\s[^>]*)?>(.*?)</script>", script, t, flags=re.S)
+
+    t = re.sub(rf"<({'|'.join(VOID_TAGS)})(\s[^<>]*?)?\s*(?<!/)>",
+               lambda m: f"<{m.group(1)}{m.group(2) or ''} />", t)
+    return masked.restore(t)
+
+
+# --------------------------------------------------------------------------
+# Headings
+# --------------------------------------------------------------------------
 
 def plain(md: str) -> str:
     s = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", md)
@@ -627,10 +695,6 @@ def git_date(src: str) -> str | None:
     except (OSError, subprocess.CalledProcessError):
         return None
     return out or None
-
-
-def human_date(d: dt.date) -> str:
-    return f"{d.day} {MONTHS[d.month - 1]} {d.year}"
 
 
 def as_date(v) -> dt.date | None:
@@ -658,7 +722,7 @@ class Site:
         self.blog = blog_config(self.conf)
         self.blog_dir = self.blog.get("blog_dir", "blog").strip("/")
         self.nav_title = nav_titles(self.conf.get("nav", []))
-        self.macros = load_macros(self.conf)
+        self.facts = load_facts(self.conf)
         self.files: dict[str, bytes | pathlib.Path] = {}
         self.seo: dict[str, dict] = {}
         self.notes: list[str] = []
@@ -682,6 +746,11 @@ class Site:
             if is_post:
                 if "slug" not in meta or "date" not in meta:
                     raise ConvertError(f"{src}: a post needs slug and date")
+                # The news index shows each post up to this marker
+                # (starlight/src/components/macros/PostList.astro), as the
+                # blog plugin does; `post_excerpt: required` makes it a must.
+                if self.blog.get("post_excerpt") == "required" and "<!-- more -->" not in body:
+                    raise ConvertError(f"{src}: no <!-- more --> excerpt marker")
                 url = "/" + self.blog_dir + "/" + self.blog.get(
                     "post_url_format", "{date}/{slug}").format(slug=meta["slug"]).strip("/") + "/"
             else:
@@ -703,8 +772,7 @@ class Site:
 
     def page_title(self, p: dict, h1: str | None) -> str:
         """MkDocs' page.title: the nav's label, else the front matter's
-        title, else the first H1. Open Graph, the breadcrumb and main.py's
-        macros use this one."""
+        title, else the first H1. Open Graph and the breadcrumb use this one."""
         if p.get("src") in self.nav_title:
             return self.nav_title[p["src"]]
         if p["meta"].get("title"):
@@ -722,40 +790,45 @@ class Site:
             return str(p["meta"]["title"])
         return self.page_title(p, h1)
 
-    def render(self, p: dict) -> tuple[str, bool]:
+    def render(self, p: dict) -> tuple[str, bool, Componentize | None]:
         meta, body = p["meta"], p["body"]
-        if meta.get("render_macros") is True and self.macros:
-            h1 = re.search(r"(?m)^# (.+)$", body)
-            page = _Page(p["src"], p["url"], self.page_title(p, h1 and h1.group(1)),
-                         meta, self.base)
-            body = self.macros.render(body, page)
+        comp = None
+        if meta.get("render_macros") is True:
+            comp = Componentize(p["src"], self.facts)
+            body = comp(body)
         blocks = Blocks(p["src"])
         lines = blocks.convert(body.split("\n"))
         text = "\n".join(lines)
         text = rewrite_inline(text, Links(self.src_to_url, p["src"], p["src"], p["url"]))
-        if blocks.mdx:
-            self.check_mdx(p["src"], text)
-        return text, blocks.mdx
+        return text, blocks.mdx or bool(comp and comp.used), comp
 
     def check_mdx(self, src: str, text: str):
+        """What MDX would read as code, or refuse, after mdx_safe(): a brace
+        that is not a component's, a comment or a script's; `<` that opens
+        no tag; an autolink."""
         masked = Masked(text).text
-        masked = re.sub(r"</?(Tabs|TabItem)\b[^>]*>", "", masked)
-        bad = re.search(r"[{}]|<!--", masked)
+        masked = re.sub(r"\{/\*.*?\*/\}", "", masked, flags=re.S)
+        masked = re.sub(r'set:html=\{"(?:[^"\\]|\\.)*"\}', "", masked)
+        masked = masked.replace("={frontmatter}", "")
+        masked = re.sub(r"^import \{[^}]*\} from '[^']*';$", "", masked, flags=re.M)
+        bad = re.search(r"[{}]|<!--|<(?![a-zA-Z/])|<https?:", masked)
         if bad:
-            raise ConvertError(f"{src}: needs .mdx for its tabs, and carries "
-                               f"{bad.group(0)!r}, which MDX would read as code")
+            raise ConvertError(f"{src}: is .mdx, and carries {bad.group(0)!r} "
+                               f"that MDX would misread: {masked[max(0, bad.start() - 40):bad.end() + 20]!r}")
 
     def page(self, p: dict):
         meta = p["meta"]
-        text, mdx = self.render(p)
-        if p["post"]:
-            text = text.replace("<!-- more -->", "", 1)
+        text, mdx, comp = self.render(p)
+        is_index = p["src"] == f"{self.blog_dir}/index.md"
 
         # Starlight prints the title as the page's H1. Where the page opens
         # with its own H1, that H1 becomes the title and leaves the body;
         # where its H1 sits inside a layout block (the front page, Features,
-        # News), the layout keeps it and Starlight's is not printed.
+        # News) or a component writes it (a feature page's FeatureScreen),
+        # the page keeps it and Starlight's is not printed.
         m = re.match(r"^\s*# (.+?)\s*#*\s*(?:\n|$)", text)
+        if m and "<" in m.group(1) and re.search(r"<[A-Z]", m.group(1)):
+            raise ConvertError(f"{p['src']}: a component in the page's leading H1 is not converted")
         h1 = plain(m.group(1)) if m else None
         if m:
             text = text[m.end():]
@@ -763,7 +836,8 @@ class Site:
         # The visible heading: the page's own H1, or the one Material inserts
         # when there is none, which is page.title.
         shown = h1 or title
-        own_h1 = not m and bool(re.search(r"(?m)^\s*# |<h1[\s>]", text))
+        own_h1 = not m and (bool(re.search(r"(?m)^\s*# |<h1[\s>]", text))
+                            or bool(comp and comp.renders_h1))
         if "{{" in shown or "{%" in shown:
             raise ConvertError(f"{p['src']}: a macro in the title is not rendered")
 
@@ -785,23 +859,42 @@ class Site:
         updated = git_date(p["src"])
         if updated:
             fm["lastUpdated"] = dt.date.fromisoformat(updated)
+        # What the components read off the page itself: a post's date (the
+        # news index, the post's own header), a feature page's `feature:`
+        # block and `since:` (FeatureScreen, FeaturePlates).
+        if p["post"]:
+            fm["date"] = as_date(meta["date"])
+        for key in ("feature", "since"):
+            if key in meta:
+                fm[key] = meta[key]
+        if "feature" in meta and meta.get("title"):
+            # The feature's own name, which its first screen and its plate
+            # print (main.py: `meta.get("title") or page.title`). It can
+            # differ from the nav's label, which is the page's `title` here.
+            fm["feature"] = {"title": str(meta["title"]), **meta["feature"]}
         tp: dict = {}
         if own_h1:
             tp["hideTitle"] = True
-        if p["post"]:
-            d = as_date(meta["date"])
-            text = (f'<p class="tp-post__meta"><time datetime="{d.isoformat()}">'
-                    f"{human_date(d)}</time></p>\n\n" + text.lstrip("\n"))
         if tp:
             fm["tp"] = tp
 
-        if p["src"] == f"{self.blog_dir}/index.md":
-            text = text.rstrip() + "\n\n" + self.blog_listing(1)
+        imports = set(comp.used) if comp else set()
+        if is_index:
+            # The news index: its own head, then the posts, newest first.
+            text = text.rstrip() + "\n\n<PostList />\n"
+            imports.add("PostList")
+            mdx = True
 
         ext = ".mdx" if mdx else ".md"
         if mdx:
-            text = ("import { Tabs, TabItem } from '@astrojs/starlight/components';\n\n"
-                    + text.lstrip("\n"))
+            text = mdx_safe(p["src"], text)
+            head = []
+            if "<Tabs>" in text:
+                head.append("import { Tabs, TabItem } from '@astrojs/starlight/components';")
+            if imports:
+                head.append(f"import {{ {', '.join(sorted(imports))} }} from '{MACROS_IMPORT}';")
+            text = "\n".join(head) + "\n\n" + text.lstrip("\n")
+            self.check_mdx(p["src"], text)
         rel = "index" if p["url"] == "/" else p["url"].strip("/")
         if p["src"].endswith("index.md") and p["url"] != "/":
             rel += "/index"
@@ -813,67 +906,28 @@ class Site:
                                                  + "\n").encode()
 
     # -- the blog ----------------------------------------------------------
-
-    def posts(self) -> list[dict]:
-        posts = [p for p in self.pages.values() if p["post"]]
-        # The blog plugin: newest first, a stable sort over the walk order,
-        # so two posts of one day keep the order of their file names.
-        return sorted(posts, key=lambda p: as_date(p["meta"]["date"]), reverse=True)
-
-    def excerpt(self, p: dict) -> str:
-        if "converted" not in p:
-            p["converted"] = self.render(p)[0]
-        text = p["converted"]
-        if "<!-- more -->" not in text:
-            if self.blog.get("post_excerpt") == "required":
-                raise ConvertError(f"{p['src']}: no <!-- more --> excerpt marker")
-            return text
-        return text.split("<!-- more -->", 1)[0].strip()
-
-    def blog_listing(self, n: int) -> str:
-        per = int(self.blog.get("pagination_per_page", 10))
-        posts = self.posts()
-        pages = max(1, -(-len(posts) // per))
-        chunk = posts[(n - 1) * per:n * per]
-        out = ['<div class="tp-posts">', ""]
-        for p in chunk:
-            d = as_date(p["meta"]["date"])
-            title = str(p["meta"].get("title") or p["meta"]["slug"])
-            out += ['<article class="tp-post">', "",
-                    f'<p class="tp-post__meta"><time datetime="{d.isoformat()}">'
-                    f"{human_date(d)}</time></p>", "",
-                    f"## [{title}]({p['url']})", "",
-                    self.excerpt(p), "",
-                    f'<p class="tp-post__more"><a href="{p["url"]}">Continue reading</a></p>',
-                    "", "</article>", ""]
-        out += ["</div>", ""]
-        if pages > 1:
-            index = f"/{self.blog_dir}/"
-            links = []
-            for k in range(1, pages + 1):
-                href = index if k == 1 else f"{index}page/{k}/"
-                links.append(f'<span class="tp-pagination__current">{k}</span>' if k == n
-                             else f'<a class="tp-pagination__link" href="{href}">{k}</a>')
-            out.append('<nav class="tp-pagination">' + " ".join(links) + "</nav>")
-        return "\n".join(out)
+    #
+    # The posts are pages (news/<slug>.md, with a `date`); the index and its
+    # later pages are components that list them (PostList, and the route
+    # src/pages/news/page/[page].astro), so a new post needs nothing here.
+    # Only the later pages' <head> data is written, as for every page.
 
     def blog_pages(self):
         per = int(self.blog.get("pagination_per_page", 10))
-        total = max(1, -(-len(self.posts()) // per))
+        # PostList pages by its own constant; the two must agree, or the
+        # later pages' <head> data below would be written for pages that
+        # do not exist (or not written for ones that do).
+        news_ts = (self.out / "src" / "lib" / "news.ts").read_text()
+        m = re.search(r"POSTS_PER_PAGE = (\d+);", news_ts)
+        if not m or int(m.group(1)) != per:
+            raise ConvertError(f"mkdocs.yml pages the blog by {per}; starlight/src/lib/news.ts "
+                               f"POSTS_PER_PAGE says {m and m.group(1)}")
+        posts = sum(1 for p in self.pages.values() if p["post"])
+        total = max(1, -(-posts // per))
         index = self.pages[f"{self.blog_dir}/index.md"]
         for n in range(2, total + 1):
             url = f"/{self.blog_dir}/page/{n}/"
             title = self.page_title(index, None)
-            fm = {"title": title}
-            if index["meta"].get("description"):
-                fm["description"] = str(index["meta"]["description"])
-            fm["slug"] = url.strip("/")
-            hide = set(index["meta"].get("hide") or [])
-            if "navigation" in hide:
-                fm["template"] = "splash"
-            if "toc" in hide:
-                fm["tableOfContents"] = False
-            self.emit_page(f"{self.blog_dir}/page/{n}.md", fm, self.blog_listing(n))
             self.seo_for({"src": None, "meta": index["meta"], "url": url, "post": False},
                          title, self.html_title(index, None))
 
@@ -901,7 +955,7 @@ class Site:
             "published": str(as_date(meta["date"])) if p["post"] and meta.get("date") else None,
             "jsonld": [],
         }
-        facts = (self.conf.get("extra") or {}).get("facts") or {}
+        facts = self.facts
         if home:
             fw = ((facts.get("releases") or {}).get("firmware") or {}).get("newest", "")
             app = {
@@ -944,14 +998,15 @@ class Site:
                           "applicationCategory": "DeveloperApplication"})
             post["about"] = about
             entry["jsonld"].append(post)
-        elif p.get("src") == "faq.md" and (self.conf.get("extra") or {}).get("faq"):
+        elif p.get("src") == "faq.md":
+            # The questions are read off the page when it is built
+            # (starlight/src/lib/faq.ts, from the route middleware), so the
+            # structured data follows the page with nothing to regenerate.
             entry["jsonld"].append({
                 "@context": "https://schema.org",
                 "@type": "FAQPage",
                 "url": canonical,
-                "mainEntity": [{"@type": "Question", "name": q["q"],
-                                "acceptedAnswer": {"@type": "Answer", "text": q["a"]}}
-                               for q in self.conf["extra"]["faq"]],
+                "mainEntity": [],
             })
         if not home:
             # Material's ancestors: nav sections carry no URL and drop out,
@@ -992,17 +1047,19 @@ class Site:
 
     def run(self):
         self.inventory()
-        # main.py puts facts and the FAQ into config.extra, for the theme;
-        # the SEO block reads them from there, as overrides/main.html does.
         for src, p in self.pages.items():
             if p.get("shadowed"):
                 continue
             self.page(p)
         self.blog_pages()
         for src in self.assets:
-            if src in PLUGIN_OWNED:
-                self.notes.append(f"docs/{src} not copied: {PLUGIN_OWNED[src]}")
+            if src in ROUTED:
+                self.files[ROUTED[src]] = DOCS / src
                 continue
+            if src.startswith("data/"):
+                # The data the components read. Also still public, as on the
+                # live site, which serves docs/data/ like any other file.
+                self.files[f"src/{src}"] = DOCS / src
             self.files[f"public/{src}"] = DOCS / src
         urls = {s: p["url"] for s, p in self.pages.items() if not p.get("shadowed")}
         gen = {
@@ -1020,7 +1077,7 @@ class Site:
     def sync(self):
         """Write what changed, delete what is no longer generated: the dev
         server sees only real changes, and a page removed from docs/ goes."""
-        roots = ["src/content/docs", "public", "src/generated"]
+        roots = ["src/content/docs", "public", "src/generated", "src/data"]
         written = changed = 0
         for rel, data in sorted(self.files.items()):
             dest = self.out / rel

@@ -1,0 +1,51 @@
+---
+// The newest firmware release, in its own first sentence: main.py's
+// news_lede(), for the front page's "What's new". The sentence was typed by
+// hand once and was two releases old the day this replaced it; the post the
+// changelog generator writes opens with the release's own lede, so the front
+// page says what the newest post says, by construction.
+import { posts, isoDate } from '../../lib/news';
+import { escapeHtml } from '../../lib/inline';
+
+// Newest by date, then by version number: two releases of one day.
+const versionOf = (id: string) => (id.match(/\d+/g) ?? []).map(Number);
+const key = (p: Awaited<ReturnType<typeof posts>>[number]) => [isoDate(p.data.date), versionOf(p.id)] as const;
+const newer = (a: ReturnType<typeof key>, b: ReturnType<typeof key>) => {
+  if (a[0] !== b[0]) return a[0] > b[0];
+  for (let i = 0; i < Math.max(a[1].length, b[1].length); i++) {
+    const x = a[1][i];
+    const y = b[1][i];
+    if (x === undefined) return false;
+    if (y === undefined) return true;
+    if (x !== y) return x > y;
+  }
+  return false;
+};
+
+let html = '';
+const all = await posts();
+const newest = all.reduce<(typeof all)[number] | undefined>(
+  (best, p) => (!best || newer(key(p), key(best)) ? p : best),
+  undefined,
+);
+if (newest) {
+  let text = (newest.body ?? '').split('<!-- more -->')[0]!;
+  text = text.replace(/\*\*|`/g, '').replace(/\s+/g, ' ').trim();
+  // An entry with no lede opens with its label and first item.
+  text = text.replace(/^(Added|Changed|Fixed|Removed|Deprecated|Security)\s*[-*]\s*/, '');
+  const first = text.split(/(?<=[.!?])\s+/)[0] ?? '';
+  // The version is the post's slug. An editorial title is the better
+  // sentence, so it wins over the lede.
+  const ver = escapeHtml(newest.id.split('/').pop()!);
+  const title = newest.data.title;
+  if (title && !title.startsWith('Firmware ')) {
+    html = `Firmware <b>${ver}</b>: ${escapeHtml(title.replace(/\.+$/, ''))}.`;
+  } else if (first.startsWith('Pins ')) {
+    html = `Firmware <b>${ver}</b> pins ${escapeHtml(first.slice(5))}`;
+  } else {
+    html = `Firmware <b>${ver}</b>: ${escapeHtml(first)}`;
+  }
+}
+---
+
+<Fragment set:html={html} />

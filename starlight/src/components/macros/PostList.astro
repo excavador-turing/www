@@ -1,0 +1,64 @@
+---
+// The news index: a page of posts, newest first, each with its date, its
+// title and its excerpt, then the page numbers. What Material's blog plugin
+// rendered at /news/ and /news/page/<n>/ (src/pages/news/page/[page].astro),
+// with the same heading ids, so links into the list keep landing.
+import { render } from 'astro:content';
+import Excerpt from './Excerpt.astro';
+import { slugify, unique } from '../../plugins/heading-ids.mjs';
+import { humanDate, isoDate, pageCount, pageUrl, posts, postUrl, POSTS_PER_PAGE } from '../../lib/news';
+
+interface Props {
+  /** Which page of the index, from 1. */
+  page?: number;
+}
+
+const { page = 1 } = Astro.props;
+const all = await posts();
+const pages = await pageCount();
+const chunk = all.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE);
+const ids = new Set<string>();
+const items = await Promise.all(
+  chunk.map(async (post) => ({
+    post,
+    id: unique(slugify(post.data.title), ids),
+    Content: (await render(post)).Content,
+  })),
+);
+---
+
+<div class="tp-posts">
+  {
+    items.map(({ post, id, Content }) => (
+      <article class="tp-post">
+        <p class="tp-post__meta">
+          <time datetime={isoDate(post.data.date)}>{humanDate(post.data.date)}</time>
+        </p>
+        <h2 id={id}>
+          <a href={postUrl(post)}>{post.data.title}</a>
+        </h2>
+        <div class="tp-post__excerpt">
+          <Excerpt>
+            <Content />
+          </Excerpt>
+        </div>
+        <p class="tp-post__more">
+          <a href={postUrl(post)}>Continue reading</a>
+        </p>
+      </article>
+    ))
+  }
+</div>
+{
+  pages > 1 && (
+    <nav class="tp-pagination not-content" aria-label="Pages of news">
+      {Array.from({ length: pages }, (_, i) => i + 1).map((n) =>
+        n === page ? (
+          <span class="tp-pagination__current" aria-current="page">{n}</span>
+        ) : (
+          <a class="tp-pagination__link" href={pageUrl(n)}>{n}</a>
+        ),
+      )}
+    </nav>
+  )
+}

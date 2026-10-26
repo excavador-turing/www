@@ -1,0 +1,30 @@
+---
+// /news/page/2/ and on: the rest of the news index, at the addresses
+// Material's blog plugin gave them. Page 1 is /news/ itself, a written page
+// (news/index) that ends in the same list. The <head> -- title, description,
+// Open Graph -- comes from the route middleware like every other page's.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getEntry } from 'astro:content';
+import PostList from '../../../components/macros/PostList.astro';
+import { NEWS, pageCount } from '../../../lib/news';
+
+export async function getStaticPaths() {
+  const pages = await pageCount();
+  return Array.from({ length: pages - 1 }, (_, i) => ({ params: { page: String(i + 2) } }));
+}
+
+const page = Number(Astro.params.page);
+const index = await getEntry('docs', NEWS);
+if (!index) throw new Error(`the news index (${NEWS}) is not in the docs collection`);
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'News',
+    description: index.data.description,
+    template: 'splash',
+    tableOfContents: false,
+  }}
+>
+  <PostList page={page} />
+</StarlightPage>

@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import { satteri } from '@astrojs/markdown-satteri';
 import mermaid from 'astro-mermaid';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
+import { factsInHeadings } from './src/plugins/facts-in-headings.mjs';
 import { pythonMarkdownHeadingIds } from './src/plugins/heading-ids.mjs';
 import { knownBroken, scriptRoute } from './src/known-broken-links.mjs';
 
@@ -26,6 +28,23 @@ function generated(name) {
 
 const site = generated('site.json');
 
+// Who serves /llms.txt -- the owner's call, so it is one line:
+//   'curated'  scripts/llms.py's index (docs/llms.txt), which the live site
+//              serves today: the nav's order, one line per page.
+//   'plugin'   starlight-llms-txt: its own /llms.txt, plus /llms-full.txt and
+//              /llms-small.txt, the whole site as text.
+// Both cannot be served: two writers of one address is a build warning.
+const llmsTxt = 'curated';
+
+/** Serves the curated /llms.txt (src/routes/llms.txt.ts). */
+const curatedLlmsTxt = {
+  name: 'curated-llms-txt',
+  hooks: {
+    'astro:config:setup': ({ injectRoute }) =>
+      injectRoute({ pattern: '/llms.txt', entrypoint: './src/routes/llms.txt.ts', prerender: true }),
+  },
+};
+
 export default defineConfig({
   site: site.site,
   // MkDocs serves directory URLs with a trailing slash, and every inbound
@@ -36,7 +55,12 @@ export default defineConfig({
     processor: satteri({
       // Before Starlight's own heading ids, which keep an id already set:
       // anchors stay the ones MkDocs wrote, so deep links keep working.
-      hastPlugins: [pythonMarkdownHeadingIds],
+      // A <Fact> in a heading is text before the ids are written, so an
+      // anchor like /why/fresh-and-fixed/#142-releases-... stays the same.
+      hastPlugins: [
+        factsInHeadings({ file: fileURLToPath(new URL('./src/data/facts.yaml', import.meta.url)) }),
+        pythonMarkdownHeadingIds,
+      ],
       // python-markdown has no smart punctuation unless asked, and this site
       // never asked: "--" stays two hyphens, as it is written in docs/.
       features: { smartPunctuation: false },
@@ -74,9 +98,8 @@ export default defineConfig({
       // The 404 page is src/pages/404.astro.
       disable404Route: true,
       head: [
-        // What overrides/main.html writes on every page, and the stylesheet
-        // mkdocs.yml loads with extra_css. The per-page tags -- Open Graph,
-        // robots, structured data -- are src/route-data.ts.
+        // What overrides/main.html writes on every page. The per-page tags --
+        // Open Graph, robots, structured data -- are src/route-data.ts.
         {
           tag: 'link',
           attrs: {
@@ -86,14 +109,27 @@ export default defineConfig({
             href: `${site.site}/feed.xml`,
           },
         },
-        { tag: 'link', attrs: { rel: 'stylesheet', href: '/stylesheets/landing.css' } },
       ],
-      customCss: ['./src/styles/site.css'],
+      // Roboto, as Material loads it (from this site, not from Google);
+      // landing.css is the port of docs/stylesheets/landing.css, which the
+      // live site loads with extra_css and which is still copied to
+      // /stylesheets/landing.css unchanged; site.css is the frame.
+      customCss: [
+        '@fontsource/roboto/300.css',
+        '@fontsource/roboto/400.css',
+        '@fontsource/roboto/400-italic.css',
+        '@fontsource/roboto/700.css',
+        '@fontsource/roboto-mono/400.css',
+        './src/styles/landing.css',
+        './src/styles/site.css',
+      ],
       sidebar: generated('sidebar.json'),
       routeMiddleware: './src/route-data.ts',
       components: {
         Footer: './src/components/Footer.astro',
+        Header: './src/components/Header.astro',
         PageTitle: './src/components/PageTitle.astro',
+        Sidebar: './src/components/Sidebar.astro',
       },
       plugins: [
         // Fails the build on a broken internal link or anchor.
@@ -107,11 +143,11 @@ export default defineConfig({
             scriptRoute.test(link) ||
             (knownBroken[slug] ?? []).includes(link),
         }),
-        starlightLlmsTxt({
-          projectName: site.title,
-          description: site.description,
-        }),
+        ...(llmsTxt === 'plugin'
+          ? [starlightLlmsTxt({ projectName: site.title, description: site.description })]
+          : []),
       ],
     }),
+    ...(llmsTxt === 'curated' ? [curatedLlmsTxt] : []),
   ],
 });

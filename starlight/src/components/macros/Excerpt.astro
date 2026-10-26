@@ -1,0 +1,10 @@
+---
+// A post up to its `<!-- more -->`, the way the blog plugin cuts it: the
+// post is rendered whole (it is the slot) and the HTML is cut at the marker,
+// which Markdown keeps as a comment. A post without one is shown whole; the
+// converter refuses such a post while mkdocs.yml says `post_excerpt: required`.
+const html = await Astro.slots.render('default');
+const cut = html.indexOf('<!-- more -->');
+---
+
+<Fragment set:html={cut < 0 ? html : html.slice(0, cut)} />

@@ -1,0 +1,23 @@
+---
+// One number (or name) from facts.yaml, where a page quotes it: the
+// `{{ gate.promoted }}` of the MkDocs macros. facts.yaml is the only place a
+// number about this project may be written; scripts/facts-lint.py fails a
+// page that types one instead of asking for it.
+//
+//   <Fact of="gate.promoted" />
+//   <Fact of="features.count" filters="title_number" />          Eleven
+//   <Fact of="boards.from_readers" filters="title_number lower" />  two
+//   <Fact of="platform.kernel.fork" filters="first_word" />       6.12.109
+import { facts } from '../../lib/data';
+import { format } from '../../lib/facts.mjs';
+
+interface Props {
+  of: string;
+  filters?: string;
+}
+
+const { of, filters = '' } = Astro.props;
+const text = format(facts, of, filters);
+---
+
+{text}

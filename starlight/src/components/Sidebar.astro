@@ -1,0 +1,32 @@
+---
+// Material with navigation.tabs shows, beside a page, only the nav of the
+// tab it is under: Docs shows the guides and the reference, not the
+// features. Starlight's sidebar is the whole tree, which the phone menu
+// keeps (there are no tabs there). On a wide screen, only the current tab's
+// entries.
+//
+// A news post is in no nav. Material's blog gave it the way back to the
+// index and its date instead, and so does this, on a wide screen.
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import { humanDate, isoDate, NEWS, pageUrl } from '../lib/news';
+import { tabs } from '../lib/tabs';
+
+const { entry, sidebar } = Astro.locals.starlightRoute;
+const current = tabs(sidebar, Astro.url.pathname).findIndex((t) => t.current);
+const date = entry.id.startsWith(`${NEWS}/`) ? entry.data.date : undefined;
+---
+
+<div class:list={['tp-sidebar', { 'tp-sidebar--post': date }]} data-tab={current >= 0 ? current + 1 : undefined}>
+  {
+    date && (
+      <div class="tp-post-aside">
+        <a class="tp-post-aside__back" href={pageUrl(1)}>← Back to index</a>
+        <div>
+          <b>Metadata</b>
+          <time datetime={isoDate(date)}>{humanDate(date)}</time>
+        </div>
+      </div>
+    )
+  }
+  <div class="tp-sidebar__nav"><Default /></div>
+</div>

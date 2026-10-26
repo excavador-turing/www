@@ -1,0 +1,778 @@
+/* docs/stylesheets/landing.css, ported to Starlight's page (phase 2).
+
+   The rules, the numbers and the reasons in the comments are the MkDocs
+   stylesheet's; what changed is only what has to:
+
+   * every length in rem is 1.25x the original, because Material's root font
+     is 20px and Starlight's is 16px, so the page keeps the size it had;
+   * `.md-typeset` is `.sl-markdown-content`, `.md-main` is `.main-pane`,
+     `.md-content__inner` is the content panel's `.sl-container`, and the
+     dark scheme is `:root[data-theme="dark"]`, not `[data-md-color-scheme]`;
+   * the blog's `.md-post--excerpt` is PostList's `.tp-post`;
+   * Material's tab strip, footer meta and edit button have no equivalent
+     here; their rules are dropped (the header and its tabs are site.css).
+
+   docs/stylesheets/landing.css is still what turingpi.xyz loads, and stays
+   byte for byte as it is until the switch; this file is what the Starlight
+   build uses in its place. A change to one belongs in the other. */
+
+/* The site wears the board's own palette: near-black type, a lime accent
+   (#dcfe8e is the interface's button colour, sampled from a screenshot rather
+   than guessed), and a lot of white. Material's defaults are indigo on white,
+   which reads as "documentation template" and matches nothing on the board. */
+
+:root {
+  --tp-ink: #171717;
+  --tp-lime: #dcfe8e;
+  --tp-lime-ink: #2d3a00;
+  --tp-muted: #6b6b6b;
+  --tp-line: #e4e4e4;
+  --tp-plate: #fafafa;
+  /* One measure for prose and for the headings above it. In px on purpose:
+     ch is relative to the element's own font size, so 68ch on a 1.45rem
+     heading is far wider than 68ch of body text, and the rule under a
+     heading overshot its paragraph by most of the screen. */
+  --tp-measure: 740px;
+  --tp-header: var(--sl-nav-height);   /* the header, tabs included (site.css) */
+  --tp-tabs: 0px;     /* inside the header here, not under it */
+  --tp-bar: 3.25rem;      /* the Overview / Live demo strip */
+}
+:root[data-theme="dark"] {
+  --tp-ink: #f2f2f2;
+  --tp-muted: #a3a3a3;
+  --tp-line: #2e2e2e;
+  --tp-plate: #1c1c1c;
+}
+
+/* ---- the front page: chapters, and the demo ---------------------------- */
+/* The page was one screen, locked to the viewport height, with the four
+   destination cards standing in for a footer because a footer was the
+   hundred pixels that made it scroll. That constraint is what broke it: the
+   card pictures took whatever height was left over, so they were 90px on a
+   1280x720 laptop and 501px on a 2560x1440 monitor, and on the short screens
+   the sentence under each card was cut off mid-word.
+
+   So the page scrolls now, in chapters. The FIRST screen is still complete on
+   its own -- headline, one line, two buttons, and the interface itself -- and
+   every chapter below it fits a screen too, which `scripts/screens.py`
+   measures at nine viewports rather than trusting. Nothing is sized from
+   leftover height any more: a picture is sized by its own aspect ratio and
+   the text is sized by the type scale.
+
+   Full width, because Material's 61rem prose grid is right for a guide and
+   wrong for a picture beside a paragraph. */
+.main-pane:has(.tp-landing) .content-panel .sl-container { margin: 0 auto; padding: 0 clamp(1.25rem, 2.5vw, 3rem) 0; max-width: 1600px; }
+.main-pane:has(.tp-landing) footer .meta { display: none; }
+.main-pane:has(.tp-landing) .content-panel { padding-block: 0; }
+.tp-landing [hidden] { display: none !important; }
+
+/* The demo is a view, not a chapter: it takes the whole window, and the
+   site's footer steps out of the way while it is open. */
+body.tp-demo-open :is(.tp-footer, .main-pane footer) { display: none; }
+
+.tp-bar { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; height: var(--tp-bar); }
+.tp-seg { display: inline-flex; gap: 0.1875rem; padding: 0.1875rem; border: 1px solid var(--tp-line); border-radius: 999px; }
+.sl-markdown-content .tp-seg a { font-size: 0.85rem; font-weight: 600; line-height: 1; padding: 0.525rem 1.0625rem; border-radius: 999px; color: var(--tp-muted); }
+.sl-markdown-content .tp-seg a:hover { color: var(--tp-ink); }
+.sl-markdown-content .tp-back { font-size: 0.875rem; font-weight: 600; color: var(--tp-ink); padding: 0.525rem 1.125rem; border: 2px solid var(--tp-ink); border-radius: 999px; }
+.sl-markdown-content .tp-back:hover { background: var(--tp-ink); color: #fff; }
+.sl-markdown-content .tp-panes a[aria-current="true"] { background: var(--tp-lime); color: var(--tp-lime-ink); }
+
+/* A screen: one idea, taken in at once. Its height is a MINIMUM, never a
+   fixed size -- content that needs more room gets it and the page grows,
+   which is the whole difference from the layout this replaces. The gate
+   fails a screen that grows past the viewport, so the two agree. */
+.tp-screen {
+  box-sizing: border-box;
+  min-height: calc(100svh - var(--tp-header) - var(--tp-tabs));
+  display: grid;
+  align-content: center;
+  gap: clamp(1.5rem, 3.5svh, 3.25rem);
+  padding: clamp(1.75rem, 5svh, 4.25rem) 0;
+}
+.tp-screen + .tp-screen { border-top: 1px solid var(--tp-line); }
+
+/* Screen one: the claim, and the thing itself. */
+.tp-hero { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: center; }
+.sl-markdown-content .tp-hero h1 {
+  font-size: clamp(2.625rem, 4.4vw, 4.5rem);
+  line-height: 1.02; font-weight: 700; letter-spacing: -0.03em;
+  color: var(--tp-ink); margin: 0 0 1.25rem; max-width: 15ch; text-wrap: balance;
+}
+.sl-markdown-content .tp-hero p.lede { font-size: clamp(1.1rem, 1.15vw, 1.35rem); line-height: 1.55; max-width: 46ch; color: var(--tp-muted); margin: 0 0 1.75rem; }
+.tp-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.sl-markdown-content .tp-actions .md-button { border-radius: 999px; padding: 0.75rem 1.75rem; font-weight: 600; font-size: 1rem; border: 2px solid var(--tp-ink); color: var(--tp-ink); margin: 0; }
+.sl-markdown-content .tp-actions .md-button--primary { background: var(--tp-lime); border-color: var(--tp-lime); color: var(--tp-lime-ink); }
+.sl-markdown-content .tp-actions .md-button--primary:hover { filter: brightness(0.96); }
+
+/* Every picture on this page is a screenshot at 2240x1600, so its box is
+   given that aspect ratio and a width, and never a height. That is the rule
+   the old layout broke. */
+.sl-markdown-content .tp-hero__show,
+.sl-markdown-content .tp-chapter__show { margin: 0; min-width: 0; }
+.sl-markdown-content .tp-hero__show img,
+.sl-markdown-content .tp-chapter__show img {
+  display: block; width: 100%; height: auto; aspect-ratio: 2240 / 1600;
+  object-fit: cover; object-position: top center;
+  border: 1px solid var(--tp-line); border-radius: 0.875rem;
+  background: var(--tp-plate);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.10);
+}
+.sl-markdown-content .tp-chapter__show figcaption { font-size: 0.9rem; line-height: 1.45; color: var(--tp-muted); margin-top: 0.75rem; text-align: left; }
+
+/* A chapter: one claim, its evidence, and the picture that shows it. */
+.tp-chapter { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; }
+.tp-chapter--flip .tp-chapter__say { order: 2; }
+.tp-chapter--flip .tp-chapter__show { order: 1; }
+.tp-chapter__say { min-width: 0; }
+.sl-markdown-content .tp-chapter h2 {
+  font-size: clamp(1.875rem, 2.5vw, 2.875rem); line-height: 1.08; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--tp-ink); margin: 0.25rem 0 0.875rem;
+  max-width: 20ch; text-wrap: balance;
+}
+.sl-markdown-content .tp-chapter p { font-size: clamp(1rem, 0.95vw, 1.1875rem); line-height: 1.6; color: var(--tp-muted); max-width: 52ch; margin: 0 0 1.5rem; }
+.sl-markdown-content .tp-eyebrow {
+  display: inline-block; font-size: 0.775rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--tp-lime); color: var(--tp-lime-ink);
+  padding: 0.3rem 0.75rem; border-radius: 999px;
+}
+.sl-markdown-content a.tp-why { display: inline-block; font-weight: 600; font-size: 0.975rem; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); }
+
+/* What's new: the two questions a returning reader has. It has no picture,
+   so it is one band rather than two columns of unequal weight. */
+.tp-chapter--news { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+.tp-news { width: 100%; max-width: 1100px; text-align: center; }
+.sl-markdown-content .tp-chapter--news h2 { max-width: none; margin-left: auto; margin-right: auto; }
+.tp-news__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem; text-align: left; margin-top: 2rem; }
+.tp-news__col { border: 1px solid var(--tp-line); border-radius: 0.875rem; padding: 1.375rem 1.625rem; background: var(--tp-plate); }
+.sl-markdown-content .tp-news__col > b { display: block; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tp-muted); margin-bottom: 0.625rem; }
+.sl-markdown-content .tp-news__col p { font-size: 1.025rem; margin-bottom: 1rem; max-width: none; color: var(--tp-ink); }
+.sl-markdown-content .tp-news__col a { font-weight: 600; font-size: 0.95rem; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); margin-right: 1.125rem; }
+
+/* The last chapter: what the board is, for a reader who arrived from a
+   search, and the four places to go next. */
+.tp-chapter--what { grid-template-columns: minmax(0, 1fr); align-content: center; }
+.tp-what-grid { display: grid; gap: 1.75rem; }
+.sl-markdown-content .tp-what { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.5rem; align-items: center; color: inherit; border: 1px solid var(--tp-line); border-radius: 0.875rem; padding: 0.875rem 1.5rem 0.875rem 0.875rem; }
+.sl-markdown-content .tp-what:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.sl-markdown-content .tp-what img { display: block; width: 168px; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 0.625rem; margin: 0; }
+.sl-markdown-content .tp-what__text { font-size: 0.975rem; line-height: 1.55; color: var(--tp-muted); }
+.sl-markdown-content .tp-what__text b { color: var(--tp-ink); font-size: 1.125rem; margin-right: 0.375rem; }
+.sl-markdown-content .tp-what__link { color: var(--tp-ink); font-weight: 600; white-space: nowrap; }
+
+.tp-dest { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+.sl-markdown-content .tp-dest__card {
+  display: flex; flex-direction: column; gap: 0.375rem;
+  border: 1px solid var(--tp-line); border-radius: 0.875rem; color: inherit;
+  padding: 1.25rem 1.375rem;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.sl-markdown-content .tp-dest__card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.sl-markdown-content .tp-dest__card b { font-size: 1.1875rem; color: var(--tp-ink); }
+.sl-markdown-content .tp-dest__card span { font-size: 0.925rem; line-height: 1.5; color: var(--tp-muted); }
+
+/* The demo view: one interface at a time, as large as the screen allows.
+   Side by side is what made them too small to use. */
+.tp-stage iframe,
+.tp-stage__soon { display: block; width: 100%; height: calc(100svh - var(--tp-header) - var(--tp-tabs) - var(--tp-bar) - 0.625rem); border: 1px solid var(--tp-line); border-radius: 0.625rem; background: #fff; }
+.tp-stage__soon { display: flex; align-items: center; justify-content: center; text-align: center; border-style: dashed; padding: 2.5rem; background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(0,0,0,0.025) 10px 20px); }
+.tp-stage__soon > div { max-width: 40ch; }
+.sl-markdown-content .tp-stage__soon h2 { margin: 0 0 0.5rem; font-size: 1.625rem; color: var(--tp-ink); }
+.sl-markdown-content .tp-stage__soon p { margin: 0; color: var(--tp-muted); font-size: 1rem; }
+.sl-markdown-content .tp-bar__note { flex: 1 1 0; min-width: 0; font-size: 0.775rem; line-height: 1.35; color: var(--tp-muted); text-align: center; overflow: hidden; }
+@media (max-width: 1100px) { .sl-markdown-content .tp-bar__note { display: none; } }
+
+/* Narrow: everything stacks, the picture leads, and nothing is dropped.
+   The old layout hid the card pictures, the claim evidence and half the
+   explainer on a phone to buy back height it did not have. */
+@media (max-width: 900px) {
+  .tp-screen { min-height: 0; gap: 1.5rem; padding: 2.75rem 0; }
+  .tp-hero, .tp-chapter { grid-template-columns: minmax(0, 1fr); }
+  .tp-chapter--flip .tp-chapter__say,
+  .tp-chapter--flip .tp-chapter__show { order: 0; }
+  .sl-markdown-content .tp-hero h1 { font-size: clamp(2.375rem, 8vw, 3rem); max-width: none; }
+  .sl-markdown-content .tp-hero p.lede { max-width: none; }
+  .tp-news__grid { grid-template-columns: minmax(0, 1fr); }
+  .tp-dest { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sl-markdown-content .tp-what { grid-template-columns: minmax(0, 1fr); }
+  .sl-markdown-content .tp-what img { width: 100%; }
+}
+@media (max-width: 560px) {
+  .tp-dest { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* The first features index -- eight plates, four across -- was here. It is
+   generated from the pages now; see the foot of this file. */
+
+/* ---- documentation hub: two columns ----------------------------------- */
+.tp-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem; }
+@media (max-width: 900px) { .tp-cols { grid-template-columns: 1fr; } }
+.sl-markdown-content .tp-cols h2 { margin-top: 0; }
+
+/* ---- marketing pages: Features, About, and each feature article --------- */
+/* Same family as the front page, different job. A page carrying a
+   .tp-hero-band opts in: full width, a stated opening, and prose set to be
+   read rather than referred to. The documentation keeps Material's chrome --
+   a reference page WANTS a sidebar and a table of contents. These do not. */
+.main-pane:has(.tp-hero-band) .content-panel .sl-container { margin: 0 auto; padding: 0 clamp(1.25rem, 2.5vw, 3rem) 2.5rem; max-width: 1500px; }
+
+.tp-hero-band { padding: clamp(2rem, 5svh, 4rem) 0 1.5rem; border-bottom: 1px solid var(--tp-line); margin-bottom: 2.25rem; }
+.sl-markdown-content .tp-hero-band h1 { font-size: clamp(2rem, 3.4vw, 3.375rem); line-height: 1.06; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); margin: 0 0 0.75rem; max-width: 20ch; text-wrap: balance; }
+.sl-markdown-content .tp-hero-band p { font-size: clamp(1.0625rem, 1.05vw, 1.25rem); line-height: 1.55; max-width: var(--tp-measure); color: var(--tp-muted); margin: 0; }
+.sl-markdown-content .tp-hero-band .tp-eyebrow { display: inline-block; font-size: 0.775rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tp-lime-ink); background: var(--tp-lime); padding: 0.3125rem 0.75rem; border-radius: 999px; margin-bottom: 1rem; }
+:root[data-theme="dark"] .sl-markdown-content .tp-hero-band .tp-eyebrow { color: #2d3a00; }
+
+/* Prose on one of these pages is a column, not a full-width sprawl: about 68
+   characters, which is what a line is readable at. Figures, code and the
+   plate grid are exempt and stay wide -- which is why this selects direct
+   children rather than wrapping the page in a div the markdown would have to
+   nest inside. */
+.main-pane:has(.tp-hero-band) .sl-markdown-content > *:not(figure):not(.highlight):not(pre):not(.tp-hero-band):not(.tp-next):not(.tp-plates):not(.tp-vs):not(.tp-dest):not(.tp-ideas):not(.tp-releases):not(.tp-posts) { max-width: var(--tp-measure); }
+.main-pane:has(.tp-hero-band) .sl-markdown-content h2 { font-size: 1.8125rem; line-height: 1.15; letter-spacing: -0.015em; margin: 3rem 0 0.875rem; padding-top: 1.75rem; border-top: 3px solid var(--tp-lime); }
+.main-pane:has(.tp-hero-band) .sl-markdown-content h3 { font-size: 1.3125rem; margin: 2rem 0 0.625rem; }
+.main-pane:has(.tp-hero-band) .sl-markdown-content p,
+.main-pane:has(.tp-hero-band) .sl-markdown-content li { font-size: 1.075rem; line-height: 1.72; }
+.main-pane:has(.tp-hero-band) .sl-markdown-content .tp-hero-band p { line-height: 1.55; }
+.main-pane:has(.tp-hero-band) .sl-markdown-content figure { max-width: 1100px; width: min(1100px, 92vw); margin: 2.25rem 0; }
+.main-pane:has(.tp-hero-band) .sl-markdown-content figure img { width: 100%; border: 1px solid var(--tp-line); border-radius: 0.625rem; }
+.main-pane:has(.tp-hero-band) .sl-markdown-content figcaption { font-size: 0.875rem; color: var(--tp-muted); margin-top: 0.625rem; text-align: left; }
+.main-pane:has(.tp-hero-band) .sl-markdown-content .highlight { max-width: 1100px; width: min(1100px, 92vw); }
+.main-pane:has(.tp-hero-band) .sl-markdown-content table:not([class]) { font-size: 0.95rem; }
+.main-pane:has(.tp-hero-band) .sl-markdown-content table:not([class]) th { background: var(--tp-plate); font-weight: 700; color: var(--tp-ink); }
+.main-pane:has(.tp-hero-band) .sl-markdown-content .starlight-aside { font-size: 1rem; }
+
+/* Where next: every article ends somewhere on purpose. */
+.tp-next { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 1rem; margin: 3.75rem 0 0; padding-top: 2rem; border-top: 1px solid var(--tp-line); }
+.sl-markdown-content .tp-next a { display: block; border: 1px solid var(--tp-line); border-radius: 0.75rem; padding: 1rem 1.1875rem; color: inherit; transition: transform 120ms ease, box-shadow 120ms ease; }
+.sl-markdown-content .tp-next a:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.sl-markdown-content .tp-next b { display: block; font-size: 1.0625rem; color: var(--tp-ink); margin-bottom: 0.1875rem; }
+.sl-markdown-content .tp-next span { font-size: 0.9rem; line-height: 1.45; color: var(--tp-muted); }
+
+/* ---- upstream against this fork, made readable -------------------------- */
+/* The same facts the reference table carries, laid out so the eye can take a
+   row in one movement: what is being compared, what upstream does, what this
+   does. A 3-column markdown table made the reader parse a grid instead. */
+.tp-vs { display: grid; gap: 0.625rem; margin: 1.75rem 0 2.5rem; max-width: 1100px; }
+.tp-vs__row { display: grid; grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) minmax(0, 1fr); gap: 1.125rem; align-items: start; border: 1px solid var(--tp-line); border-radius: 0.75rem; padding: 0.9375rem 1.125rem; }
+.sl-markdown-content .tp-vs__what { font-size: 0.975rem; font-weight: 700; color: var(--tp-ink); }
+.sl-markdown-content .tp-vs__them, .sl-markdown-content .tp-vs__us { font-size: 0.95rem; line-height: 1.5; }
+.sl-markdown-content .tp-vs__them { color: var(--tp-muted); }
+.sl-markdown-content .tp-vs__us { color: var(--tp-ink); }
+.sl-markdown-content .tp-vs__them::before, .sl-markdown-content .tp-vs__us::before { display: block; font-size: 0.725rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.25rem; color: var(--tp-muted); }
+.sl-markdown-content .tp-vs__them::before { content: "upstream"; }
+.sl-markdown-content .tp-vs__us::before { content: "this fork"; color: var(--tp-lime-ink); }
+:root[data-theme="dark"] .sl-markdown-content .tp-vs__us::before { color: var(--tp-lime); }
+.tp-vs__row .tp-vs__us { border-left: 3px solid var(--tp-lime); padding-left: 0.875rem; }
+@media (max-width: 800px) { .tp-vs__row { grid-template-columns: 1fr; gap: 0.625rem; } }
+
+/* ---- the proof strip on a feature page --------------------------------- */
+/* Every feature opens with the same thing: a few numbers somebody measured.
+   Consistent across the pages on purpose -- a reader who has seen one knows
+   where to look on the next -- and numbers rather than adjectives, because
+   every one of these is checkable and the adjectives would not be. */
+.tp-proof { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 1.125rem; margin: 0 0 2rem; max-width: 1100px; }
+.tp-proof > div { border-top: 3px solid var(--tp-lime); padding-top: 0.625rem; }
+.sl-markdown-content .tp-proof b { display: block; font-size: 1.8125rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; color: var(--tp-ink); font-variant-numeric: tabular-nums; }
+.sl-markdown-content .tp-proof span { display: block; font-size: 0.875rem; line-height: 1.4; color: var(--tp-muted); margin-top: 0.1875rem; }
+
+/* --------------------------------------------------------------------------
+   One screen, every feature page (SQU-197)
+
+   A feature page is a pitch, not a chapter: the reader should be able to see
+   the claim, the three numbers behind it, and where to go next WITHOUT
+   SCROLLING, on a phone as well as a laptop. The argument is not deleted for
+   that -- it sits in a collapsed disclosure, in the same place on every page,
+   one click below the numbers.
+
+   These rules are what buys the room. They are opt-in through `tp-one-screen`
+   on the hero band so the landing page and the guides, which are meant to be
+   read straight down, keep the roomier spacing.
+
+   Measured, not estimated: docs/../parts.py renders each page in headless
+   Chrome at 1440x900 and 390x844 and reports the height of every band. The
+   phone is the binding constraint by a wide margin, which is why almost
+   everything below sits in the narrow media query.
+   -------------------------------------------------------------------------- */
+.main-pane:has(.tp-one-screen) .tp-hero-band { padding: clamp(1.25rem, 3svh, 2.5rem) 0 1rem; margin-bottom: 1.375rem; }
+.main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band .tp-eyebrow { margin-bottom: 0.625rem; }
+.main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band h1 { margin-bottom: 0.5625rem; }
+.main-pane:has(.tp-one-screen) .tp-proof { margin-bottom: 1.375rem; }
+/* The disclosure is the page's one closed door; it should read as a control,
+   not as a warning box sitting in the middle of the layout. */
+.main-pane:has(.tp-one-screen) .sl-markdown-content details { margin: 0; font-size: 1rem; }
+.main-pane:has(.tp-one-screen) .sl-markdown-content details > summary { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+.main-pane:has(.tp-one-screen) .tp-next { margin-top: 1.75rem; padding-top: 1.25rem; }
+/* "Last update" metadata is worth having on a guide and worth 27px of a
+   phone screen nowhere. */
+.main-pane:has(.tp-one-screen) footer .meta { display: none; }
+
+@media (max-width: 600px) {
+  /* Three numbers stay three numbers. Stacking them into two rows costs a
+     hundred pixels and breaks the one thing every feature page shares. */
+  .main-pane:has(.tp-one-screen) .tp-proof { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.625rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-proof b { font-size: 1.375rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-proof span { font-size: 0.775rem; line-height: 1.3; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band p { font-size: 1rem; line-height: 1.5; }
+  /* The four destinations keep their headings and lose their descriptions:
+     a link whose title already says where it goes does not need a subtitle
+     on a 390px screen, and the four subtitles together are 250px. */
+  .main-pane:has(.tp-one-screen) .tp-next { grid-template-columns: 1fr; gap: 0.5rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-next a { padding: 0.625rem 0.875rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-next b { font-size: 0.975rem; margin-bottom: 0; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-next span { display: none; }
+}
+
+/* The footer these pages get is the meta bar alone -- `hide: navigation`
+   already drops the previous/next pair -- and on a phone its copyright line
+   and its social icon wrap onto two rows, 92px. One row is 46. Written after
+   reading the rendered footer: an earlier version of this rule hid
+   `.md-footer__inner`, which these pages do not have, and measured exactly
+   the same as no rule at all.
+   (Ported: those rules were for Material's footer meta bar, which this
+   build does not have -- the footer is Footer.astro -- so they are gone.) */
+
+@media (max-width: 600px) {
+  .main-pane:has(.tp-one-screen) .content-panel .sl-container { padding-bottom: 1.25rem; }
+  /* Two by two rather than a column of four: the titles are long enough to
+     wrap at 390px either way, so the second column is free height. */
+  .main-pane:has(.tp-one-screen) .tp-next { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .main-pane:has(.tp-one-screen) .tp-hero-band { padding-top: 0.875rem; margin-bottom: 1.125rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band h1 { font-size: 1.8125rem; }
+  .main-pane:has(.tp-one-screen) .tp-proof { margin-bottom: 1.125rem; }
+  .main-pane:has(.tp-one-screen) .tp-next { margin-top: 1.25rem; padding-top: 1rem; }
+}
+
+/* The disclosure summary is one line of the page's budget, so it is set as
+   one line: no admonition icon indent to speak of, no block margins. */
+@media (max-width: 600px) {
+  .main-pane:has(.tp-one-screen) .sl-markdown-content details { font-size: 0.9375rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content details > summary { padding: 0.4375rem 0.75rem 0.4375rem 2.25rem; line-height: 1.3; }
+}
+
+/* A short phone is a different constraint from a narrow one, and the estate
+   has both: a 390x844 handset clears the page with 50-120px to spare, while a
+   375x667 one was 143px over with exactly the same layout. So the last tier
+   keys on HEIGHT as well as width and steps the whole page down a notch --
+   type, padding and gaps together, so the proportions survive the shrink.
+   Measured on 375x667 and 360x740; a taller phone never reaches these rules. */
+@media (max-width: 600px) and (max-height: 780px) {
+  .main-pane:has(.tp-one-screen) .tp-hero-band { padding-top: 0.625rem; padding-bottom: 0.75rem; margin-bottom: 0.875rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band h1 { font-size: 1.5625rem; margin-bottom: 0.4375rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band p { font-size: 0.9rem; line-height: 1.45; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band .tp-eyebrow { font-size: 0.6875rem; padding: 0.1875rem 0.5625rem; margin-bottom: 0.4375rem; }
+  .main-pane:has(.tp-one-screen) .tp-proof { gap: 0.5rem; margin-bottom: 0.875rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-proof b { font-size: 1.1875rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-proof span { font-size: 0.725rem; line-height: 1.25; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content details { font-size: 0.875rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content details > summary { padding: 0.3125rem 0.625rem 0.3125rem 2rem; }
+  .main-pane:has(.tp-one-screen) .tp-next { margin-top: 0.875rem; padding-top: 0.75rem; gap: 0.4375rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-next a { padding: 0.4375rem 0.625rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-next b { font-size: 0.875rem; line-height: 1.25; }
+}
+
+/* Same argument on the other axis: a 1366x768 laptop is a wide screen and a
+   short one, and it was 24px over while a 1440x900 one had room. The hero's
+   own padding is the give here -- `clamp(1rem, 3svh, 2rem)` already shrinks
+   with the viewport, just not far enough. */
+@media (min-width: 601px) and (max-height: 830px) {
+  .main-pane:has(.tp-one-screen) .tp-hero-band { padding-top: 0.875rem; padding-bottom: 0.75rem; margin-bottom: 1.125rem; }
+  .main-pane:has(.tp-one-screen) .tp-proof { margin-bottom: 1.125rem; }
+  .main-pane:has(.tp-one-screen) .tp-next { margin-top: 1.25rem; padding-top: 1rem; }
+}
+
+/* The disclosure is the page's one control, so it is dressed as one rather
+   than as Material's blue "note" aside: the same line, plate and lime the
+   proof strip above it uses. A blue box in the middle of a lime-and-ink page
+   reads as a warning somebody left behind. */
+.main-pane:has(.tp-one-screen) .sl-markdown-content details.note { border: 1px solid var(--tp-line); border-left: 3px solid var(--tp-lime); border-radius: 0.625rem; box-shadow: none; }
+.main-pane:has(.tp-one-screen) .sl-markdown-content details.note > summary { background: var(--tp-plate); color: var(--tp-ink); border-radius: 0; }
+.main-pane:has(.tp-one-screen) .sl-markdown-content details.note > summary::before { background-color: var(--tp-ink); }
+.main-pane:has(.tp-one-screen) .sl-markdown-content details.note > summary::after { color: var(--tp-muted); }
+
+/* The about page carries four doors rather than one, so the per-door cost is
+   multiplied and worth another pass: a summary is one line of text and should
+   occupy one line of the budget. The trailing space under the destinations is
+   the other easy 16px -- the footer provides its own. */
+.main-pane:has(.tp-one-screen) .sl-markdown-content details > summary { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+.main-pane:has(.tp-one-screen) .sl-markdown-content details + details { margin-top: 0.375rem; }
+.main-pane:has(.tp-one-screen) .content-panel .sl-container { padding-bottom: 1.25rem; }
+@media (min-width: 601px) and (max-height: 830px) {
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-next a { padding: 0.75rem 1rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-hero-band h1 { font-size: clamp(1.875rem, 2.8vw, 2.75rem); }
+}
+
+/* On a short screen the proof strip's labels are the cheapest thing to shrink:
+   the number carries the claim and the label is the footnote under it. */
+@media (min-width: 601px) and (max-height: 830px) {
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-proof b { font-size: 1.625rem; }
+  .main-pane:has(.tp-one-screen) .sl-markdown-content .tp-proof span { font-size: 0.825rem; line-height: 1.35; }
+}
+
+/* The front page's old phone tier lived here: it hid the destination
+   pictures, the evidence under each claim and half the explainer, to buy
+   back height for a layout locked to one screen. The page scrolls now, so
+   a phone gets the same words a laptop does -- see the narrow rules in the
+   front-page section above. */
+
+/* ---- the demo pane, sized by what is left rather than by a guess -------- */
+/* The iframe used to be `100vh - header - var(--tp-bar)`, and `--tp-bar` is a
+   constant. On a phone the bar WRAPS -- the back button and the three pane
+   pills do not fit one row -- so the real bar is 122px where the constant
+   says 57, and the demo overflowed by exactly that difference on every
+   handset while looking right on every laptop.
+   A constant cannot know that, so nothing is measured here any more: the
+   demo view is a flex column and the frame takes what is left. `svh` rather than `vh` throughout, for the
+   same class of reason: `vh` is the viewport a phone has once its address bar
+   has RETRACTED, and a page measured against that scrolls while the bar is
+   still showing. `svh` is the smallest the viewport gets, so fitting it fits
+   always. */
+.tp-landing:has(.tp-view--demo:not([hidden])) {
+  display: flex; flex-direction: column;
+  height: calc(100vh - var(--tp-header) - var(--tp-tabs) - 0.5rem);   /* older browsers */
+  height: calc(100svh - var(--tp-header) - var(--tp-tabs) - 0.5rem);
+}
+.tp-view--demo:not([hidden]) { flex: 1 1 auto; min-height: 0; display: flex; }
+.tp-view--demo .tp-stage { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.tp-stage iframe:not([hidden]),
+.tp-stage .tp-stage__soon { flex: 1 1 auto; min-height: 0; height: auto; }
+
+/* The bar itself is worth keeping to one row on a phone even so: two rows of
+   chrome above a demo is 65px the demo could have had. */
+@media (max-width: 600px) {
+  .tp-bar { flex-wrap: nowrap; gap: 0.5rem; padding: 0.4375rem 0; }
+  .sl-markdown-content .tp-back { font-size: 0.75rem; padding: 0.375rem 0.6875rem; border-width: 1px; }
+  .tp-seg { padding: 0.125rem; }
+  .sl-markdown-content .tp-seg a { font-size: 0.75rem; padding: 0.375rem 0.625rem; }
+}
+
+/* The old features index and feature-page layouts lived here, in six
+   sections and about 310 lines: a hand-written sixteen-plate grid, three
+   phone and tablet tiers that clamped every plate's sentence to two lines,
+   and a feature layout that sized the screenshot with `max-height: 15svh`.
+   All of it existed to force pages onto one screen that did not fit, and all
+   of it is replaced by the template at the foot of this file -- where the
+   data lives in each page's front matter and the picture is sized by its own
+   aspect ratio. The clamps were 307 of the site's 439 measured faults, and
+   the `max-height` rules squashed every capture on a phone into a third of
+   its shape. */
+
+/* ---- the site's footer ------------------------------------------------- */
+/* Material's own footer is one line naming the generator plus three icons --
+   a template footer, not a site footer -- and the front page hid even that,
+   because the page was locked to the viewport and the footer was the hundred
+   pixels that made it scroll. The four destination cards were standing in
+   for it.
+   The front page scrolls now, so it has a real one, on every page. */
+.tp-footer {
+  background: var(--tp-plate);
+  border-top: 1px solid var(--tp-line);
+  color: var(--tp-ink);
+  margin-top: 3.75rem;
+}
+.tp-footer__inner {
+  max-width: 1600px; margin: 0 auto;
+  padding: 3.25rem clamp(1.25rem, 2.5vw, 3rem) 2.25rem;
+  display: grid; grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));
+  gap: 2rem 2.5rem;
+}
+.tp-footer__brand b { display: block; font-size: 1.1875rem; margin-bottom: 0.5625rem; }
+.tp-footer__brand span { display: block; font-size: 0.925rem; line-height: 1.55; color: var(--tp-muted); max-width: 34ch; }
+.tp-footer__col b {
+  display: block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--tp-muted); margin-bottom: 0.875rem;
+}
+.tp-footer__col ul { list-style: none; margin: 0; padding: 0; }
+.tp-footer__col li { margin: 0 0 0.525rem; }
+.tp-footer__col a { font-size: 0.975rem; line-height: 1.45; color: var(--tp-ink); text-decoration: none; }
+.tp-footer__col a:hover { border-bottom: 2px solid var(--tp-lime); }
+.tp-footer__legal {
+  max-width: 1600px; margin: 0 auto;
+  padding: 1.125rem clamp(1.25rem, 2.5vw, 3rem) 2rem;
+  border-top: 1px solid var(--tp-line);
+  display: flex; align-items: center; justify-content: space-between; gap: 1.75rem;
+}
+.tp-footer__legal span { font-size: 0.875rem; line-height: 1.5; color: var(--tp-muted); }
+.tp-footer__legal b { color: var(--tp-ink); }
+.tp-footer__legal a { color: var(--tp-ink); }
+.tp-footer__social { display: flex; gap: 0.875rem; flex: none; }
+.tp-footer__social a { display: inline-flex; width: 1.375rem; height: 1.375rem; color: var(--tp-muted); }
+.tp-footer__social a:hover { color: var(--tp-ink); }
+.tp-footer__social svg { width: 100%; height: 100%; fill: currentColor; }
+@media (max-width: 1100px) {
+  .tp-footer__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tp-footer__brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .tp-footer__inner { grid-template-columns: minmax(0, 1fr); gap: 1.625rem; }
+  .tp-footer__legal { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---- the tab strip ----------------------------------------------------- */
+/* Seven tabs, in the board's palette rather than Material's. The active one
+   is underlined in lime, which is the only accent this site uses.
+   (Ported: the tabs are Header.astro here, styled in site.css.) */
+
+/* ---- admonitions in the board's palette -------------------------------- */
+/* Material's `note` is indigo on pale blue, which is the one colour this
+   site does not use anywhere else -- and the changelog is twenty-nine of
+   them stacked, so it was the loudest thing on the page. */
+.sl-markdown-content .starlight-aside--note,
+.sl-markdown-content details.note {
+  border-color: var(--tp-line);
+  box-shadow: none;
+  border-radius: 0.625rem;
+}
+.sl-markdown-content .starlight-aside--note > .starlight-aside__title,
+.sl-markdown-content .note > summary {
+  background: var(--tp-plate);
+  font-weight: 600;
+}
+.sl-markdown-content .starlight-aside--note .starlight-aside__icon { color: var(--tp-ink); }
+.sl-markdown-content details.note[open] > summary { border-bottom: 1px solid var(--tp-line); }
+/* The newest release is the one open block; give it the accent so it is
+   findable in a column of twenty-nine. */
+.sl-markdown-content details.note[open]:first-of-type > summary { box-shadow: inset 3px 0 0 var(--tp-lime); }
+
+/* ---- a feature page: one template, eleven pages ------------------------ */
+/* These pages shared a skeleton in eleven copies of the markup, and a
+   skeleton kept by copy drifts. The data lives in each page's front matter
+   now and `main.py` renders it, so the shape is identical by construction.
+   Same column ratio, same picture aspect, same proof strip, same four links
+   in the same order -- a reader clicking through all eleven meets one page
+   eleven times, which is the point. */
+.tp-feature {
+  min-height: calc(100svh - var(--tp-header) - var(--tp-tabs));
+  box-sizing: border-box;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-content: center; align-items: center;
+  gap: clamp(1.75rem, 3vw, 3.75rem);
+  padding: clamp(1.75rem, 5svh, 3.75rem) 0;
+}
+.tp-feature__say { min-width: 0; }
+.sl-markdown-content .tp-feature h1 {
+  font-size: clamp(2.125rem, 3vw, 3.375rem); line-height: 1.04; font-weight: 700;
+  letter-spacing: -0.025em; color: var(--tp-ink); margin: 0.625rem 0 1rem;
+  max-width: 18ch; text-wrap: balance;
+}
+.sl-markdown-content .tp-feature p.lede { font-size: clamp(1.025rem, 1vw, 1.25rem); line-height: 1.6; color: var(--tp-muted); max-width: 52ch; margin: 0 0 1.75rem; }
+.sl-markdown-content .tp-provenance { font-size: 0.85rem; line-height: 1.45; color: var(--tp-muted); margin: 0.6875rem 0 1.75rem; }
+.sl-markdown-content .tp-feature__show { margin: 0; min-width: 0; }
+.sl-markdown-content .tp-feature__show img {
+  display: block; width: 100%; height: auto; aspect-ratio: 2240 / 1538;
+  object-fit: cover; object-position: top center;
+  border: 1px solid var(--tp-line); border-radius: 0.875rem;
+  background: var(--tp-plate); box-shadow: 0 18px 50px rgba(0,0,0,0.10);
+}
+.sl-markdown-content .tp-feature__show figcaption { font-size: 0.9rem; line-height: 1.45; color: var(--tp-muted); margin-top: 0.75rem; text-align: left; }
+
+/* The argument, below the fold: three sentences and a way to the whole of
+   it. NOT a second screen's worth of prose -- the full argument is its own
+   page and always was. */
+.tp-argument { max-width: var(--tp-measure); padding: 3rem 0 3.75rem; border-top: 1px solid var(--tp-line); }
+.sl-markdown-content .tp-argument h2 { font-size: 1.4375rem; margin: 0 0 0.875rem; color: var(--tp-ink); }
+.sl-markdown-content .tp-argument p { font-size: 1.0625rem; line-height: 1.7; color: var(--tp-ink); }
+
+/* ---- the features index: one plate per page ---------------------------- */
+/* It was sixteen hand-written plates for eleven pages, five of them jumping
+   into Reference and two of those to the same page, and every plate's
+   sentence was cut off at every viewport -- 307 of the site's 439 measured
+   faults were this one page. The plates come from the pages now, so the
+   count cannot disagree, and nothing is clamped: a plate is as tall as its
+   sentence. */
+.tp-index { padding: 2.5rem 0 3.75rem; }
+.tp-index__head { max-width: var(--tp-measure); margin-bottom: 2.5rem; }
+.sl-markdown-content .tp-index__head h1 { font-size: clamp(2rem, 3vw, 3rem); line-height: 1.08; letter-spacing: -0.02em; margin: 0.625rem 0 0.75rem; color: var(--tp-ink); }
+.sl-markdown-content .tp-index__head p { font-size: 1.075rem; line-height: 1.6; color: var(--tp-muted); margin: 0; }
+.tp-plates { display: grid; grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); gap: 1.25rem; }
+.sl-markdown-content a.tp-plate {
+  display: grid; grid-template-rows: auto auto 1fr; gap: 0.4375rem;
+  border: 1px solid var(--tp-line); border-radius: 0.875rem; padding: 1.375rem 1.5rem;
+  color: inherit; transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.sl-markdown-content a.tp-plate:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.08); }
+.sl-markdown-content a.tp-plate img { width: 44px; height: auto; margin: 0 0 0.4375rem; }  /* height auto: these drawings are 267x150, and a square box around one is 44px of box holding 25px of picture */
+.sl-markdown-content a.tp-plate b { font-size: 1.15rem; line-height: 1.2; color: var(--tp-ink); }
+.sl-markdown-content a.tp-plate span { font-size: 0.925rem; line-height: 1.5; color: var(--tp-muted); }
+.tp-index__more { margin: 2rem 0 0; padding: 1.25rem 1.5rem; border: 1px dashed var(--tp-line); border-radius: 0.875rem; }
+.sl-markdown-content .tp-index__more b { display: block; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tp-muted); margin-bottom: 0.5625rem; }
+.sl-markdown-content .tp-index__more span { font-size: 0.975rem; line-height: 1.7; }
+
+@media (max-width: 900px) {
+  .tp-feature { min-height: 0; grid-template-columns: minmax(0, 1fr); padding: 2.5rem 0; }
+  .sl-markdown-content .tp-feature h1 { max-width: none; }
+}
+
+/* The four next links, compact enough to share a screen with the claim.
+   They were 440px of a 981px screen -- two rows of cards padded like the
+   destination cards on the front page, which have a screen to themselves.
+   Here they are the last thing on a screen that already carries a headline,
+   a paragraph, three numbers and a picture. */
+.sl-markdown-content .tp-feature .tp-next {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem; margin: 0; padding: 0;
+}
+.sl-markdown-content .tp-feature .tp-next a {
+  display: block; padding: 0.75rem 0.9375rem; border: 1px solid var(--tp-line);
+  border-radius: 0.625rem; color: inherit;
+}
+.sl-markdown-content .tp-feature .tp-next a:hover { border-color: var(--tp-ink); }
+.sl-markdown-content .tp-feature .tp-next b { display: block; font-size: 0.95rem; line-height: 1.25; color: var(--tp-ink); margin-bottom: 0.1875rem; }
+.sl-markdown-content .tp-feature .tp-next span { display: block; font-size: 0.85rem; line-height: 1.4; color: var(--tp-muted); }
+
+/* Short screens. The binding constraint on these pages is viewport HEIGHT,
+   not width: a 1366x768 laptop fails where a 1440x900 has room, and 1536x864
+   fails where 1920x1080 does not. Nothing is hidden or clipped here -- the
+   same words, set smaller, which is the difference between this tier and the
+   one it replaces. */
+@media (max-height: 880px) {
+  .sl-markdown-content .tp-feature h1 { font-size: clamp(1.8125rem, 2.4vw, 2.5rem); margin: 0.4375rem 0 0.6875rem; }
+  .sl-markdown-content .tp-feature p.lede { font-size: 1rem; line-height: 1.5; margin-bottom: 1.125rem; }
+  .sl-markdown-content .tp-feature .tp-proof { margin-bottom: 0.625rem; }
+  .sl-markdown-content .tp-provenance { margin: 0.5rem 0 1.125rem; }
+  .sl-markdown-content .tp-feature .tp-next a { padding: 0.625rem 0.8125rem; }
+  .sl-markdown-content .tp-feature .tp-next span { font-size: 0.8rem; line-height: 1.35; }
+  .tp-feature { gap: clamp(1.25rem, 2.2vw, 2.5rem); padding: 1.5rem 0; }
+}
+@media (max-height: 780px) {
+  .sl-markdown-content .tp-feature h1 { font-size: 1.6875rem; }
+  .sl-markdown-content .tp-feature p.lede { font-size: 0.9375rem; margin-bottom: 0.875rem; }
+  .sl-markdown-content .tp-feature .tp-next b { font-size: 0.9rem; }
+  .sl-markdown-content .tp-feature .tp-next span { font-size: 0.75rem; }
+}
+
+/* ---- who makes this: the About page's maintainer block ------------------- */
+/* The site said "the maintainer is one person with two boards" on the
+   feedback page and nowhere gave that person a name or a way to reach them
+   outside GitHub. One block, three links, `rel="me"` so the identity links
+   count as such. */
+.tp-maker {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.75rem;
+  align-items: center; max-width: none;
+  border: 1px solid var(--tp-line); border-radius: 0.875rem;
+  padding: 1.375rem 1.625rem; margin: 2.5rem 0 0; background: var(--tp-plate);
+}
+.tp-maker__who { display: grid; gap: 0.375rem; }
+/* justify-self, because the eyebrow is a grid ITEM here and a grid item
+   stretches: without it the pill ran the full width of the column and
+   read as a lime banner rather than a label. */
+.sl-markdown-content .tp-maker__who .tp-eyebrow { justify-self: start; margin-bottom: 0.25rem; }
+.sl-markdown-content .tp-maker__who > b { font-size: 1.3125rem; color: var(--tp-ink); }
+.sl-markdown-content .tp-maker__who > span { font-size: 0.975rem; line-height: 1.55; color: var(--tp-muted); max-width: 60ch; }
+.tp-maker__links { display: flex; flex-wrap: wrap; gap: 0.625rem; }
+.sl-markdown-content .tp-maker__links a {
+  display: inline-block; font-size: 0.95rem; font-weight: 600; color: var(--tp-ink);
+  padding: 0.5625rem 1.1875rem; border: 2px solid var(--tp-ink); border-radius: 999px;
+}
+.sl-markdown-content .tp-maker__links a:hover { background: var(--tp-ink); color: #fff; }
+@media (max-width: 720px) {
+  .tp-maker { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* The argument pages close with five cards: the way back to the feature and
+   the feature's own four. Five in two columns leaves an orphan, so the way
+   back takes the whole first row -- it is the one a reader who came from
+   the feature page most likely wants. */
+.sl-markdown-content .tp-next--argument > a:first-child { grid-column: 1 / -1; }
+
+/* ---- roadmap: the ideas as cards ----------------------------------------- */
+/* The page was a table -- seven rows, four columns, the vote count in bold
+   at the left edge and the status in prose at the right -- and read like a
+   spreadsheet beside every other page. A card carries the same four facts
+   in the site's own shape, and the number that orders the page is the thing
+   you see first. */
+.tp-ideas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(310px, 100%), 1fr)); gap: 1.25rem; margin: 0 0 1.75rem; }
+.sl-markdown-content a.tp-idea {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto 1fr;
+  column-gap: 1.125rem; row-gap: 0.375rem; align-items: start;
+  border: 1px solid var(--tp-line); border-radius: 0.875rem; padding: 1.25rem 1.375rem;
+  color: inherit; background: var(--tp-plate);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.sl-markdown-content a.tp-idea:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.08); }
+.sl-markdown-content .tp-idea__votes {
+  grid-row: 1 / span 3; display: flex; flex-direction: column; align-items: center;
+  min-width: 3.25rem; padding-right: 1.125rem; border-right: 1px solid var(--tp-line); align-self: stretch;
+  font-size: 2rem; line-height: 1; font-weight: 700; color: var(--tp-ink); font-variant-numeric: tabular-nums;
+}
+.sl-markdown-content .tp-idea__votes small { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tp-muted); margin-top: 0.375rem; }
+.sl-markdown-content .tp-idea__title { font-size: 1.15rem; line-height: 1.25; font-weight: 700; color: var(--tp-ink); }
+.sl-markdown-content .tp-idea__what { font-size: 0.925rem; line-height: 1.5; color: var(--tp-muted); }
+.sl-markdown-content .tp-idea__status { justify-self: start; align-self: end; font-size: 0.825rem; font-weight: 600; line-height: 1.35; padding: 0.1875rem 0.6875rem; border-radius: 999px; border: 1px solid var(--tp-line); color: var(--tp-muted); margin-top: 0.375rem; }
+.sl-markdown-content .tp-idea--started .tp-idea__status { background: var(--tp-lime); color: var(--tp-lime-ink); border-color: transparent; }
+.sl-markdown-content .tp-idea--shipped .tp-idea__status { background: var(--tp-ink); color: var(--tp-plate); border-color: transparent; }
+.sl-markdown-content .tp-ideas--done a.tp-idea { background: transparent; }
+
+.tp-releases { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 0.875rem; margin: 0 0 1.25rem; }
+.sl-markdown-content .tp-releases a { display: block; border: 1px solid var(--tp-line); border-radius: 0.75rem; padding: 0.75rem 1rem; color: inherit; transition: transform 120ms ease, box-shadow 120ms ease; }
+.sl-markdown-content .tp-releases a:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.sl-markdown-content .tp-releases b { display: block; font-size: 1.125rem; color: var(--tp-ink); font-variant-numeric: tabular-nums; }
+.sl-markdown-content .tp-releases span { font-size: 0.85rem; color: var(--tp-muted); }
+
+/* The changelog index: four plates, one per component. */
+.sl-markdown-content a.tp-plate .tp-plate__meta { font-size: 0.825rem; color: var(--tp-muted); font-variant-numeric: tabular-nums; align-self: end; margin-top: 0.5rem; }
+
+/* ---- news: Material's blog index, in the same family ---------------------- */
+.main-pane:has(.tp-hero-band) .tp-post { border: 1px solid var(--tp-line); border-radius: 0.875rem; padding: 1.375rem 1.625rem 1.25rem; margin: 0 0 1.25rem; }
+.main-pane:has(.tp-hero-band) .tp-post .tp-post__meta { margin: 0 0 0.4375rem; }
+.main-pane:has(.tp-hero-band) .tp-post .tp-post__meta { font-size: 0.825rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tp-muted); }
+.main-pane:has(.tp-hero-band) .tp-post h2 { margin: 0 0 0.5625rem; padding: 0; border: 0; font-size: 1.4375rem; }
+.main-pane:has(.tp-hero-band) .tp-post .tp-post__excerpt > p,
+.main-pane:has(.tp-hero-band) .tp-post .tp-post__excerpt > ul,
+.main-pane:has(.tp-hero-band) .tp-post .tp-post__excerpt > blockquote { font-size: 1.025rem; line-height: 1.6; color: var(--tp-muted); }
+.main-pane:has(.tp-hero-band) .tp-post .tp-post__more { margin-top: 0.25rem; }
+.main-pane:has(.tp-hero-band) .tp-post .tp-post__more a { font-weight: 600; font-size: 0.95rem; color: var(--tp-ink); border-bottom: 2px solid var(--tp-lime); }
+.main-pane:has(.tp-hero-band) .tp-pagination { max-width: var(--tp-measure); }
+
+/* ---- a news post: items taken apart ------------------------------------- */
+.sl-markdown-content small.tp-tag { display: inline-block; font-size: 0.775rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tp-muted); border: 1px solid var(--tp-line); border-radius: 999px; padding: 0.0625rem 0.625rem; margin: -0.3rem 0 0.75rem; vertical-align: middle; }
+.sl-markdown-content li small.tp-tag { margin: 0 0 0 0.375rem; }
+.sl-markdown-content figure.tp-post-figure { margin: 0 0 2rem; width: 100%; }
+.sl-markdown-content figure.tp-post-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--tp-line); border-radius: 0.75rem; box-shadow: 0 12px 36px rgba(0,0,0,0.08); }
+.sl-markdown-content figure.tp-post-figure figcaption { font-size: 0.9rem; color: var(--tp-muted); margin-top: 0.625rem; text-align: left; }
+.main-pane:has(.tp-post__meta--page) .sl-markdown-content h2 { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 3px solid var(--tp-lime); }
+.main-pane:has(.tp-post__meta--page) .sl-markdown-content h3 { margin-bottom: 0.375rem; }
+
+/* On the news index the picture is shown whole, at the card's width. A
+   thumbnail that crops the tab was the first version, and the screens gate
+   refused it: a capture is never cropped or stretched on this site. The
+   hero-band figure rule above would set it wider than the card. */
+.main-pane:has(.tp-hero-band) .tp-post figure.tp-post-figure { width: 100%; max-width: 100%; margin: 0.25rem 0 1.125rem; }
+.main-pane:has(.tp-hero-band) .tp-post figure.tp-post-figure img { box-shadow: none; }
+
+/* The news index on a wide screen: two columns of posts. One 740px column
+   beside 900px of nothing was the first version. Here the list is its own
+   grid (PostList's .tp-posts), so the hero and the page numbers are
+   outside it and span the page by themselves. */
+@media screen and (min-width: 76.25em) {
+  .tp-posts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.5rem; align-items: start; }
+}
+
+/* "In this fork since vX" under a feature's title: a tag that is a link,
+   without a link's underline, so it reads as a label and still goes to the
+   release that introduced the feature. */
+.sl-markdown-content a.tp-since { text-decoration: none; }
+.sl-markdown-content a.tp-since small.tp-tag { margin: -0.4rem 0 1rem; }
+.sl-markdown-content a.tp-since:hover small.tp-tag { color: var(--tp-lime-ink); border-color: var(--tp-lime-ink); }
+
+/* The board record on the install guide: three short columns and one that
+   wraps, so it survives a phone without a sideways scroll. */
+.sl-markdown-content table.tp-boards { font-size: 0.9rem; }
+.sl-markdown-content table.tp-boards th, .sl-markdown-content table.tp-boards td { vertical-align: top; }
+.sl-markdown-content table.tp-boards td:nth-child(-n+3) { white-space: nowrap; }
+.sl-markdown-content table.tp-boards .tp-boards__who { display: block; color: var(--tp-muted); }
+
+/* On a phone the four columns become one card per report: the three short
+   facts on a line, the report under them. A table that scrolls sideways on
+   a phone is a table nobody reads to the end. */
+@media screen and (max-width: 59.9375em) {
+  .sl-markdown-content table.tp-boards thead { display: none; }
+  .sl-markdown-content table.tp-boards, .sl-markdown-content table.tp-boards tbody,
+  .sl-markdown-content table.tp-boards tr, .sl-markdown-content table.tp-boards td { display: block; white-space: normal; }
+  .sl-markdown-content table.tp-boards tr { border-top: 1px solid var(--tp-line); padding: 0.625rem 0; }
+  .sl-markdown-content table.tp-boards td { padding: 0.125rem 0; border: 0; }
+  .sl-markdown-content table.tp-boards td:nth-child(-n+3) { display: inline-block; margin-right: 1.125rem; }
+}
