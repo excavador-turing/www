@@ -1,0 +1,88 @@
+/*
+ * What Starlight needs to show the converted pages legibly. Not a port of
+ * Material's look: docs/stylesheets/landing.css is loaded as it is on the
+ * live site (astro.config.mjs head), and its tp-* rules do most of the
+ * layout. The visual pass is a later phase; this keeps phase 1 readable.
+ */
+
+/* The board's palette: near-black chrome, a lime accent (mkdocs.yml). */
+:root {
+  --sl-color-accent-low: #2a3300;
+  --sl-color-accent: #8bab00;
+  --sl-color-accent-high: #d4f264;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #eef8c4;
+  --sl-color-accent: #5c7300;
+  --sl-color-accent-high: #2f3b00;
+}
+
+/* pymdownx.details: the collapsed "whole entry" blocks. */
+.sl-markdown-content details.note {
+  border-inline-start: 0.25rem solid var(--sl-color-blue);
+  background: var(--sl-color-blue-low);
+  padding: 0.5rem 1rem;
+}
+.sl-markdown-content details.note > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* The blog index, until the blog itself arrives in phase 2. */
+.tp-posts article.tp-post {
+  border-block-end: 1px solid var(--sl-color-hairline);
+  padding-block-end: 1rem;
+}
+.tp-post__meta {
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+}
+.tp-pagination {
+  display: flex;
+  gap: 0.75rem;
+  margin-block-start: 2rem;
+}
+.tp-pagination__current {
+  font-weight: 700;
+}
+
+/* overrides/partials/footer.html */
+.tp-footer {
+  margin-block-start: 3rem;
+  border-block-start: 1px solid var(--sl-color-hairline);
+  padding-block: 2rem;
+  font-size: var(--sl-text-sm);
+}
+.tp-footer__inner {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+.tp-footer__brand,
+.tp-footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.tp-footer__col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tp-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-block-start: 1.5rem;
+  color: var(--sl-color-gray-3);
+}
+.tp-footer__social {
+  display: flex;
+  gap: 0.75rem;
+}
+.tp-footer__social svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}

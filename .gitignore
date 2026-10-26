@@ -16,3 +16,18 @@ docs/demo/fleet/
 # rather than disturb the main tree). Without this, `git add -A` records the
 # whole worktree as a gitlink.
 /worktree/
+
+# The Starlight build (starlight/). Its content, public files and generated
+# data are rendered from docs/ by scripts/mkdocs-to-starlight.py before every
+# build -- MkDocs is the source of truth until the switch -- so none of it is
+# committed. Only the build's own sources are.
+/starlight/node_modules/
+/starlight/dist/
+/starlight/.astro/
+/starlight/.yarn/*
+!/starlight/.yarn/releases/
+!/starlight/.yarn/plugins/
+/starlight/.pnp.*
+/starlight/src/content/docs/
+/starlight/src/generated/
+/starlight/public/

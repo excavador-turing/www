@@ -217,3 +217,38 @@ demo-fork-latest checkout:
     tag=$(gh api repos/excavador-turing/BMC-UI/releases/latest --jq .tag_name)
     just refresh-demo "{{checkout}}" "$tag"
     echo "$tag" > docs/demo/fork/VERSION
+
+# ---------------------------------------------------------------------------
+# The Starlight build, in starlight/ -- phase 1 of moving off Material for
+# MkDocs, which is in maintenance mode. It builds the whole site from the same
+# docs/ and deploys nothing: MkDocs above is still what turingpi.xyz serves,
+# and `site.yaml` only proves the new build in CI. Not `site/`, because that is
+# MkDocs's output directory and `mkdocs build` empties it.
+
+# Install the Starlight build's dependencies exactly as the lockfile says.
+site-install:
+    cd starlight && yarn install --immutable
+
+# Render docs/ into starlight/: pages, public files, sidebar, footer and SEO
+# data. Git-ignored and rewritten every time; docs/ is never touched.
+site-convert:
+    ./scripts/mkdocs-to-starlight.py
+
+# A strict build into starlight/dist: no warning, no broken internal link,
+# no LFS pointer, and what the site must carry (search, llms.txt, the feed).
+site-build: site-install site-convert
+    starlight/scripts/strict-build.sh
+    starlight/scripts/check-built.sh
+
+# The Starlight site on http://localhost:4321 with live reload. Re-run
+# `just site-convert` after editing docs/.
+site-dev: site-install site-convert
+    cd starlight && yarn dev
+
+# Every URL, asset and head tag turingpi.xyz serves, against starlight/dist.
+# A report, not a gate: it exits 0 whatever it finds. Needs `just site-build`.
+site-parity:
+    ./scripts/url-parity.py
+
+# What CI runs for the Starlight build (site.yaml).
+site-check: site-build site-parity
