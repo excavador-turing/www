@@ -86,6 +86,12 @@ the only one.
 requests. Make Checks a required check on `main`: it is the only thing between
 a bad layout and the live site.
 
+`publish.yaml` is the Starlight build's publish path, waiting for the switch:
+the demo panes, every `just site-check` gate and the Pages artifact on every
+push, hour and dispatch, and a deploy only on a dispatch from `main` with
+`deploy: true`. Its refresh is a dry run; `pages.yml` makes the hourly commit
+until the switch moves it.
+
 > The screen gate used to be 132 seconds of a 178-second deploy, while
 > building the site took 3. Publishing a typo waited two minutes on a browser
 > re-measuring pages that had not changed — and a layout regression should

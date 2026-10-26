@@ -13,7 +13,9 @@ module, the blog plugin's posts -- and writes what Starlight needs:
 
 All four are git-ignored and rewritten on every run: the output is a pure
 function of docs/, mkdocs.yml and the git history (for the "last updated"
-dates), so running it twice changes nothing.
+dates), so running it twice changes nothing. The one exception is OWN_PUBLIC:
+files in starlight/public/ that belong to the Starlight build itself (the
+favicon), committed there, never written or removed by this script.
 
 The rules that matter, and why:
 
@@ -76,6 +78,13 @@ ASIDE = {"note": "note", "tip": "tip", "warning": "caution", "danger": "danger"}
 ROUTED = {
     "llms.txt": "src/data/llms.txt",
 }
+
+# Files in starlight/public/ that are the Starlight build's own, committed
+# there rather than rendered from docs/: Starlight links /favicon.svg from
+# every page, and MkDocs serves Material's theme icon instead, so there is
+# nothing in docs/ to copy. sync() leaves them alone, and a docs/ file at the
+# same path is an error rather than a silent overwrite.
+OWN_PUBLIC = {"favicon.svg"}
 
 # The macros main.py defines, and the component that does each one's job.
 # The flag: the component writes the page's H1 itself, so Starlight's is not
@@ -1053,6 +1062,9 @@ class Site:
             self.page(p)
         self.blog_pages()
         for src in self.assets:
+            if src in OWN_PUBLIC:
+                raise ConvertError(f"docs/{src} would overwrite starlight/public/{src}, "
+                                   f"which the Starlight build owns (OWN_PUBLIC)")
             if src in ROUTED:
                 self.files[ROUTED[src]] = DOCS / src
                 continue
@@ -1094,6 +1106,8 @@ class Site:
                 continue
             for f in sorted(base.rglob("*"), reverse=True):
                 rel = f.relative_to(self.out).as_posix()
+                if rel.startswith("public/") and rel[len("public/"):] in OWN_PUBLIC:
+                    continue
                 if f.is_file() and rel not in self.files:
                     f.unlink()
                     removed += 1

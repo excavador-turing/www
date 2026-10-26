@@ -304,7 +304,7 @@ def main() -> int:
     built = set()
     for f in dist.rglob("index.html"):
         rel = f.parent.relative_to(dist).as_posix()
-        if rel.startswith(("demo/stock", "_astro", "pagefind")):
+        if rel.startswith(("demo/stock", "demo/fork", "demo/fleet", "_astro", "pagefind")):
             continue
         built.add("/" if rel == "." else f"/{rel}/")
     extra_pages = sorted(built - set(paths))
