@@ -76,8 +76,11 @@ function live(jsonld: unknown[], body: string): unknown[] {
       return { ...doc, softwareVersion: String(lookup(facts, 'releases.firmware.newest')) };
     }
     if (doc['@type'] === 'FAQPage') {
-      // 'jinja': as the live site serves it today (see lib/faq.ts).
-      const qs = faqEntities(body, 'jinja', (of, filters) => format(facts, of, filters));
+      // 'value': each <Fact> as the number a reader sees on the page. The
+      // live site serves the raw Jinja here (`{{ roadmap.count }}`, see
+      // lib/faq.ts); this build fixes it on purpose, and url-parity.py
+      // carries the difference in its allowlist of deliberate fixes.
+      const qs = faqEntities(body, 'value', (of, filters) => format(facts, of, filters));
       return {
         ...doc,
         mainEntity: qs.map(({ q, a }) => ({
