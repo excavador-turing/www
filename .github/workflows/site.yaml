@@ -1,0 +1,90 @@
+name: Site (Starlight)
+
+# The Starlight build of turingpi.xyz, proved on every pull request and on
+# main -- and published NOWHERE. Phase 1 of moving off Material for MkDocs:
+# `pages.yml` still builds and deploys the live site with MkDocs, `checks.yml`
+# still judges it, and neither is touched by this file. There is no deploy
+# job here on purpose; one arrives, under its own name, when the switch does.
+#
+#   build   render docs/ into starlight/, a strict Astro build (no warning,
+#           no broken internal link), and what the build must contain --
+#           including that no Git LFS pointer was published as an image;
+#   parity  a REPORT of every URL, asset (by sha256) and head tag
+#           turingpi.xyz serves against the build. It does not fail the run
+#           yet; the job summary is where to read it.
+on:
+  pull_request:
+  workflow_dispatch:
+  # On main as a canary: if the build breaks there, something reached main
+  # without passing.
+  push:
+    branches: [main]
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Images and fonts are Git LFS objects (.gitattributes). Without
+          # this the build succeeds and publishes the pointers as the images;
+          # check-built.sh refuses that, and this prevents it.
+          lfs: true
+          # Each page's "last updated" date is its source file's last commit;
+          # a shallow clone would date every page today.
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The toolchain is devbox.json's -- node, yarn, Python for the
+      # converter -- so CI and a workstation build with the same versions.
+      - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
+        with:
+          enable-cache: true
+          devbox-version: 0.18.4
+
+      - name: convert, build strictly, check what was built
+        run: devbox run -- just site-build
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: starlight-dist
+          path: starlight/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  parity:
+    needs: build
+    # Downstream of a job that may be skipped or cancelled: run only on a
+    # build that actually succeeded, never on a skip inherited from it.
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # The parity script and `git lfs ls-files` (which LFS files to compare)
+      # need the tree, not the LFS objects: the bytes compared are dist's.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: starlight-dist
+          path: starlight/dist
+
+      # Standard library only, so the runner's own Python will do.
+      - name: every URL, asset and head tag the live site serves
+        run: python3 scripts/url-parity.py --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: url-parity
+          path: parity.json
+          if-no-files-found: ignore
