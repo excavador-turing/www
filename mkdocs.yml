@@ -237,11 +237,12 @@ extra:
 
   # Cloudflare Web Analytics beacon token -- EMPTY on purpose. turingpi.xyz
   # is proxied by Cloudflare, and its Web Analytics site uses automatic
-  # setup: Cloudflare adds the beacon to every page at its edge, so the site
-  # emits none of its own (Cloudflare skips its beacon while the page carries
-  # one). The old snippet site (token c6b63bc6...) keeps the history up to
-  # 2026-10-26. Set a token here only if the domain ever stops being
-  # proxied; empty means no beacon is emitted (overrides/main.html checks).
+  # setup: Cloudflare adds the beacon to every page at its edge (since
+  # 2026-10-26; the old snippet site and its history are deleted), so the
+  # site emits none of its own. The setup must be "Enable", not "Enable,
+  # excluding visitor data in the EU": that one injects nothing for EU
+  # visitors. Set a token here only if the domain ever stops being proxied;
+  # empty means no beacon is emitted (overrides/main.html checks).
   cloudflare_beacon: ""
   social:
     - icon: fontawesome/brands/github
