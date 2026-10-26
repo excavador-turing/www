@@ -1,12 +1,13 @@
 ---
 title: Questions people actually ask
-render_macros: true
-hide:
-  - toc
-description: "Can the board face the internet, does this run on a 2.4, why does the clock say not synchronised: the questions people ask, answered in a sentence."
+description: 'Can the board face the internet, does this run on a 2.4, why does the clock say not synchronised: the questions people ask, answered in a sentence.'
+slug: faq
+tableOfContents: false
+tp:
+  ogTitle: Questions people ask
 ---
 
-# Questions people actually ask
+import { Fact } from '~/components/macros';
 
 Every one of these has been asked more than once. The answer is a sentence;
 the link is where the reasoning lives.
@@ -17,10 +18,10 @@ the link is where the reasoning lives.
 administrator with no authorization layer under it, and its login deliberately
 does not depend on anything outside the board — because the board is what you
 reach for when everything outside it is broken. Expose
-[one page over every board](features/one-page-over-every-board.md) instead,
+[one page over every board](/features/one-page-over-every-board/) instead,
 which holds no credential of its own.
 
-[Why, at length →](guides/facing-the-internet.md)
+[Why, at length →](/guides/facing-the-internet/)
 
 ## Does upgrading the firmware reboot my nodes?
 
@@ -32,7 +33,7 @@ nodes lost, and **48 seconds** for the board itself to come back.
 The board's own network drops for those 48 seconds, because the board drives
 the switch. The modules keep running throughout.
 
-[The measurement →](guides/upgrade-from-stock.md)
+[The measurement →](/guides/upgrade-from-stock/)
 
 ## Can I use my own certificate?
 
@@ -43,10 +44,10 @@ applied to a WebSocket.
 
 Getting your certificate onto the board is a control now — the Security page,
 `tpi tls install`, or the API — and it takes effect without a restart.
-Automatic renewal over ACME is still on [the roadmap](roadmap.md). Let's
+Automatic renewal over ACME is still on [the roadmap](/roadmap/). Let's
 Encrypt is possible and is the wrong tool here, for three reasons.
 
-[All of it →](guides/your-own-certificate.md)
+[All of it →](/guides/your-own-certificate/)
 
 ## The password form will not let me type. Is my board broken?
 
@@ -66,7 +67,7 @@ $ passwd
 On a board still using the password it shipped with, that also clears the
 page which blocks the rest of the interface. Nothing needs undoing
 afterwards. The full account is in
-[what is and isn't fixed](reference/known-faults.md).
+[what is and isn't fixed](/reference/known-faults/).
 
 ## Why did my password and certificate reset after I upgraded?
 
@@ -89,13 +90,13 @@ BMC reboots. To tell them apart:
 - With a damaged volume, the reset repeats at every reboot. Over SSH,
   `mount | grep ' / '` shows `upperdir=/tmp/safemode/upper`, and
   `dmesg | grep -i ubifs` shows a UBIFS error. This is
-  [a known fault](reference/known-faults.md#the-board-forgets-everything-at-every-reboot) with a repair.
+  [a known fault](/reference/known-faults/#the-board-forgets-everything-at-every-reboot) with a repair.
 
 Holding KEY1 at power-on is a deliberate safe mode and also gives the factory
 password; that is expected. To reset on purpose with the new card, put
 `factory-reset.txt` next to `install.txt`.
 
-[The card, step by step →](guides/install.md#from-an-sd-card-the-installer)
+[The card, step by step →](/guides/install/#from-an-sd-card-the-installer)
 
 ## Grafana's Save & test fails with "failed to get Prometheus heuristics". What is wrong?
 
@@ -104,7 +105,7 @@ port 9110 and cannot answer queries; Grafana needs a Prometheus server (or
 VictoriaMetrics, or Mimir) that *scrapes* the board, and its URL is that
 server's — `http://<prometheus host>:9090` — never the board's. That `curl`
 against `:9110` returns data is correct and is not what Grafana is asking
-for. The [monitoring guide](guides/monitor-it.md#the-data-source-is-the-scraper-not-the-board)
+for. The [monitoring guide](/guides/monitor-it/#the-data-source-is-the-scraper-not-the-board)
 has the one-container Prometheus for people who have Grafana and nothing
 scraping yet.
 
@@ -114,17 +115,17 @@ Look at the mini-PCIe slot of that node. The slots of nodes 1 and 2 carry USB 2.
 
 Power the node off, take the mini-PCIe card out, flash, and put it back. Or move the module to slot 3 or 4 for the flash; those slots have no mini-PCIe USB. From v2.44.0 the error says what it saw instead: it names the other USB devices on the node's lines and says that a device in the node's mini-PCIe slot may be in the way.
 
-This comes from one user report on Discord (2026-10-15) and from reading the firmware source and the factory tests, not from a schematic, so I call it likely, not proven. [The entry in known faults](reference/known-faults.md#flashing-a-module-in-slot-1-or-2-fails-when-a-mini-pcie-card-uses-usb) has the details.
+This comes from one user report on Discord (2026-10-15) and from reading the firmware source and the factory tests, not from a schematic, so I call it likely, not proven. [The entry in known faults](/reference/known-faults/#flashing-a-module-in-slot-1-or-2-fails-when-a-mini-pcie-card-uses-usb) has the details.
 
 ## Which board revisions does it run on?
 
 **v2.5.2**, on the two boards this fork is developed against, and **v2.4**,
-from {{ boards.from_readers | title_number | lower }} readers' reports — every
+from <Fact of="boards.from_readers" filters="title_number lower" /> readers' reports — every
 one dated and recorded on the install guide. The other revisions are
 upstream's compatibility list, not this fork's proof, and the install guide
 says so rather than implying a test matrix that does not exist.
 
-[What you need →](guides/install.md)
+[What you need →](/guides/install/)
 
 ## The clock says "not synchronised". What now?
 
@@ -168,7 +169,7 @@ a live board and the patch releases that follow minors are the visible
 evidence of that. What CI can prove without hardware it proves; what only a
 board can prove is listed as such.
 
-[What is checked, and by what →](contributing.md)
+[What is checked, and by what →](/contributing/)
 
 ## Where do I report something, or ask for a feature?
 
@@ -177,22 +178,22 @@ a question to
 [Q&A](https://github.com/excavador-turing/BMC-Firmware/discussions/categories/q-a),
 and a feature to
 [Ideas](https://github.com/excavador-turing/BMC-Firmware/discussions/categories/ideas),
-where **{{ roadmap.count }} are waiting and {{ roadmap.votes }} votes have
+where **<Fact of="roadmap.count" /> are waiting and <Fact of="roadmap.votes" /> votes have
 been cast**. The roadmap is ordered by those votes.
 
-[Every door →](feedback.md)
+[Every door →](/feedback/)
 
 ## What changed recently?
 
-Firmware **{{ releases.firmware.newest }}** is the newest of
-{{ releases.total }} releases across four components. The changelog is each
+Firmware **<Fact of="releases.firmware.newest" />** is the newest of
+<Fact of="releases.total" /> releases across four components. The changelog is each
 repository's own, not a summary, and there is a feed.
 
-[The news →](news/index.md) · [Every component's changelog →](changelog/index.md) · [Follow by feed →](feed.xml)
+[The news →](/news/) · [Every component's changelog →](/changelog/) · [Follow by feed →](/feed.xml)
 
 <div class="tp-next">
-<a href="/features/"><b>What it does →</b><span>{{ features.count }} features, each with the measurement behind it.</span></a>
+<a href="/features/"><b>What it does →</b><span><Fact of="features.count" /> features, each with the measurement behind it.</span></a>
 <a href="/guides/install/"><b>Put it on your board →</b><span>Install over the network, or recover from an SD card.</span></a>
-<a href="/reference/known-faults/"><b>What is not fixed →</b><span>{{ faults.count }} open faults, each with a ticket.</span></a>
+<a href="/reference/known-faults/"><b>What is not fixed →</b><span><Fact of="faults.count" /> open faults, each with a ticket.</span></a>
 <a href="/roadmap/"><b>Vote on what comes next →</b><span>Ordered by the votes it has.</span></a>
 </div>

@@ -1,11 +1,10 @@
 ---
 title: The board describes its own API
-description: "Why the API reference is generated from the board's own OpenAPI document rather than written and kept by hand."
+description: Why the API reference is generated from the board's own OpenAPI document rather than written and kept by hand.
+slug: why/the-board-describes-itself
 ---
 
-# The board describes its own API
-
-This is the argument behind [The board describes its own API](../features/the-board-describes-itself.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [The board describes its own API](/features/the-board-describes-itself/), with the measurements that back it. The feature page is the short version.
 
 A prose page is a description of an API that drifts from it. Nothing checks
 it, nothing regenerates from it, and the moment a handler changes the page is
@@ -33,7 +32,7 @@ Both are documented rather than one being pretended away.
 ## Three things are generated from it, not written
 
 **This site's API reference.** Every page under
-[the API reference](../reference/api/operations.md) is emitted from the committed
+[the API reference](/reference/api/operations/) is emitted from the committed
 document by `just refresh-api`. They are never hand-edited — a page saying
 something the board does not do would be the exact failure the document
 exists to prevent.
@@ -63,4 +62,4 @@ console on this site, deliberately — the operations that matter here power
 modules off and flash them, and a documentation page is the wrong place to
 have that one click away from a reader who is browsing.
 
-<div class="tp-next tp-next--argument"><a href="../../features/the-board-describes-itself/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The interface built from the types this document generates.</span></a><a href="/reference/cli/"><b>Do it on your board →</b><span>tpi reaches every operation the document describes.</span></a><a href="/reference/api/"><b>The evidence →</b><span>Every operation, on pages emitted from the document.</span></a><a href="../see-what-the-board-sees/"><b>See what the board sees →</b><span>The readings those operations return.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/the-board-describes-itself/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The interface built from the types this document generates.</span></a><a href="/reference/cli/"><b>Do it on your board →</b><span>tpi reaches every operation the document describes.</span></a><a href="/reference/api/"><b>The evidence →</b><span>Every operation, on pages emitted from the document.</span></a><a href="/why/see-what-the-board-sees/"><b>See what the board sees →</b><span>The readings those operations return.</span></a></div>

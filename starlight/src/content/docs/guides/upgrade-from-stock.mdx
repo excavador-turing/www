@@ -1,8 +1,13 @@
 ---
-description: "Move a Turing Pi 2 from the stock firmware to this fork, what changes on the board, and why the stock updater would downgrade you afterwards."
+title: Upgrading from stock firmware
+description: Move a Turing Pi 2 from the stock firmware to this fork, what changes on the board, and why the stock updater would downgrade you afterwards.
+slug: guides/upgrade-from-stock
+tp:
+  htmlTitle: Upgrading from stock
+  ogTitle: Upgrading from stock
 ---
 
-# Upgrading from stock firmware
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 What changes on your board, what it costs, and how to go back.
 
@@ -10,33 +15,40 @@ Every timing and every screenshot on this page came from doing it once, on a
 board that shipped with stock firmware, on **2026-09-10**. Where something was
 not measured, it says so.
 
-Read [Installing on your own board](install.md) first for the warnings. This
+Read [Installing on your own board](/guides/install/) first for the warnings. This
 page is the transition itself.
 
 ## What you have, and what you get
 
-=== "Stock"
+<Tabs>
+<TabItem label="Stock">
 
-    ![The stock About tab](../assets/factory/08-about.png)
 
-    Six tabs. bmcd 2.3.2, BMC UI 3.3.3, Buildroot 2024.05.1, kernel 6.8.12,
-    built 2024-09-03.
+![The stock About tab](/assets/factory/08-about.png)
 
-=== "This fork"
+Six tabs. bmcd 2.3.2, BMC UI 3.3.3, Buildroot 2024.05.1, kernel 6.8.12,
+built 2024-09-03.
 
-    ![The About tab after the upgrade](../assets/fork/10-about.png)
+</TabItem>
+<TabItem label="This fork">
 
-    Seven tabs — a console, a network tab and a settings tab that stock does
-    not have. This capture is firmware v2.20.0: bmcd 2.29.0, BMC UI 3.19.0,
-    Buildroot 2025.02.17, kernel **6.12.109 LTS**. The daemon and the
-    interface have moved on since — the
-    [changelog](../changelog/index.md) is the live answer — but the tabs and
-    the kernel are what this page is about. Since BMC-UI 4.0.0 the tabs are a
-    sidebar and the pages have new names; the capture shows the interface as it
-    was then.
+
+![The About tab after the upgrade](/assets/fork/10-about.png)
+
+Seven tabs — a console, a network tab and a settings tab that stock does
+not have. This capture is firmware v2.20.0: bmcd 2.29.0, BMC UI 3.19.0,
+Buildroot 2025.02.17, kernel **6.12.109 LTS**. The daemon and the
+interface have moved on since — the
+[changelog](/changelog/) is the live answer — but the tabs and
+the kernel are what this page is about. Since BMC-UI 4.0.0 the tabs are a
+sidebar and the pages have new names; the capture shows the interface as it
+was then.
+
+</TabItem>
+</Tabs>
 
 The full stock interface, tab by tab, is [its own
-page](../reference/factory-firmware.md), captured before this board was
+page](/reference/factory-firmware/), captured before this board was
 upgraded.
 
 ## Doing it
@@ -58,7 +70,7 @@ Stock's **Firmware Upgrade** tab takes the file and, optionally, the checksum.
 Put the checksum in. It is the only integrity check stock offers, and the
 field is optional in a place where it should not be.
 
-![Stock's Firmware Upgrade tab](../assets/factory/07-firmware-upgrade.png)
+![Stock's Firmware Upgrade tab](/assets/factory/07-firmware-upgrade.png)
 
 ### From the command line
 
@@ -73,19 +85,20 @@ started transfer of 36.12 MiB..
 Done
 ```
 
-!!! danger "`Done` does not mean upgraded"
-    It means *staged*. The board keeps running the old firmware, its uptime
-    does not reset, and nothing appears in `dmesg`. It looks exactly like a
-    failed upgrade, and on the first run here it was mistaken for one for ten
-    minutes.
+:::danger[`Done` does not mean upgraded]
+It means *staged*. The board keeps running the old firmware, its uptime
+does not reset, and nothing appears in `dmesg`. It looks exactly like a
+failed upgrade, and on the first run here it was mistaken for one for ten
+minutes.
 
-    What actually happened is visible in the flash layout: a new UBI volume
-    `rootfs_new` appears beside `rootfs`, and u-boot's boot target begins with
-    `nextboot`. The image is written and armed.
+What actually happened is visible in the flash layout: a new UBI volume
+`rootfs_new` appears beside `rootfs`, and u-boot's boot target begins with
+`nextboot`. The image is written and armed.
 
-    ```console
-    $ ssh root@BMC reboot
-    ```
+```console
+$ ssh root@BMC reboot
+```
+:::
 
 ## What it costs
 
@@ -118,16 +131,17 @@ After the upgrade the flash holds `rootfs` and `rootfs_prev`, and
 `rootfs_prev` is **the stock image your board shipped with**. Returning to
 stock is a boot away, not a re-flash.
 
-!!! warning "That is true for exactly one upgrade"
-    The next upgrade overwrites `rootfs_prev` with the version you are leaving.
-    After it, the rollback slot holds *this fork's* previous release, and
-    getting back to stock means flashing a stock `.tpu` again.
+:::caution[That is true for exactly one upgrade]
+The next upgrade overwrites `rootfs_prev` with the version you are leaving.
+After it, the rollback slot holds *this fork's* previous release, and
+getting back to stock means flashing a stock `.tpu` again.
+:::
 
 For the longer route, stock's own releases are already a configured source in
 this fork's Firmware Upgrade page, listed under *show older or unrelated
 versions*. How Turing Pi publishes those, and why neither of their two routes
 carries a checksum, is [its own
-page](../reference/comparison.md).
+page](/reference/comparison/).
 
 ## What the upgrade does not change
 

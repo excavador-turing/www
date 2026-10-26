@@ -1,0 +1,131 @@
+{
+  "columns": [
+    {
+      "title": "The firmware",
+      "links": [
+        {
+          "text": "What it does",
+          "href": "/features/",
+          "external": false
+        },
+        {
+          "text": "Try it live",
+          "href": "#demo/fork",
+          "external": false
+        },
+        {
+          "text": "Install it",
+          "href": "/guides/install/",
+          "external": false
+        },
+        {
+          "text": "Coming from stock",
+          "href": "/guides/upgrade-from-stock/",
+          "external": false
+        }
+      ]
+    },
+    {
+      "title": "What is changing",
+      "links": [
+        {
+          "text": "News",
+          "href": "/news/",
+          "external": false
+        },
+        {
+          "text": "Changelogs",
+          "href": "/changelog/",
+          "external": false
+        },
+        {
+          "text": "Roadmap",
+          "href": "/roadmap/",
+          "external": false
+        },
+        {
+          "text": "Follow by feed",
+          "href": "/feed.xml",
+          "external": false
+        },
+        {
+          "text": "What is not fixed",
+          "href": "/reference/known-faults/",
+          "external": false
+        }
+      ]
+    },
+    {
+      "title": "When it goes wrong",
+      "links": [
+        {
+          "text": "Recover a bad flash",
+          "href": "/guides/recover-a-bad-flash/",
+          "external": false
+        },
+        {
+          "text": "Report a problem",
+          "href": "https://github.com/excavador-turing/BMC-Firmware/issues/new/choose",
+          "external": true
+        },
+        {
+          "text": "Ask a question",
+          "href": "https://github.com/excavador-turing/BMC-Firmware/discussions/categories/q-a",
+          "external": true
+        },
+        {
+          "text": "Questions people ask",
+          "href": "/faq/",
+          "external": false
+        },
+        {
+          "text": "All the feedback doors",
+          "href": "/feedback/",
+          "external": false
+        }
+      ]
+    },
+    {
+      "title": "The project",
+      "links": [
+        {
+          "text": "Why this fork exists",
+          "href": "/about/",
+          "external": false
+        },
+        {
+          "text": "Upstream vs this fork",
+          "href": "/reference/comparison/",
+          "external": false
+        },
+        {
+          "text": "The code",
+          "href": "https://github.com/excavador-turing",
+          "external": true
+        },
+        {
+          "text": "Contributing",
+          "href": "/contributing/",
+          "external": false
+        }
+      ]
+    }
+  ],
+  "social": [
+    {
+      "icon": "fontawesome/brands/github",
+      "link": "https://github.com/excavador-turing",
+      "name": "The code"
+    },
+    {
+      "icon": "fontawesome/solid/bug",
+      "link": "https://github.com/excavador-turing/BMC-Firmware/issues/new/choose",
+      "name": "Report a problem"
+    },
+    {
+      "icon": "fontawesome/solid/lightbulb",
+      "link": "https://github.com/excavador-turing/BMC-Firmware/discussions/categories/ideas",
+      "name": "Propose a feature, or vote on one"
+    }
+  ]
+}

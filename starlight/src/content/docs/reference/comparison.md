@@ -1,8 +1,11 @@
 ---
-description: "What upstream's Turing Pi 2 BMC firmware does and what this fork does instead, set side by side, with where each difference was measured."
+title: Upstream, and this fork
+description: What upstream's Turing Pi 2 BMC firmware does and what this fork does instead, set side by side, with where each difference was measured.
+slug: reference/comparison
+tp:
+  htmlTitle: Upstream vs this fork
+  ogTitle: Upstream vs this fork
 ---
-
-# Upstream, and this fork
 
 Every number here was measured on a running board or read from a live server,
 on **2026-09-08**, and re-measured on 2026-09-09 where it says so. Where a
@@ -20,11 +23,12 @@ Turing Pi publishes firmware by two routes, and they do not agree:
 The mirror is what the stock web interface follows. On a board running anything
 newer, following it walks the board *backwards*.
 
-!!! note "No checksums at all"
-    `SHA256SUMS`, `sha256sum.txt`, `sha256` and `checksums.txt` all return 404
-    on the mirror. An image from there is trusted on TLS and nothing else —
-    which is why this fork labels such a source **TLS only** rather than
-    pretending it was verified.
+:::note[No checksums at all]
+`SHA256SUMS`, `sha256sum.txt`, `sha256` and `checksums.txt` all return 404
+on the mirror. An image from there is trusted on TLS and nothing else —
+which is why this fork labels such a source **TLS only** rather than
+pretending it was verified.
+:::
 
 Both routes ship as sources in this fork, precisely so the disagreement is
 visible on one page rather than discovered later.
@@ -51,7 +55,7 @@ visible on one page rather than discovered later.
 **The gate's record is a counter the board keeps**, not a number written here:
 `bmcd_firmware_promotion_total{result}`. One rollback in that record was
 deliberate, to prove the gate could refuse. The figures are on
-[the gate's record](gate-history.md).
+[the gate's record](/reference/gate-history/).
 
 Every time, each module's uptime advanced by exactly the wall-clock duration
 of the flash, which is the evidence that nothing was reset.
@@ -62,13 +66,14 @@ a metric existed to check them. Then this paragraph quoted the counter's value
 in prose and drifted too, from 14 to 17 in a day. The number now appears in
 exactly one place, written there from the board by `just refresh-gate-history`.*
 
-!!! warning "What the gate cannot see"
-    It checks that the daemon answers, that the switch ports exist, that the
-    image is the one that was staged and that `/metrics` answers. An image
-    whose *new feature* is broken passes all four. This fork's own metrics
-    endpoint could once have shipped completely broken and been promoted
-    happily — that check was added afterwards — which is why release
-    verification is explicit and written down, not left to the gate.
+:::caution[What the gate cannot see]
+It checks that the daemon answers, that the switch ports exist, that the
+image is the one that was staged and that `/metrics` answers. An image
+whose *new feature* is broken passes all four. This fork's own metrics
+endpoint could once have shipped completely broken and been promoted
+happily — that check was added afterwards — which is why release
+verification is explicit and written down, not left to the gate.
+:::
 
 ## Hardware the board could not see
 
@@ -86,7 +91,7 @@ device tree is what made both work.
 
 ## Monitoring
 
-A [catalogue of metric families](metrics.md), none of which existed
+A [catalogue of metric families](/reference/metrics/), none of which existed
 upstream. Where it is served is the part worth noting: since v2.15.0
 `/metrics` is on **its own listener, port 9110**, plain HTTP and no credential
 — a port that reaches nothing else, so a scrape config cannot power-cycle a

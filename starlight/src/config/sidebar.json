@@ -1,0 +1,277 @@
+[
+  {
+    "label": "Home",
+    "link": "/"
+  },
+  {
+    "label": "Try it",
+    "link": "/demo/"
+  },
+  {
+    "label": "Features",
+    "items": [
+      {
+        "label": "Overview",
+        "link": "/features/"
+      },
+      {
+        "label": "One page over every board",
+        "link": "/features/one-page-over-every-board/"
+      },
+      {
+        "label": "Fresh, and fixed",
+        "link": "/features/fresh-and-fixed/"
+      },
+      {
+        "label": "Update without touching your nodes",
+        "link": "/features/update-without-touching-your-nodes/"
+      },
+      {
+        "label": "Updates that undo themselves",
+        "link": "/features/updates-that-undo-themselves/"
+      },
+      {
+        "label": "See what the board sees",
+        "link": "/features/see-what-the-board-sees/"
+      },
+      {
+        "label": "Pick a version, from anywhere",
+        "link": "/features/pick-a-version/"
+      },
+      {
+        "label": "A console to every module",
+        "link": "/features/a-console-to-every-module/"
+      },
+      {
+        "label": "A certificate that does not rot",
+        "link": "/features/a-certificate-that-does-not-rot/"
+      },
+      {
+        "label": "The board describes its own API",
+        "link": "/features/the-board-describes-itself/"
+      },
+      {
+        "label": "Flash a module from the card",
+        "link": "/features/flash-from-the-card/"
+      },
+      {
+        "label": "Who may reach this board",
+        "link": "/features/who-may-reach-this-board/"
+      },
+      {
+        "label": "The arguments",
+        "items": [
+          {
+            "label": "One page over every board",
+            "link": "/why/one-page-over-every-board/"
+          },
+          {
+            "label": "Fresh, and fixed",
+            "link": "/why/fresh-and-fixed/"
+          },
+          {
+            "label": "Update without touching your nodes",
+            "link": "/why/update-without-touching-your-nodes/"
+          },
+          {
+            "label": "Updates that undo themselves",
+            "link": "/why/updates-that-undo-themselves/"
+          },
+          {
+            "label": "See what the board sees",
+            "link": "/why/see-what-the-board-sees/"
+          },
+          {
+            "label": "Pick a version, from anywhere",
+            "link": "/why/pick-a-version/"
+          },
+          {
+            "label": "A console to every module",
+            "link": "/why/a-console-to-every-module/"
+          },
+          {
+            "label": "A certificate that does not rot",
+            "link": "/why/a-certificate-that-does-not-rot/"
+          },
+          {
+            "label": "The board describes its own API",
+            "link": "/why/the-board-describes-itself/"
+          },
+          {
+            "label": "Flash a module from the card",
+            "link": "/why/flash-from-the-card/"
+          },
+          {
+            "label": "Who may reach this board",
+            "link": "/why/who-may-reach-this-board/"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "Docs",
+    "items": [
+      {
+        "label": "Overview",
+        "link": "/guides/"
+      },
+      {
+        "label": "Guides",
+        "items": [
+          {
+            "label": "Install",
+            "link": "/guides/install/"
+          },
+          {
+            "label": "Upgrading from stock",
+            "link": "/guides/upgrade-from-stock/"
+          },
+          {
+            "label": "Recover a bad flash",
+            "link": "/guides/recover-a-bad-flash/"
+          },
+          {
+            "label": "Your own certificate",
+            "link": "/guides/your-own-certificate/"
+          },
+          {
+            "label": "Segment the network",
+            "link": "/guides/segment-the-network/"
+          },
+          {
+            "label": "Should it face the internet?",
+            "link": "/guides/facing-the-internet/"
+          },
+          {
+            "label": "Monitor it",
+            "link": "/guides/monitor-it/"
+          },
+          {
+            "label": "Developing",
+            "link": "/guides/development/"
+          }
+        ]
+      },
+      {
+        "label": "Reference",
+        "items": [
+          {
+            "label": "Upstream vs this fork",
+            "link": "/reference/comparison/"
+          },
+          {
+            "label": "The factory firmware",
+            "link": "/reference/factory-firmware/"
+          },
+          {
+            "label": "Command line",
+            "link": "/reference/cli/"
+          },
+          {
+            "label": "Metrics",
+            "link": "/reference/metrics/"
+          },
+          {
+            "label": "The API",
+            "link": "/reference/api/"
+          },
+          {
+            "label": "Every operation",
+            "link": "/reference/api/operations/"
+          },
+          {
+            "label": "What each release's API had",
+            "link": "/reference/api-history/"
+          },
+          {
+            "label": "The board",
+            "link": "/reference/api/board/"
+          },
+          {
+            "label": "The nodes",
+            "link": "/reference/api/nodes/"
+          },
+          {
+            "label": "Firmware",
+            "link": "/reference/api/firmware/"
+          },
+          {
+            "label": "Storage",
+            "link": "/reference/api/storage/"
+          },
+          {
+            "label": "Network and time",
+            "link": "/reference/api/network/"
+          },
+          {
+            "label": "Cooling and thermals",
+            "link": "/reference/api/thermal/"
+          },
+          {
+            "label": "The gate's record",
+            "link": "/reference/gate-history/"
+          },
+          {
+            "label": "What is and isn't fixed",
+            "link": "/reference/known-faults/"
+          },
+          {
+            "label": "Changelogs",
+            "items": [
+              {
+                "label": "Every component",
+                "link": "/changelog/"
+              },
+              {
+                "label": "BMC-Firmware",
+                "link": "/changelog/firmware/"
+              },
+              {
+                "label": "bmcd",
+                "link": "/changelog/bmcd/"
+              },
+              {
+                "label": "BMC-UI",
+                "link": "/changelog/bmc-ui/"
+              },
+              {
+                "label": "tpi",
+                "link": "/changelog/tpi/"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "News",
+    "link": "/news/"
+  },
+  {
+    "label": "Roadmap",
+    "link": "/roadmap/"
+  },
+  {
+    "label": "About",
+    "items": [
+      {
+        "label": "Why this fork exists",
+        "link": "/about/"
+      },
+      {
+        "label": "Questions people ask",
+        "link": "/faq/"
+      },
+      {
+        "label": "Feedback",
+        "link": "/feedback/"
+      },
+      {
+        "label": "Contributing",
+        "link": "/contributing/"
+      }
+    ]
+  }
+]

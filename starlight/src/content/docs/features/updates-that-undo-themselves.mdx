@@ -1,19 +1,18 @@
 ---
 title: Updates that undo themselves
-render_macros: true
-since: v2.7.0
-hide:
-- navigation
-- toc
+description: A new BMC image boots on trial and is kept only when the board answers properly afterwards, so a bad flash undoes itself without a trip to the rack.
+slug: features/updates-that-undo-themselves
+template: splash
+tableOfContents: false
 feature:
+  title: Updates that undo themselves
   order: 1
   icon: undo.svg
   summary: A new image boots on trial and is kept only if the board comes back right.
-  lede: Upstream promotes a new image the moment it boots, which proves the kernel started and nothing
-    else. Here an image boots on trial and is kept only if the board answers properly afterwards.
+  lede: Upstream promotes a new image the moment it boots, which proves the kernel started and nothing else. Here an image boots on trial and is kept only if the board answers properly afterwards.
   capture: firmware.png
-  alt: "The Firmware page: the running slot, the image it can fall back to, and when the gate last promoted one."
-  caption: "The Firmware page: the running slot, the image it can fall back to, and when the gate last promoted one."
+  alt: 'The Firmware page: the running slot, the image it can fall back to, and when the gate last promoted one.'
+  caption: 'The Firmware page: the running slot, the image it can fall back to, and when the gate last promoted one.'
   proofs:
   - n: '26'
     of: updates taken on this board
@@ -44,17 +43,23 @@ feature:
       href: ../pick-a-version/
       text: Pick a version, from anywhere
       note: Where the image the gate judges comes from.
-description: "A new BMC image boots on trial and is kept only when the board answers properly afterwards, so a bad flash undoes itself without a trip to the rack."
+since: v2.7.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 The gate asks three questions after a new image boots, not one. Two images this fork built would have passed "did it boot" while being broken, and one of them cut all four compute modules off the network. The one rollback on record was deliberate: an image with its staged note tampered to claim an older version, refused in about 35 seconds.
 
-[The full argument, with every measurement →](../why/updates-that-undo-themselves.md)
+[The full argument, with every measurement →](/why/updates-that-undo-themselves/)
+
 
 </div>

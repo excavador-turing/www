@@ -1,10 +1,8 @@
 ---
 title: Segment the network
-render_macros: true
-description: "Put the compute modules and the BMC on separate VLANs using the board's own switch, and give the BMC a fixed address or leave it on DHCP."
+description: Put the compute modules and the BMC on separate VLANs using the board's own switch, and give the BMC a fixed address or leave it on DHCP.
+slug: guides/segment-the-network
 ---
-
-# Segment the network
 
 By default everything on this board shares one network: the four compute
 modules, the BMC itself, and both uplink jacks. Anything a module can reach,
@@ -227,13 +225,13 @@ exit from a configuration that *was* reachable when you confirmed it and has
 since stopped being — because a cable moved, or the router changed.
 
 **4. The USB-OTG console.** A serial console over the micro-USB port, which
-needs no network at all. [Recovering a bad flash](recover-a-bad-flash.md)
+needs no network at all. [Recovering a bad flash](/guides/recover-a-bad-flash/)
 describes it.
 
 **5. An SD-card boot** from a released image, the last exit for anything else.
 Delete `install.txt` from the card first, or the card installs. A card from
 v2.42.0 keeps the board's settings when it can verify them; an older one erases
-them: [Installing on your own board](install.md#from-an-sd-card-the-installer).
+them: [Installing on your own board](/guides/install/#from-an-sd-card-the-installer).
 
 The thing worth carrying away: **nothing you can do from this page survives a
 power cycle unless you confirmed it.**
@@ -311,8 +309,8 @@ aggregation offload, and the gain would be board-aggregate bandwidth rather
 than per-module.
 
 <div class="tp-next">
-<a href="../../features/see-what-the-board-sees/"><b>What the switch reports →</b><span>Link, speed and counters per port, before you move anything onto an uplink.</span></a>
-<a href="../recover-a-bad-flash/"><b>The console and the SD card →</b><span>The two recoveries that need no network.</span></a>
-<a href="../facing-the-internet/"><b>Should it face the internet? →</b><span>The other half of keeping this board where it belongs.</span></a>
-<a href="../../roadmap/"><b>Vote on what comes next →</b><span>Including per-port tagging for the BMC itself.</span></a>
+<a href="/features/see-what-the-board-sees/"><b>What the switch reports →</b><span>Link, speed and counters per port, before you move anything onto an uplink.</span></a>
+<a href="/guides/recover-a-bad-flash/"><b>The console and the SD card →</b><span>The two recoveries that need no network.</span></a>
+<a href="/guides/facing-the-internet/"><b>Should it face the internet? →</b><span>The other half of keeping this board where it belongs.</span></a>
+<a href="/roadmap/"><b>Vote on what comes next →</b><span>Including per-port tagging for the BMC itself.</span></a>
 </div>

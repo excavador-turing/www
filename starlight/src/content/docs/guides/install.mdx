@@ -1,33 +1,38 @@
 ---
-description: "Install this firmware on your own Turing Pi 2: which file to take, flashing over the network or from the SD card installer, and what to check afterwards."
-render_macros: true
+title: Installing on your own board
+description: 'Install this firmware on your own Turing Pi 2: which file to take, flashing over the network or from the SD card installer, and what to check afterwards.'
+slug: guides/install
+tp:
+  htmlTitle: Install
+  ogTitle: Install
 ---
 
-# Installing on your own board
+import { BoardReports } from '~/components/macros';
 
-!!! danger "Read this part"
-    This is unofficial firmware for hardware you own. It has run on two boards
-    — both mine, both revision v2.5.2 — across the upgrades
-    [their own counters record](../reference/gate-history.md).
+:::danger[Read this part]
+This is unofficial firmware for hardware you own. It has run on two boards
+— both mine, both revision v2.5.2 — across the upgrades
+[their own counters record](/reference/gate-history/).
 
-    The A/B health gate makes it **safer than upstream's update path**: a bad
-    image reboots back onto the previous one by itself. But it cannot save an
-    image that hangs *before* the gate runs, and recovering from that means
-    physical access to the board.
+The A/B health gate makes it **safer than upstream's update path**: a bad
+image reboots back onto the previous one by itself. But it cannot save an
+image that hangs *before* the gate runs, and recovering from that means
+physical access to the board.
 
-    Do not do this to a board you cannot reach.
+Do not do this to a board you cannot reach.
+:::
 
 ## What you need
 
 - A Turing Pi 2, revision **v2.4, v2.5, v2.5.1 or v2.5.2** — upstream's
   compatibility list. What has actually been run is the record below: the
   two boards this fork is developed against, across the upgrades
-  [their own counters record](../reference/gate-history.md), and every
+  [their own counters record](/reference/gate-history/), and every
   report a reader has sent. It is a record, not a test matrix, and this page
   will not pretend otherwise. Ran it on a board not listed?
-  [Say so](../feedback.md) and it goes in.
+  [Say so](/feedback/) and it goes in.
 
-    {{ board_reports() }}
+    <BoardReports />
 
 - The BMC reachable over the network
 - Its root password
@@ -62,12 +67,13 @@ The board then boots the new image *tentatively*. It is kept only if the daemon
 answers and every module's switch port is present; otherwise the board reboots
 and lands back on what you had.
 
-!!! tip "The first install is the awkward one"
-    A stock board has no `tpi-selfupdate` — it ships with this fork. For the
-    first install, upload the `.tpu` from
-    [the releases page](https://github.com/excavador-turing/BMC-Firmware/releases)
-    through the stock web interface's **Firmware Upgrade** tab, with the
-    published SHA-256 in the checksum field.
+:::tip[The first install is the awkward one]
+A stock board has no `tpi-selfupdate` — it ships with this fork. For the
+first install, upload the `.tpu` from
+[the releases page](https://github.com/excavador-turing/BMC-Firmware/releases)
+through the stock web interface's **Firmware Upgrade** tab, with the
+published SHA-256 in the checksum field.
+:::
 
 ## From an SD card: the installer
 
@@ -79,17 +85,18 @@ It replaces the root filesystem and always kept the overlay, so the password,
 the certificate and the settings survive. The card is for recovery, or for a
 reset you mean to do.
 
-!!! warning "Cards from v2.41.0 and earlier erase the password, the certificate and the settings"
-    Until v2.41.0 the installer formatted the board's whole UBI partition and
-    wrote back only the bootloader environment and the root filesystem. The
-    overlay volume went with it: the root password returned to `turing`, the
-    board generated a new self-signed certificate, and the network, NTP, fan
-    and node settings were gone. That is how the installer from Turing Pi's own
-    tree behaves, and this fork's card inherited it. **From v2.42.0 the card
-    keeps the overlay** when the installer can verify that the volume is intact
-    and that the board will attach it afterwards. When it cannot, it erases as
-    before and says why on the serial console. A card you wrote from v2.41.0 or
-    earlier still erases, so write a fresh one.
+:::caution[Cards from v2.41.0 and earlier erase the password, the certificate and the settings]
+Until v2.41.0 the installer formatted the board's whole UBI partition and
+wrote back only the bootloader environment and the root filesystem. The
+overlay volume went with it: the root password returned to `turing`, the
+board generated a new self-signed certificate, and the network, NTP, fan
+and node settings were gone. That is how the installer from Turing Pi's own
+tree behaves, and this fork's card inherited it. **From v2.42.0 the card
+keeps the overlay** when the installer can verify that the volume is intact
+and that the board will attach it afterwards. When it cannot, it erases as
+before and says why on the serial console. A card you wrote from v2.41.0 or
+earlier still erases, so write a fresh one.
+:::
 
 ```console
 $ xz -d tp2-bmc-firmware-sdcard-v2.32.0.img.xz
@@ -117,7 +124,7 @@ certificate is regenerated, and the settings go.
 
 Since v2.42.0 the card keeps the settings volume, including a damaged one. A
 board that forgets its settings at every reboot needs `factory-reset.txt`; see
-[the known-faults entry](../reference/known-faults.md#the-board-forgets-everything-at-every-reboot).
+[the known-faults entry](/reference/known-faults/#the-board-forgets-everything-at-every-reboot).
 
 ### Booting from the card without installing
 

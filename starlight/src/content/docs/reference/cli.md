@@ -1,8 +1,11 @@
 ---
-description: "Every tpi command for a Turing Pi 2: power, flash, console, firmware, the board's own address and its clock, with what each one needs."
+title: The command line
+description: 'Every tpi command for a Turing Pi 2: power, flash, console, firmware, the board''s own address and its clock, with what each one needs.'
+slug: reference/cli
+tp:
+  htmlTitle: Command line
+  ogTitle: Command line
 ---
-
-# The command line
 
 `tpi` controls a board from a shell. Upstream ships it; this fork extends it to
 reach the endpoints the fork added, which until **1.1.0** were reachable only
@@ -108,17 +111,18 @@ When there is something newer it names it and exits **10** instead:
 cron without parsing output. It is deliberately not `1`, which stays "the
 command failed".
 
-!!! danger "Every one of these was broken until 1.2.2"
-    The commands on this page were written, documented and released **without
-    ever being run against a board**. The response unwrapper returned the API's
-    wrapper array instead of the result inside it, and since every command
-    begins by reading `about` to check the daemon's version, every command
-    failed.
+:::danger[Every one of these was broken until 1.2.2]
+The commands on this page were written, documented and released **without
+ever being run against a board**. The response unwrapper returned the API's
+wrapper array instead of the result inside it, and since every command
+begins by reading `about` to check the daemon's version, every command
+failed.
 
-    The examples above are now output captured from a real board. The ones that
-    were here before were not, and one of them described a command
-    (`firmware install`) that had never worked in any release. See
-    [what is and isn't fixed](known-faults.md).
+The examples above are now output captured from a real board. The ones that
+were here before were not, and one of them described a command
+(`firmware install`) that had never worked in any release. See
+[what is and isn't fixed](/reference/known-faults/).
+:::
 
 ## Two builds, one source
 
@@ -151,12 +155,13 @@ this board runs bmcd 2.7.0; `tpi firmware list` needs 2.8.0 or newer --
 upgrade the firmware first (`tpi firmware check`)
 ```
 
-!!! note "Why the comparison is numeric"
-    As text, `"2.10.0" < "2.9.0"` — so a string compare would tell a board on
-    2.9.0 that it satisfied a 2.10.0 requirement, and it would then fail with
-    exactly the unreadable error the gate exists to remove. There is a test
-    that asserts this, because the bug is invisible until the tenth minor
-    release.
+:::note[Why the comparison is numeric]
+As text, `"2.10.0" < "2.9.0"` — so a string compare would tell a board on
+2.9.0 that it satisfied a 2.10.0 requirement, and it would then fail with
+exactly the unreadable error the gate exists to remove. There is a test
+that asserts this, because the bug is invisible until the tenth minor
+release.
+:::
 
 ## Installing
 
@@ -167,14 +172,15 @@ architectures, on the
 
 The copy on the board needs nothing: it arrives with the firmware.
 
-!!! warning "Nothing before 1.2.3 has binaries"
-    The release job was inherited from upstream, where it ran on a push to the
-    default branch: read the version, and abort if a tag for it already exists.
-    This fork made the tag the trigger, so the job ran *because* the tag was
-    pushed, found it, and skipped every step that publishes anything — while
-    reporting success.
+:::caution[Nothing before 1.2.3 has binaries]
+The release job was inherited from upstream, where it ran on a push to the
+default branch: read the version, and abort if a tag for it already exists.
+This fork made the tag the trigger, so the job ran *because* the tag was
+pushed, found it, and skipped every step that publishes anything — while
+reporting success.
 
-    **1.1.0, 1.1.1, 1.2.0, 1.2.1 and 1.2.2 have no release page and no
-    binaries.** Five green runs that shipped nothing, on the tool this page
-    tells you to install. Fixed in 1.2.3, which now refuses to publish a
-    release with no artifacts in it.
+**1.1.0, 1.1.1, 1.2.0, 1.2.1 and 1.2.2 have no release page and no
+binaries.** Five green runs that shipped nothing, on the tool this page
+tells you to install. Fixed in 1.2.3, which now refuses to publish a
+release with no artifacts in it.
+:::

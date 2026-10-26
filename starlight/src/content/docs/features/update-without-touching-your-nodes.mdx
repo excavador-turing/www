@@ -1,19 +1,18 @@
 ---
-title: Update the BMC without touching your nodes
-render_macros: true
-since: v2.7.0
-hide:
-- navigation
-- toc
+title: Update without touching your nodes
+description: Update the Turing Pi 2 BMC while the four compute modules stay powered and running, measured across every flash on these boards.
+slug: features/update-without-touching-your-nodes
+template: splash
+tableOfContents: false
 feature:
+  title: Update the BMC without touching your nodes
   order: 2
   icon: rails.svg
   summary: Patching the management computer leaves the four compute modules powered.
-  lede: Upstream power-cycles all four compute modules to patch the management computer beside them. This
-    fork leaves their rails alone, so updating the board does not take the cluster down.
+  lede: Upstream power-cycles all four compute modules to patch the management computer beside them. This fork leaves their rails alone, so updating the board does not take the cluster down.
   capture: power-control.png
-  alt: "The Power Control page: the four compute modules, each switched on and counted in uptime. A BMC upgrade leaves every one of them exactly like this."
-  caption: "The four compute modules on the Power Control page, powered and counted in uptime, across a BMC upgrade."
+  alt: 'The Power Control page: the four compute modules, each switched on and counted in uptime. A BMC upgrade leaves every one of them exactly like this.'
+  caption: The four compute modules on the Power Control page, powered and counted in uptime, across a BMC upgrade.
   proofs:
   - n: '0'
     of: modules power-cycled by a BMC update
@@ -44,17 +43,24 @@ feature:
       href: ../updates-that-undo-themselves/
       text: Updates that undo themselves
       note: What happens if the image you are updating to is bad.
-description: "Update the Turing Pi 2 BMC while the four compute modules stay powered and running, measured across every flash on these boards."
+since: v2.7.0
+tp:
+  hideTitle: true
+  htmlTitle: Update the BMC without touching your nodes
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 Upstream cycles the modules because its update path resets the board's USB multiplexer and power rails together. Separating them is most of the change. The cost of not separating them is that patching a management computer becomes a cluster outage, which is the opposite of what a BMC is for.
 
-[The full argument, with every measurement →](../why/update-without-touching-your-nodes.md)
+[The full argument, with every measurement →](/why/update-without-touching-your-nodes/)
+
 
 </div>

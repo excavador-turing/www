@@ -1,10 +1,9 @@
 ---
-hide:
-  - toc
-description: "Where to report a fault, ask a question or propose an idea for the Turing Pi 2 BMC firmware, and which door suits which kind of message."
+title: Feedback
+description: Where to report a fault, ask a question or propose an idea for the Turing Pi 2 BMC firmware, and which door suits which kind of message.
+slug: feedback
+tableOfContents: false
 ---
-
-# Feedback
 
 Three doors, each for a different kind of message. All of them are GitHub, so
 what you say is public and stays findable.
@@ -16,14 +15,14 @@ The form asks for the two commands that say which board and which firmware —
 run them on the BMC and paste the output — and how you reached the board,
 because a browser bug and a daemon bug look alike from outside and are not.
 
-Read [what is and isn't fixed](reference/known-faults.md) first. Every open
+Read [what is and isn't fixed](/reference/known-faults/) first. Every open
 fault is there with the ticket that tracks it, and a comment on that entry
 beats a new issue.
 
 ## Something is missing
 
 [Propose it, or vote on it](https://github.com/excavador-turing/BMC-Firmware/discussions/categories/ideas).
-Ideas carry upvotes, and the [roadmap](roadmap.md) is ordered by them. If
+Ideas carry upvotes, and the [roadmap](/roadmap/) is ordered by them. If
 yours is already there, an upvote is worth more than a duplicate.
 
 ## Something is unclear

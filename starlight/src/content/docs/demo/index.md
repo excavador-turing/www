@@ -1,14 +1,13 @@
 ---
-hide:
-  - navigation
-  - toc
-search:
-  exclude: true
-description: "The BMC interface running in your browser on a real board's captured data, so you can click through every page before you flash anything."
-robots: "noindex, follow"
+title: Try it
+description: The BMC interface running in your browser on a real board's captured data, so you can click through every page before you flash anything.
+slug: demo
+template: splash
+tableOfContents: false
+pagefind: false
+tp:
+  robots: noindex, follow
 ---
-
-# Try it
 
 <meta http-equiv="refresh" content="0; url=/#demo/fork">
 

@@ -1,8 +1,8 @@
 ---
-description: "Every metric the Turing Pi 2 BMC serves at /metrics in Prometheus format, what each family means, and which ones upstream never had."
+title: Metrics
+description: Every metric the Turing Pi 2 BMC serves at /metrics in Prometheus format, what each family means, and which ones upstream never had.
+slug: reference/metrics
 ---
-
-# Metrics
 
 Upstream's firmware exposes no metrics. This fork serves **40 families**
 at `/metrics`, in Prometheus text format.
@@ -36,13 +36,14 @@ API, so restricting the daemon to a management network restricts both. And
 there is nothing secret in it: temperatures, fan steps, port counters, power
 state, NAND wear and slot versions.
 
-!!! note "On a board older than v2.15.0"
-    `/metrics` is on `:443` and wants a token, which `tpi metrics show`
-    printed. That command is gone, along with the token; if you are scraping
-    an older board, keep the old config until you update it.
+:::note[On a board older than v2.15.0]
+`/metrics` is on `:443` and wants a token, which `tpi metrics show`
+printed. That command is gone, along with the token; if you are scraping
+an older board, keep the old config until you update it.
+:::
 
 A Grafana dashboard over every family below ships with each release; see
-[monitor it](../guides/monitor-it.md).
+[monitor it](/guides/monitor-it/).
 
 ## Scraping it
 
@@ -55,23 +56,24 @@ scrape_configs:
           instance: <the board's hostname>
 ```
 
-!!! note "The `instance` label is yours, not the board's"
-    The board's exposition carries **no** `instance` label and no hostname —
-    190 lines, and its own name appears in none of them. The labels it emits
-    are `device`, `kind`, `name`, `node`, `port`, `result`, `sensor`, `slot`,
-    `state`, `version` and `volume`.
+:::note[The `instance` label is yours, not the board's]
+The board's exposition carries **no** `instance` label and no hostname —
+190 lines, and its own name appears in none of them. The labels it emits
+are `device`, `kind`, `name`, `node`, `port`, `result`, `sensor`, `slot`,
+`state`, `version` and `volume`.
 
-    So `instance` is whatever your scraper assigns, and the example above
-    assigns it deliberately. **Renaming a board moves no history**; editing
-    that label moves all of it. Both boards here were renamed on 2026-09-11
-    and not one series moved.
+So `instance` is whatever your scraper assigns, and the example above
+assigns it deliberately. **Renaming a board moves no history**; editing
+that label moves all of it. Both boards here were renamed on 2026-09-11
+and not one series moved.
 
-    This page said the opposite until then, as did `tpi hostname` and the
-    API's own description of the endpoint (SQU-191). The claim was written
-    from a worry rather than from the exposition, and a confident wrong
-    warning is worse than none: it makes a safe rename look dangerous, and
-    implies that leaving the name alone protects a history that the scrape
-    config alone decides.
+This page said the opposite until then, as did `tpi hostname` and the
+API's own description of the endpoint (SQU-191). The claim was written
+from a worry rather than from the exposition, and a confident wrong
+warning is worse than none: it makes a safe rename look dangerous, and
+implies that leaving the name alone protects a history that the scrape
+config alone decides.
+:::
 
 ## The families
 
@@ -115,36 +117,37 @@ build is simply absent rather than zero.
 | `bmcd_node_usb_boot_armed` | gauge | 1 when a module's USB-boot pin is asserted, which stops it booting from its own eMMC. |
 | `bmcd_usb_config` | gauge | The board's persisted USB multiplexer configuration, labelled with its node, mode, route and bus type. |
 
-!!! warning "The one to put a rule on"
-    `bmcd_node_usb_boot_armed` is the only reading here that describes a
-    **trap rather than a state**. Flashing a module leaves the board's
-    persisted configuration at `Flashing(nodeN, …)`, and the daemon re-applies
-    it on every start — which holds that module's USB-boot pin high and stops
-    it booting from its own eMMC.
+:::caution[The one to put a rule on]
+`bmcd_node_usb_boot_armed` is the only reading here that describes a
+**trap rather than a state**. Flashing a module leaves the board's
+persisted configuration at `Flashing(nodeN, …)`, and the daemon re-applies
+it on every start — which holds that module's USB-boot pin high and stops
+it booting from its own eMMC.
 
-    The module carries on running, because it is already booted. The failure
-    arrives at its *next* reboot, which can be weeks later, and it looks like
-    dead hardware: nothing at all on the serial console, not even a bootloader
-    banner, because the loader does not use the console; nothing on the
-    network; and the board still reporting the rail on. `tpi usb status`
-    cannot tell you either — it prints the same route for a normal
-    configuration and for this one.
+The module carries on running, because it is already booted. The failure
+arrives at its *next* reboot, which can be weeks later, and it looks like
+dead hardware: nothing at all on the serial console, not even a bootloader
+banner, because the loader does not use the console; nothing on the
+network; and the board still reporting the rail on. `tpi usb status`
+cannot tell you either — it prints the same route for a normal
+configuration and for this one.
 
-    So alert on **duration**, not on the state. Flashing a module is a
-    legitimate thing to be doing; a module still armed fifteen minutes later
-    is a forgotten `tpi usb device -n N`, and the page reaches whoever armed
-    it while they still remember.
+So alert on **duration**, not on the state. Flashing a module is a
+legitimate thing to be doing; a module still armed fifteen minutes later
+is a forgotten `tpi usb device -n N`, and the page reaches whoever armed
+it while they still remember.
 
-    ```yaml
-    - alert: ModuleLeftArmedForUsbBoot
-      expr: bmcd_node_usb_boot_armed == 1
-      for: 15m
-      annotations:
-        summary: "{{ $labels.node }} will not boot from its own eMMC - run `tpi usb device`."
-    ```
+```yaml
+- alert: ModuleLeftArmedForUsbBoot
+  expr: bmcd_node_usb_boot_armed == 1
+  for: 15m
+  annotations:
+    summary: "{{ $labels.node }} will not boot from its own eMMC - run `tpi usb device`."
+```
 
-    The family is four samples rather than one because a single "which node"
-    gauge cannot say *none*, and none is the normal answer.
+The family is four samples rather than one because a single "which node"
+gauge cannot say *none*, and none is the normal answer.
+:::
 
 ## The BMC itself
 
@@ -204,10 +207,11 @@ hand on the board.
 | `bmcd_firmware_slot_size_bytes` | gauge | Size of the firmware in a slot. |
 | `bmcd_firmware_update_staged` | gauge | Whether a firmware update is staged for the next boot. Absent when the U-Boot environment cannot be read. |
 
-!!! note "A gauge that is absent is not a zero"
-    Several of these are omitted rather than sent as `0` when the board cannot
-    answer: `bmcd_clock_synchronised` on a board with no chrony,
-    `bmcd_firmware_update_staged` when the boot environment cannot be read,
-    `bmcd_process_resident_bytes` on a kernel without `/proc/self/statm`,
-    `bmcd_process_threads` on one without `/proc/self/status`.
-    An absent series means *not known*; a zero would be a claim.
+:::note[A gauge that is absent is not a zero]
+Several of these are omitted rather than sent as `0` when the board cannot
+answer: `bmcd_clock_synchronised` on a board with no chrony,
+`bmcd_firmware_update_staged` when the boot environment cannot be read,
+`bmcd_process_resident_bytes` on a kernel without `/proc/self/statm`,
+`bmcd_process_threads` on one without `/proc/self/status`.
+An absent series means *not known*; a zero would be a claim.
+:::

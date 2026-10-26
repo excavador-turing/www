@@ -1,11 +1,10 @@
 ---
 title: Flash a module from the card
-description: "Why the board decides which SD-card files can be written to a module, and what the two flash bugs behind this were."
+description: Why the board decides which SD-card files can be written to a module, and what the two flash bugs behind this were.
+slug: why/flash-from-the-card
 ---
 
-# Flash a module from the card
-
-This is the argument behind [Flash a module from the card](../features/flash-from-the-card.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [Flash a module from the card](/features/flash-from-the-card/), with the measurements that back it. The feature page is the short version.
 
 Writing an operating system to a compute module means moving about two
 gigabytes. Doing it from a browser means moving those bytes twice — up to the
@@ -80,4 +79,4 @@ modification time — none of which the daemon offers yet. Uploading,
 renaming and moving files on the card are not here either. Both are
 tracked in SQU-198.
 
-<div class="tp-next tp-next--argument"><a href="../../features/flash-from-the-card/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The flash picker, listing a real card's contents.</span></a><a href="/reference/cli/"><b>Do it on your board →</b><span>The same operation from a shell, through tpi.</span></a><a href="/reference/api/storage/"><b>The evidence →</b><span>The endpoints the picker calls, as the board describes them.</span></a><a href="../pick-a-version/"><b>Pick a version, from anywhere →</b><span>The card is one of three places firmware can come from.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/flash-from-the-card/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The flash picker, listing a real card's contents.</span></a><a href="/reference/cli/"><b>Do it on your board →</b><span>The same operation from a shell, through tpi.</span></a><a href="/reference/api/storage/"><b>The evidence →</b><span>The endpoints the picker calls, as the board describes them.</span></a><a href="/why/pick-a-version/"><b>Pick a version, from anywhere →</b><span>The card is one of three places firmware can come from.</span></a></div>

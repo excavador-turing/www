@@ -1,8 +1,8 @@
 ---
-description: "Every firmware update these boards have taken and whether the gate promoted or rolled it back, read from the board's own counter."
+title: The gate's record
+description: Every firmware update these boards have taken and whether the gate promoted or rolled it back, read from the board's own counter.
+slug: reference/gate-history
 ---
-
-# The gate's record
 
 Every count on this site comes from here, and this page comes from the board.
 
@@ -70,16 +70,17 @@ Three checks, in order, before the volumes are renamed:
 A failure at any of them reboots, which lands on the previous image because
 nothing has been renamed and the boot variable is one-shot.
 
-!!! warning "What it does not prove"
-    The gate only runs on an image that boots far enough to run it. One that
-    hangs earlier still needs power cut, which hard-cuts the compute modules.
-    A hardware watchdog is the fix and is not built yet.
+:::caution[What it does not prove]
+The gate only runs on an image that boots far enough to run it. One that
+hangs earlier still needs power cut, which hard-cuts the compute modules.
+A hardware watchdog is the fix and is not built yet.
 
-    It also proves the daemon is *serving*, not that it is *correct in every
-    respect*. On 2026-09-09 a board that had passed the gate cleanly went on
-    to lose about a megabyte of memory a minute under sustained polling and
-    stopped answering four hours later. The gate was not wrong; it was
-    answering a question about the first ninety seconds.
+It also proves the daemon is *serving*, not that it is *correct in every
+respect*. On 2026-09-09 a board that had passed the gate cleanly went on
+to lose about a megabyte of memory a minute under sustained polling and
+stopped answering four hours later. The gate was not wrong; it was
+answering a question about the first ninety seconds.
+:::
 
 ## The modules do not notice
 

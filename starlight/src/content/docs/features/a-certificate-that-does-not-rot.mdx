@@ -1,19 +1,18 @@
 ---
 title: A certificate that does not rot
-render_macros: true
-since: v2.23.0
-hide:
-- navigation
-- toc
+description: The BMC issues its own HTTPS certificate with a name your browser accepts, renews it before it expires, and never overwrites one you installed.
+slug: features/a-certificate-that-does-not-rot
+template: splash
+tableOfContents: false
 feature:
+  title: A certificate that does not rot
   order: 11
   icon: certificate.svg
   summary: Named, renewed before it expires, and it refuses to overwrite one you installed.
-  lede: Stock firmware serves a certificate no browser will accept, valid for thirty days, and never replaces
-    it. This one is named after the board, renews itself, and will not overwrite yours.
+  lede: Stock firmware serves a certificate no browser will accept, valid for thirty days, and never replaces it. This one is named after the board, renews itself, and will not overwrite yours.
   capture: security.png
-  alt: "The Security page, showing the certificate the board serves: who issued it, its key and when it expires. On stock firmware no browser would accept the certificate in front of it."
-  caption: "The Security page: the certificate the board serves, who issued it, its key and when it expires. On stock firmware no browser would accept the certificate in front of it."
+  alt: 'The Security page, showing the certificate the board serves: who issued it, its key and when it expires. On stock firmware no browser would accept the certificate in front of it.'
+  caption: 'The Security page: the certificate the board serves, who issued it, its key and when it expires. On stock firmware no browser would accept the certificate in front of it.'
   proofs:
   - n: '825'
     of: days of validity, renewed 30 days before it ends
@@ -44,17 +43,23 @@ feature:
       href: ../who-may-reach-this-board/
       text: Who may reach this board
       note: The other half of the board's access story.
-description: "The BMC issues its own HTTPS certificate with a name your browser accepts, renews it before it expires, and never overwrites one you installed."
+since: v2.23.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 An expired self-signed certificate teaches operators to click through warnings, which is the habit that makes every later certificate meaningless. This one carries the board's real names, renews itself 30 days out, and refuses to replace a certificate it did not issue -- so installing your own is safe.
 
-[The full argument, with every measurement →](../why/a-certificate-that-does-not-rot.md)
+[The full argument, with every measurement →](/why/a-certificate-that-does-not-rot/)
+
 
 </div>

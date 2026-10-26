@@ -1,19 +1,18 @@
 ---
 title: A console to every module
-render_macros: true
-since: v2.13.0
-hide:
-- navigation
-- toc
+description: A serial console to each of the four compute modules in the browser, replaying the boot output you were not there to watch.
+slug: features/a-console-to-every-module
+template: splash
+tableOfContents: false
 feature:
+  title: A console to every module
   order: 5
   icon: console.svg
   summary: Four serial consoles in the browser, each replaying the scrollback you missed.
-  lede: Reaching a compute module's serial console used to mean a USB adapter and three jumper wires.
-    The BMC is already wired to all four, so this fork puts them in the browser.
+  lede: Reaching a compute module's serial console used to mean a USB adapter and three jumper wires. The BMC is already wired to all four, so this fork puts them in the browser.
   capture: console.png
-  alt: "A module's console on the Console page, with its reader state, Clear, Redraw and Reconnect."
-  caption: "A module's console in the browser, on the Console page."
+  alt: A module's console on the Console page, with its reader state, Clear, Redraw and Reconnect.
+  caption: A module's console in the browser, on the Console page.
   proofs:
   - n: '4'
     of: consoles, one per module
@@ -44,17 +43,23 @@ feature:
       href: ../a-certificate-that-does-not-rot/
       text: A certificate that does not rot
       note: Why a console needs a certificate a browser accepts.
-description: "A serial console to each of the four compute modules in the browser, replaying the boot output you were not there to watch."
+since: v2.13.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 The daemon keeps the last 16 KiB per module and replays it when a tab opens, because a console opened on a module that has been up for hours would otherwise show nothing at all. A reconnect used to replay the whole buffer underneath what was already on screen; since v2.31.0 it writes only the gap.
 
-[The full argument, with every measurement →](../why/a-console-to-every-module.md)
+[The full argument, with every measurement →](/why/a-console-to-every-module/)
+
 
 </div>

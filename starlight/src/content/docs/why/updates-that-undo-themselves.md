@@ -1,11 +1,10 @@
 ---
 title: Updates that undo themselves
-description: "Why a new image boots on trial, what promoting on boot alone cost upstream's users, and what the gate has recorded since."
+description: Why a new image boots on trial, what promoting on boot alone cost upstream's users, and what the gate has recorded since.
+slug: why/updates-that-undo-themselves
 ---
 
-# Updates that undo themselves
-
-This is the argument behind [Updates that undo themselves](../features/updates-that-undo-themselves.md), with the measurements that back it. The feature page is the short version.
+This is the argument behind [Updates that undo themselves](/features/updates-that-undo-themselves/), with the measurements that back it. The feature page is the short version.
 
 The first could not link `bmcd`, so the web interface never came up. The second
 silently lost the DSA switch driver from its kernel config, which leaves the
@@ -50,7 +49,7 @@ uptime advanced by exactly the wall-clock duration of both reboots.
 
 A gate that has never refused anything is an untested gate. This one has
 refused, on purpose, and the record of every decision it has made is in
-[the gate's record](../reference/gate-history.md).
+[the gate's record](/reference/gate-history/).
 
 ## The third check exists because the first two are not enough
 
@@ -87,8 +86,8 @@ watchdog is the fix and is not built yet.
 
 And it is a question about the first ninety seconds, not a warranty. A board
 that passed cleanly on 2026-09-09 went on to run out of memory four hours
-later; see [what is and isn't fixed](../reference/known-faults.md).
+later; see [what is and isn't fixed](/reference/known-faults/).
 
-<div class="tp-next tp-next--argument"><a href="../../features/updates-that-undo-themselves/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Firmware page, answering from a real board's data.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install this firmware, and what to read first.</span></a><a href="/reference/gate-history/"><b>The evidence →</b><span>Every decision the gate has made here, read off the board.</span></a><a href="../pick-a-version/"><b>Pick a version, from anywhere →</b><span>Where the image the gate judges comes from.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/updates-that-undo-themselves/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Firmware page, answering from a real board's data.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install this firmware, and what to read first.</span></a><a href="/reference/gate-history/"><b>The evidence →</b><span>Every decision the gate has made here, read off the board.</span></a><a href="/why/pick-a-version/"><b>Pick a version, from anywhere →</b><span>Where the image the gate judges comes from.</span></a></div>
 
-<div class="tp-next tp-next--argument"><a href="../../features/updates-that-undo-themselves/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Firmware page, answering from a real board's data.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install this firmware, and what to read first.</span></a><a href="/reference/gate-history/"><b>The evidence →</b><span>Every decision the gate has made here, read off the board.</span></a><a href="../pick-a-version/"><b>Pick a version, from anywhere →</b><span>Where the image the gate judges comes from.</span></a></div>
+<div class="tp-next tp-next--argument"><a href="/features/updates-that-undo-themselves/"><b>Back to the feature →</b><span>The short version: the claim, its numbers and the picture.</span></a><a href="/#demo/fork"><b>See it in the demo →</b><span>The Firmware page, answering from a real board's data.</span></a><a href="/guides/install/"><b>Do it on your board →</b><span>Install this firmware, and what to read first.</span></a><a href="/reference/gate-history/"><b>The evidence →</b><span>Every decision the gate has made here, read off the board.</span></a><a href="/why/pick-a-version/"><b>Pick a version, from anywhere →</b><span>Where the image the gate judges comes from.</span></a></div>

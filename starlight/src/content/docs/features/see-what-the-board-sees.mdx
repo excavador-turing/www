@@ -1,19 +1,18 @@
 ---
 title: See what the board sees
-render_macros: true
-since: v2.7.0
-hide:
-- navigation
-- toc
+description: The Turing Pi 2 board temperature, the fan step and the trip that explains it, plus every reading the stock firmware never described.
+slug: features/see-what-the-board-sees
+template: splash
+tableOfContents: false
 feature:
+  title: See what the board sees
   order: 6
   icon: sensors.svg
   summary: The temperature sensor upstream never described, and a fan that says why it is where it is.
-  lede: The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing
-    could read it and the fan ran against nothing.
+  lede: The Turing Pi 2 has a temperature sensor. Upstream's device tree never described it, so nothing could read it and the fan ran against nothing.
   capture: cooling.png
-  alt: "The Cooling page: the BMC's temperature against the points where the fan steps up, and the fan's own step and mode."
-  caption: "The Cooling page: the BMC's temperature against the points where the fan steps up, with the fan's step and mode below it."
+  alt: 'The Cooling page: the BMC''s temperature against the points where the fan steps up, and the fan''s own step and mode.'
+  caption: 'The Cooling page: the BMC''s temperature against the points where the fan steps up, with the fan''s step and mode below it.'
   proofs:
   - n: '5'
     of: trip points the fan follows
@@ -44,17 +43,23 @@ feature:
       href: ../the-board-describes-itself/
       text: The board describes its own API
       note: Where the readings on this page come from.
-description: "The Turing Pi 2 board temperature, the fan step and the trip that explains it, plus every reading the stock firmware never described."
+since: v2.7.0
+tp:
+  hideTitle: true
 ---
 
-{{ feature_screen() }}
+import { FeatureScreen } from '~/components/macros';
 
-<div class="tp-argument" markdown>
+<FeatureScreen page={frontmatter} />
+
+<div class="tp-argument">
+
 
 ## The argument
 
 A fan speed nobody can explain is a fault waiting to be misdiagnosed. The board now reports the temperature, the trip points and which trip put the fan where it is, so "why is the fan at step 4" has an answer. Nothing here writes to the sensor; a held fan is taken back by the daemon above the hottest active trip.
 
-[The full argument, with every measurement →](../why/see-what-the-board-sees.md)
+[The full argument, with every measurement →](/why/see-what-the-board-sees/)
+
 
 </div>

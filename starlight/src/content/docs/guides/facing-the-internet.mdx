@@ -1,10 +1,12 @@
 ---
 title: Should the board face the internet?
-render_macros: true
-description: "Why a Turing Pi 2 BMC should not face the internet, what an exposed board gives away, and how to reach yours from outside without exposing it."
+description: Why a Turing Pi 2 BMC should not face the internet, what an exposed board gives away, and how to reach yours from outside without exposing it.
+slug: guides/facing-the-internet
+tp:
+  ogTitle: Should it face the internet?
 ---
 
-# Should the board face the internet?
+import { Fact } from '~/components/macros';
 
 No. Not this board, and not the one upstream ships either.
 
@@ -37,7 +39,7 @@ your cluster.
 **And a board that ships as `root` / `turing`** — which upstream's does, and
 this fork's still does today — will be found by the first scan that reaches it.
 Forcing that password to change is
-[on the roadmap](../roadmap.md) and is not a substitute for the paragraph
+[on the roadmap](/roadmap/) and is not a substitute for the paragraph
 above.
 
 ## Why the login cannot be delegated
@@ -64,7 +66,7 @@ credential you use on the management network when something is already wrong.
 Expose **one page, inside your cluster, that speaks to every board** — and
 leave the boards themselves on the management network where they belong.
 
-That is what [the fleet](../features/one-page-over-every-board.md) is. It runs
+That is what [the fleet](/features/one-page-over-every-board/) is. It runs
 as a pod, it carries every control a board's own interface has, and the
 important part is what it does *not* carry:
 
@@ -91,16 +93,16 @@ You own the hardware. If you expose a board despite the above, at least:
 - put it behind something that authenticates **before** the request reaches
   the board, rather than forwarding a port to it;
 - change the password first;
-- give it [a certificate your browser trusts](your-own-certificate.md), so you
+- give it [a certificate your browser trusts](/guides/your-own-certificate/), so you
   are not training yourself to click through warnings on the one device where
   that matters most;
-- and know that [`{{ faults.count }}` faults are open](../reference/known-faults.md)
+- and know that [<code><Fact of="faults.count" /></code> faults are open](/reference/known-faults/)
   on this firmware, one of which is that anything running locally on the board
   is trusted without a credential at all.
 
 <div class="tp-next">
-<a href="../../features/one-page-over-every-board/"><b>One page over every board →</b><span>The exposure surface, and what it holds.</span></a>
-<a href="../../features/who-may-reach-this-board/"><b>Who may reach this board →</b><span>The two ways in: a password, and a proxy a certificate names.</span></a>
-<a href="../your-own-certificate/"><b>Your own certificate →</b><span>A green padlock, and a console that connects.</span></a>
-<a href="../../reference/known-faults/"><b>What is still not fixed →</b><span>Including the local-trust fault named above.</span></a>
+<a href="/features/one-page-over-every-board/"><b>One page over every board →</b><span>The exposure surface, and what it holds.</span></a>
+<a href="/features/who-may-reach-this-board/"><b>Who may reach this board →</b><span>The two ways in: a password, and a proxy a certificate names.</span></a>
+<a href="/guides/your-own-certificate/"><b>Your own certificate →</b><span>A green padlock, and a console that connects.</span></a>
+<a href="/reference/known-faults/"><b>What is still not fixed →</b><span>Including the local-trust fault named above.</span></a>
 </div>
