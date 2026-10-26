@@ -26,10 +26,10 @@ import html.parser
 import pathlib
 import sys
 
-import yaml
+import json
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = ROOT / "site"
+SITE = ROOT / "starlight" / "dist"
 
 # Reachable in one click from the front page, by decision: the two pages a
 # reader who already runs this firmware comes back for.
@@ -40,8 +40,9 @@ MAX_CLICKS = 2
 class Links(html.parser.HTMLParser):
     """Every href a READER can click.
 
-    Not every href in the file. Material renders the whole sidebar nav into
-    every page, and on the pages that hide it -- the front page, Features,
+    Not every href in the file. The site's frame renders the whole sidebar
+    nav into every page (Material's did, and Starlight's does), and on the
+    pages that hide it -- the front page, Features,
     About, each feature page -- the sidebar is still in the DOM under an
     element carrying `hidden`. The first version of this walk followed those
     and reported all 55 nav pages one click from the front, which was true
@@ -106,35 +107,29 @@ def page_of(href: str, here: str) -> str | None:
 
 
 def nav_pages() -> list[str]:
-    cfg = yaml.safe_load(
-        (ROOT / "mkdocs.yml").read_text().replace("!!python/name:", ""))
+    """Every page the sidebar lists, as a path without its leading slash."""
+    sidebar = json.loads((ROOT / "starlight" / "src" / "config" / "sidebar.json").read_text())
     out: list[str] = []
 
-    def walk(node):
-        if isinstance(node, dict):
-            for v in node.values():
-                walk(v)
-        elif isinstance(node, list):
-            for v in node:
-                walk(v)
-        elif isinstance(node, str):
-            p = node[:-3] if node.endswith(".md") else node
-            p = "" if p == "index" else (p[:-len("/index")] + "/" if p.endswith("/index") else p + "/")
-            out.append(p)
+    def walk(items):
+        for item in items:
+            if "items" in item:
+                walk(item["items"])
+            elif item["link"].startswith("/"):
+                out.append(item["link"].lstrip("/"))
 
-    walk(cfg["nav"])
+    walk(sidebar)
     return out
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", default=str(SITE),
-                    help="the built site to walk (default: site/, MkDocs's)")
+                    help="the built site to walk (default: starlight/dist)")
     site = pathlib.Path(ap.parse_args().site).resolve()
     if not (site / "index.html").exists():
         name = site.relative_to(ROOT).as_posix() if site.is_relative_to(ROOT) else str(site)
-        build = "just build" if site == SITE else "just site-build"
-        print(f"no build in {name}/ -- run `{build}` first", file=sys.stderr)
+        print(f"no build in {name}/ -- run `just build` first", file=sys.stderr)
         return 1
 
     clicks: dict[str, int] = {"": 0}

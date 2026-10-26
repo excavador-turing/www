@@ -14,7 +14,7 @@ sites:
                          screenshot of THIS SITE; five with the demo's ribbon
                          across the top and six without
 
-`main.py` renders the shape now, so the markup cannot drift. This checks the
+`<FeatureScreen />` renders the shape now, so the markup cannot drift. This checks the
 things a template cannot: that the content in the front matter is the right
 length, that every number has a source and a date, that the four links are
 the four roles pointing at four different places, and that the capture exists.
@@ -30,11 +30,12 @@ import sys
 
 import yaml
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-FEATURES = ROOT / "docs" / "features"
-CAPTURES = ROOT / "docs" / "assets" / "captures"
-ICONS = ROOT / "docs" / "assets" / "icons"
-WHY = ROOT / "docs" / "why"
+from sitepage import CONTENT, DATA, PUBLIC, ROOT
+
+FEATURES = CONTENT / "features"
+CAPTURES = PUBLIC / "assets" / "captures"
+ICONS = PUBLIC / "assets" / "icons"
+WHY = CONTENT / "why"
 
 # A lede is the one paragraph beside the picture. Below 25 words it does not
 # say what upstream does AND what this does instead; above 35 the text column
@@ -89,12 +90,12 @@ def check_argument(path: pathlib.Path, feature: pathlib.Path, bad) -> None:
         here("its next block does not link back to the feature page")
 
 
-POSTS_FILE = ROOT / "docs" / "data" / "news-posts.json"
+POSTS_FILE = DATA / "news-posts.json"
 POSTS = json.loads(POSTS_FILE.read_text()) if POSTS_FILE.exists() else {}
 
 
 def main() -> int:
-    pages = sorted(p for p in FEATURES.glob("*.md") if p.stem != "index")
+    pages = sorted(p for p in FEATURES.glob("*.md*") if p.stem != "index")
     problems: list[str] = []
 
     def bad(page, msg):
@@ -108,11 +109,10 @@ def main() -> int:
         if not f:
             bad(page, "no `feature:` block in the front matter")
             continue
-        if not meta.get("render_macros"):
-            bad(page, "front matter is missing `render_macros: true`, so the "
-                      "template will render as literal text")
-        if "{{ feature_screen() }}" not in body:
-            bad(page, "body does not call `{{ feature_screen() }}`")
+        if page.suffix != ".mdx":
+            bad(page, "is not .mdx, so its components render as literal text")
+        if "<FeatureScreen page={frontmatter} />" not in body:
+            bad(page, "body does not render `<FeatureScreen page={frontmatter} />`")
 
         n = len((f.get("lede") or "").split())
         if not LEDE[0] <= n <= LEDE[1]:
@@ -187,18 +187,19 @@ def main() -> int:
         elif not (ICONS / icon).exists():
             bad(page, f"icon {icon} does not exist")
 
-        argument = WHY / f"{page.stem}.md"
-        if not argument.exists():
+        argument = next((a for a in (WHY / f"{page.stem}.md", WHY / f"{page.stem}.mdx")
+                         if a.exists()), None)
+        if argument is None:
             bad(page, f"no argument page at why/{page.stem}.md")
-        elif f"../why/{page.stem}.md" not in body:
+        elif f"(/why/{page.stem}/)" not in body:
             bad(page, "does not link its argument page")
         else:
             check_argument(argument, page, bad)
 
-    index = FEATURES / "index.md"
-    if "{{ feature_plates() }}" not in index.read_text():
-        problems.append(f"{index.relative_to(ROOT)}: does not call "
-                        f"`{{{{ feature_plates() }}}}` -- the plates would be "
+    index = FEATURES / "index.mdx"
+    if "<FeaturePlates />" not in index.read_text():
+        problems.append(f"{index.relative_to(ROOT)}: does not render "
+                        f"`<FeaturePlates />` -- the plates would be "
                         f"hand-written again, which is how it came to list "
                         f"sixteen for eleven pages")
 

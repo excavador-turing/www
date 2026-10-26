@@ -6,8 +6,7 @@
 // at compile time, which runs inside astro.config.mjs before Vite exists.
 //
 // The facts themselves are src/data/facts.yaml, which scripts/facts.py
-// writes. Until the switch the converter copies it there from docs/data/;
-// after it, facts.py writes it there and nothing else changes.
+// writes.
 import { parse } from 'yaml';
 
 // Eleven reads better than 11 at the top of a page (main.py's title_number).
@@ -64,18 +63,3 @@ export function format(facts, path, filters = '') {
   return String(v);
 }
 
-/**
- * The Jinja expression a Fact stands for. Only the FAQ's structured data
- * uses it, to stay byte-for-byte what the live site serves (main.py parses
- * faq.md before the macros render, so the live JSON-LD carries the raw
- * expression); see src/lib/faq.ts.
- */
-export function jinja(path, filters = '') {
-  let expr = path;
-  const pipes = [];
-  for (const name of filters.split(/\s+/).filter(Boolean)) {
-    if (name === 'first_word') expr += '.split()[0]';
-    else pipes.push(name);
-  }
-  return `{{ ${[expr, ...pipes].join(' | ')} }}`;
-}

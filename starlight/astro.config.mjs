@@ -50,7 +50,7 @@ export default defineConfig({
         pythonMarkdownHeadingIds,
       ],
       // python-markdown has no smart punctuation unless asked, and this site
-      // never asked: "--" stays two hyphens, as it is written in docs/.
+      // never asked: "--" stays two hyphens, as it is written.
       features: { smartPunctuation: false },
     }),
   },

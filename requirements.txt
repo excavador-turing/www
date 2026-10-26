@@ -1,28 +1,13 @@
-# Pinned to what actually resolved, not to invented numbers. These sites are
-# built by CI and by a workstation, and a docs theme that renders differently
-# in the two is a bug nobody notices until a screenshot disagrees with a page.
+# Pinned to what actually resolved, not to invented numbers: the generators
+# and the checks run in CI and on a workstation, and a check that judges
+# differently in the two is a bug nobody notices until a run disagrees.
 #
-# Resolved 2026-09-08. Bump deliberately: `uv pip install -U -r` then re-freeze.
-mkdocs==1.6.1
-mkdocs-material==9.7.7
-mkdocs-material-extensions==1.3.1
-mkdocs-git-revision-date-localized-plugin==1.5.4
-mkdocs-redirects==1.2.3
-pymdown-extensions==11.0.2
+# Resolved 2026-10-26. Bump deliberately: `uv pip install -U -r` then re-freeze.
 
-# Not a build dependency: scripts/one-screen.py drives headless Chrome over
-# its debugging protocol to prove the feature pages fit one screen. It is here
-# rather than in a second requirements file because the site has exactly one
-# Python environment and a second one is a second thing to keep pinned.
+# Front matter and the data files: every generator writes YAML, and every
+# check that reads a page reads its front matter.
+pyyaml==6.0.3
+
+# scripts/screens.py drives headless Chrome over its debugging protocol to
+# prove every screen fits.
 websockets==17.1
-
-# Facts, once. Every number the site quotes about itself lives in
-# docs/data/facts.yaml (scripts/facts.py) and pages ask for it rather than
-# retyping it -- `{{ gate.promoted }}`, never 26. Five numbers had already
-# drifted apart by the time this was added.
-#
-# Rendering is OPT-IN per page (`render_macros: true` in front matter),
-# because macros expands Jinja before Markdown and so reaches inside fenced
-# code blocks: reference/metrics.md carries a Prometheus alert template,
-# `{{ $labels.node }}`, which would otherwise be eaten at build time.
-mkdocs-macros-plugin==1.5.0

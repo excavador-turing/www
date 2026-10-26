@@ -11,7 +11,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Post = CollectionEntry<'docs'> & { data: { date: Date } };
 
-/** mkdocs.yml's blog `pagination_per_page`; the converter checks they agree. */
+/** Posts per page of the news index, as MkDocs's blog plugin paged it. */
 export const POSTS_PER_PAGE = 10;
 
 export const NEWS = 'news';

@@ -4,7 +4,6 @@
 .venv
 .venv/
 .devbox/
-/site/
 __pycache__/
 
 # The demo panes are built at deploy from the latest BMC-UI release

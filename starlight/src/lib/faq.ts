@@ -1,32 +1,26 @@
 // The FAQ's structured data: every "## question" with the first paragraph
-// under it, as main.py's _faq_entities() reads it for overrides/main.html.
+// under it, as MkDocs's main.py once read it.
 //
 // Read off the page itself when the site is built (the route middleware
 // calls this with the FAQ's own source), so it follows the page with nothing
 // to regenerate. Capped, because a rich result shows two lines of an answer;
 // an answer that is a table, a list or a code block is left out rather than
 // flattened into nonsense.
-import { jinja } from './facts.mjs';
-
 const CAP = 600;
-
-/**
- * How a <Fact> reads in the answer text. The live site's FAQPage carries the
- * raw Jinja (`{{ roadmap.count }}`), because main.py parses faq.md before the
- * macros render it. 'jinja' reproduces that bug; 'value' is the fix, and is
- * what the route middleware asks for since phase 3.
- */
-export type FactsAs = 'jinja' | 'value';
 
 export type Entity = { q: string; a: string };
 
+/**
+ * The questions and their answers, each <Fact> as the number a reader sees
+ * on the page. (MkDocs's FAQPage carried the raw `{{ roadmap.count }}`: its
+ * main.py read faq.md before the macros rendered it.)
+ */
 export function faqEntities(
   source: string,
-  factsAs: FactsAs,
   value: (of: string, filters: string) => string,
 ): Entity[] {
   const text = source.replace(/<Fact of="([^"]+)"(?: filters="([^"]*)")? \/>/g, (_, of: string, filters = '') =>
-    factsAs === 'jinja' ? jinja(of, filters) : value(of, filters),
+    value(of, filters),
   );
   const out: Entity[] = [];
   const heads = [...text.matchAll(/^## +(.+?)\s*$/gm)];

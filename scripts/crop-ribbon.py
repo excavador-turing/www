@@ -24,8 +24,9 @@ import struct
 import sys
 import zlib
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-CAPTURES = ROOT / "docs" / "assets" / "captures"
+from sitepage import PUBLIC
+
+CAPTURES = PUBLIC / "assets" / "captures"
 
 # The ribbon's own background, from scripts/demo-ribbon.py.
 LIME = (220, 254, 142)

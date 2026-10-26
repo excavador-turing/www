@@ -11,8 +11,8 @@
 // The mechanism stays. Add a line only for a link the live site really
 // serves broken; delete it when it is fixed, because
 // starlight/scripts/check-built.sh fails while a line names a page that now
-// exists, so this list can only shrink. The MkDocs side has its own check:
-// `just links-internal` fails on any internal link that lands on nothing.
+// exists, so this list can only shrink. Beside it, `just links-internal`
+// fails on any internal link in the built HTML that lands on nothing.
 
 /** Front-page routes a script handles (#overview, #demo/<pane>): never ids. */
 export const scriptRoute = /^\/?#(overview|demo(\/(fork|fleet|stock))?)$/;

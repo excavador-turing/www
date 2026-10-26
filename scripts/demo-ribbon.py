@@ -14,6 +14,8 @@ import re
 import sys
 from pathlib import Path
 
+from sitepage import PUBLIC
+
 RIBBON = (
     # A block in the normal flow, NOT position:fixed.
     #
@@ -54,7 +56,7 @@ def strip_ribbon(html: str) -> tuple[str, bool]:
 
 def main() -> int:
     for pane in ("fork", "stock", "fleet"):
-        path = Path("docs/demo") / pane / "index.html"
+        path = PUBLIC / "demo" / pane / "index.html"
         if not path.exists():
             print(f"  {path}: missing, skipped")
             continue
