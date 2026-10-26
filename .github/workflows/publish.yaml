@@ -29,7 +29,7 @@ on:
       - .github/workflows/publish.yaml
       - scripts/demo-ribbon.py
       - scripts/served-urls.py
-      - starlight/scripts/stamp-build.py
+      - site/scripts/stamp-build.py
   workflow_dispatch:
     inputs:
       deploy:
@@ -112,7 +112,7 @@ jobs:
           # Empty unless this run pushes: the build then checks out the
           # commit the run started from.
           echo "commit=" >> "$GITHUB_OUTPUT"
-          if git diff --quiet -- starlight/src starlight/public; then
+          if git diff --quiet -- site/src site/public; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "nothing moved" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
@@ -121,7 +121,7 @@ jobs:
           {
             echo "### Refresh: what moved"
             echo '```'
-            git --no-pager diff --stat -- starlight/src starlight/public
+            git --no-pager diff --stat -- site/src site/public
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
           if [ "$COMMIT" != true ]; then
@@ -130,7 +130,7 @@ jobs:
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add starlight/src starlight/public
+          git add site/src site/public
           git commit -q -F - <<'MSG'
           the site catches up with what the repositories say
 
@@ -236,8 +236,8 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
-            starlight/public/demo/fork
-            starlight/public/demo/fleet
+            site/public/demo/fork
+            site/public/demo/fleet
           key: demo-${{ needs.plan.outputs.tag }}-${{ hashFiles('scripts/demo-ribbon.py', '.github/workflows/publish.yaml') }}
 
       - name: BMC-UI at that release
@@ -290,7 +290,7 @@ jobs:
           npm run build
           mv dist ../fleet-dist
 
-      # Into starlight/public/demo/, which is git-ignored. Astro serves
+      # Into site/public/demo/, which is git-ignored. Astro serves
       # public/ as it is -- no route, no content collection, no link
       # validation (astro.config.mjs excludes /demo/fork and /demo/fleet) --
       # at /demo/fork/ and /demo/fleet/, the paths the site has always used.
@@ -300,15 +300,15 @@ jobs:
           TAG: ${{ needs.plan.outputs.tag }}
         run: |
           set -eu
-          rm -rf starlight/public/demo/fork starlight/public/demo/fleet
-          mkdir -p starlight/public/demo/fork starlight/public/demo/fleet
-          cp -a fork-dist/. starlight/public/demo/fork/
-          cp -a fleet-dist/. starlight/public/demo/fleet/
-          echo "$TAG" > starlight/public/demo/fork/VERSION
-          echo "$TAG" > starlight/public/demo/fleet/VERSION
+          rm -rf site/public/demo/fork site/public/demo/fleet
+          mkdir -p site/public/demo/fork site/public/demo/fleet
+          cp -a fork-dist/. site/public/demo/fork/
+          cp -a fleet-dist/. site/public/demo/fleet/
+          echo "$TAG" > site/public/demo/fork/VERSION
+          echo "$TAG" > site/public/demo/fleet/VERSION
           # The board list the demo shows. Both cards answer from ONE board's
           # capture, which the demo page says out loud.
-          cat > starlight/public/demo/fleet/config.json <<'JSON'
+          cat > site/public/demo/fleet/config.json <<'JSON'
           {
             "boards": [
               { "id": "bmc-1", "name": "bmc-1 (board A)", "note": "hive-1 … hive-4" },
@@ -331,7 +331,7 @@ jobs:
         run: |
           set -eu
           for pane in fork fleet; do
-            dir=starlight/public/demo/$pane
+            dir=site/public/demo/$pane
             if ! grep -rqlF "a recording, not a live stream" "$dir/assets"; then
               echo "$TAG $pane built without its demo mode; refusing to publish it as one" >&2
               exit 1
@@ -373,9 +373,9 @@ jobs:
           TAG: ${{ needs.plan.outputs.tag }}
         run: |
           set -eu
-          dist=starlight/dist
+          dist=site/dist
           for pane in fork fleet; do
-            diff -r "starlight/public/demo/$pane" "$dist/demo/$pane" >/dev/null \
+            diff -r "site/public/demo/$pane" "$dist/demo/$pane" >/dev/null \
               || { echo "$dist/demo/$pane is not public/demo/$pane byte for byte" >&2; exit 1; }
             [ "$(cat "$dist/demo/$pane/VERSION")" = "$TAG" ] \
               || { echo "$dist/demo/$pane/VERSION is not $TAG" >&2; exit 1; }
@@ -395,13 +395,13 @@ jobs:
             "$dist/build.json" "$TAG"
 
       - name: every page says what it is for, and says it whole
-        run: devbox run -- python3 scripts/description-lint.py --site starlight/dist
+        run: devbox run -- python3 scripts/description-lint.py --site site/dist
 
       - name: the structured data parses, and carries real values
         run: devbox run -- python3 scripts/structured-data.py --strict
 
       - name: llms.txt matches the nav, is served as written, and its links land
-        run: devbox run -- python3 scripts/llms.py --check --site starlight/dist
+        run: devbox run -- python3 scripts/llms.py --check --site site/dist
 
       - name: every internal link lands on a file
         run: devbox run -- python3 scripts/internal-links.py
@@ -416,7 +416,7 @@ jobs:
         id: stamp
         run: |
           set -eu
-          python3 - starlight/dist/build.json >> "$GITHUB_OUTPUT" <<'PY'
+          python3 - site/dist/build.json >> "$GITHUB_OUTPUT" <<'PY'
           import json, sys
           b = json.load(open(sys.argv[1]))
           print(f"commit={b['commit']}")
@@ -425,14 +425,14 @@ jobs:
           {
             echo "### Built"
             echo '```json'
-            cat starlight/dist/build.json
+            cat site/dist/build.json
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: starlight-dist
-          path: starlight/dist
+          name: site-dist
+          path: site/dist
           if-no-files-found: error
           retention-days: 7
 
@@ -440,7 +440,7 @@ jobs:
       # dry run produced is the artifact a deploy would have published.
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: starlight/dist
+          path: site/dist
 
   screens:
     needs: [plan, build]
@@ -462,13 +462,13 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: starlight-dist
-          path: starlight/dist
+          name: site-dist
+          path: site/dist
 
       # With the demo panes in place, which site.yaml's build does not have:
       # the front page's three demo views frame the real panes here.
       - name: every screen fits, nothing clipped, nothing stretched
-        run: devbox run -- python3 scripts/screens.py --site starlight/dist --json screens.json
+        run: devbox run -- python3 scripts/screens.py --site site/dist --json screens.json
 
       - name: the measurements, if anything failed
         if: failure()

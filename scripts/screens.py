@@ -491,10 +491,10 @@ def report(results, baseline: pathlib.Path | None, update: bool) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--site", default=str(ROOT / "starlight" / "dist"))
+    ap.add_argument("--site", default=str(ROOT / "site" / "dist"))
     ap.add_argument("--pages", nargs="*", help="check only these paths")
     ap.add_argument("--json", help="write the full measurements here")
-    ap.add_argument("--baseline", default=str(ROOT / "starlight" / "src" / "data" /
+    ap.add_argument("--baseline", default=str(ROOT / "site" / "src" / "data" /
                                               "screens-baseline.json"),
                     help="faults this site is known to have")
     ap.add_argument("--no-baseline", action="store_true",

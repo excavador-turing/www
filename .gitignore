@@ -8,20 +8,20 @@ __pycache__/
 
 # The demo panes are built at deploy from the latest BMC-UI release
 # (.github/workflows/publish.yaml); locally, `just demo-fork-latest <checkout>`.
-/starlight/public/demo/fork/
-/starlight/public/demo/fleet/
+/site/public/demo/fork/
+/site/public/demo/fleet/
 
 # Worktrees live inside the checkout (the standing rule is to branch in one
 # rather than disturb the main tree). Without this, `git add -A` records the
 # whole worktree as a gitlink.
 /worktree/
 
-# The Starlight build (starlight/): what it installs and builds, never its
+# The Starlight build (site/): what it installs and builds, never its
 # sources.
-/starlight/node_modules/
-/starlight/dist/
-/starlight/.astro/
-/starlight/.yarn/*
-!/starlight/.yarn/releases/
-!/starlight/.yarn/plugins/
-/starlight/.pnp.*
+/site/node_modules/
+/site/dist/
+/site/.astro/
+/site/.yarn/*
+!/site/.yarn/releases/
+!/site/.yarn/plugins/
+/site/.pnp.*

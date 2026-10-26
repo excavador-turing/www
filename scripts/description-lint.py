@@ -18,7 +18,7 @@ true. This holds every page -- generated or typed -- to the same three rules,
 because a rule that only applies to the pages somebody remembered is not one.
 
     just description-lint
-    scripts/description-lint.py --site starlight/dist   # and what was built
+    scripts/description-lint.py --site site/dist   # and what was built
 
 `--site` adds a second pass over a BUILT site: every page's
 `<meta name="description">` is the one its source asks for, whole, and the
@@ -132,7 +132,7 @@ def built_faults(site: pathlib.Path, wanted: dict[str, str],
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", help="also check the descriptions a built "
-                    "site carries (e.g. starlight/dist)")
+                    "site carries (e.g. site/dist)")
     args = ap.parse_args()
     tagline = site_description()
     pages = sorted(CONTENT.rglob("*.md*"))

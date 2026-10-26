@@ -14,7 +14,7 @@ import pathlib
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = ROOT / "starlight"
+SITE = ROOT / "site"
 # One page per file, at the path that is its URL: changelog/bmcd.md is
 # /changelog/bmcd/.
 CONTENT = SITE / "src" / "content" / "docs"

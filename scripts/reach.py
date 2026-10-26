@@ -29,7 +29,7 @@ import sys
 import json
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = ROOT / "starlight" / "dist"
+SITE = ROOT / "site" / "dist"
 
 # Reachable in one click from the front page, by decision: the two pages a
 # reader who already runs this firmware comes back for.
@@ -108,7 +108,7 @@ def page_of(href: str, here: str) -> str | None:
 
 def nav_pages() -> list[str]:
     """Every page the sidebar lists, as a path without its leading slash."""
-    sidebar = json.loads((ROOT / "starlight" / "src" / "config" / "sidebar.json").read_text())
+    sidebar = json.loads((ROOT / "site" / "src" / "config" / "sidebar.json").read_text())
     out: list[str] = []
 
     def walk(items):
@@ -125,7 +125,7 @@ def nav_pages() -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", default=str(SITE),
-                    help="the built site to walk (default: starlight/dist)")
+                    help="the built site to walk (default: site/dist)")
     site = pathlib.Path(ap.parse_args().site).resolve()
     if not (site / "index.html").exists():
         name = site.relative_to(ROOT).as_posix() if site.is_relative_to(ROOT) else str(site)

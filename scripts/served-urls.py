@@ -3,7 +3,7 @@
 
 The site moved from MkDocs to Starlight on 2026-10-26 under one rule: no URL
 changes without a redirect. A link in a forum post, a search result or a
-bookmark is a promise the site made. starlight/served-urls.json is every page
+bookmark is a promise the site made. site/served-urls.json is every page
 MkDocs served, each with the heading anchors a deep link can name, and every
 other file it published, frozen at the switch. This fails when one of them
 stops answering:
@@ -19,7 +19,7 @@ anybody linked to is lost (a theme's own icon, a compressed copy of the
 sitemap). Pages added since are not in the list and are not judged.
 
     just urls
-    scripts/served-urls.py [--site starlight/dist]
+    scripts/served-urls.py [--site site/dist]
 """
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ REDIRECT = "<title>Redirecting to: "
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", default=str(SITE / "dist"),
-                    help="the built site to judge (default: starlight/dist)")
+                    help="the built site to judge (default: site/dist)")
     site = pathlib.Path(ap.parse_args().site)
     if not (site / "index.html").is_file():
         print(f"served-urls: no build in {site} -- run `just build` first", file=sys.stderr)

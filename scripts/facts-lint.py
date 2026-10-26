@@ -7,7 +7,7 @@ in its own docstring and in the header it generates into
 served on the site inside a generated file -- a promise nothing kept, which is
 the exact failure the facts file exists to prevent, one level up.
 
-So: every number in `starlight/src/data/facts.yaml` is a number no page may
+So: every number in `site/src/data/facts.yaml` is a number no page may
 type. A page that wants it asks for it (`<Fact of="gate.promoted" />`), and
 this refuses the ones written out by hand.
 
