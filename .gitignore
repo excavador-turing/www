@@ -30,5 +30,7 @@ docs/demo/fleet/
 /starlight/.pnp.*
 /starlight/src/content/docs/
 /starlight/src/generated/
-/starlight/public/
+/starlight/public/*
+# ...except what the Starlight build owns itself (OWN_PUBLIC in the converter).
+!/starlight/public/favicon.svg
 /starlight/src/data/

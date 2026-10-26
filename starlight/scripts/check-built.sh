@@ -12,9 +12,22 @@ bad() { echo "check-built: $*" >&2; fail=1; }
 
 for f in index.html 404.html llms.txt sitemap.xml sitemap-index.xml robots.txt \
          feed.xml stylesheets/landing.css features/index.html news/index.html \
-         news/page/2/index.html reference/api/index.html; do
+         news/page/2/index.html reference/api/index.html favicon.svg build.json; do
   [ -s "$dist/$f" ] || bad "missing or empty: $f"
 done
+
+# /build.json (stamp-build.py) names the commit that was built: it is what
+# the publish workflow's `published` job compares with the live site.
+if [ -s "$dist/build.json" ] && ! python3 - "$dist/build.json" "$(git rev-parse HEAD)" <<'PY'
+import json, re, sys
+b = json.load(open(sys.argv[1]))
+ok = (b.get("commit") == sys.argv[2] and bool(b.get("run"))
+      and re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ", b.get("built_at") or ""))
+sys.exit(0 if ok else 1)
+PY
+then
+  bad "build.json does not name this commit, a run and a build time: $(tr -d '\n' < "$dist/build.json")"
+fi
 
 # /llms.txt: astro.config.mjs's `llmsTxt` switch. starlight-llms-txt writes
 # llms-full.txt beside it; without that, it must be the curated index,

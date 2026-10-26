@@ -1,0 +1,595 @@
+name: Publish (Starlight)
+
+# The Starlight build of turingpi.xyz, built the way it will be published --
+# with the demo panes from the latest BMC-UI release, from the Git LFS
+# objects, through every gate -- and, until the switch, published only when
+# someone asks by hand.
+#
+# This is pages.yml's successor under a NEW file name, on purpose. Disabling
+# a workflow in the Actions UI disables that file path on every branch, so
+# the switch must be able to turn pages.yml off without touching this file,
+# and the other way round for a rollback.
+#
+# Phase 4a, what runs:
+#
+#   push to main, the hourly schedule,     refresh (dry run), plan, build,
+#   a dispatch                             screens, parity: every gate and
+#                                          the Pages artifact. No deploy.
+#   a pull request that changes this       the same, so a change to the
+#   pipeline (paths below)                 publish path is proved before main.
+#   a dispatch from main with deploy=true  all of that, then deploy and
+#                                          `published`. Until pages.yml is
+#                                          disabled, its next deploy puts the
+#                                          MkDocs site back.
+#
+# pages.yml still deploys the live site with MkDocs and still makes the
+# hourly refresh commit; two workflows committing to main would race. The
+# switch (phase 4b) moves that commit here and widens one expression, the
+# `DEPLOY` gate in the plan job.
+#
+# Not here: repository_dispatch. pages.yml still lists `ui-released`, but
+# nothing sends it: BMC-UI's release.yaml deliberately holds no credential
+# for this repository and says so. The hourly schedule notices a release
+# within the hour; `gh workflow run publish.yaml` is the immediate path.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - .github/workflows/publish.yaml
+      - scripts/demo-ribbon.py
+      - starlight/scripts/stamp-build.py
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: >-
+          Publish this build to turingpi.xyz (from main only). Phase 4a:
+          pages.yml's next deploy replaces it with the MkDocs site again.
+        type: boolean
+        default: false
+  schedule:
+    - cron: "23 * * * *"
+
+concurrency:
+  # Not cancel-in-progress: a run that deploys must not be cut off half-way.
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # pages.yml's hourly refresh -- refresh-changelog, refresh-roadmap, facts --
+  # as a DRY RUN: the generators run and the job summary shows what the
+  # hourly commit would carry, and nothing is committed. pages.yml makes that
+  # commit until the switch.
+  #
+  # Phase 4b adds `contents: write` and the commit step pages.yml has (as
+  # github-actions[bot], main only, never on a pull request), with the SHA it
+  # pushed as the `commit` output: a push made with GITHUB_TOKEN starts no
+  # new workflow run, so the build below checks that commit out itself.
+  refresh:
+    if: >-
+      github.event_name == 'schedule'
+      || github.event_name == 'workflow_dispatch'
+      || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+      commit: ${{ steps.diff.outputs.commit }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The converter dates each page from its file's last commit.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
+        with:
+          enable-cache: true
+          devbox-version: 0.18.4
+
+      - name: read the sources, as the hourly job does
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          devbox run -- python3 scripts/refresh-changelog.py
+          devbox run -- python3 scripts/refresh-roadmap.py
+          devbox run -- python3 scripts/facts.py
+
+      - name: what the hourly commit would carry (dry run, not committed)
+        id: diff
+        run: |
+          set -eu
+          if git diff --quiet -- docs/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "nothing moved" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Refresh, dry run: the hourly commit would carry"
+              echo '```'
+              git --no-pager diff --stat -- docs/
+              echo '```'
+              echo "Not committed here: pages.yml makes this commit until the switch."
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          # Empty in phase 4a: nothing was pushed, so the build checks out
+          # the commit this run started from.
+          echo "commit=" >> "$GITHUB_OUTPUT"
+
+      # The refreshed sources still render into the Starlight project: what
+      # the hourly commit would carry is something the build can take.
+      - name: the refreshed sources still convert
+        run: devbox run -- python3 scripts/mkdocs-to-starlight.py
+
+  # What this run builds and whether it may publish.
+  plan:
+    needs: [refresh]
+    # `needs` on a job that was skipped skips this one too, and a push must
+    # still build.
+    if: ${{ !cancelled() && (needs.refresh.result == 'success' || needs.refresh.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.ui.outputs.tag }}
+      skip: ${{ steps.ui.outputs.skip }}
+      deploy: ${{ steps.gate.outputs.deploy }}
+      ref: ${{ steps.gate.outputs.ref }}
+    steps:
+      # Which interface the site should show: the latest published, non-draft,
+      # non-prerelease BMC-UI release. On the schedule, compare with what the
+      # site already serves and stop if they agree and nothing was refreshed:
+      # a rebuild of the same bytes every hour is noise.
+      - name: latest BMC-UI release
+        id: ui
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          CHANGED: ${{ needs.refresh.outputs.changed }}
+        run: |
+          set -eu
+          tag=$(gh api repos/excavador-turing/BMC-UI/releases/latest --jq .tag_name)
+          live=$(curl -fsS --max-time 15 https://turingpi.xyz/demo/fork/VERSION 2>/dev/null || echo none)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT" = schedule ] && [ "$tag" = "$live" ] && [ "$CHANGED" != true ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "the site already carries $tag and nothing moved; nothing to do"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "building the demo from $tag (the site carries $live)"
+          fi
+
+      # THE DEPLOY GATE, and the only one. Phase 4a: a dispatch from main
+      # with deploy=true, nothing else -- not a push, not the schedule, never
+      # a pull request.
+      #
+      # Phase 4b turns publishing on by replacing the DEPLOY expression with
+      #   github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      #     && (github.event_name != 'workflow_dispatch' || inputs.deploy)
+      # and the input's default with true.
+      - name: may this run publish
+        id: gate
+        env:
+          DEPLOY: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy && github.ref == 'refs/heads/main' }}
+          SKIP: ${{ steps.ui.outputs.skip }}
+          # The refresh's commit when it pushed one (phase 4b), else this
+          # run's own commit. Never `main`: on a pull request that would
+          # build the wrong tree, and main may have moved since.
+          REF: ${{ needs.refresh.outputs.commit || github.sha }}
+        run: |
+          set -eu
+          if [ "$DEPLOY" = true ] && [ "$SKIP" != true ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            echo "this run publishes $REF, if every gate passes" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "this run publishes nothing: build and gates only (phase 4a)" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: [plan]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.skip != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      commit: ${{ steps.stamp.outputs.commit }}
+      run: ${{ steps.stamp.outputs.run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.plan.outputs.ref }}
+          # Each page's "last updated" date is its source file's last commit;
+          # a shallow clone would date every page today.
+          fetch-depth: 0
+          # Media and fonts are Git LFS objects (.gitattributes). Without
+          # this the build succeeds and publishes 130-byte pointers as the
+          # images; check-built.sh refuses that, and this prevents it.
+          lfs: true
+          persist-credentials: false
+
+      # The panes are a pure function of the BMC-UI release and how this job
+      # builds them, so most builds take them from the cache. The key holds
+      # THIS FILE as well as the ribbon script: the build environment lives
+      # here, and a pane cached before a change to it would be served for
+      # that release's whole life.
+      - name: the demo panes, if this release has been built before
+        id: demo-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            docs/demo/fork
+            docs/demo/fleet
+          key: demo-${{ needs.plan.outputs.tag }}-${{ hashFiles('scripts/demo-ribbon.py', '.github/workflows/publish.yaml') }}
+
+      - name: BMC-UI at that release
+        if: steps.demo-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: excavador-turing/BMC-UI
+          ref: ${{ needs.plan.outputs.tag }}
+          path: bmc-ui
+          persist-credentials: false
+
+      - name: node, as BMC-UI pins it
+        if: steps.demo-cache.outputs.cache-hit != 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: bmc-ui/.nvmrc
+          cache: npm
+          cache-dependency-path: bmc-ui/package-lock.json
+
+      - name: build the fork demo
+        if: steps.demo-cache.outputs.cache-hit != 'true'
+        working-directory: bmc-ui
+        env:
+          VITE_DEMO: "1"
+          VITE_BASE: /demo/fork/
+          BMC_UI_VERSION: ${{ needs.plan.outputs.tag }}
+        run: |
+          set -eu
+          npm ci --no-audit --no-fund
+          npm run build
+          # Moved aside at once: the fleet build below writes the same
+          # `dist`, and without this the fork pane is quietly the fleet one.
+          mv dist ../fork-dist
+
+      # The fleet interface from the same release and the same capture: one
+      # tree, two builds, so the two panes cannot drift apart.
+      - name: build the fleet demo
+        if: steps.demo-cache.outputs.cache-hit != 'true'
+        working-directory: bmc-ui
+        env:
+          VITE_APP: fleet
+          VITE_DEMO: "1"
+          VITE_BASE: /demo/fleet/
+          BMC_UI_VERSION: ${{ needs.plan.outputs.tag }}
+          # The fleet header reads import.meta.env.VITE_BMC_UI_VERSION; Vite
+          # exposes only VITE_ variables, so without this it says "dev".
+          VITE_BMC_UI_VERSION: ${{ needs.plan.outputs.tag }}
+        run: |
+          set -eu
+          npm run build
+          mv dist ../fleet-dist
+
+      # Into docs/demo/, which is git-ignored: the converter copies every
+      # non-Markdown file under docs/ into starlight/public/ byte for byte,
+      # and Astro serves public/ as it is -- no route, no content
+      # collection, no link validation (astro.config.mjs excludes
+      # /demo/fork and /demo/fleet) -- at /demo/fork/ and /demo/fleet/, the
+      # paths the live site uses. The MkDocs build below picks them up too.
+      - name: place them and give them a way out
+        if: steps.demo-cache.outputs.cache-hit != 'true'
+        env:
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          set -eu
+          rm -rf docs/demo/fork docs/demo/fleet
+          mkdir -p docs/demo/fork docs/demo/fleet
+          cp -a fork-dist/. docs/demo/fork/
+          cp -a fleet-dist/. docs/demo/fleet/
+          echo "$TAG" > docs/demo/fork/VERSION
+          echo "$TAG" > docs/demo/fleet/VERSION
+          # The board list the demo shows. Both cards answer from ONE board's
+          # capture, which the demo page says out loud.
+          cat > docs/demo/fleet/config.json <<'JSON'
+          {
+            "boards": [
+              { "id": "bmc-1", "name": "bmc-1 (board A)", "note": "hive-1 … hive-4" },
+              { "id": "bmc-2", "name": "bmc-2 (board B)", "note": "hive-5 … hive-8" }
+            ],
+            "supportedBmcd": { "min": "2.20.0", "max": "2.38.3" }
+          }
+          JSON
+          python3 scripts/demo-ribbon.py
+
+      # Prove the panes are demos, INCLUDING when they came out of the cache:
+      # a cache can be wrong, and this is what stops a bundle that would try
+      # to reach real boards from a public page. The string lives inside
+      # `import.meta.env.VITE_DEMO === "1"`, which Vite replaces statically,
+      # so a build without demo mode drops it.
+      - name: both panes are demos
+        env:
+          TAG: ${{ needs.plan.outputs.tag }}
+          HIT: ${{ steps.demo-cache.outputs.cache-hit }}
+        run: |
+          set -eu
+          for pane in fork fleet; do
+            if ! grep -rqlF "a recording, not a live stream" "docs/demo/$pane/assets"; then
+              echo "$TAG $pane built without its demo mode; refusing to publish it as one" >&2
+              exit 1
+            fi
+            [ "$(cat "docs/demo/$pane/VERSION")" = "$TAG" ] \
+              || { echo "$pane pane says $(cat "docs/demo/$pane/VERSION"), not $TAG" >&2; exit 1; }
+            echo "$pane pane: $TAG, $(find "docs/demo/$pane" -type f | wc -l) files (cache hit: ${HIT:-false})"
+          done
+
+      # The toolchain is devbox.json's -- node, yarn, Python -- as in
+      # site.yaml and on a workstation. The demo builds above used BMC-UI's
+      # own node; `devbox run` puts devbox's first.
+      - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
+        with:
+          enable-cache: true
+          devbox-version: 0.18.4
+
+      # From here to the uploads: `just site-check`, step for step, as
+      # site.yaml runs it; screens and parity are the jobs below.
+      - name: the facts file matches its sources
+        run: devbox run -- python3 scripts/facts.py --check
+
+      - name: no page types a number the facts file owns
+        run: devbox run -- python3 scripts/facts-lint.py
+
+      - name: the feature pages have one shape
+        run: devbox run -- python3 scripts/feature-lint.py
+
+      - name: no capture carries the demo ribbon
+        run: devbox run -- python3 scripts/crop-ribbon.py --check
+
+      # Converts, builds strictly (no warning, no broken internal link),
+      # stamps /build.json, and checks what was built (no LFS pointer).
+      - name: convert, build strictly, stamp, check what was built
+        run: devbox run -- just site-build
+
+      - name: the panes are served where the live site serves them, as built
+        env:
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          set -eu
+          dist=starlight/dist
+          for pane in fork fleet; do
+            diff -r "docs/demo/$pane" "$dist/demo/$pane" >/dev/null \
+              || { echo "$dist/demo/$pane is not docs/demo/$pane byte for byte" >&2; exit 1; }
+            [ "$(cat "$dist/demo/$pane/VERSION")" = "$TAG" ] \
+              || { echo "$dist/demo/$pane/VERSION is not $TAG" >&2; exit 1; }
+            grep -qF 'id="tp-demo-ribbon"' "$dist/demo/$pane/index.html" \
+              || { echo "$dist/demo/$pane/index.html has no ribbon" >&2; exit 1; }
+            grep -rqlF "a recording, not a live stream" "$dist/demo/$pane/assets" \
+              || { echo "$dist/demo/$pane is not a demo build" >&2; exit 1; }
+            echo "/demo/$pane/: $TAG, $(find "$dist/demo/$pane" -type f | wc -l) files, ribbon, demo mode"
+          done
+          # Not pages: Astro did not route them, so the sitemap does not
+          # list them.
+          if grep -hoE '<loc>[^<]*/demo/(fork|fleet)/[^<]*</loc>' "$dist"/sitemap-*.xml; then
+            echo "the sitemap lists a demo pane as a page" >&2
+            exit 1
+          fi
+          python3 -c 'import json,sys; b=json.load(open(sys.argv[1])); assert b["bmc_ui"]==sys.argv[2], b; print("build.json:", b)' \
+            "$dist/build.json" "$TAG"
+
+      - name: every page says what it is for, and says it whole
+        run: devbox run -- python3 scripts/description-lint.py --site starlight/dist
+
+      - name: the structured data parses, and carries real values
+        run: devbox run -- python3 scripts/structured-data.py --site starlight/dist --strict
+
+      - name: llms.txt matches the nav, is served as written, and its links land
+        run: devbox run -- python3 scripts/llms.py --check --site starlight/dist
+
+      - name: every internal link lands on a file
+        run: devbox run -- python3 scripts/internal-links.py --site starlight/dist
+
+      - name: every page is within two clicks of the front page
+        run: devbox run -- python3 scripts/reach.py --site starlight/dist
+
+      # Parity's tie-breaker: a difference from the live site that this
+      # commit's MkDocs build shares is content that moved since the last
+      # deploy, not something the port got wrong.
+      - name: the MkDocs build of this commit
+        run: devbox run -- mkdocs build --strict
+
+      - name: what was built
+        id: stamp
+        run: |
+          set -eu
+          python3 - starlight/dist/build.json >> "$GITHUB_OUTPUT" <<'PY'
+          import json, sys
+          b = json.load(open(sys.argv[1]))
+          print(f"commit={b['commit']}")
+          print(f"run={b['run']}")
+          PY
+          {
+            echo "### Built"
+            echo '```json'
+            cat starlight/dist/build.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: starlight-dist
+          path: starlight/dist
+          if-no-files-found: error
+          retention-days: 7
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mkdocs-site
+          path: site
+          if-no-files-found: error
+          retention-days: 7
+
+      # What the deploy publishes. Uploaded on every run, so the artifact a
+      # dry run produced is the artifact a deploy would have published.
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: starlight/dist
+
+  screens:
+    needs: [plan, build]
+    # Downstream of a job that may be skipped: run only on a build that
+    # actually succeeded, never on a skip inherited from it.
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.plan.outputs.ref }}
+          persist-credentials: false
+
+      - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
+        with:
+          enable-cache: true
+          devbox-version: 0.18.4
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: starlight-dist
+          path: starlight/dist
+
+      # With the demo panes in place, which site.yaml's build does not have:
+      # the front page's three demo views frame the real panes here.
+      - name: every screen fits, nothing clipped, nothing stretched
+        run: devbox run -- python3 scripts/screens.py --site starlight/dist --json screens.json
+
+      - name: the measurements, if anything failed
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: screens
+          path: screens.json
+          if-no-files-found: ignore
+
+  parity:
+    needs: [plan, build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # The script and `git lfs ls-files` need the tree, not the LFS objects:
+      # the bytes compared are dist's.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.plan.outputs.ref }}
+          persist-credentials: false
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: starlight-dist
+          path: starlight/dist
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mkdocs-site
+          path: site
+
+      # The live site is the reference, read when this runs; the summary
+      # says when.
+      - name: every URL, asset, head tag and anchor the live site serves
+        run: python3 scripts/url-parity.py --strict --mkdocs site --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ !cancelled() }}
+        with:
+          name: url-parity
+          path: parity.json
+          if-no-files-found: ignore
+
+  deploy:
+    needs: [plan, build, screens, parity]
+    # Every gate passed, and the plan job's gate said this run publishes.
+    # Each `needs` is checked by name: `!cancelled()` alone would let a
+    # deploy follow a failed gate, and without it a skipped dependency
+    # skips this job silently.
+    if: ${{ !cancelled()
+            && needs.plan.outputs.deploy == 'true'
+            && needs.build.result == 'success'
+            && needs.screens.result == 'success'
+            && needs.parity.result == 'success' }}
+    # pages.yml's group while it deploys, so the two never publish at once;
+    # a run that is not deploying never joins it, and so can never displace
+    # a pending pages.yml run.
+    concurrency:
+      group: ${{ needs.plan.outputs.deploy == 'true' && 'pages' || format('publish-dry-run-{0}', github.run_id) }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # A green run is not a live site. When this run was meant to publish, fail
+  # unless turingpi.xyz serves THIS build: its /build.json names this commit
+  # and this run. When it was not meant to (phase 4a: anything but a
+  # dispatch with deploy=true), say so and pass.
+  published:
+    needs: [plan, build, screens, parity, deploy]
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SITE: https://turingpi.xyz
+      SKIP: ${{ needs.plan.outputs.skip }}
+      WANTED: ${{ needs.plan.outputs.deploy }}
+      DEPLOY: ${{ needs.deploy.result }}
+      COMMIT: ${{ needs.build.outputs.commit }}
+      RUN: ${{ needs.build.outputs.run }}
+      TAG: ${{ needs.plan.outputs.tag }}
+    steps:
+      - name: the site serves this build
+        run: |
+          set -eu
+          if [ "$SKIP" = true ]; then
+            echo "the plan found nothing to publish (the site carries $TAG and nothing moved)"
+            exit 0
+          fi
+          if [ "$WANTED" != true ]; then
+            echo "this run was not meant to publish (phase 4a: only a dispatch from main with deploy=true does)"
+            exit 0
+          fi
+          if [ "$DEPLOY" != success ]; then
+            echo "::error::this run was meant to publish and deploy did not succeed ($DEPLOY): $SITE has not moved"
+            exit 1
+          fi
+          # Pages answers from a cache for up to ten minutes; the query
+          # string asks past it. Bounded: 40 tries, 15 s apart.
+          for i in $(seq 1 40); do
+            live=$(curl -fsS --max-time 20 "$SITE/build.json?run=$RUN-$i" 2>/dev/null || true)
+            got=$(printf '%s' "$live" | jq -r '"\(.commit // "") \(.run // "")"' 2>/dev/null || echo none)
+            if [ "$got" = "$COMMIT $RUN" ]; then
+              echo "$SITE serves commit $COMMIT, run $RUN"
+              break
+            fi
+            echo "try $i: $SITE serves '${got}', want '$COMMIT $RUN'"
+            [ "$i" -lt 40 ] || { echo "::error::$SITE does not serve the build that was deployed"; exit 1; }
+            sleep 15
+          done
+          for path in / /features/ /news/ /changelog/ /feed.xml /llms.txt /favicon.svg /pagefind/pagefind.js; do
+            curl -fsS --max-time 20 -o /dev/null "$SITE$path?run=$RUN" \
+              || { echo "::error::$SITE$path does not answer"; exit 1; }
+          done
+          for pane in fork fleet; do
+            v=$(curl -fsS --max-time 20 "$SITE/demo/$pane/VERSION?run=$RUN")
+            [ "$v" = "$TAG" ] || { echo "::error::$SITE/demo/$pane/ serves $v, not $TAG"; exit 1; }
+          done
+          echo "published: $COMMIT (run $RUN), demo $TAG"

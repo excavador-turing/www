@@ -246,6 +246,7 @@ site-convert:
 # no LFS pointer, and what the site must carry (search, llms.txt, the feed).
 site-build: site-install site-convert
     starlight/scripts/strict-build.sh
+    starlight/scripts/stamp-build.py
     starlight/scripts/check-built.sh
 
 # The Starlight site on http://localhost:4321 with live reload. Re-run
@@ -279,11 +280,10 @@ site-llms-check: site-build
 
 # Every href and src in the built HTML resolves, by the same resolver as
 # `just links-internal` -- the header, footer and components included, which
-# starlight-links-validator does not see. /favicon.svg is Starlight's default
-# icon link and the repository has no favicon yet (phase 4 picks one); the
-# exception fails the day the file exists.
+# starlight-links-validator does not see. Starlight's /favicon.svg is
+# starlight/public/favicon.svg, so it is checked like any other file.
 site-links-internal: site-build
-    ./scripts/internal-links.py --site starlight/dist --known-missing /favicon.svg
+    ./scripts/internal-links.py --site starlight/dist
 
 # The click-depth walk of `just reach`, over the Starlight build.
 site-reach: site-build
