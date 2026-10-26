@@ -10,7 +10,9 @@ import re
 import sys
 import urllib.request
 
-PAGE = "docs/reference/gate-history.md"
+from sitepage import CONTENT
+
+PAGE = CONTENT / "reference" / "gate-history.md"
 
 
 def counter(text, result):
@@ -63,30 +65,9 @@ if n != 1:
 
 open(PAGE, "w").write(page)
 
-# The same two numbers are quoted on the front page and on the feature page
-# that argues for the gate. They were typed in, and drifted -- 18 on the page
-# while the board said 26 -- which is the exact failure this script exists to
-# prevent, so they are rewritten from the same scrape. Anywhere else a count
-# appears, it must be added here, not typed.
-QUOTED = {
-    "docs/index.md": [
-        (r"On this board: \d+ updates, \d+ automatic rollback",
-         f"On this board: {promoted} updates, {rolled_back} automatic rollback"),
-    ],
-    "docs/features/updates-that-undo-themselves.md": [
-        (r"<div><b>\d+</b><span>updates taken on this board</span></div>",
-         f"<div><b>{promoted}</b><span>updates taken on this board</span></div>"),
-        (r"<div><b>\d+</b><span>rolled back by the board itself</span></div>",
-         f"<div><b>{rolled_back}</b><span>rolled back by the board itself</span></div>"),
-    ],
-}
-for path, edits in QUOTED.items():
-    text = open(path).read()
-    for pattern, replacement in edits:
-        text, n = re.subn(pattern, replacement, text, count=1)
-        if n != 1:
-            sys.exit(f"{path}: could not find the quoted count for {pattern!r}")
-    open(path, "w").write(text)
-    print(f"{path}: quoted counts rewritten")
+# The front page and the feature page that argues for the gate quote the same
+# two numbers, through facts.yaml (`just facts` reads them off this page), so
+# nothing else is rewritten here. They were typed in once and drifted -- 18 on
+# the page while the board said 26.
 print(f"{board}: promoted {promoted}, rolled back {rolled_back}, as of {today}")
 print("page unchanged" if page == before else "page rewritten")

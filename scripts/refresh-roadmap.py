@@ -10,7 +10,7 @@ to open seven discussions to find out what the ordering claim meant.
 The votes are two API calls away, so the page is generated from them:
 ordered by votes, with the count on every row.
 
-    just refresh-roadmap          # rewrite docs/roadmap.md and the data
+    just refresh-roadmap          # rewrite the roadmap page and its data
     just refresh-roadmap --check  # fail if the page is stale
 
 Committed like the changelog and for the same reason. The hourly Pages job
@@ -33,15 +33,16 @@ import re
 import subprocess
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-DATA = ROOT / "docs" / "data" / "roadmap.json"
+from sitepage import CONTENT, DATA as DATA_DIR, ROOT, page
+
+DATA = DATA_DIR / "roadmap.json"
 # Where a thing stands is a judgement, not a fact a script can read. It
 # belongs in the discussion, as a `Status:` line in the opening post. These
 # are the ones the hand-written page carried before it was generated, kept so
 # that nothing was lost on the way -- delete an entry here once its
 # discussion carries its own line.
-STATUS_FALLBACK = ROOT / "docs" / "data" / "roadmap-status.yaml"
-PAGE = ROOT / "docs" / "roadmap.md"
+STATUS_FALLBACK = DATA_DIR / "roadmap-status.yaml"
+PAGE = CONTENT / "roadmap.md"
 ORG = "excavador-turing"
 REPO = "BMC-Firmware"
 
@@ -180,21 +181,18 @@ def render(items: list[dict], as_of: str) -> str:
     desc = (f"What is planned for the Turing Pi 2 BMC firmware and what has "
             f"shipped: {len(planned)} open ideas ordered by your vote, "
             f"proposed and voted on in GitHub Discussions.")
+    fm = {"title": "Roadmap", "description": desc, "slug": "roadmap",
+          "template": "splash", "tableOfContents": False,
+          # The page's H1 is the hero band's.
+          "tp": {"hideTitle": True}}
     lines = [
-        "---",
-        "title: Roadmap",
-        f"description: {json.dumps(desc)}",
-        "hide:",
-        "  - navigation",
-        "  - toc",
-        "---",
-        "",
         # The page was a table: seven rows, four columns, the one number
         # that orders it in bold at the left edge and the status in prose at
         # the right. It carried the facts and read like a spreadsheet next
         # to every other page on the site. The cards carry the same four
         # facts in the site's own shape, and the vote is the thing you see.
-        '<div class="tp-hero-band" markdown>',
+        '<div class="tp-hero-band">',
+        "",
         '<span class="tp-eyebrow">Roadmap</span>',
         f"# {len(planned)} things planned. Your vote orders them.",
         "",
@@ -203,6 +201,7 @@ def render(items: list[dict], as_of: str) -> str:
         "cast now is on the page within one. Not on the list? "
         f'<a href="{propose}">Propose it</a> — a sentence about the problem is '
         "enough.</p>",
+        "",
         "</div>",
         "",
         '<div class="tp-proof">',
@@ -215,8 +214,8 @@ def render(items: list[dict], as_of: str) -> str:
         *[card(i) for i in planned],
         "</div>",
         "",
-        "Something broken rather than missing? [Report it](feedback.md), "
-        "and read [what is and isn't fixed](reference/known-faults.md) first, "
+        "Something broken rather than missing? [Report it](/feedback/), "
+        "and read [what is and isn't fixed](/reference/known-faults/) first, "
         "because it may already be there with a ticket.",
     ]
     if done:
@@ -235,17 +234,17 @@ def render(items: list[dict], as_of: str) -> str:
         "## Recently shipped",
         "",
         "One post per firmware release, from the repositories' own "
-        "changelogs — [all of them](news/index.md), or "
-        "[by feed](feed.xml).",
+        "changelogs — [all of them](/news/), or "
+        "[by feed](/feed.xml).",
         "",
         "{{ recent_releases }}",
         "",
         "## How a thing gets from here to there",
         "",
         "A feature is a ticket in the maintainer's tracker, a Discussion here, "
-        "and then a page under [Features](features/index.md) with the numbers "
+        "and then a page under [Features](/features/) with the numbers "
         "that prove it — in that order. The "
-        "[known-faults page](reference/known-faults.md) is the other half of "
+        "[known-faults page](/reference/known-faults/) is the other half of "
         "this one: what is wrong today, with the ticket that tracks it. A "
         "roadmap that lists only what is coming is advertising.",
         "",
@@ -262,17 +261,20 @@ def render(items: list[dict], as_of: str) -> str:
         "with the measurement behind it.</span></a>",
         "</div>",
     ]
-    return "\n".join(lines) + "\n"
+    return page(fm, lines)
 
 
 def recent(n: int = 5) -> str:
     """The newest firmware releases, each linking to its news post."""
-    page = ROOT / "docs" / "changelog" / "firmware.md"
-    if not page.exists():
+    firmware = CONTENT / "changelog" / "firmware.md"
+    if not firmware.exists():
         return "_Run `just refresh-changelog` first._"
-    rows = re.findall(r'^\?\?\?\+? note "([^"]+)"', page.read_text(), re.M)
+    # Each release is a collapsed block whose summary is "v2.44.0 — 15
+    # October 2026" (refresh-changelog.py).
+    rows = [html.unescape(r) for r in re.findall(
+        r"^<summary>(.+?)</summary>$", firmware.read_text(), re.M)]
     # A release covered by another's post links to that post.
-    posts_map = ROOT / "docs" / "data" / "news-posts.json"
+    posts_map = DATA_DIR / "news-posts.json"
     slug_of = json.loads(posts_map.read_text()) if posts_map.exists() else {}
     out = ['<div class="tp-releases">']
     for row in rows[:n]:

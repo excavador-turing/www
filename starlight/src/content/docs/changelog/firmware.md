@@ -23,7 +23,6 @@ $ sha256sum -c SHA256SUMS
 <details class="note" open>
 <summary>v2.44.0 — 15 October 2026</summary>
 
-
 bmcd 2.40.0; BMC-UI 4.1.0 and tpi 1.10.0 are unchanged.
 
 **Changed**
@@ -49,7 +48,6 @@ bmcd 2.40.0; BMC-UI 4.1.0 and tpi 1.10.0 are unchanged.
 
 <details class="note">
 <summary>v2.43.0 — 15 October 2026</summary>
-
 
 bmcd 2.39.0 and BMC-UI 4.1.0; tpi 1.10.0 is unchanged.
 
@@ -82,7 +80,6 @@ bmcd 2.39.0 and BMC-UI 4.1.0; tpi 1.10.0 is unchanged.
 
 <details class="note">
 <summary>v2.42.0 — 6 October 2026</summary>
-
 
 bmcd 2.38.4, BMC-UI 4.0.1 and tpi 1.10.0 are unchanged; what changed is the
 SD-card installer and the scripts around it.
@@ -117,7 +114,6 @@ SD-card installer and the scripts around it.
 <details class="note">
 <summary>v2.41.0 — 6 October 2026</summary>
 
-
 Pins **bmcd 2.38.4** and **BMC-UI 4.0.1**; tpi stays at 1.10.0. One fix,
 from a reader on the Turing Pi Discord.
 
@@ -150,7 +146,6 @@ from a reader on the Turing Pi Discord.
 <details class="note">
 <summary>v2.40.0 — 3 October 2026</summary>
 
-
 Pins **BMC-UI 4.0.0**; bmcd stays at 2.38.3 and tpi at 1.10.0. The web
 interface, redesigned.
 
@@ -176,7 +171,6 @@ interface, redesigned.
 
 <details class="note">
 <summary>v2.39.0 — 23 September 2026</summary>
-
 
 Pins **bmcd 2.38.3** and **BMC-UI 3.38.0**; tpi stays at 1.10.0. One bug,
 from a reader who named a VLAN.
@@ -209,7 +203,6 @@ from a reader who named a VLAN.
 <details class="note">
 <summary>v2.38.0 — 22 September 2026</summary>
 
-
 Pins **BMC-UI 3.37.0**. bmcd stays at 2.38.2 and tpi at 1.10.0. One change,
 from a reader who had just done an update for the first time.
 
@@ -238,7 +231,6 @@ from a reader who had just done an update for the first time.
 <details class="note">
 <summary>v2.37.0 — 22 September 2026</summary>
 
-
 Pins **BMC-UI 3.36.0**. bmcd stays at 2.38.2 and tpi at 1.10.0. One fix, and
 it is the one a new board meets first.
 
@@ -265,7 +257,6 @@ it is the one a new board meets first.
 
 <details class="note">
 <summary>v2.36.0 — 22 September 2026</summary>
-
 
 Pins **bmcd 2.38.2** and **BMC-UI 3.35.0**; tpi stays at 1.10.0. Two fixes,
 both from one report the day after v2.35.0 shipped, by the same reader whose
@@ -319,7 +310,6 @@ had no DNS — and neither of them said so.
 <details class="note">
 <summary>v2.35.0 — 21 September 2026</summary>
 
-
 Pins **bmcd 2.38.0**, **BMC-UI 3.34.1** and **tpi 1.10.0**. All three come
 from one Discord report on 2026-09-21: a user on a 2.4 board — the second
 2.4 board confirmed on this fork — had set the Split layout up, given the
@@ -367,7 +357,6 @@ the detail; what follows is what this image adds on top of them.
 <details class="note">
 <summary>v2.34.0 — 20 September 2026</summary>
 
-
 Pins **BMC-UI 3.32.0**. bmcd stays at 2.37.0 and tpi at 1.9.0.
 
 **Changed**
@@ -382,7 +371,6 @@ Pins **BMC-UI 3.32.0**. bmcd stays at 2.37.0 and tpi at 1.9.0.
 
 <details class="note">
 <summary>v2.33.0 — 20 September 2026</summary>
-
 
 Pins **bmcd 2.37.0**, **BMC-UI 3.30.0** and **tpi 1.9.0** — the first release
 carrying the on-board switch, the certificate endpoint and the forced password
@@ -440,7 +428,6 @@ this image adds on top of them.
 <details class="note">
 <summary>v2.32.0 — 13 September 2026</summary>
 
-
 Pins BMC-UI 3.29.0. bmcd stays at 2.36.3 and tpi is unchanged.
 
 **Added**
@@ -477,7 +464,6 @@ Pins BMC-UI 3.29.0. bmcd stays at 2.36.3 and tpi is unchanged.
 <details class="note">
 <summary>v2.31.0 — 12 September 2026</summary>
 
-
 Pins BMC-UI 3.28.0. bmcd stays at 2.36.3 and tpi is unchanged.
 
 **Fixed**
@@ -505,7 +491,6 @@ Pins BMC-UI 3.28.0. bmcd stays at 2.36.3 and tpi is unchanged.
 
 <details class="note">
 <summary>v2.30.0 — 12 September 2026</summary>
-
 
 Pins bmcd 2.36.3. BMC-UI stays at 3.27.0 and tpi is unchanged.
 
@@ -559,7 +544,6 @@ Pins bmcd 2.36.3. BMC-UI stays at 3.27.0 and tpi is unchanged.
 <details class="note">
 <summary>v2.29.0 — 12 September 2026</summary>
 
-
 Pins bmcd 2.36.1. BMC-UI stays at 3.27.0 and tpi is unchanged.
 
 **Fixed**
@@ -579,7 +563,6 @@ Pins bmcd 2.36.1. BMC-UI stays at 3.27.0 and tpi is unchanged.
 
 <details class="note">
 <summary>v2.28.0 — 12 September 2026</summary>
-
 
 Pins bmcd 2.36.0 and BMC-UI 3.27.0; tpi is unchanged and already current.
 
@@ -624,7 +607,6 @@ measurement: BMC-UI 3.25.0 (the SD card picker and two dead flash buttons) and
 <details class="note">
 <summary>v2.27.0 — 12 September 2026</summary>
 
-
 The first release that carries the latest of all three: BMC-UI 3.26.0, bmcd
 2.34.0 and tpi 1.8.0.
 
@@ -640,7 +622,6 @@ The first release that carries the latest of all three: BMC-UI 3.26.0, bmcd
 <details class="note">
 <summary>v2.26.0 — 11 September 2026</summary>
 
-
 Pins BMC-UI 3.25.0: the SD card picker, and the flash button that threw
 instead of flashing.
 
@@ -654,7 +635,6 @@ instead of flashing.
 
 <details class="note">
 <summary>v2.25.0 — 11 September 2026</summary>
-
 
 **Fixed**
 
@@ -680,7 +660,6 @@ instead of flashing.
 
 <details class="note">
 <summary>v2.24.0 — 11 September 2026</summary>
-
 
 Everything current: the daemon, the interface and the CLI.
 
@@ -728,7 +707,6 @@ Everything current: the daemon, the interface and the CLI.
 
 <details class="note">
 <summary>v2.23.0 — 11 September 2026</summary>
-
 
 TLS, made usable rather than merely present.
 
@@ -795,7 +773,6 @@ TLS, made usable rather than merely present.
 <details class="note">
 <summary>v2.22.0 — 11 September 2026</summary>
 
-
 **Added**
 
 - **bmcd v2.29.0 → v2.30.0: a proxy holding a certificate from a trusted CA
@@ -811,7 +788,6 @@ TLS, made usable rather than merely present.
 
 <details class="note">
 <summary>v2.21.0 — 11 September 2026</summary>
-
 
 **Changed**
 
@@ -830,7 +806,6 @@ TLS, made usable rather than merely present.
 
 <details class="note">
 <summary>v2.20.0 — 10 September 2026</summary>
-
 
 **Added**
 
@@ -860,7 +835,6 @@ TLS, made usable rather than merely present.
 
 <details class="note">
 <summary>v2.19.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -898,7 +872,6 @@ TLS, made usable rather than merely present.
 <details class="note">
 <summary>v2.18.0 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **`tpi` v1.5.0 → v1.5.1: the fix v2.17.0 shipped did not work.** `firmware
@@ -929,7 +902,6 @@ TLS, made usable rather than merely present.
 <details class="note">
 <summary>v2.17.0 — 9 September 2026</summary>
 
-
 > **The `tpi` change below is inert.** It describes behaviour v1.5.0 did not
 > have; v2.18.0 carries the version that does. Kept as written, because a
 > release note that quietly becomes true later teaches nobody anything.
@@ -957,7 +929,6 @@ TLS, made usable rather than merely present.
 
 <details class="note">
 <summary>v2.16.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -1005,7 +976,6 @@ TLS, made usable rather than merely present.
 <details class="note">
 <summary>v2.15.0 — 9 September 2026</summary>
 
-
 **Changed**
 
 - **`/metrics` is served on port 9110, plain HTTP, with no credential**
@@ -1048,7 +1018,6 @@ TLS, made usable rather than merely present.
 
 <details class="note">
 <summary>v2.14.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -1096,7 +1065,6 @@ TLS, made usable rather than merely present.
 
 <details class="note">
 <summary>v2.13.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -1155,7 +1123,6 @@ TLS, made usable rather than merely present.
 <details class="note">
 <summary>v2.12.0 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **A serial console could reboot the board by accident.** The kernel boots
@@ -1188,7 +1155,6 @@ TLS, made usable rather than merely present.
 <details class="note">
 <summary>v2.11.0 — 9 September 2026</summary>
 
-
 Built but **not installed**: the board wedged before this could be flashed and
 needs a physical power cycle first (SQU-172). This is the image to install when
 it comes back.
@@ -1215,7 +1181,6 @@ it comes back.
 <details class="note">
 <summary>v2.10.0 — 9 September 2026</summary>
 
-
 **Changed**
 
 - bmcd **2.16.0**: every API operation has a path of its own —
@@ -1232,7 +1197,6 @@ it comes back.
 <details class="note">
 <summary>v2.9.2 — 9 September 2026</summary>
 
-
 **Changed**
 
 - BMC-UI **3.9.2**: each firmware source lists its newest three versions,
@@ -1244,7 +1208,6 @@ it comes back.
 
 <details class="note">
 <summary>v2.9.1 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -1259,7 +1222,6 @@ it comes back.
 
 <details class="note">
 <summary>v2.9.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -1309,7 +1271,6 @@ it comes back.
 
 <details class="note">
 <summary>v2.8.1 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1362,7 +1323,6 @@ it comes back.
 <details class="note">
 <summary>v2.8.0 — 8 September 2026</summary>
 
-
 **Changed**
 
 - First release built entirely in `excavador-turing`. Firmware sources point at
@@ -1373,7 +1333,6 @@ it comes back.
 
 <details class="note">
 <summary>v2.7.0 — 8 September 2026</summary>
-
 
 **Added**
 

@@ -15,11 +15,11 @@ None of those were wrong when written. They were written more than once, and
 a fact written twice is a fact that will disagree with itself.
 
 So: every number lives here, each with where it came from and when, and pages
-quote it through the macros plugin -- `{{ gate.updates }}` rather than `26`.
+quote it through a component -- `<Fact of="gate.promoted" />` rather than `26`.
 `scripts/facts-lint.py` fails the build if a page types one of these numbers
 instead of asking for it.
 
-    just facts            # rebuild docs/data/facts.yaml
+    just facts            # rebuild starlight/src/data/facts.yaml
     just facts --offline  # keep what needs the network, refresh the rest
 
 What comes from where:
@@ -47,9 +47,9 @@ import yaml
 import subprocess
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ROOT / "docs"
-OUT = DOCS / "data" / "facts.yaml"
+from sitepage import CONTENT, DATA, ROOT
+
+OUT = DATA / "facts.yaml"
 
 TODAY = dt.date.today().isoformat()
 
@@ -60,7 +60,7 @@ def gate() -> dict:
     Read out of the page `refresh-gate-history.py` writes rather than off a
     board: CI has no route to one and must never be the thing that notices.
     """
-    text = (DOCS / "reference" / "gate-history.md").read_text()
+    text = (CONTENT / "reference" / "gate-history.md").read_text()
     when = re.search(r"As of \*\*(\d{4}-\d{2}-\d{2})\*\*", text)
 
     def row(label):
@@ -90,12 +90,12 @@ def gate() -> dict:
 
 def releases() -> dict:
     """Newest version and release count per component, from the changelog pages."""
-    out = {"source": "docs/changelog/*.md, written by `just refresh-changelog` "
+    out = {"source": "changelog/*.md, written by `just refresh-changelog` "
                      "from each repository's CHANGELOG.md"}
     total = 0
     for name, page in (("firmware", "firmware"), ("bmcd", "bmcd"),
                        ("ui", "bmc-ui"), ("tpi", "tpi")):
-        f = DOCS / "changelog" / f"{page}.md"
+        f = CONTENT / "changelog" / f"{page}.md"
         if not f.exists():
             continue
         text = f.read_text()
@@ -117,25 +117,25 @@ def releases() -> dict:
 
 def features() -> dict:
     """How many features there are: how many feature pages there are."""
-    pages = sorted(p.stem for p in (DOCS / "features").glob("*.md")
+    pages = sorted(p.stem for p in (CONTENT / "features").glob("*.md*")
                    if p.stem != "index")
-    return {"source": "docs/features/*.md -- a feature is a page",
+    return {"source": "features/*.mdx -- a feature is a page",
             "count": len(pages), "pages": pages}
 
 
 def boards() -> dict:
     """Which board revisions this firmware has been seen running on."""
-    reports = yaml.safe_load((DOCS / "data" / "boards.yaml").read_text()) or []
+    reports = yaml.safe_load((DATA / "boards.yaml").read_text()) or []
     revisions = sorted({str(r.get("revision", "")) for r in reports if r.get("revision")})
     readers = sum(1 for r in reports if "reader" in str(r.get("source", "")))
-    return {"source": "docs/data/boards.yaml -- one entry per report, rendered by board_reports()",
+    return {"source": "data/boards.yaml -- one entry per report, rendered by <BoardReports />",
             "reports": len(reports), "from_readers": readers,
             "revisions": revisions}
 
 
 def faults() -> dict:
     """Open faults: the headings under `## Open`."""
-    text = (DOCS / "reference" / "known-faults.md").read_text()
+    text = (CONTENT / "reference" / "known-faults.md").read_text()
     body = re.split(r"^##\s+", text, flags=re.M)
     open_section = next((s for s in body if s.lower().startswith("open")), "")
     names = re.findall(r"^###\s+(.+)$", open_section, re.M)
@@ -145,9 +145,9 @@ def faults() -> dict:
 
 def roadmap() -> dict:
     """Planned features and their votes, as refresh-roadmap.py last recorded."""
-    f = DOCS / "data" / "roadmap.json"
+    f = DATA / "roadmap.json"
     if not f.exists():
-        return {"source": "docs/data/roadmap.json, written by "
+        return {"source": "data/roadmap.json, written by "
                           "`just refresh-roadmap`", "count": 0, "top": None}
     data = json.loads(f.read_text())
     items = sorted(data.get("items", []), key=lambda i: -i.get("votes", 0))
@@ -158,7 +158,7 @@ def roadmap() -> dict:
     # evening they shipped.
     planned = [i for i in items
                if not re.match(r"\s*shipped\b", i.get("status", ""), re.I)]
-    return {"source": "docs/data/roadmap.json, written by `just refresh-roadmap` "
+    return {"source": "data/roadmap.json, written by `just refresh-roadmap` "
                       "from the Ideas discussions",
             "as_of": data.get("as_of"),
             "count": len(planned),
@@ -169,7 +169,7 @@ def roadmap() -> dict:
 
 def platform() -> dict:
     """The versions the comparison page proves, which the selling pages quote."""
-    text = (DOCS / "reference" / "comparison.md").read_text()
+    text = (CONTENT / "reference" / "comparison.md").read_text()
 
     # Data rows of the upstream-vs-fork tables: a row whose first cell is a
     # label. Not the header rule, not the `route` header of the two-catalogue
@@ -212,7 +212,7 @@ def dump(data: dict) -> str:
     lines = ["# GENERATED by scripts/facts.py -- do not edit.",
              "#",
              "# Every number this site quotes about itself, with where it came",
-             "# from. Pages read it through the macros plugin: {{ gate.updates }},",
+             "# from. Pages read it through <Fact of=\"gate.promoted\" />,",
              "# never 26. scripts/facts-lint.py fails a build that types one.",
              f"generated: {TODAY}"]
 

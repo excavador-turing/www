@@ -14,12 +14,12 @@ in), each page supplies its own one-line description, and
 `scripts/description-lint.py` guarantees every page has one.
 
 `llms-full.txt` -- the whole site as one document -- is deliberately NOT
-written. These pages are macros and snippets; the markdown on disk is not the
+written. These pages are full of components; the markdown on disk is not the
 page a reader gets, and pouring built HTML back into markdown would publish a
 third version of the text that nobody checks. If an index asks for it, build
 it from the built pages, not from the source.
 
-    just llms            # write docs/llms.txt
+    just llms            # write starlight/src/data/llms.txt
     just llms --check    # fail if the committed file is stale
     scripts/llms.py --check --site starlight/dist   # and what a build serves
 
@@ -41,9 +41,10 @@ import sys
 
 import yaml
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ROOT / "docs"
-OUT = DOCS / "llms.txt"
+from sitepage import CONTENT, DATA, SITE, ROOT
+
+# Served at /llms.txt by src/routes/llms.txt.ts.
+OUT = DATA / "llms.txt"
 ORG = "excavador-turing"
 
 # The one paragraph. It says what the thing IS and why it exists, because
@@ -62,26 +63,23 @@ BLURB = (
 
 # Not everything in the nav is a page an assistant should read. The demo is
 # an application shell whose text is one board's captured data.
-SKIP = {"demo/index.md"}
+SKIP = {"/demo/"}
+
+
+def config(name: str):
+    return json.loads((SITE / "src" / "config" / name).read_text())
 
 
 def site_url() -> str:
-    for line in (ROOT / "mkdocs.yml").read_text().splitlines():
-        if line.startswith("site_url:"):
-            return line.split(":", 1)[1].strip().strip('"\'').rstrip("/")
-    return ""
+    return config("site.json")["site"].rstrip("/")
 
 
 def nav() -> list:
-    cfg = yaml.safe_load((ROOT / "mkdocs.yml").read_text())
-    return cfg.get("nav") or []
+    return config("sidebar.json")
 
 
-def front_matter(src: str) -> dict:
-    p = DOCS / src
-    if not p.exists():
-        return {}
-    text = p.read_text()
+def front_matter(path: pathlib.Path) -> dict:
+    text = path.read_text()
     if not text.startswith("---"):
         return {}
     end = text.find("\n---", 3)
@@ -91,45 +89,44 @@ def front_matter(src: str) -> dict:
         return {}
 
 
-def url_of(src: str, base: str) -> str:
-    """The published URL of a source path, as mkdocs' directory URLs make it."""
-    s = src[:-3] if src.endswith(".md") else src
-    if s.endswith("/index"):
-        s = s[:-6]
-    elif s == "index":
-        s = ""
-    return f"{base}/{s}/" if s else f"{base}/"
+_pages: dict[str, dict] | None = None
 
 
-def walk(node, out: list[tuple[str, str, str]], group: str = "") -> None:
-    """Flatten a nav subtree into (group, title, src), keeping its order.
+def page_at(url: str) -> dict:
+    """The front matter of the page served at a site path, by its slug."""
+    global _pages
+    if _pages is None:
+        _pages = {}
+        for p in CONTENT.rglob("*.md*"):
+            fm = front_matter(p)
+            slug = str(fm.get("slug", ""))
+            _pages["/" if slug == "index" else f"/{slug}/"] = fm
+    return _pages.get(url, {})
+
+
+def walk(items: list, out: list[tuple[str, str, str]], group: str = "") -> None:
+    """Flatten a sidebar subtree into (group, label, link), keeping its order.
 
     `group` is the nearest sub-heading inside the section -- "The arguments",
     "Reference", "Changelogs". Eleven feature pages and eleven argument pages
     share their titles, so without it the list reads as the same page twice.
     """
-    if isinstance(node, str):
-        out.append((group, "", node))
-    elif isinstance(node, dict):
-        for title, child in node.items():
-            if isinstance(child, str):
-                out.append((group, title, child))
-            else:
-                walk(child, out, title)
-    elif isinstance(node, list):
-        for child in node:
-            walk(child, out, group)
+    for item in items:
+        if "items" in item:
+            walk(item["items"], out, item["label"])
+        else:
+            out.append((group, item["label"], item["link"]))
 
 
 def recent_posts(base: str, limit: int = 10) -> list[str]:
     posts = []
-    for p in (DOCS / "news" / "posts").glob("*.md"):
-        fm = front_matter(str(p.relative_to(DOCS)))
+    for p in (CONTENT / "news").glob("*.md"):
+        fm = front_matter(p)
         if fm.get("date") and fm.get("slug"):
             posts.append((str(fm["date"]), fm["slug"], fm.get("title", ""),
                           fm.get("description", "")))
     posts.sort(reverse=True)
-    return [f"- [{t}]({base}/news/{slug}/): {d}"
+    return [f"- [{t}]({base}/{slug}/): {d}"
             for _when, slug, t, d in posts[:limit]]
 
 
@@ -146,26 +143,24 @@ def render() -> str:
     ]
     counted = 0
     for section in nav():
-        if not isinstance(section, dict):
-            continue
-        (heading, child), = section.items()
+        heading = section["label"]
         pairs: list[tuple[str, str, str]] = []
-        walk(child if not isinstance(child, str) else {heading: child}, pairs)
+        walk(section.get("items") or [section], pairs)
         rows, seen_urls = [], set()
-        for group, title, src in pairs:
-            if src in SKIP or not src.endswith(".md"):
+        for group, title, link in pairs:
+            if link in SKIP or not link.startswith("/"):
                 continue
-            fm = front_matter(src)
-            if (fm.get("robots") or "").startswith("noindex"):
+            fm = page_at(link)
+            if ((fm.get("tp") or {}).get("robots") or "").startswith("noindex"):
                 continue
-            url = url_of(src, base)
+            url = base + link
             # Two sources can claim one URL (a page and a directory index of
             # the same name). The nav shows both; an index must not.
             if url in seen_urls:
                 continue
             seen_urls.add(url)
             desc = (fm.get("description") or "").strip()
-            name = title or fm.get("title") or src
+            name = title or fm.get("title") or link
             if group and group != heading:
                 name = f"{group}: {name}"
             rows.append(f"- [{name}]({url}): {desc}")
@@ -249,10 +244,10 @@ def main() -> int:
     text = render()
     if args.check:
         if not OUT.exists() or OUT.read_text() != text:
-            print("llms: docs/llms.txt is stale — run `just llms`",
+            print(f"llms: {OUT.relative_to(ROOT)} is stale — run `just llms`",
                   file=sys.stderr)
             return 1
-        print("  docs/llms.txt matches the nav")
+        print(f"  {OUT.relative_to(ROOT)} matches the nav")
         if args.site:
             return check_served(pathlib.Path(args.site), text)
         return 0

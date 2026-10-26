@@ -12,7 +12,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note" open>
 <summary>2.40.0 — 15 October 2026</summary>
 
-
 **Changed**
 
 - **Flashing waits up to 15 s for the module's USB boot device, and names
@@ -39,7 +38,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.39.0 — 14 October 2026</summary>
-
 
 **Added**
 
@@ -78,7 +76,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.38.4 — 6 October 2026</summary>
 
-
 **Fixed**
 
 - **After an upgrade the browser could keep running the old interface, and
@@ -99,7 +96,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.38.3 — 23 September 2026</summary>
-
 
 **Fixed**
 
@@ -128,7 +124,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.38.2 — 22 September 2026</summary>
 
-
 **Fixed**
 
 - **A firmware source that could not be reached reported nothing rather
@@ -153,7 +148,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.38.1 — 22 September 2026</summary>
-
 
 **Fixed**
 
@@ -186,7 +180,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.38.0 — 21 September 2026</summary>
-
 
 **Added**
 
@@ -232,7 +225,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>v2.37.0 — 20 September 2026</summary>
-
 
 **Security**
 
@@ -508,7 +500,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.36.3 — 12 September 2026</summary>
 
-
 **Added**
 
 - **`/metrics` now reports the USB multiplexer, including which module is
@@ -552,7 +543,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.36.2 — 12 September 2026 (no release of its own)</summary>
 
-
 **Fixed**
 
 - **The board refused every attempt to resume a TLS session, fatally.** This
@@ -591,7 +581,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.36.1 — 12 September 2026</summary>
 
-
 **Fixed**
 
 - **Every refusal from the new access endpoints answered 500.** Measured on
@@ -617,7 +606,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.36.0 — 12 September 2026</summary>
-
 
 **Added**
 
@@ -682,7 +670,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.35.0 — 11 September 2026</summary>
 
-
 **Fixed**
 
 - **The board could stop checking for firmware, for ever** (SQU-201). The
@@ -740,7 +727,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.34.0 — 11 September 2026</summary>
 
-
 **Added**
 
 - **`opt=get&type=sdcard_files`, also `GET /api/bmc/sdcard/files`: what is on
@@ -782,7 +768,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.33.0 — 11 September 2026</summary>
 
-
 **Fixed**
 
 - **A node's USB bus number is not part of its identity, and pinning it
@@ -816,7 +801,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.32.0 — 11 September 2026</summary>
-
 
 **Added**
 
@@ -858,7 +842,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.31.0 — 11 September 2026</summary>
 
-
 **Changed**
 
 - **The daemon offers TLS 1.3, with 1.2 as the fallback.** The acceptor was
@@ -890,7 +873,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.30.0 — 11 September 2026</summary>
 
-
 **Added**
 
 - **A proxy holding a certificate from a trusted CA can name the human it
@@ -920,7 +902,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.29.0 — 10 September 2026</summary>
-
 
 **Added**
 
@@ -954,7 +935,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 
 <details class="note">
 <summary>2.28.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1009,7 +989,6 @@ Newest release **2.40.0**, 15 October 2026. 46 in total. Each entry is this repo
 <details class="note">
 <summary>2.27.0 — 9 September 2026</summary>
 
-
 **Changed**
 
 - **`/metrics` moved to its own listener: port 9110, plain HTTP, no
@@ -1063,7 +1042,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 <details class="note">
 <summary>2.26.0 — 9 September 2026</summary>
 
-
 **Added**
 
 - **`bmcd --openapi` prints the API document and exits** (SQU-149, towards
@@ -1087,7 +1065,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 
 <details class="note">
 <summary>2.25.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1123,7 +1100,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 
 <details class="note">
 <summary>2.24.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1166,7 +1142,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 <details class="note">
 <summary>2.23.0 — 9 September 2026</summary>
 
-
 **Added**
 
 - **One audit line per mutating API call** (SQU-108). Until now a `power off`
@@ -1208,7 +1183,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 <details class="note">
 <summary>2.22.0 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **A flash now targets the module that was asked for** (SQU-105). On a v2.5
@@ -1247,7 +1221,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 
 <details class="note">
 <summary>2.21.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1303,7 +1276,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 
 <details class="note">
 <summary>2.20.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1363,7 +1335,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 <details class="note">
 <summary>2.19.1 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **Two strings had source indentation in the middle of a sentence.** A literal
@@ -1386,7 +1357,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 <details class="note">
 <summary>2.19.0 — 9 September 2026</summary>
 
-
 **Added**
 
 - **A rollback can be named** (SQU-158). The interface said *"Rollback: version
@@ -1407,7 +1377,6 @@ request to 9110. The on-board `tpi` is the only remaining user of the bypass
 
 <details class="note">
 <summary>2.18.0 — 9 September 2026</summary>
-
 
 The board wedged at 02:11 UTC after losing roughly a megabyte a minute under
 continuous polling (SQU-172). Its kernel still answered ICMP; nothing
@@ -1444,7 +1413,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.17.0 — 9 September 2026</summary>
 
-
 **Added**
 
 - **`bmcd_firmware_promotion_total{result}`** (SQU-141), counted from the
@@ -1470,7 +1438,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 
 <details class="note">
 <summary>2.16.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1509,7 +1476,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.15.1 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **Park mode did not compile for the board.** `statvfs`'s block counts are
@@ -1535,7 +1501,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.15.0 — 9 September 2026</summary>
 
-
 **Added**
 
 - **`type=thermal` reports each zone's trip points** (SQU-135). The governor is
@@ -1555,7 +1520,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 
 <details class="note">
 <summary>2.14.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1599,7 +1563,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 
 <details class="note">
 <summary>2.13.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1648,7 +1611,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.12.0 — 9 September 2026</summary>
 
-
 **Added**
 
 - **Park an uploaded image instead of installing it** (SQU-134).
@@ -1678,7 +1640,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 
 <details class="note">
 <summary>2.11.0 — 9 September 2026</summary>
-
 
 **Fixed**
 
@@ -1723,7 +1684,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.10.1 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **A parked image is ordered against what is running** (SQU-169). A local
@@ -1758,7 +1718,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.10.0 — 8 September 2026</summary>
 
-
 **Changed**
 
 - Rust 1.98.1 across the workspace, dependencies refreshed, and 23 clippy lints
@@ -1771,7 +1730,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.9.0 — 8 September 2026</summary>
 
-
 **Changed**
 
 - Firmware sources point at `excavador-turing/BMC-Firmware`. A board that still
@@ -1782,7 +1740,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 
 <details class="note">
 <summary>2.8.0 — 8 September 2026 (no release of its own)</summary>
-
 
 **Added**
 
@@ -1795,7 +1752,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 
 <details class="note">
 <summary>2.7.0 — 7 September 2026 (no release of its own)</summary>
-
 
 **Added**
 
@@ -1812,7 +1768,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 <details class="note">
 <summary>2.5.0 — 7 September 2026 (no release of its own)</summary>
 
-
 **Added**
 
 - `firmware_info` reports *which* image is staged, not merely that one is.
@@ -1823,7 +1778,6 @@ occurrence is diagnosable, and so one of the plausible causes cannot happen.
 
 <details class="note">
 <summary>2.4.0 — 6 September 2026 (no release of its own)</summary>
-
 
 **Added**
 

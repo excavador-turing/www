@@ -20,12 +20,13 @@ Usage:  ./scripts/refresh-changelog.py            # every component
 The result is committed, for the same reason the OpenAPI document is: the
 site builds offline and reproducibly, and a change to the history arrives as
 a reviewable diff instead of appearing the next time CI runs. The hourly
-Pages job runs this and commits when it differs, so a release reaches the
+publish job runs this and commits when it differs, so a release reaches the
 site without anybody remembering.
 """
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import pathlib
 import re
@@ -33,9 +34,14 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-OUTDIR = ROOT / "docs" / "changelog"
-NEWS = ROOT / "docs" / "news" / "posts"
+from sitepage import CONTENT, DATA, PUBLIC, ROOT, aside, details, page
+
+OUTDIR = CONTENT / "changelog"
+# The posts sit beside the news index (news/index.mdx), which lists them.
+NEWS = CONTENT / "news"
+FEED = PUBLIC / "feed.xml"
+# version -> the slug of the post that announced it.
+POSTS_MAP = DATA / "news-posts.json"
 ORG = "excavador-turing"
 
 # Ordered as a reader meets them: the thing you flash, then what runs on it,
@@ -61,7 +67,7 @@ RELEASE = re.compile(
 
 # A page's own `<meta name="description">`.
 #
-# Without one, Material repeats `site_description` on every page, so all 91
+# Without one, a page repeats the site's description, as all 91 once did, and
 # said "A fork of the Turing Pi 2 BMC firmware, and what it changes" -- which
 # is then what a search result, a link preview and an AI summary of any page
 # say. These pages are generated, so their description is generated too: the
@@ -234,9 +240,9 @@ def render(slug: str, repo: str, blurb: str) -> dict:
     desc = (f"Every {repo} release and what changed in it: {len(shipped)} "
             f"entries" + (f", newest {newest_ver}" if newest_ver else "") +
             ", taken from the repository's own CHANGELOG.md.")
-    lines = ["---", f"description: {json.dumps(meta_description(desc))}",
-             "hide:", "  - toc", "---", "",
-             f"# {repo}", "", blurb, ""]
+    fm = {"title": repo, "description": meta_description(desc),
+          "slug": f"changelog/{slug}", "tableOfContents": False}
+    lines = [blurb, ""]
     if newest:
         lines += [
             f"Newest release **{newest['version']}**, "
@@ -254,25 +260,25 @@ def render(slug: str, repo: str, blurb: str) -> dict:
             f"[Every release on GitHub](https://github.com/{ORG}/{repo}/releases) "
             "carries a `.tpu` OTA package, an `.img` recovery image and a "
             "`SHA256SUMS` to check them against. New ones come through "
-            "[the feed](../feed.xml).",
+            "[the feed](/feed.xml).",
             "",
-            '!!! note "Checking what you downloaded"',
-            "",
-            "    ```console",
-            "    $ sha256sum -c SHA256SUMS",
-            "    ```",
-            "",
-            "    `SHA256SUMS` lists bare filenames, so run it from the "
-            "directory holding the files. Upstream publishes no checksums at "
-            "all, on either of its two catalogues — see [upstream vs this "
-            "fork](../reference/comparison.md).",
+            *aside("note", "Checking what you downloaded", [
+                "",
+                "```console",
+                "$ sha256sum -c SHA256SUMS",
+                "```",
+                "",
+                "`SHA256SUMS` lists bare filenames, so run it from the "
+                "directory holding the files. Upstream publishes no checksums "
+                "at all, on either of its two catalogues — see [upstream vs "
+                "this fork](/reference/comparison/).",
+            ]),
             "",
         ]
 
     if pending:
-        lines += ['???+ note "Unreleased — merged, not yet on a board"', ""]
-        lines += ["    " + ln if ln.strip() else ""
-                  for ln in demote(pending["body"]).splitlines()]
+        lines += details("Unreleased — merged, not yet on a board",
+                         demote(pending["body"]).splitlines(), opened=True)
         lines.append("")
 
     for i, e in enumerate(shipped):
@@ -286,22 +292,19 @@ def render(slug: str, repo: str, blurb: str) -> dict:
             # firmware image, and a gap worth seeing for the firmware itself.
             title += (" (no release of its own)" if slug != "firmware"
                       else " (not released)")
+        body = ((demote(e["body"]) if e["source"] == "changelog"
+                 else e["body"]) or "_No entry._").splitlines()
+        if e["source"] == "release-note":
+            body += ["", "*No entry in `CHANGELOG.md` for this release; "
+                         "the text above is its release note.*"]
         # The newest is open unless an Unreleased block already took that
         # spot: two open blocks at the top is two things shouting.
-        marker = "???+" if (i == 0 and not pending) else "???"
-        lines.append(f'{marker} note "{title}"')
-        lines.append("")
-        body = (demote(e["body"]) if e["source"] == "changelog"
-                else e["body"]) or "_No entry._"
-        lines += ["    " + ln if ln.strip() else "" for ln in body.splitlines()]
-        if e["source"] == "release-note":
-            lines += ["", "    *No entry in `CHANGELOG.md` for this release; "
-                          "the text above is its release note.*"]
+        lines += details(title, body, opened=i == 0 and not pending)
         lines.append("")
 
-    page = OUTDIR / f"{slug}.md"
-    page.write_text("\n".join(lines).rstrip() + "\n")
-    return {"slug": slug, "repo": repo, "page": page, "blurb": blurb,
+    out = OUTDIR / f"{slug}.md"
+    out.write_text(page(fm, lines))
+    return {"slug": slug, "repo": repo, "page": out, "blurb": blurb,
             "count": len(shipped),
             "newest": newest["version"] if newest else None,
             "newest_date": newest["date"] if newest else None,
@@ -312,21 +315,20 @@ def render(slug: str, repo: str, blurb: str) -> dict:
 
 
 def write_index(summary: list[dict]) -> pathlib.Path:
+    fm = {
+        "title": "Every component's changelog",
+        "description": "What changed in every release of the firmware, the "
+                       "daemon, the interface and the command line, from each "
+                       "repository's own CHANGELOG.md.",
+        "slug": "changelog",
+        "tableOfContents": False,
+        # The tab and the nav call it what the sidebar does.
+        "tp": {"htmlTitle": "Changelogs", "ogTitle": "Every component"},
+    }
     idx = [
-        "---",
-        "title: Changelogs",
-        "description: \"What changed in every release of the firmware, the "
-        "daemon, the interface and the command line, from each repository's "
-        "own CHANGELOG.md.\"",
-        "hide:",
-        "  - toc",
-        "---",
-        "",
-        "# Every component's changelog",
-        "",
         "What changed in each release, taken from each repository's own "
         "`CHANGELOG.md`. For the same history as one post per firmware "
-        "release, newest first, read [the news](../news/index.md).",
+        "release, newest first, read [the news](/news/).",
         "",
         '<div class="tp-plates">',
     ]
@@ -343,15 +345,15 @@ def write_index(summary: list[dict]) -> pathlib.Path:
         "`BMC-UI` and a `tpi`, and the board's Dashboard names all four — so a "
         "firmware version is the one to quote when reporting anything.",
         "",
-        "New firmware releases come through [the feed](../feed.xml). What is "
-        "planned rather than done is on the [roadmap](../roadmap.md), ordered "
+        "New firmware releases come through [the feed](/feed.xml). What is "
+        "planned rather than done is on the [roadmap](/roadmap/), ordered "
         "by votes.",
         "",
         f"Refreshed {datetime.now(timezone.utc).strftime('%-d %B %Y')} by "
         "`just refresh-changelog`.",
     ]
     p = OUTDIR / "index.md"
-    p.write_text("\n".join(idx) + "\n")
+    p.write_text(page(fm, idx))
     return p
 
 
@@ -364,7 +366,7 @@ PIN = re.compile(r"\b(?P<repo>bmcd|BMC-UI|tpi)\s+\*{0,2}v?(?P<ver>\d+\.\d+\.\d+)
 # picture. Keyed by firmware tag; every key is optional and a release with no
 # entry still gets a post, titled by its version. Written by a person at
 # release time, so the hourly job never waits on it.
-EDITORIAL = ROOT / "docs" / "data" / "news-editorial.yaml"
+EDITORIAL = DATA / "news-editorial.yaml"
 
 CATEGORY_ORDER = ["Added", "Changed", "Fixed", "Removed", "Deprecated",
                   "Security"]
@@ -471,11 +473,7 @@ def render_item(item: dict, tag: str | None) -> list[str]:
         out += [short, ""]
     more = ([rest] if rest else []) + item["more"]
     if more:
-        out.append('??? note "The whole entry"')
-        out.append("")
-        for para in more:
-            out += ["    " + ln if ln.strip() else "" for ln in para.splitlines()]
-            out.append("")
+        out += details("The whole entry", "\n\n".join(more).splitlines()) + [""]
     return out
 
 
@@ -491,10 +489,9 @@ def render_fix(item: dict, tag: str | None) -> list[str]:
     out = [line]
     more = ([rest] if rest else []) + item["more"]
     if more:
-        out += ["", '    ??? note "The whole entry"', ""]
-        for para in more:
-            out += ["        " + ln if ln.strip() else "" for ln in para.splitlines()]
-            out.append("")
+        # Inside the list item: indented under it.
+        out += [""] + details("The whole entry", "\n\n".join(more).splitlines(),
+                              indent="    ") + [""]
     return out
 
 
@@ -526,7 +523,7 @@ def carried(fw_entries: list[dict], idx: int, by_repo: dict) -> list[tuple[str, 
 
 
 def write_news(summary: list[dict]) -> list[pathlib.Path]:
-    """One post per firmware release, for the blog plugin.
+    """One post per firmware release, which the news index lists.
 
     The changelog pages are a reference: thirty collapsed releases per
     component, and four components. Nobody reads a reference to find out what
@@ -536,7 +533,7 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
     becomes a heading with its lead, one or two sentences, and the rest folded
     away; items are grouped as New, Changed and Fixed across the image and the
     component versions it is the first to carry; and a headline, a summary and
-    a picture come from docs/data/news-editorial.yaml when someone has written
+    a picture come from src/data/news-editorial.yaml when someone has written
     them, and from the entry itself when nobody has.
     """
     fw = next(s for s in summary if s["slug"] == "firmware")
@@ -606,13 +603,13 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
             # release did, so it replaces the summary here. Only the
             # description changes; the post's visible opening is left alone.
             desc_source = first_item
-        lines = ["---", f"title: {json.dumps(title)}", f"date: {when}",
-                 f"slug: {e['version']}",
-                 f"description: {json.dumps(meta_description(desc_source, title))}"]
+        fm = {"title": title,
+              "description": meta_description(desc_source, title),
+              "slug": f"news/{e['version']}"}
         if meta.get("capture"):
-            lines.append(f"image: {json.dumps(meta['capture'])}")
-        lines += ["---", ""]
-        lines += [summary_text.strip(), ""]
+            fm["image"] = meta["capture"]
+        fm["date"] = datetime.strptime(when, "%Y-%m-%d").date()
+        lines = [summary_text.strip(), ""]
 
         # The picture sits above the fold on purpose: the news index shows
         # the excerpt, and a list of releases with a picture each reads as
@@ -620,12 +617,12 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         if meta.get("capture"):
             cap = meta["capture"]
             caption = meta.get("caption", "")
-            lines += ['<figure class="tp-post-figure" markdown>',
+            lines += ['<figure class="tp-post-figure">', "",
                       # Lazy: on the index this figure is one of ten, and the
                       # browser fetches the ones near the viewport first.
-                      f"![{caption}](../../assets/{cap}){{ loading=lazy }}",
+                      f'<img src="/assets/{html.escape(cap)}" alt="{html.escape(caption)}" loading="lazy" />',
                       f"<figcaption>{caption}</figcaption>" if caption else "",
-                      "</figure>", ""]
+                      "", "</figure>", ""]
         lines += ["<!-- more -->", ""]
 
         # What the group of releases is the first to carry: each release's
@@ -644,7 +641,7 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         for r, v, _ in comps:
             if r not in newest or vtuple(v) > vtuple(newest[r]):
                 newest[r] = v
-        pins = [f"[{r} {newest[r]}](../../changelog/{SLUG_OF[r]}.md)"
+        pins = [f"[{r} {newest[r]}](/changelog/{SLUG_OF[r]}/)"
                 for _, r, _ in COMPONENTS if r in newest]
         names = " and ".join(f"**{g['version']}**" for g in group)
         dates = sorted({(g.get("released") or {}).get("publishedAt", "")[:10]
@@ -672,12 +669,12 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
             vid = meta["video"]
             poster = meta.get("capture", "")
             caption = meta.get("video_caption", "")
-            lines += ['<figure class="tp-post-figure" markdown>',
+            lines += ['<figure class="tp-post-figure">', "",
                       f'<video controls muted playsinline preload="none"'
-                      + (f' poster="../../assets/{poster}"' if poster else "")
-                      + f' src="../../assets/{vid}"></video>',
+                      + (f' poster="/assets/{poster}"' if poster else "")
+                      + f' src="/assets/{vid}"></video>',
                       f"<figcaption>{caption}</figcaption>" if caption else "",
-                      "</figure>", ""]
+                      "", "</figure>", ""]
 
         # Notes that are not the lede -- a blockquote warning, a paragraph
         # about what the release is -- keep their place before the items.
@@ -736,17 +733,17 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
             lines += [raw, ""]
 
         lines += ["---", "",
-                  "[Every release of the firmware](../../changelog/firmware.md) · "
-                  "[the roadmap](../../roadmap.md) · "
-                  "[follow by feed](../../feed.xml)"]
-        p = NEWS / f"{e['bare']}.md"
+                  "[Every release of the firmware](/changelog/firmware/) · "
+                  "[the roadmap](/roadmap/) · "
+                  "[follow by feed](/feed.xml)"]
+        p = NEWS / f"{e['version']}.md"
         # Last resort for a release whose own entry is a pin list and whose
         # substance arrives from the components it carries: the first item
         # heading in the finished body says what shipped. Done here because
         # the carried entries are only rendered by this point.
         if len(meta_description(desc_source)) < DESC_FLOOR:
             body_text = "\n".join(lines)
-            m = re.search(r"^### +(.+?)\s*$\n+(?!\?\?\?|#)(\S.*?)\s*$",
+            m = re.search(r"^### +(.+?)\s*$\n+(?!<details|#)(\S.*?)\s*$",
                           body_text, re.M) or re.search(
                           r"^### +(.+?)\s*$", body_text, re.M)
             if m:
@@ -754,20 +751,18 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
                               m.group(1)).strip().rstrip(".:")
                 if m.lastindex and m.lastindex > 1:
                     head = f"{head}: {m.group(2).strip()}"
-                at = next(i for i, l in enumerate(lines)
-                          if l.startswith("description: "))
-                lines[at] = ("description: " + json.dumps(
-                    meta_description(f"{summary_text.strip()} {head}.", title)))
-        p.write_text("\n".join(lines).rstrip() + "\n")
+                fm["description"] = meta_description(
+                    f"{summary_text.strip()} {head}.", title)
+        p.write_text(page(fm, "\n".join(lines).rstrip()))
         written.append(p)
     # A release that vanished from the changelog takes its post with it.
+    # (The posts are news/*.md; the index is news/index.mdx.)
     for stale in NEWS.glob("*.md"):
         if stale not in written:
             stale.unlink()
     # version -> post slug, for the feed and the roadmap's recently-shipped
     # strip: a covered release links to the post that covers it.
-    (ROOT / "docs" / "data" / "news-posts.json").write_text(
-        json.dumps(slug_of, indent=1) + "\n")
+    POSTS_MAP.write_text(json.dumps(slug_of, indent=1) + "\n")
     return written
 
 
@@ -784,8 +779,7 @@ def write_feed(firmware: dict) -> pathlib.Path:
                  .replace(">", "&gt;").replace('"', "&quot;"))
 
     ed = editorial()
-    posts_map = ROOT / "docs" / "data" / "news-posts.json"
-    slug_of = json.loads(posts_map.read_text()) if posts_map.exists() else {}
+    slug_of = json.loads(POSTS_MAP.read_text()) if POSTS_MAP.exists() else {}
     site = "https://turingpi.xyz"
     updated = (f"{firmware['newest_date']}T00:00:00Z" if firmware["newest_date"]
                else datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
@@ -813,9 +807,8 @@ def write_feed(firmware: dict) -> pathlib.Path:
                 f'    <content type="text">{esc(e["body"])}</content>',
                 "  </entry>"]
     out.append("</feed>")
-    p = ROOT / "docs" / "feed.xml"
-    p.write_text("\n".join(out) + "\n")
-    return p
+    FEED.write_text("\n".join(out) + "\n")
+    return FEED
 
 
 def main(argv: list[str]) -> int:
@@ -833,8 +826,8 @@ def main(argv: list[str]) -> int:
         print(f"known: {', '.join(c[0] for c in COMPONENTS)}", file=sys.stderr)
         return 2
 
-    feed = ROOT / "docs" / "feed.xml"
-    posts_map = ROOT / "docs" / "data" / "news-posts.json"
+    feed = FEED
+    posts_map = POSTS_MAP
     before = {p: p.read_text() for p in (*OUTDIR.glob("*.md"), *NEWS.glob("*.md"))}
     if posts_map.exists():
         before[posts_map] = posts_map.read_text()
