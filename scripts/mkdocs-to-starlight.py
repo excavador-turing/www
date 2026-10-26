@@ -733,6 +733,8 @@ class Site:
         self.nav_title = nav_titles(self.conf.get("nav", []))
         self.facts = load_facts(self.conf)
         self.files: dict[str, bytes | pathlib.Path] = {}
+        # Each page's output -> the docs/ file it was rendered from.
+        self.origin: dict[str, str] = {}
         self.seo: dict[str, dict] = {}
         self.notes: list[str] = []
 
@@ -865,9 +867,9 @@ class Site:
             fm["tableOfContents"] = False
         if (meta.get("search") or {}).get("exclude"):
             fm["pagefind"] = False
-        updated = git_date(p["src"])
-        if updated:
-            fm["lastUpdated"] = dt.date.fromisoformat(updated)
+        if meta.get("image"):
+            # The Open Graph picture, under /assets/ (src/route-data.ts).
+            fm["image"] = str(meta["image"])
         # What the components read off the page itself: a post's date (the
         # news index, the post's own header), a feature page's `feature:`
         # block and `since:` (FeatureScreen, FeaturePlates).
@@ -884,6 +886,18 @@ class Site:
         tp: dict = {}
         if own_h1:
             tp["hideTitle"] = True
+        # What <head> says where it is not the title a reader sees
+        # (src/route-data.ts): Material's <title> and Open Graph title come
+        # from the front matter's title and the nav's label, the page's H1
+        # from the page. Kept only where they differ.
+        home = p["url"] == "/"
+        html_title = plain(self.html_title(p, h1))
+        if (html_title != shown and not home) or (home and meta.get("title")):
+            tp["htmlTitle"] = html_title
+        if plain(title) != shown and not home:
+            tp["ogTitle"] = plain(title)
+        if meta.get("robots"):
+            tp["robots"] = str(meta["robots"])
         if tp:
             fm["tp"] = tp
 
@@ -908,7 +922,7 @@ class Site:
         if p["src"].endswith("index.md") and p["url"] != "/":
             rel += "/index"
         self.emit_page(rel + ext, fm, text)
-        self.seo_for(p, title, self.html_title(p, h1))
+        self.origin[f"src/content/docs/{rel}{ext}"] = f"docs/{p['src']}"
 
     def emit_page(self, rel: str, fm: dict, text: str):
         self.files[f"src/content/docs/{rel}"] = (yaml_front(fm) + "\n" + text.strip("\n")
@@ -1060,7 +1074,6 @@ class Site:
             if p.get("shadowed"):
                 continue
             self.page(p)
-        self.blog_pages()
         for src in self.assets:
             if src in OWN_PUBLIC:
                 raise ConvertError(f"docs/{src} would overwrite starlight/public/{src}, "
@@ -1069,27 +1082,27 @@ class Site:
                 self.files[ROUTED[src]] = DOCS / src
                 continue
             if src.startswith("data/"):
-                # The data the components read. Also still public, as on the
-                # live site, which serves docs/data/ like any other file.
+                # The data the components read, served at /data/ by
+                # src/pages/data/[file].ts as the live site serves it.
                 self.files[f"src/{src}"] = DOCS / src
+                continue
             self.files[f"public/{src}"] = DOCS / src
         urls = {s: p["url"] for s, p in self.pages.items() if not p.get("shadowed")}
         gen = {
             "sidebar.json": sidebar(self.conf.get("nav", []), urls),
             "footer.json": self.footer(),
-            "seo.json": dict(sorted(self.seo.items())),
             "site.json": {"title": self.site_name, "description": self.site_desc,
                           "site": self.base, "blogDir": self.blog_dir},
         }
         for name, data in gen.items():
-            self.files[f"src/generated/{name}"] = (
+            self.files[f"src/config/{name}"] = (
                 json.dumps(data, indent=2, ensure_ascii=False, default=str) + "\n").encode()
         self.sync()
 
     def sync(self):
         """Write what changed, delete what is no longer generated: the dev
         server sees only real changes, and a page removed from docs/ goes."""
-        roots = ["src/content/docs", "public", "src/generated", "src/data"]
+        roots = ["src/content/docs", "public", "src/config", "src/data"]
         written = changed = 0
         for rel, data in sorted(self.files.items()):
             dest = self.out / rel

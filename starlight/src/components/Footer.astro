@@ -1,12 +1,12 @@
 ---
-// The site's footer: overrides/partials/footer.html, from the same data
-// (mkdocs.yml extra.footer and extra.social, by way of the converter). Below
-// Starlight's own footer, which carries the "last updated" date.
+// The site's footer, as Material's overrides/partials/footer.html drew it,
+// from src/config/footer.json. Below Starlight's own footer, which carries
+// the "last updated" date.
 //
 // The three icons are Font Awesome Free (CC BY 4.0), copied from the
 // mkdocs-material package so they are the same drawings the live site uses.
 import Default from '@astrojs/starlight/components/Footer.astro';
-import footer from '../generated/footer.json';
+import footer from '../config/footer.json';
 
 const svgs = import.meta.glob('../icons/*.svg', { query: '?raw', import: 'default', eager: true });
 const icon = (name: string) =>

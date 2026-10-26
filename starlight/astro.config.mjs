@@ -10,27 +10,15 @@ import { factsInHeadings } from './src/plugins/facts-in-headings.mjs';
 import { pythonMarkdownHeadingIds } from './src/plugins/heading-ids.mjs';
 import { knownBroken, scriptRoute } from './src/known-broken-links.mjs';
 
-// https://turingpi.xyz, built from the MkDocs sources in ../docs. Everything
-// under src/content/docs, public/ and src/generated/ is written by
-// ../scripts/mkdocs-to-starlight.py before every build, and is not committed:
-// MkDocs stays the source of truth until the switch.
-function generated(name) {
-  const url = new URL(`./src/generated/${name}`, import.meta.url);
-  try {
-    return JSON.parse(readFileSync(url, 'utf8'));
-  } catch (e) {
-    throw new Error(
-      `src/generated/${name} is missing: run scripts/mkdocs-to-starlight.py first (just site-build does)`,
-      { cause: e },
-    );
-  }
-}
+// https://turingpi.xyz. The pages are src/content/docs; the site's name,
+// nav and footer are src/config/.
+const config = (name) => JSON.parse(readFileSync(new URL(`./src/config/${name}`, import.meta.url), 'utf8'));
 
-const site = generated('site.json');
+const site = config('site.json');
 
 // Who serves /llms.txt -- the owner's call, so it is one line:
-//   'curated'  scripts/llms.py's index (docs/llms.txt), which the live site
-//              serves today: the nav's order, one line per page.
+//   'curated'  scripts/llms.py's index (src/data/llms.txt): the nav's
+//              order, one line per page.
 //   'plugin'   starlight-llms-txt: its own /llms.txt, plus /llms-full.txt and
 //              /llms-small.txt, the whole site as text.
 // Both cannot be served: two writers of one address is a build warning.
@@ -93,7 +81,8 @@ export default defineConfig({
       ],
       // Material's edit_uri is "" and it has no previous/next footer.
       pagination: false,
-      // Dates come from each source file's git history, in front matter.
+      // Dates come from each page's git history, across renames
+      // (src/content.config.ts), into its front matter.
       lastUpdated: false,
       // The 404 page is src/pages/404.astro.
       disable404Route: true,
@@ -111,9 +100,8 @@ export default defineConfig({
         },
       ],
       // Roboto, as Material loads it (from this site, not from Google);
-      // landing.css is the port of docs/stylesheets/landing.css, which the
-      // live site loads with extra_css and which is still copied to
-      // /stylesheets/landing.css unchanged; site.css is the frame.
+      // landing.css is the port of Material's extra_css; site.css is the
+      // frame.
       customCss: [
         '@fontsource/roboto/300.css',
         '@fontsource/roboto/400.css',
@@ -123,7 +111,7 @@ export default defineConfig({
         './src/styles/landing.css',
         './src/styles/site.css',
       ],
-      sidebar: generated('sidebar.json'),
+      sidebar: config('sidebar.json'),
       routeMiddleware: './src/route-data.ts',
       components: {
         Footer: './src/components/Footer.astro',
@@ -135,7 +123,7 @@ export default defineConfig({
         // Fails the build on a broken internal link or anchor.
         starlightLinksValidator({
           // The demo panes are built at deploy from BMC-UI and are not in
-          // this build (nor in MkDocs's on a pull request); the front page's
+          // a pull request's build; the front page's
           // hash routes are a script's; and src/known-broken-links.mjs lists
           // what the live site already serves broken.
           exclude: ({ link, slug }) =>
