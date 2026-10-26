@@ -12,7 +12,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 <details class="note" open>
 <summary>v1.10.0 — 21 September 2026</summary>
 
-
 **Added**
 
 - **`tpi network address show | apply | confirm | revert`.** The BMC's own
@@ -31,7 +30,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 
 <details class="note">
 <summary>v1.9.0 — 20 September 2026</summary>
-
 
 **Changed**
 
@@ -158,7 +156,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 <details class="note">
 <summary>1.8.0 — 11 September 2026</summary>
 
-
 **Fixed**
 
 - **`tpi reboot --help` said the compute modules lose power. They do not.**
@@ -196,7 +193,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 <details class="note">
 <summary>1.7.0 — 11 September 2026</summary>
 
-
 **Fixed**
 
 - **Renaming a board does not move its metrics history, and the tool stops
@@ -219,7 +215,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 
 <details class="note">
 <summary>1.6.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -266,7 +261,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 <details class="note">
 <summary>1.5.1 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **1.5.0's fix did not work; this one does** (SQU-184). 1.5.0 asked the board
@@ -301,7 +295,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 
 <details class="note">
 <summary>1.5.0 — 9 September 2026</summary>
-
 
 > **This release does not do what the entry below says.** The retry it added is
 > inert, for the reason in 1.5.1. Kept as written, because the mistake is more
@@ -339,7 +332,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 <details class="note">
 <summary>1.4.0 — 9 September 2026</summary>
 
-
 **Removed**
 
 - **`tpi metrics show | rotate`** (SQU-178). The metrics token is gone from
@@ -356,7 +348,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 
 <details class="note">
 <summary>1.3.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -375,7 +366,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 
 <details class="note">
 <summary>1.2.3 — 9 September 2026</summary>
-
 
 **Fixed**
 
@@ -400,7 +390,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 <details class="note">
 <summary>1.2.2 — 9 September 2026 (no release of its own)</summary>
 
-
 **Fixed**
 
 - **`firmware install <version>` had never worked in any release.** The
@@ -424,7 +413,6 @@ Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this r
 
 <details class="note">
 <summary>1.2.1 — 9 September 2026 (no release of its own)</summary>
-
 
 Five bugs, all found by running the tool against a board for the first time.
 Every fork command was broken; none of them had ever been executed against
@@ -468,7 +456,6 @@ real hardware, and the examples in the documentation had never been produced.
 <details class="note">
 <summary>1.2.0 — 9 September 2026 (no release of its own)</summary>
 
-
 **Added**
 
 - **`tpi hostname [<name>]`** (SQU-138). Prints the live name, and the one that
@@ -503,7 +490,6 @@ real hardware, and the examples in the documentation had never been produced.
 
 <details class="note">
 <summary>1.1.1 — 9 September 2026 (no release of its own)</summary>
-
 
 **Fixed**
 
@@ -542,7 +528,6 @@ real hardware, and the examples in the documentation had never been produced.
 
 <details class="note">
 <summary>1.1.0 — 8 September 2026 (no release of its own)</summary>
-
 
 **Added**
 

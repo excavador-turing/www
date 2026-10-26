@@ -12,7 +12,6 @@ Newest release **v4.1.0**, 14 October 2026. 40 in total. Each entry is this repo
 <details class="note" open>
 <summary>v4.1.0 — 14 October 2026</summary>
 
-
 **Fixed**
 
 - **"Skip CRC" left unticked still skipped the check, on every node flash,
@@ -46,7 +45,6 @@ Newest release **v4.1.0**, 14 October 2026. 40 in total. Each entry is this repo
 <details class="note">
 <summary>v4.0.1 — 6 October 2026</summary>
 
-
 **Fixed**
 
 - **A browser that kept an old copy of the interface now rescues itself after
@@ -72,7 +70,6 @@ Newest release **v4.1.0**, 14 October 2026. 40 in total. Each entry is this repo
 
 <details class="note">
 <summary>v4.0.0 — 3 October 2026</summary>
-
 
 The whole interface was redesigned by
 [Sven van Ginkel (@svenvg93)](https://github.com/svenvg93) in
@@ -122,7 +119,6 @@ the daemon changed.
 <details class="note">
 <summary>v3.38.0 — 23 September 2026</summary>
 
-
 **Changed**
 
 - **A refused validate request shows the daemon's words, not "this board
@@ -141,7 +137,6 @@ the daemon changed.
 
 <details class="note">
 <summary>v3.37.0 — 22 September 2026</summary>
-
 
 **Changed**
 
@@ -162,7 +157,6 @@ the daemon changed.
 
 <details class="note">
 <summary>v3.36.0 — 22 September 2026</summary>
-
 
 **Fixed**
 
@@ -199,7 +193,6 @@ the daemon changed.
 <details class="note">
 <summary>v3.35.0 — 21 September 2026</summary>
 
-
 **Added**
 
 - **The demo can be *used*, not only read, on the one card whose subject is
@@ -225,7 +218,6 @@ the daemon changed.
 <details class="note">
 <summary>v3.34.1 — 21 September 2026</summary>
 
-
 **Fixed**
 
 - **The demo build was broken by a fixture that was not JSON.** The capture
@@ -238,7 +230,6 @@ the daemon changed.
 
 <details class="note">
 <summary>v3.34.0 — 21 September 2026</summary>
-
 
 **Added**
 
@@ -292,7 +283,6 @@ the daemon changed.
 <details class="note">
 <summary>v3.33.0 — 20 September 2026</summary>
 
-
 **Fixed**
 
 - **The demo shows the switch and the Security tab.** Both hid themselves on
@@ -313,7 +303,6 @@ the daemon changed.
 <details class="note">
 <summary>v3.32.0 — 20 September 2026</summary>
 
-
 **Changed**
 
 - **Which module: four pills, not a drop-down.** Console, USB and Flash each
@@ -328,7 +317,6 @@ the daemon changed.
 
 <details class="note">
 <summary>v3.31.0 — 20 September 2026</summary>
-
 
 **Fixed**
 
@@ -356,7 +344,6 @@ the daemon changed.
 
 <details class="note">
 <summary>v3.30.0 — 20 September 2026</summary>
-
 
 **Added**
 
@@ -711,7 +698,6 @@ the daemon changed.
 <details class="note">
 <summary>3.29.0 — 13 September 2026</summary>
 
-
 **Added**
 
 - **A node armed for USB boot says so, on its own liveness line.** A module
@@ -736,7 +722,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.28.0 — 12 September 2026</summary>
-
 
 **Fixed**
 
@@ -770,7 +755,6 @@ the daemon changed.
 <details class="note">
 <summary>3.27.0 — 12 September 2026</summary>
 
-
 **Fixed**
 
 - **The fleet's serial console connects.** It was one gate away: the
@@ -788,7 +772,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.26.0 — 11 September 2026</summary>
-
 
 **Changed**
 
@@ -812,7 +795,6 @@ the daemon changed.
 <details class="note">
 <summary>3.25.0 — 11 September 2026</summary>
 
-
 **Added**
 
 - **Choose an image off the SD card.** A 2 GB image is usually already on the
@@ -829,7 +811,6 @@ the daemon changed.
 <details class="note">
 <summary>3.24.0 — 11 September 2026</summary>
 
-
 **Changed**
 
 - **Installing firmware asks in a modal**, not in a confirmation that appeared
@@ -839,7 +820,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.23.0 — 11 September 2026</summary>
-
 
 **Added**
 
@@ -858,7 +838,6 @@ the daemon changed.
 <details class="note">
 <summary>3.22.0 — 11 September 2026</summary>
 
-
 **Added**
 
 - **The fleet: one interface over every board**, and the image and chart that
@@ -876,7 +855,6 @@ the daemon changed.
 <details class="note">
 <summary>3.21.0 — 11 September 2026</summary>
 
-
 **Fixed**
 
 - **The four modules fit the demo frame too.** The same one-screen fix as
@@ -886,7 +864,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.20.0 — 11 September 2026</summary>
-
 
 **Added**
 
@@ -908,7 +885,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.19.0 — 10 September 2026</summary>
-
 
 **Removed**
 
@@ -933,7 +909,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.18.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -980,7 +955,6 @@ the daemon changed.
 <details class="note">
 <summary>3.17.0 — 9 September 2026</summary>
 
-
 **Removed**
 
 - **The Metrics token card** from Settings, with its query, its rotate
@@ -995,7 +969,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.16.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -1033,7 +1006,6 @@ the daemon changed.
 <details class="note">
 <summary>3.15.0 — 9 September 2026</summary>
 
-
 **Changed**
 
 - **The fan slider now sits behind an explicit Override switch** (SQU-170).
@@ -1062,7 +1034,6 @@ the daemon changed.
 <details class="note">
 <summary>3.14.0 — 9 September 2026</summary>
 
-
 **Changed**
 
 - **Install OS is red** (SQU-161's colour rule). Writing an OS image overwrites
@@ -1090,7 +1061,6 @@ the daemon changed.
 <details class="note">
 <summary>3.13.0 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **After an upload the interface offered a reboot that would have done
@@ -1112,7 +1082,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.12.0 — 9 September 2026</summary>
-
 
 **Fixed**
 
@@ -1148,7 +1117,6 @@ the daemon changed.
 <details class="note">
 <summary>3.11.0 — 9 September 2026</summary>
 
-
 **Added**
 
 - **The console replays the module's scrollback when you open it** (SQU-156).
@@ -1180,7 +1148,6 @@ the daemon changed.
 <details class="note">
 <summary>3.10.1 — 9 September 2026</summary>
 
-
 **Changed**
 
 - **Reset network is red and confirms first** (SQU-161's colour rule). It was
@@ -1195,7 +1162,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.10.0 — 9 September 2026</summary>
-
 
 **Added**
 
@@ -1219,7 +1185,6 @@ the daemon changed.
 <details class="note">
 <summary>3.9.3 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **The Firmware page's two-second poll is bounded.** While the daemon reports
@@ -1236,7 +1201,6 @@ the daemon changed.
 <details class="note">
 <summary>3.9.2 — 9 September 2026</summary>
 
-
 **Changed**
 
 - **Each source lists its newest three versions, always; the rest sit behind
@@ -1252,7 +1216,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.9.1 — 9 September 2026</summary>
-
 
 **Fixed**
 
@@ -1275,7 +1238,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.9.0 — 9 September 2026</summary>
-
 
 **Changed**
 
@@ -1336,7 +1298,6 @@ the daemon changed.
 <details class="note">
 <summary>3.8.0 — 9 September 2026</summary>
 
-
 **Fixed**
 
 - **"Check now" never checked** (SQU-132). `useFirmwareAvailableQuery` sent no
@@ -1381,7 +1342,6 @@ the daemon changed.
 
 <details class="note">
 <summary>3.7.0 — 8 September 2026</summary>
-
 
 **Added**
 
