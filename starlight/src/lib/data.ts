@@ -2,9 +2,7 @@
 //
 // src/data/ holds what the generators write: facts.yaml (scripts/facts.py),
 // boards.yaml (by hand), news-posts.json (scripts/refresh-changelog.py).
-// Until the switch, scripts/mkdocs-to-starlight.py copies them there from
-// docs/data/ before every build; after it, the generators write them there
-// directly. Imported as raw text through Vite, so a changed file is part of
+// Imported as raw text through Vite, so a changed file is part of
 // the build's own dependency graph: the hourly refresh rebuilds with the new
 // numbers and no Python runs at render time.
 import { parse } from 'yaml';

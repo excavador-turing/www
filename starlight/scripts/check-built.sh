@@ -11,7 +11,7 @@ fail=0
 bad() { echo "check-built: $*" >&2; fail=1; }
 
 for f in index.html 404.html llms.txt sitemap.xml sitemap-index.xml robots.txt \
-         feed.xml stylesheets/landing.css features/index.html news/index.html \
+         feed.xml data/facts.yaml features/index.html news/index.html \
          news/page/2/index.html reference/api/index.html favicon.svg build.json; do
   [ -s "$dist/$f" ] || bad "missing or empty: $f"
 done
@@ -32,15 +32,15 @@ fi
 # /llms.txt: astro.config.mjs's `llmsTxt` switch. starlight-llms-txt writes
 # llms-full.txt beside it; without that, it must be the curated index,
 # byte for byte what scripts/llms.py wrote.
-if [ ! -e "$dist/llms-full.txt" ] && ! cmp -s "$dist/llms.txt" docs/llms.txt; then
-  bad "llms.txt is neither starlight-llms-txt's (no llms-full.txt) nor docs/llms.txt"
+if [ ! -e "$dist/llms-full.txt" ] && ! cmp -s "$dist/llms.txt" starlight/src/data/llms.txt; then
+  bad "llms.txt is neither starlight-llms-txt's (no llms-full.txt) nor src/data/llms.txt"
 fi
 
 # The feed: refresh-changelog.py writes it, and it is served as written, at
 # the address the live site's <head> announces. Every entry links a post
 # that this build has.
-if ! cmp -s "$dist/feed.xml" docs/feed.xml; then
-  bad "feed.xml is not docs/feed.xml byte for byte"
+if ! cmp -s "$dist/feed.xml" starlight/public/feed.xml; then
+  bad "feed.xml is not public/feed.xml byte for byte"
 fi
 while read -r href; do
   path=${href#https://turingpi.xyz}
@@ -63,11 +63,10 @@ fi
 images=$(find "$dist/assets" -type f \( -name '*.png' -o -name '*.jpg' \) | wc -l)
 [ "$images" -gt 0 ] || bad "no images under $dist/assets"
 
-# Macros were rendered, not printed, and Material's block syntax was
-# converted, not printed: in the visible text and in the JSON-LD, whose FAQ
-# answers carry raw `{{ ... }}` on the live site (main.py parses faq.md
-# before rendering) and real values here since phase 3. Code is skipped:
-# reference/metrics quotes a Prometheus template on purpose.
+# No Jinja and no Material block syntax reached a page: in the visible text
+# and in the JSON-LD, whose FAQ answers carried raw `{{ ... }}` under MkDocs.
+# A generator or a pasted page that writes either would print it literally.
+# Code is skipped: reference/metrics quotes a Prometheus template on purpose.
 leftovers=$(python3 - "$dist" <<'PY'
 import pathlib, re, sys
 for f in sorted(pathlib.Path(sys.argv[1]).rglob("index.html")):

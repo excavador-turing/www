@@ -1,8 +1,8 @@
 ---
 // A post up to its `<!-- more -->`, the way the blog plugin cuts it: the
 // post is rendered whole (it is the slot) and the HTML is cut at the marker,
-// which Markdown keeps as a comment. A post without one is shown whole; the
-// converter refuses such a post while mkdocs.yml says `post_excerpt: required`.
+// which Markdown keeps as a comment. A post without one is shown whole;
+// scripts/refresh-changelog.py writes the marker into every post.
 const html = await Astro.slots.render('default');
 const cut = html.indexOf('<!-- more -->');
 ---

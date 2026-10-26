@@ -1,16 +1,19 @@
 # turingpi.xyz
 
 The site for [this fork of the Turing Pi 2 BMC firmware](https://github.com/excavador-turing).
-Material for MkDocs, built by CI, deployed to GitHub Pages.
+Astro Starlight, built by CI, deployed to GitHub Pages. It was Material for
+MkDocs until 2026-10-26, when Material went into maintenance mode; every URL
+it served still answers (`just urls`).
 
 ```
 just            # the recipes
-just serve      # live reload on :8000
+just serve      # live reload on :4321
 just check      # everything CI checks, in the order CI checks it
 ```
 
-The environment is devbox and direnv: `cd` into the repository and the venv
-builds itself. Nothing here needs a board except `just refresh-gate-history`.
+The environment is devbox and direnv: `cd` into the repository and node, yarn
+and the Python the scripts need arrive with it. Nothing here needs a board
+except `just refresh-gate-history`.
 
 ## Four rules, and why each one exists
 
@@ -30,7 +33,7 @@ paragraph and three numbers genuinely do not fit 667px -- the page stacks and
 scrolls, and `scripts/screens.py` stops asking.
 
 `just screens` measures every built page at nine viewports. It is in
-`checks.yml`, which runs on pull requests, and **not** in the deploy.
+`site.yaml`, which runs on pull requests, and again before every deploy.
 
 > The front page used to be locked to one screen with no scrolling at all.
 > That constraint is what broke it: the destination pictures took whatever
@@ -46,12 +49,12 @@ smaller rather than hiding any of them.
 
 ### Every fact has one home
 
-`docs/data/facts.yaml` (`just facts`) holds every number the site quotes about
-itself, each with where it came from and when. Pages ask for it —
-`{{ gate.promoted }}`, never `26` — through the macros plugin, which is
-**opt-in per page** via `render_macros: true`. Opt-in because macros expands
-Jinja before Markdown and would otherwise eat the Prometheus alert template in
-`reference/metrics.md`.
+`starlight/src/data/facts.yaml` (`just facts`) holds every number the site
+quotes about itself, each with where it came from and when. Pages ask for it —
+`<Fact of="gate.promoted" />`, never `26` — and `just facts-lint` fails a page
+that types one. A page with a component in it is `.mdx`; the rest stay `.md`,
+where a brace is just a brace (`reference/metrics.md` quotes a Prometheus
+alert template).
 
 > Five numbers had already drifted apart. The features index said 18 updates
 > where the board said 26. About said 66 releases where the changelog said
@@ -62,12 +65,13 @@ The news, the changelogs and the roadmap are generated too, from each
 repository's `CHANGELOG.md` and from the Ideas discussions and their votes. Generated
 output is **committed**, so the site builds offline and a change arrives as a
 reviewable diff — and because nobody remembers to run the scripts, the hourly
-Pages job runs them and commits what moved.
+publish job runs them and commits what moved.
 
 ### A feature is a page, and every feature page is the same page
 
-Data in front matter, rendered by `main.py`. The index is generated from those
-pages, so the count cannot disagree with them. `just feature-lint` enforces
+Data in front matter, rendered by `<FeatureScreen />`. The index
+(`<FeaturePlates />`) is drawn from those pages, so the count cannot disagree
+with them. `just feature-lint` enforces
 the content: lede 25–35 words, three proofs each with a source and a date,
 four next links in the fixed roles `demo`, `do`, `evidence`, `related`
 reaching four different places, a capture and an icon that exist.
@@ -82,17 +86,12 @@ the only one.
 
 ### The deploy publishes; it does not judge
 
-`publish.yaml` builds the site with Starlight and deploys it: on every push
-to `main`, and every hour after committing whatever the repositories moved
-(the refresh). Every `just site-check` gate runs before the deploy, and the
-`published` job fails unless turingpi.xyz then serves that exact build.
-`checks.yml` and `site.yaml` run the checks on pull requests. Make them
-required on `main`: they are what stands between a bad layout and the live
-site.
-
-`pages.yml` is the MkDocs workflow, kept only as the rollback until MkDocs is
-retired: `gh workflow disable publish.yaml`, then `gh workflow run
-pages.yml`.
+`publish.yaml` builds the site and deploys it: on every push to `main`, and
+every hour after committing whatever the repositories moved (the refresh).
+Every `just check` gate runs before the deploy, and the `published` job fails
+unless turingpi.xyz then serves that exact build (`/build.json` names the
+commit). `site.yaml` runs the same checks on pull requests. Make it required
+on `main`: it is what stands between a bad layout and the live site.
 
 > The screen gate used to be 132 seconds of a 178-second deploy, while
 > building the site took 3. Publishing a typo waited two minutes on a browser
@@ -104,15 +103,23 @@ pages.yml`.
 
 | output | recipe | source |
 |---|---|---|
-| `docs/data/facts.yaml` | `just facts` | the pages and data that own each number |
-| `docs/changelog/*.md`, `docs/news/posts/*.md`, `docs/feed.xml` | `just refresh-changelog` | each repository's `CHANGELOG.md`, with the release note where there is no entry; one news post per firmware release |
-| `docs/roadmap.md`, `docs/data/roadmap.json` | `just refresh-roadmap` | the Ideas discussions and their votes |
-| `docs/reference/api/*.md` | `just refresh-api vX.Y.Z` | the board's own OpenAPI document |
-| `docs/reference/api-history.md` | `just refresh-api-history` | which release gained which operation |
-| `docs/reference/gate-history.md` | `just refresh-gate-history <board ip>` | a real board's promotion counter |
-| `docs/demo/{fork,fleet}/` | built at deploy | the latest `BMC-UI` release |
+Pages are under `starlight/src/content/docs/`, data under
+`starlight/src/data/`, everything served as it is under `starlight/public/`.
 
-`just refresh` runs the three the hourly job runs. The gate history needs a
+| output | recipe | source |
+|---|---|---|
+| `data/facts.yaml` | `just facts` | the pages and data that own each number |
+| `changelog/*.md`, `news/v*.md`, `public/feed.xml` | `just refresh-changelog` | each repository's `CHANGELOG.md`, with the release note where there is no entry; one news post per firmware release |
+| `roadmap.md`, `data/roadmap.json` | `just refresh-roadmap` | the Ideas discussions and their votes |
+| `data/llms.txt` | `just llms` | the sidebar and each page's description |
+| `reference/api/*.md` | `just refresh-api vX.Y.Z` | the board's own OpenAPI document |
+| `reference/api-history.md` | `just refresh-api-history` | which release gained which operation |
+| `reference/gate-history.md` | `just refresh-gate-history <board ip>` | a real board's promotion counter |
+| `public/demo/{fork,fleet}/` | built at deploy | the latest `BMC-UI` release |
+
+The generators write the page Starlight reads, through `scripts/sitepage.py`:
+front matter, links rooted at the site, `<details>` for a collapsed block.
+`just refresh` runs the four the hourly job runs. The gate history needs a
 route to a board, so it runs on a workstation and the result is committed; CI
 has no such route and must never be the thing that notices.
 
@@ -125,12 +132,18 @@ has no such route and must never be the thing that notices.
 - **Media is in Git LFS.** A checkout without `lfs: true` publishes 130-byte
   pointer files as the images: a build that succeeds and a site that is
   broken.
-- **Material's instant loading rewrites every content href to an absolute URL
-  after load.** A selector on `a[href="#x"]` finds nothing; `a[href$="#x"]`
-  does.
-- **A markdown-attributed div wraps a raw block child in a `<p>`.** That is
-  how the front page's explainer card ended up 468px wide in a 1368px row.
-  Raw HTML for anything whose width matters.
+- **A page's "last updated" date is its newest commit, followed across
+  renames.** A commit that only moves or rewrites pages ends its message
+  with `Dates-Unchanged: yes` in the last paragraph, beside any other
+  trailer, or every page it touches claims to have changed that day
+  (`src/content.config.ts`). The move out of `docs/` carried it.
+- **Markdown inside raw HTML needs blank lines around it.** CommonMark ends an
+  HTML block at the first blank line and reads what follows as Markdown;
+  without the blank line after `<div class="…">`, the Markdown inside is
+  printed as text.
+- **Every URL ever served is a promise.** `starlight/served-urls.json` lists
+  what MkDocs served, with every heading anchor; `just urls` fails when one
+  stops answering. Move a page with a redirect in `astro.config.mjs`.
 - **`turing.excavador.xyz` is dead** and has been since the docs moved here.
   Never link it.
 - **This site is not Turing Machines.** The footer says so on every page, and
@@ -139,13 +152,20 @@ has no such route and must never be the thing that notices.
 ## Layout
 
 ```
-docs/            the site
-  data/          generated facts, roadmap data, the screen baseline
-  features/      one page per feature; data in front matter
-  why/           the full argument behind each feature
-  changelog/     generated from each repository's CHANGELOG.md
-  news/          one post per firmware release, generated from the same; Material's blog plugin lists them
-overrides/       the footer, and the analytics beacon (off: Cloudflare adds it)
-main.py          macros: the feature template and the index
-scripts/         every generator and every check
+starlight/
+  src/content/docs/  the pages, each at the path that is its URL
+    features/        one page per feature; data in front matter
+    why/             the full argument behind each feature
+    changelog/       generated from each repository's CHANGELOG.md
+    news/            one post per firmware release, generated from the same
+  src/data/          generated facts, roadmap data, llms.txt, the screen baseline
+  src/config/        the site's name, the sidebar, the footer
+  src/components/    the frame (header, footer, sidebar) and the page components
+  src/route-data.ts  <title>, Open Graph and JSON-LD for every page
+  public/            served as it is: pictures, the feed, robots.txt
+  served-urls.json   every URL MkDocs served, which must keep answering
+scripts/             every generator and every check
 ```
+
+The analytics beacon is Cloudflare's: turingpi.xyz is proxied, and Web
+Analytics adds it at the edge, so the site emits none of its own.

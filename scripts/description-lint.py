@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Every page says what it is for, in one line of its own.
 
-Material writes `<meta name="description">` from a page's front matter and
-falls back to `site_description` when there is none. On 2026-09-21 not one of
+A page's `<meta name="description">` comes from its front matter, and falls
+back to the site's own description when there is none. On 2026-09-21 not one of
 the 91 pages had its own, so every page in the site -- the FAQ, the install
 guide, each feature, each release post -- told a search engine, a link preview
 and an AI summariser the same sentence: "A fork of the Turing Pi 2 BMC
@@ -23,11 +23,9 @@ because a rule that only applies to the pages somebody remembered is not one.
 `--site` adds a second pass over a BUILT site: every page's
 `<meta name="description">` is the one its source asks for, whole, and the
 Open Graph and Twitter copies agree with it. The source rules cannot see the
-template that writes the attribute -- and on 2026-10-26 that template cut two
-release posts short at an unescaped `"` (`/news/v2.39.0/`, `/news/v2.9.2/`),
-with every source description passing. MkDocs's build fails this pass on
-those two and on its 404 page, which falls back to site_description; that
-is why `just description-lint` does not run it.
+template that writes the attribute -- and until 2026-10-26 MkDocs's template
+cut two release posts short at an unescaped `"` (`/news/v2.39.0/`,
+`/news/v2.9.2/`), with every source description passing.
 """
 from __future__ import annotations
 
@@ -38,8 +36,9 @@ import sys
 
 import yaml
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ROOT / "docs"
+import json
+
+from sitepage import CONTENT, ROOT, SITE
 
 # Roughly where a result snippet is cut. Longer is not wrong, it is just not
 # read -- and a description that ends mid-word reads as neglect.
@@ -52,11 +51,7 @@ FLOOR = 40
 
 def site_description() -> str:
     """The tagline every page used to repeat."""
-    text = (ROOT / "mkdocs.yml").read_text()
-    for line in text.splitlines():
-        if line.startswith("site_description:"):
-            return line.split(":", 1)[1].strip().strip('"\'')
-    return ""
+    return json.loads((SITE / "src" / "config" / "site.json").read_text())["description"]
 
 
 def front_matter(path: pathlib.Path) -> dict:
@@ -72,14 +67,10 @@ def front_matter(path: pathlib.Path) -> dict:
         return {}
 
 
-def url_of(page: pathlib.Path, fm: dict) -> str:
-    """The directory URL a source page is served at, by both builds."""
-    rel = page.relative_to(DOCS).as_posix()
-    if rel.startswith("news/posts/") and fm.get("slug"):
-        return f"/news/{fm['slug']}/"
-    s = rel.removesuffix(".md")
-    s = "" if s == "index" else s.removesuffix("/index")
-    return f"/{s}/" if s else "/"
+def url_of(fm: dict) -> str:
+    """The directory URL a page is served at: its slug."""
+    slug = str(fm.get("slug", ""))
+    return "/" if slug == "index" else f"/{slug}/"
 
 
 class Meta(html.parser.HTMLParser):
@@ -144,7 +135,7 @@ def main() -> int:
                     "site carries (e.g. starlight/dist)")
     args = ap.parse_args()
     tagline = site_description()
-    pages = sorted(DOCS.rglob("*.md"))
+    pages = sorted(CONTENT.rglob("*.md*"))
     faults: list[str] = []
 
     wanted: dict[str, str] = {}
@@ -153,7 +144,7 @@ def main() -> int:
         fm = front_matter(page)
         desc = (fm.get("description") or "").strip()
         if desc:
-            wanted[url_of(page, fm)] = desc
+            wanted[url_of(fm)] = desc
         if not desc:
             faults.append(f"{rel}: no description in the front matter")
         elif desc == tagline:
@@ -170,8 +161,8 @@ def main() -> int:
     # nothing: a moved directory would otherwise turn this check green for
     # the wrong reason.
     if not pages:
-        print("description-lint: no pages found under docs/ -- refusing to "
-              "pass", file=sys.stderr)
+        print(f"description-lint: no pages found under {CONTENT.relative_to(ROOT)} "
+              "-- refusing to pass", file=sys.stderr)
         return 1
 
     if faults:

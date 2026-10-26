@@ -9,8 +9,8 @@
 # Weekly, not on every pull request: the answer depends on somebody else's
 # server, and a check that goes red because a third party had a bad minute
 # is a check people learn to ignore. Internal links are already the build's
-# business (`mkdocs build --strict`), so they are excluded and only the
-# outside is asked.
+# business (the strict build and `just links-internal`), so they are excluded
+# and only the outside is asked.
 name: Links
 
 on:
@@ -28,17 +28,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           lfs: true
+          # Each page's "last updated" date comes from its git history.
+          fetch-depth: 0
+          persist-credentials: false
 
-      - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+      - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
         with:
           enable-cache: true
-          cache-dependency-glob: requirements.txt
+          devbox-version: 0.18.4
 
       - name: build the site, so generated pages and the footer are checked too
-        run: |
-          uv venv
-          uv pip install -r requirements.txt
-          .venv/bin/mkdocs build --strict
+        run: devbox run -- just build
 
       - name: every outside link answers
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
@@ -52,7 +52,7 @@ jobs:
             --no-progress
             --base-url https://turingpi.xyz
             --exclude '^https://turingpi\.xyz'
-            --exclude-path site/demo
+            --exclude-path starlight/dist/demo
             --exclude 'localhost'
             --exclude 'turingpi\.local'
             --exclude '192\.168\.'
@@ -61,7 +61,7 @@ jobs:
             --timeout 20
             --max-retries 2
             --max-concurrency 8
-            'site/**/*.html'
+            'starlight/dist/**/*.html'
           fail: true
           format: markdown
           output: links.md

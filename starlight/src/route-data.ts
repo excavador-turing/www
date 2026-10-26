@@ -92,7 +92,7 @@ export const onRequest = defineRouteMiddleware(async (context) => {
   } else if (url === '/faq/') {
     // The questions, read off the page; each <Fact> as the number a reader
     // sees there (lib/faq.ts).
-    const qs = faqEntities(route.entry.body ?? '', 'value', (of, filters) => format(facts, of, filters));
+    const qs = faqEntities(route.entry.body ?? '', (of, filters) => format(facts, of, filters));
     jsonld.push({
       '@context': 'https://schema.org',
       '@type': 'FAQPage',

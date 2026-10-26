@@ -1,16 +1,11 @@
-name: Publish (Starlight)
+name: Publish
 
 # turingpi.xyz: the Starlight build, with the demo panes from the latest
 # BMC-UI release, from the Git LFS objects, through every gate, published.
 #
-# This is pages.yml's successor under a NEW file name, on purpose. Disabling
-# a workflow in the Actions UI disables that file path on every branch, so
-# the switch must be able to turn pages.yml off without touching this file,
-# and the other way round for a rollback.
+# What runs:
 #
-# What runs (phase 4b, the switch):
-#
-#   push to main                           plan, build, screens, parity,
+#   push to main                           plan, build, screens,
 #                                          deploy, `published`.
 #   the hourly schedule, a dispatch        refresh first, which commits what
 #   from main                              the repositories moved; then all
@@ -21,11 +16,6 @@ name: Publish (Starlight)
 #   from another branch                    refresh is a dry run.
 #   a pull request that changes this       the same, so a change to the
 #   pipeline (paths below)                 publish path is proved before main.
-#
-# pages.yml, the MkDocs workflow, runs only by hand now: it is the rollback.
-# To go back, `gh workflow disable publish.yaml` and then
-# `gh workflow run pages.yml`; the two share the `pages` deploy group, so
-# they never publish at once.
 #
 # Not here: repository_dispatch. Nothing sends `ui-released`: BMC-UI's
 # release.yaml deliberately holds no credential for this repository and says
@@ -38,6 +28,7 @@ on:
     paths:
       - .github/workflows/publish.yaml
       - scripts/demo-ribbon.py
+      - scripts/served-urls.py
       - starlight/scripts/stamp-build.py
   workflow_dispatch:
     inputs:
@@ -59,12 +50,12 @@ permissions:
   contents: read
 
 jobs:
-  # The generated pages -- changelog, roadmap, facts -- are committed, so the
-  # site builds offline and a change to them arrives as a reviewable diff.
-  # The cost is that somebody has to run the generators, and nobody did: the
-  # site once sat on firmware v2.31.0 for a week after v2.32.0 shipped. So
-  # this job runs them every hour and commits what moved, as
-  # github-actions[bot].
+  # The generated pages -- changelog, news, roadmap, facts, llms.txt -- are
+  # committed, so the site builds offline and a change to them arrives as a
+  # reviewable diff. The cost is that somebody has to run the generators, and
+  # nobody did: the site once sat on firmware v2.31.0 for a week after
+  # v2.32.0 shipped. So this job runs them every hour and commits what moved,
+  # as github-actions[bot].
   #
   # Only on the schedule and by hand -- a push already carries whatever the
   # author committed, and refreshing under them would rewrite it -- and a
@@ -110,11 +101,9 @@ jobs:
           devbox run -- python3 scripts/refresh-changelog.py
           devbox run -- python3 scripts/refresh-roadmap.py
           devbox run -- python3 scripts/facts.py
-
-      # Before the commit: what is pushed to main must be something the
-      # build can take.
-      - name: the refreshed sources still convert
-        run: devbox run -- python3 scripts/mkdocs-to-starlight.py
+          # The index lists the newest posts: a release that adds one moves
+          # it, and the build checks it is current.
+          devbox run -- python3 scripts/llms.py
 
       - name: commit, if anything moved
         id: diff
@@ -123,7 +112,7 @@ jobs:
           # Empty unless this run pushes: the build then checks out the
           # commit the run started from.
           echo "commit=" >> "$GITHUB_OUTPUT"
-          if git diff --quiet -- docs/; then
+          if git diff --quiet -- starlight/src starlight/public; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "nothing moved" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
@@ -132,7 +121,7 @@ jobs:
           {
             echo "### Refresh: what moved"
             echo '```'
-            git --no-pager diff --stat -- docs/
+            git --no-pager diff --stat -- starlight/src starlight/public
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
           if [ "$COMMIT" != true ]; then
@@ -141,13 +130,13 @@ jobs:
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/
+          git add starlight/src starlight/public
           git commit -q -F - <<'MSG'
           the site catches up with what the repositories say
 
-          Written by scripts/refresh-changelog.py, refresh-roadmap.py and
-          scripts/facts.py on the hourly publish schedule. Nothing here is
-          typed by hand.
+          Written by scripts/refresh-changelog.py, refresh-roadmap.py,
+          facts.py and llms.py on the hourly publish schedule. Nothing here
+          is typed by hand.
           MSG
           # Fails if main moved since the checkout; the next hour retries
           # from the new main, and nothing below runs on a failed refresh.
@@ -247,8 +236,8 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
-            docs/demo/fork
-            docs/demo/fleet
+            starlight/public/demo/fork
+            starlight/public/demo/fleet
           key: demo-${{ needs.plan.outputs.tag }}-${{ hashFiles('scripts/demo-ribbon.py', '.github/workflows/publish.yaml') }}
 
       - name: BMC-UI at that release
@@ -301,27 +290,25 @@ jobs:
           npm run build
           mv dist ../fleet-dist
 
-      # Into docs/demo/, which is git-ignored: the converter copies every
-      # non-Markdown file under docs/ into starlight/public/ byte for byte,
-      # and Astro serves public/ as it is -- no route, no content
-      # collection, no link validation (astro.config.mjs excludes
-      # /demo/fork and /demo/fleet) -- at /demo/fork/ and /demo/fleet/, the
-      # paths the live site uses. The MkDocs build below picks them up too.
+      # Into starlight/public/demo/, which is git-ignored. Astro serves
+      # public/ as it is -- no route, no content collection, no link
+      # validation (astro.config.mjs excludes /demo/fork and /demo/fleet) --
+      # at /demo/fork/ and /demo/fleet/, the paths the site has always used.
       - name: place them and give them a way out
         if: steps.demo-cache.outputs.cache-hit != 'true'
         env:
           TAG: ${{ needs.plan.outputs.tag }}
         run: |
           set -eu
-          rm -rf docs/demo/fork docs/demo/fleet
-          mkdir -p docs/demo/fork docs/demo/fleet
-          cp -a fork-dist/. docs/demo/fork/
-          cp -a fleet-dist/. docs/demo/fleet/
-          echo "$TAG" > docs/demo/fork/VERSION
-          echo "$TAG" > docs/demo/fleet/VERSION
+          rm -rf starlight/public/demo/fork starlight/public/demo/fleet
+          mkdir -p starlight/public/demo/fork starlight/public/demo/fleet
+          cp -a fork-dist/. starlight/public/demo/fork/
+          cp -a fleet-dist/. starlight/public/demo/fleet/
+          echo "$TAG" > starlight/public/demo/fork/VERSION
+          echo "$TAG" > starlight/public/demo/fleet/VERSION
           # The board list the demo shows. Both cards answer from ONE board's
           # capture, which the demo page says out loud.
-          cat > docs/demo/fleet/config.json <<'JSON'
+          cat > starlight/public/demo/fleet/config.json <<'JSON'
           {
             "boards": [
               { "id": "bmc-1", "name": "bmc-1 (board A)", "note": "hive-1 … hive-4" },
@@ -344,13 +331,14 @@ jobs:
         run: |
           set -eu
           for pane in fork fleet; do
-            if ! grep -rqlF "a recording, not a live stream" "docs/demo/$pane/assets"; then
+            dir=starlight/public/demo/$pane
+            if ! grep -rqlF "a recording, not a live stream" "$dir/assets"; then
               echo "$TAG $pane built without its demo mode; refusing to publish it as one" >&2
               exit 1
             fi
-            [ "$(cat "docs/demo/$pane/VERSION")" = "$TAG" ] \
-              || { echo "$pane pane says $(cat "docs/demo/$pane/VERSION"), not $TAG" >&2; exit 1; }
-            echo "$pane pane: $TAG, $(find "docs/demo/$pane" -type f | wc -l) files (cache hit: ${HIT:-false})"
+            [ "$(cat "$dir/VERSION")" = "$TAG" ] \
+              || { echo "$pane pane says $(cat "$dir/VERSION"), not $TAG" >&2; exit 1; }
+            echo "$pane pane: $TAG, $(find "$dir" -type f | wc -l) files (cache hit: ${HIT:-false})"
           done
 
       # The toolchain is devbox.json's -- node, yarn, Python -- as in
@@ -361,8 +349,8 @@ jobs:
           enable-cache: true
           devbox-version: 0.18.4
 
-      # From here to the uploads: `just site-check`, step for step, as
-      # site.yaml runs it; screens and parity are the jobs below.
+      # From here to the uploads: `just check`, step for step, as site.yaml
+      # runs it; screens is the job below.
       - name: the facts file matches its sources
         run: devbox run -- python3 scripts/facts.py --check
 
@@ -375,10 +363,10 @@ jobs:
       - name: no capture carries the demo ribbon
         run: devbox run -- python3 scripts/crop-ribbon.py --check
 
-      # Converts, builds strictly (no warning, no broken internal link),
-      # stamps /build.json, and checks what was built (no LFS pointer).
-      - name: convert, build strictly, stamp, check what was built
-        run: devbox run -- just site-build
+      # Builds strictly (no warning, no broken internal link), stamps
+      # /build.json, and checks what was built (no LFS pointer).
+      - name: build strictly, stamp, check what was built
+        run: devbox run -- just build
 
       - name: the panes are served where the live site serves them, as built
         env:
@@ -387,8 +375,8 @@ jobs:
           set -eu
           dist=starlight/dist
           for pane in fork fleet; do
-            diff -r "docs/demo/$pane" "$dist/demo/$pane" >/dev/null \
-              || { echo "$dist/demo/$pane is not docs/demo/$pane byte for byte" >&2; exit 1; }
+            diff -r "starlight/public/demo/$pane" "$dist/demo/$pane" >/dev/null \
+              || { echo "$dist/demo/$pane is not public/demo/$pane byte for byte" >&2; exit 1; }
             [ "$(cat "$dist/demo/$pane/VERSION")" = "$TAG" ] \
               || { echo "$dist/demo/$pane/VERSION is not $TAG" >&2; exit 1; }
             grep -qF 'id="tp-demo-ribbon"' "$dist/demo/$pane/index.html" \
@@ -410,22 +398,19 @@ jobs:
         run: devbox run -- python3 scripts/description-lint.py --site starlight/dist
 
       - name: the structured data parses, and carries real values
-        run: devbox run -- python3 scripts/structured-data.py --site starlight/dist --strict
+        run: devbox run -- python3 scripts/structured-data.py --strict
 
       - name: llms.txt matches the nav, is served as written, and its links land
         run: devbox run -- python3 scripts/llms.py --check --site starlight/dist
 
       - name: every internal link lands on a file
-        run: devbox run -- python3 scripts/internal-links.py --site starlight/dist
+        run: devbox run -- python3 scripts/internal-links.py
 
       - name: every page is within two clicks of the front page
-        run: devbox run -- python3 scripts/reach.py --site starlight/dist
+        run: devbox run -- python3 scripts/reach.py
 
-      # Parity's reference. Once this workflow publishes, the live site IS
-      # the Starlight build and can no longer tell the port from itself;
-      # this commit's MkDocs build can, until MkDocs is retired.
-      - name: the MkDocs build of this commit
-        run: devbox run -- mkdocs build --strict
+      - name: every URL the site has served still answers
+        run: devbox run -- python3 scripts/served-urls.py
 
       - name: what was built
         id: stamp
@@ -448,13 +433,6 @@ jobs:
         with:
           name: starlight-dist
           path: starlight/dist
-          if-no-files-found: error
-          retention-days: 7
-
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: mkdocs-site
-          path: site
           if-no-files-found: error
           retention-days: 7
 
@@ -500,43 +478,8 @@ jobs:
           path: screens.json
           if-no-files-found: ignore
 
-  parity:
-    needs: [plan, build]
-    if: ${{ !cancelled() && needs.build.result == 'success' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      # The script and `git lfs ls-files` need the tree, not the LFS objects:
-      # the bytes compared are dist's.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.plan.outputs.ref }}
-          persist-credentials: false
-
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: starlight-dist
-          path: starlight/dist
-
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: mkdocs-site
-          path: site
-
-      # Against this commit's MkDocs build, not the live site: the live
-      # site is this workflow's own output now.
-      - name: every URL, asset, head tag and anchor the MkDocs build serves
-        run: python3 scripts/url-parity.py --strict --reference site --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
-
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        if: ${{ !cancelled() }}
-        with:
-          name: url-parity
-          path: parity.json
-          if-no-files-found: ignore
-
   deploy:
-    needs: [plan, build, screens, parity]
+    needs: [plan, build, screens]
     # Every gate passed, and the plan job's gate said this run publishes.
     # Each `needs` is checked by name: `!cancelled()` alone would let a
     # deploy follow a failed gate, and without it a skipped dependency
@@ -544,11 +487,9 @@ jobs:
     if: ${{ !cancelled()
             && needs.plan.outputs.deploy == 'true'
             && needs.build.result == 'success'
-            && needs.screens.result == 'success'
-            && needs.parity.result == 'success' }}
-    # pages.yml's group, so a rollback run of it and this never publish at
-    # once; a run that is not deploying never joins it, and so can never
-    # displace a pending deploy.
+            && needs.screens.result == 'success' }}
+    # One deploy at a time across every run; a run that is not deploying
+    # never joins the group, and so can never displace a pending deploy.
     concurrency:
       group: ${{ needs.plan.outputs.deploy == 'true' && 'pages' || format('publish-dry-run-{0}', github.run_id) }}
       cancel-in-progress: false
@@ -569,7 +510,7 @@ jobs:
   # and this run. When it was not meant to (a pull request, another branch,
   # a dispatch with deploy=false), say so and pass.
   published:
-    needs: [plan, build, screens, parity, deploy]
+    needs: [plan, build, screens, deploy]
     if: ${{ !cancelled() && needs.plan.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15

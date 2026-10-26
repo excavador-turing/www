@@ -71,8 +71,8 @@ VIEWPORTS = [
     ("phone 375x667", 375, 667),
 ]
 
-# Chrome rounds, Material's header carries a sub-pixel border, and a page one
-# pixel over is not a page that scrolls.
+# Chrome rounds, a header can carry a sub-pixel border, and a page one pixel
+# over is not a page that scrolls.
 SLOP = 4
 
 # How far an image box may depart from the shape of the picture in it, in
@@ -95,7 +95,7 @@ MEASURE = """
   // usable height is not the window height. Anything else positioned that
   // way is the page's business, not ours.
   let chrome = 0;
-  for (const el of document.querySelectorAll('header, .md-header, .md-tabs')) {
+  for (const el of document.querySelectorAll('header')) {
     const p = getComputedStyle(el).position;
     if (p === 'fixed' || p === 'sticky') chrome += el.getBoundingClientRect().height;
   }
@@ -126,14 +126,12 @@ MEASURE = """
   // page's cards lost the ends of their sentences at 1366x768 while the
   // document still fitted, so the old gate called it green.
   //
-  // Scoped to what this site writes. Material's chrome clips on purpose --
-  // a collapsed search field, a nav list behind a drawer, the repository
-  // facts in the header -- and an unscoped rule reported 2219 of those and
-  // buried the eight that were ours. `.md-content` is Material's content
-  // column and `.sl-markdown-content` Starlight's: each build has only its
-  // own, so one selector judges both (`--site starlight/dist`).
+  // Scoped to what this site writes. The frame's chrome clips on purpose --
+  // a collapsed search field, a nav list behind a drawer -- and under
+  // Material an unscoped rule reported 2219 of those and buried the eight
+  // that were ours. `.sl-markdown-content` is Starlight's content column.
   const text = el => (el.innerText || '').trim();
-  const scope = [...document.querySelectorAll('.md-content, .sl-markdown-content, [data-screen]')];
+  const scope = [...document.querySelectorAll('.sl-markdown-content, [data-screen]')];
   const mine = new Set(scope.flatMap(s => [s, ...s.querySelectorAll('*')]));
   for (const el of mine) {
     const cs = getComputedStyle(el);
@@ -493,10 +491,10 @@ def report(results, baseline: pathlib.Path | None, update: bool) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--site", default=str(ROOT / "site"))
+    ap.add_argument("--site", default=str(ROOT / "starlight" / "dist"))
     ap.add_argument("--pages", nargs="*", help="check only these paths")
     ap.add_argument("--json", help="write the full measurements here")
-    ap.add_argument("--baseline", default=str(ROOT / "docs" / "data" /
+    ap.add_argument("--baseline", default=str(ROOT / "starlight" / "src" / "data" /
                                               "screens-baseline.json"),
                     help="faults this site is known to have")
     ap.add_argument("--no-baseline", action="store_true",

@@ -12,9 +12,8 @@
    * Material's tab strip, footer meta and edit button have no equivalent
      here; their rules are dropped (the header and its tabs are site.css).
 
-   docs/stylesheets/landing.css is still what turingpi.xyz loads, and stays
-   byte for byte as it is until the switch; this file is what the Starlight
-   build uses in its place. A change to one belongs in the other. */
+   The MkDocs original went with MkDocs on 2026-10-26; this is the site's
+   stylesheet now. */
 
 /* The site wears the board's own palette: near-black type, a lime accent
    (#dcfe8e is the interface's button colour, sampled from a screenshot rather

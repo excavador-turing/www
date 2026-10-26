@@ -1,15 +1,27 @@
-# One site: turingpi.xyz (moved from turing.excavador.xyz, SQU-189).
+# One site: turingpi.xyz (moved from turing.excavador.xyz, SQU-189), built
+# with Astro Starlight in starlight/. It was Material for MkDocs until
+# 2026-10-26, when Material went into maintenance mode.
 #
-# MkDocs is the only Python in this estate -- everything else is Node 24 or
-# Rust. That was a deliberate trade for Material's docs UX; devbox contains the
-# cost rather than letting it spread.
+# Two toolchains, both from devbox: Node for the site, Python for the
+# generators that write its pages and the checks that judge what was built.
 
 default:
     @just --list
 
-# Build into site/
-build:
-    mkdocs build --strict
+# Install the build's dependencies exactly as the lockfile says.
+install:
+    cd starlight && yarn install --immutable
+
+# A strict build into starlight/dist: no warning, no broken internal link,
+# no LFS pointer, and what the site must carry (search, llms.txt, the feed).
+build: install
+    starlight/scripts/strict-build.sh
+    starlight/scripts/stamp-build.py
+    starlight/scripts/check-built.sh
+
+# The site on http://localhost:4321 with live reload.
+serve: install
+    cd starlight && yarn dev
 
 # Refresh the API document from a bmcd release. `just refresh-api v2.26.0`
 #
@@ -18,7 +30,7 @@ build:
 # diff instead of appearing silently the next time CI runs.
 refresh-api version:
     gh release download {{version}} --repo excavador-turing/bmcd \
-        --pattern openapi.json --output docs/reference/openapi.json --clobber
+        --pattern openapi.json --output starlight/public/reference/openapi.json --clobber
     @just _describe-api
     ./scripts/generate-api-pages.py
 
@@ -28,7 +40,7 @@ refresh-api version:
 _describe-api:
     #!/usr/bin/env python3
     import json
-    doc = json.load(open("docs/reference/openapi.json"))
+    doc = json.load(open("starlight/public/reference/openapi.json"))
     print("openapi {} from bmcd {}: {} paths, {} schemas".format(
         doc["openapi"], doc["info"]["version"],
         len(doc["paths"]), len(doc["components"]["schemas"])))
@@ -43,14 +55,10 @@ _describe-api:
 refresh-gate-history board:
     ./scripts/refresh-gate-history.py {{board}}
 
-# Serve with live reload
-serve:
-    mkdocs serve
-
 # Everything CI checks, in the order CI checks it. Run this before pushing;
-# `checks.yml` runs exactly these and nothing else, and the deploy runs none
-# of them.
-check: facts-check facts-lint feature-lint description-lint llms-check ribbon-check build links-internal structured-data screens reach
+# `site.yaml` runs exactly these, and `publish.yaml` runs them again before
+# it deploys.
+check: facts-check facts-lint feature-lint ribbon-check build description-lint structured-data llms-check links-internal reach urls screens
 
 # Prove every screen reads whole, at nine viewports.
 #
@@ -80,7 +88,14 @@ reach: build
 screens-baseline: build
     ./scripts/screens.py --update-baseline
 
-# Rebuild docs/data/facts.yaml from the pages and data that own each number.
+# Every URL turingpi.xyz served under MkDocs still answers: each page, each
+# heading anchor a deep link can name, each file. A URL leaves
+# starlight/served-urls.json only with a redirect, or retired with a reason.
+urls: build
+    ./scripts/served-urls.py
+
+# Rebuild starlight/src/data/facts.yaml from the pages and data that own each
+# number.
 facts:
     ./scripts/facts.py
 
@@ -88,8 +103,8 @@ facts:
 #
 # They shared a skeleton in eleven copies of the markup and it had drifted in
 # every direction: ledes from 22 to 48 words, eight different labels opening
-# the same demo, proof numbers with no source. main.py renders the shape now;
-# this checks the content a template cannot.
+# the same demo, proof numbers with no source. <FeatureScreen /> renders the
+# shape now; this checks the content a component cannot.
 feature-lint:
     ./scripts/feature-lint.py
 
@@ -106,23 +121,25 @@ ribbon-check:
 facts-check:
     ./scripts/facts.py --check
 
-# Fail if a page does not say what it is for.
+# Fail if a page does not say what it is for, or the built page does not
+# carry that description whole.
 #
-# Material falls back to site_description when a page has none, so all 91
-# pages told a search result, a link preview and an AI summariser the same
-# sentence about the site and nothing about the page.
-description-lint:
-    ./scripts/description-lint.py
+# A page with no description repeats the site's, so all 91 pages once told a
+# search result, a link preview and an AI summariser the same sentence about
+# the site and nothing about the page.
+description-lint: build
+    ./scripts/description-lint.py --site starlight/dist
 
-# The JSON-LD in every built page parses and says what is there.
+# The JSON-LD in every built page parses and says what is there, with no
+# template left unrendered in it and no description that disagrees with the
+# page's meta tag.
 structured-data: build
-    ./scripts/structured-data.py
+    ./scripts/structured-data.py --strict
 
-# Every internal link in the built site lands on a page or file.
-#
-# `mkdocs build --strict` checks Markdown links and nothing else; a link in
-# raw HTML is resolved by the browser against the served URL, and 62 of them
-# were 404s on the live site until this existed.
+# Every href and src in the built HTML lands on a page or file -- the header,
+# footer and components included, which starlight-links-validator does not
+# see. Under MkDocs 62 links in raw HTML were 404s on the live site until
+# this existed.
 links-internal: build
     ./scripts/internal-links.py
 
@@ -130,18 +147,20 @@ links-internal: build
 # here when you want it now. Needs lychee on the path (devbox has it).
 links: build
     lychee --no-progress --base-url https://turingpi.xyz \
-        --exclude '^https://turingpi\.xyz' --exclude-path site/demo \
+        --exclude '^https://turingpi\.xyz' --exclude-path starlight/dist/demo \
         --exclude localhost --exclude 'turingpi\.local' --exclude '192\.168\.' \
         --exclude 'linkedin\.com' \
         --accept '200..=204,206,301..=308,429' --timeout 20 --max-retries 2 \
-        'site/**/*.html'
+        'starlight/dist/**/*.html'
 
 # The index an assistant reads instead of the nav.
 llms:
     ./scripts/llms.py
 
-llms-check:
-    ./scripts/llms.py --check
+# llms.txt matches the nav, the build serves it byte for byte, and every link
+# in it lands on a built page.
+llms-check: build
+    ./scripts/llms.py --check --site starlight/dist
 
 # Fail if a page types a number the facts file owns.
 #
@@ -152,7 +171,7 @@ facts-lint:
     ./scripts/facts-lint.py
 
 clean:
-    rm -rf site
+    rm -rf starlight/dist starlight/.astro
 
 # Which bmcd release gained which API operation.
 #
@@ -163,8 +182,9 @@ clean:
 refresh-api-history *ARGS:
     ./scripts/api-history.py {{ARGS}}
 
-# Rebuild the changelog pages, and the feed, from each repository's CHANGELOG.md.
-# `just refresh-changelog` for all four, or name one: `just refresh-changelog bmcd`.
+# Rebuild the changelog pages, the news posts and the feed from each
+# repository's CHANGELOG.md. `just refresh-changelog` for all four, or name
+# one: `just refresh-changelog bmcd`.
 #
 # NOT from the GitHub release notes, which is where this used to read. Every
 # firmware release note is the same fixed paragraph -- v2.28.0 and v2.32.0,
@@ -179,7 +199,8 @@ refresh-api-history *ARGS:
 #
 # Committed rather than fetched at build time, for the same reason the OpenAPI
 # document is: the site builds offline and reproducibly, and a change arrives
-# as a reviewable diff. The hourly Pages job runs this and commits what moves.
+# as a reviewable diff. The hourly publish job runs this and commits what
+# moves.
 refresh-changelog *COMPONENTS:
     ./scripts/refresh-changelog.py {{COMPONENTS}}
 
@@ -194,15 +215,14 @@ refresh-roadmap:
 # Everything the hourly job refreshes, in one go.
 refresh: refresh-changelog refresh-roadmap facts llms
 
-# Rebuild the fork pane of the demo from a BMC-UI checkout at a tag.
+# Build the fork pane of the demo from a BMC-UI checkout at a tag.
 #   just refresh-demo ../BMC-UI v3.19.0
 #
 # The pane is the real interface -- the same bundle a board serves -- built
 # with VITE_DEMO=1 so it answers from its captured fixtures, and with the
-# site's subpath as its base. Committed rather than built in CI, like the
-# API document and the changelog: the site builds offline, and a new demo
-# arrives as a reviewable diff. The tag is what the firmware pins; check
-# `docs/changelog/firmware.md` if unsure.
+# site's subpath as its base. The deploy builds both panes from the latest
+# BMC-UI release (publish.yaml); this puts one in place locally, where it is
+# git-ignored.
 refresh-demo checkout tag:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -212,9 +232,9 @@ refresh-demo checkout tag:
     git -C "$src" checkout -q "{{tag}}"
     ( cd "$src" && npm ci --no-audit --no-fund >/dev/null && \
       VITE_DEMO=1 VITE_BASE=/demo/fork/ BMC_UI_VERSION="{{tag}}" npm run build >/dev/null )
-    rm -rf docs/demo/fork && mkdir -p docs/demo/fork
-    cp -a "$src/dist/." docs/demo/fork/
-    echo "demo fork pane: {{tag}} ($(find docs/demo/fork -type f | wc -l) files)"
+    rm -rf starlight/public/demo/fork && mkdir -p starlight/public/demo/fork
+    cp -a "$src/dist/." starlight/public/demo/fork/
+    echo "demo fork pane: {{tag}} ($(find starlight/public/demo/fork -type f | wc -l) files)"
     python3 scripts/demo-ribbon.py
 
 # The fork demo pane the way the site deploys it: from the latest BMC-UI
@@ -224,86 +244,4 @@ demo-fork-latest checkout:
     set -euo pipefail
     tag=$(gh api repos/excavador-turing/BMC-UI/releases/latest --jq .tag_name)
     just refresh-demo "{{checkout}}" "$tag"
-    echo "$tag" > docs/demo/fork/VERSION
-
-# ---------------------------------------------------------------------------
-# The Starlight build, in starlight/: what turingpi.xyz serves since phase 4b
-# of moving off Material for MkDocs, which is in maintenance mode. It still
-# builds from docs/ through the converter; MkDocs above stays as parity's
-# reference and the rollback until it is retired. Not `site/`, because that
-# is MkDocs's output directory and `mkdocs build` empties it.
-
-# Install the Starlight build's dependencies exactly as the lockfile says.
-site-install:
-    cd starlight && yarn install --immutable
-
-# Render docs/ into starlight/: pages, public files, sidebar, footer and SEO
-# data. Git-ignored and rewritten every time; docs/ is never touched.
-site-convert:
-    ./scripts/mkdocs-to-starlight.py
-
-# A strict build into starlight/dist: no warning, no broken internal link,
-# no LFS pointer, and what the site must carry (search, llms.txt, the feed).
-site-build: site-install site-convert
-    starlight/scripts/strict-build.sh
-    starlight/scripts/stamp-build.py
-    starlight/scripts/check-built.sh
-
-# The Starlight site on http://localhost:4321 with live reload. Re-run
-# `just site-convert` after editing docs/.
-site-dev: site-install site-convert
-    cd starlight && yarn dev
-
-# Everything the Starlight build must pass before it can replace MkDocs: every
-# check `just check` runs, each against this build where it judges what was
-# built, and URL parity with the MkDocs build as a gate. The one local command
-# for the new build; `site.yaml` runs exactly these. The four source checks
-# are the MkDocs ones, unchanged: both builds read the same docs/.
-site-check: facts-check facts-lint feature-lint ribbon-check site-build site-description-lint site-llms-check site-links-internal site-structured-data site-screens site-reach site-parity
-
-# Every page says what it is for (the source rules), and the built page
-# carries that description whole: escaped, not cut at a `"` as MkDocs's
-# template cuts two posts today.
-site-description-lint: site-build
-    ./scripts/description-lint.py --site starlight/dist
-
-# The JSON-LD in every built page parses and says what is there, with no
-# template left unrendered in it and no description that disagrees with the
-# page's meta tag -- the two faults MkDocs's build ships (`--strict`).
-site-structured-data: site-build
-    ./scripts/structured-data.py --site starlight/dist --strict
-
-# llms.txt matches the nav, the build serves it byte for byte, and every link
-# in it lands on a built page.
-site-llms-check: site-build
-    ./scripts/llms.py --check --site starlight/dist
-
-# Every href and src in the built HTML resolves, by the same resolver as
-# `just links-internal` -- the header, footer and components included, which
-# starlight-links-validator does not see. Starlight's /favicon.svg is
-# starlight/public/favicon.svg, so it is checked like any other file.
-site-links-internal: site-build
-    ./scripts/internal-links.py --site starlight/dist
-
-# The click-depth walk of `just reach`, over the Starlight build.
-site-reach: site-build
-    ./scripts/reach.py --site starlight/dist
-
-# Every screen of the Starlight build at nine viewports, as `just screens`
-# measures the MkDocs one: same script, same baseline, the other build.
-site-screens: site-build
-    ./scripts/screens.py --site starlight/dist
-
-# Every URL, asset, head tag and anchor the MkDocs build of this commit
-# serves, against starlight/dist: a gate. Not against turingpi.xyz, which is
-# the Starlight build itself since the switch. The deliberate fixes are
-# listed, with reasons, in the script (DELIBERATE).
-site-parity: site-build build
-    ./scripts/url-parity.py --strict --reference site
-
-# The hourly refresh, then the Starlight build's inputs from it: what
-# publish.yaml's refresh job runs before it commits. The generators still
-# write docs/; the converter carries their pages into the content collection
-# and their data -- facts.yaml, boards.yaml, news-posts.json, roadmap.json --
-# into starlight/src/data/, where the components read it at build time.
-site-refresh: refresh site-convert
+    echo "$tag" > starlight/public/demo/fork/VERSION

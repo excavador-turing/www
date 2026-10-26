@@ -1,25 +1,22 @@
 #!/usr/bin/env python3
 """The structured data on every built page is valid, and says what is there.
 
-`overrides/main.html` writes JSON-LD into the head: the front page as a piece
-of software with a version, each release post as an article about that
-version, the FAQ as its questions, and a breadcrumb everywhere. All of it is
-assembled by a template out of page metadata, so a stray quote in a title or
-a description breaks the JSON silently -- the page still renders, and the
+`starlight/src/route-data.ts` writes JSON-LD into the head: the front page as
+a piece of software with a version, each release post as an article about
+that version, the FAQ as its questions, and a breadcrumb everywhere. All of
+it is assembled out of page metadata, so a stray quote in a title or a
+description breaks the JSON silently -- the page still renders, and the
 only sign is that a search engine quietly stops reading it.
 
-This parses what was actually built. It runs after `mkdocs build`, on `site/`.
+This parses what was actually built, in starlight/dist.
 
-    just build && just structured-data
-    scripts/structured-data.py --site starlight/dist --strict
+    just structured-data
 
-`--strict` also refuses two faults the MkDocs build ships, which the
-Starlight build fixes on purpose: a template left unrendered in the data
-(the FAQ's answers carry raw `{{ roadmap.count }}` on turingpi.xyz, because
-main.py reads faq.md before the macros render it), and a post's JSON-LD
-description that disagrees with the page's own `<meta name="description">`
-(two posts are cut at an unescaped `"` in the meta tag). It is off by
-default so `just structured-data` judges the MkDocs build as it always has.
+`--strict` also refuses two faults the MkDocs build shipped until the site
+moved off it: a template left unrendered in the data (the FAQ's answers
+carried raw `{{ roadmap.count }}`), and a post's JSON-LD description that
+disagrees with the page's own `<meta name="description">` (two posts were
+cut at an unescaped `"` in the meta tag). `just structured-data` passes it.
 """
 from __future__ import annotations
 
@@ -31,7 +28,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = ROOT / "site"
+SITE = ROOT / "starlight" / "dist"
 BLOCK = re.compile(r'<script type="application/ld\+json">(.*?)</script>', re.S)
 META_DESC = re.compile(r'<meta name="description" content="([^"]*)"')
 TEMPLATE = re.compile(r"\{\{|\{%")
@@ -60,7 +57,7 @@ def strings(node):
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", default=str(SITE),
-                    help="the built site to read (default: site/, MkDocs's)")
+                    help="the built site to read (default: starlight/dist)")
     ap.add_argument("--strict", action="store_true",
                     help="also refuse unrendered templates in the data, and "
                          "a description that disagrees with the meta tag")

@@ -3,13 +3,13 @@
 
     just links-internal
 
-`mkdocs build --strict` checks Markdown links and nothing else. A link written
-as raw HTML -- the cards, the plates, the "next" blocks -- is passed through
-untouched and resolved by the BROWSER against the served URL, so one written
-for a page at a different depth is a 404 that nothing noticed: 62 of them were
-live, among them every plate on the Features index (`../<slug>/` on
-/features/ is /<slug>/). This resolves each href and src in site/ the way a
-browser would and fails on a miss.
+starlight-links-validator checks the links in the content and nothing else.
+A link written as raw HTML -- the cards, the plates, the "next" blocks, the
+header and the footer -- is resolved by the BROWSER against the served URL,
+so one written for a page at a different depth is a 404 that nothing
+noticed: under MkDocs 62 of them were live, among them every plate on the
+Features index (`../<slug>/` on /features/ is /<slug>/). This resolves each
+href and src in the build the way a browser would and fails on a miss.
 
 Skipped on purpose: external links (`just links` owns those), fragments (a
 bare `#id` stays on the page; `/#demo/...` is a script route on the front
@@ -25,7 +25,7 @@ import sys
 import urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = ROOT / "site"
+SITE = ROOT / "starlight" / "dist"
 ORIGIN = "https://turingpi.xyz"
 NOT_BUILT_HERE = ("/demo/fork/", "/demo/fleet/")
 
@@ -54,13 +54,9 @@ def exists(path: str, site: pathlib.Path = SITE) -> bool:
 
 
 def main() -> int:
-    # --site: the same resolver over another build. The Starlight build
-    # (starlight/dist) has starlight-links-validator, which checks the links
-    # in the CONTENT; this checks every href and src in the HTML it built,
-    # header, footer and components included.
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", default=str(SITE),
-                    help="the built site to read (default: site/, MkDocs's)")
+                    help="the built site to read (default: starlight/dist)")
     ap.add_argument("--known-missing", action="append", default=[], metavar="PATH",
                     help="a target this build is known not to have yet; it is "
                          "not reported, and the run FAILS once it exists, so "

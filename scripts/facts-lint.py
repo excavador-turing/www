@@ -3,13 +3,13 @@
 
 `scripts/facts.py` has claimed since it was written that this script exists,
 in its own docstring and in the header it generates into
-`docs/data/facts.yaml`. It did not. The claim shipped, was committed, and was
+`facts.yaml`. It did not. The claim shipped, was committed, and was
 served on the site inside a generated file -- a promise nothing kept, which is
 the exact failure the facts file exists to prevent, one level up.
 
-So: every number in `docs/data/facts.yaml` is a number no page may type. A
-page that wants it asks for it (`{{ gate.promoted }}`), and this refuses the
-ones written out by hand.
+So: every number in `starlight/src/data/facts.yaml` is a number no page may
+type. A page that wants it asks for it (`<Fact of="gate.promoted" />`), and
+this refuses the ones written out by hand.
 
     just facts-lint
 
@@ -40,13 +40,13 @@ import sys
 
 import yaml
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ROOT / "docs"
-FACTS = DOCS / "data" / "facts.yaml"
+from sitepage import CONTENT, DATA
+
+FACTS = DATA / "facts.yaml"
 
 # Written by a script from its own source. A number here is read, not typed.
 GENERATED = ("changelog/", "reference/api/", "reference/api-history.md",
-             "reference/gate-history.md", "roadmap.md", "data/")
+             "reference/gate-history.md", "roadmap.md")
 
 # What each fact counts. A number is a claim only when a noun says what it
 # counts, and these are the nouns the site has actually used -- including the
@@ -90,11 +90,13 @@ def owned(facts: dict) -> dict[str, tuple[int, str]]:
 
 
 def strip(text: str) -> str:
-    """Remove what is not prose: code, links, front matter, macro calls."""
+    """Remove what is not prose: code, links, front matter, components."""
     text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.S)
     text = re.sub(r"```.*?```", " ", text, flags=re.S)
     text = re.sub(r"`[^`]*`", " ", text)
-    text = re.sub(r"\{\{.*?\}\}", " ", text)          # already asking
+    text = re.sub(r"<Fact\b[^>]*/>", " ", text)       # already asking
+    text = re.sub(r"^import .*$", " ", text, flags=re.M)
+    text = re.sub(r"\{/\*.*?\*/\}", " ", text, flags=re.S)
     text = re.sub(r"\]\([^)]*\)", "] ", text)          # link targets
     text = re.sub(r"https?://\S+", " ", text)
     text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
@@ -109,8 +111,8 @@ def main() -> int:
     policed = owned(facts)
 
     problems = []
-    for page in sorted(DOCS.rglob("*.md")):
-        rel = page.relative_to(DOCS).as_posix()
+    for page in sorted(CONTENT.rglob("*.md*")):
+        rel = page.relative_to(CONTENT).as_posix()
         if any(rel.startswith(g) for g in GENERATED):
             continue
         text = strip(page.read_text())
@@ -132,7 +134,7 @@ def main() -> int:
                            f"and the facts file says {value}")
                 problems.append(
                     f"{rel}: {m.group(0)!r} is typed, {verdict} -- "
-                    f"write {{{{ {path} }}}}\n      ...{context}...")
+                    f'write <Fact of="{path}" />\n      ...{context}...')
 
     if problems:
         print(f"{len(problems)} typed numbers the facts file owns:\n",
