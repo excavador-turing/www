@@ -1,36 +1,36 @@
 name: Publish (Starlight)
 
-# The Starlight build of turingpi.xyz, built the way it will be published --
-# with the demo panes from the latest BMC-UI release, from the Git LFS
-# objects, through every gate -- and, until the switch, published only when
-# someone asks by hand.
+# turingpi.xyz: the Starlight build, with the demo panes from the latest
+# BMC-UI release, from the Git LFS objects, through every gate, published.
 #
 # This is pages.yml's successor under a NEW file name, on purpose. Disabling
 # a workflow in the Actions UI disables that file path on every branch, so
 # the switch must be able to turn pages.yml off without touching this file,
 # and the other way round for a rollback.
 #
-# Phase 4a, what runs:
+# What runs (phase 4b, the switch):
 #
-#   push to main, the hourly schedule,     refresh (dry run), plan, build,
-#   a dispatch                             screens, parity: every gate and
-#                                          the Pages artifact. No deploy.
+#   push to main                           plan, build, screens, parity,
+#                                          deploy, `published`.
+#   the hourly schedule, a dispatch        refresh first, which commits what
+#   from main                              the repositories moved; then all
+#                                          of the above, unless the site
+#                                          already carries the latest BMC-UI
+#                                          release and nothing moved.
+#   a dispatch with deploy=false, or       everything but the deploy; the
+#   from another branch                    refresh is a dry run.
 #   a pull request that changes this       the same, so a change to the
 #   pipeline (paths below)                 publish path is proved before main.
-#   a dispatch from main with deploy=true  all of that, then deploy and
-#                                          `published`. Until pages.yml is
-#                                          disabled, its next deploy puts the
-#                                          MkDocs site back.
 #
-# pages.yml still deploys the live site with MkDocs and still makes the
-# hourly refresh commit; two workflows committing to main would race. The
-# switch (phase 4b) moves that commit here and widens one expression, the
-# `DEPLOY` gate in the plan job.
+# pages.yml, the MkDocs workflow, runs only by hand now: it is the rollback.
+# To go back, `gh workflow disable publish.yaml` and then
+# `gh workflow run pages.yml`; the two share the `pages` deploy group, so
+# they never publish at once.
 #
-# Not here: repository_dispatch. pages.yml still lists `ui-released`, but
-# nothing sends it: BMC-UI's release.yaml deliberately holds no credential
-# for this repository and says so. The hourly schedule notices a release
-# within the hour; `gh workflow run publish.yaml` is the immediate path.
+# Not here: repository_dispatch. Nothing sends `ui-released`: BMC-UI's
+# release.yaml deliberately holds no credential for this repository and says
+# so. The hourly schedule notices a release within the hour;
+# `gh workflow run publish.yaml` is the immediate path.
 on:
   push:
     branches: [main]
@@ -43,10 +43,10 @@ on:
     inputs:
       deploy:
         description: >-
-          Publish this build to turingpi.xyz (from main only). Phase 4a:
-          pages.yml's next deploy replaces it with the MkDocs site again.
+          Publish this build to turingpi.xyz (from main only). Off: build,
+          gates and a dry-run refresh, nothing committed or published.
         type: boolean
-        default: false
+        default: true
   schedule:
     - cron: "23 * * * *"
 
@@ -59,15 +59,19 @@ permissions:
   contents: read
 
 jobs:
-  # pages.yml's hourly refresh -- refresh-changelog, refresh-roadmap, facts --
-  # as a DRY RUN: the generators run and the job summary shows what the
-  # hourly commit would carry, and nothing is committed. pages.yml makes that
-  # commit until the switch.
+  # The generated pages -- changelog, roadmap, facts -- are committed, so the
+  # site builds offline and a change to them arrives as a reviewable diff.
+  # The cost is that somebody has to run the generators, and nobody did: the
+  # site once sat on firmware v2.31.0 for a week after v2.32.0 shipped. So
+  # this job runs them every hour and commits what moved, as
+  # github-actions[bot].
   #
-  # Phase 4b adds `contents: write` and the commit step pages.yml has (as
-  # github-actions[bot], main only, never on a pull request), with the SHA it
-  # pushed as the `commit` output: a push made with GITHUB_TOKEN starts no
-  # new workflow run, so the build below checks that commit out itself.
+  # Only on the schedule and by hand -- a push already carries whatever the
+  # author committed, and refreshing under them would rewrite it -- and a
+  # commit only from main, never on a pull request or with deploy=false:
+  # those are dry runs that say what the commit would carry. The SHA pushed
+  # is the `commit` output: a push made with GITHUB_TOKEN starts no new
+  # workflow run, so the build below checks that commit out itself.
   refresh:
     if: >-
       github.event_name == 'schedule'
@@ -75,6 +79,13 @@ jobs:
       || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      COMMIT: >-
+        ${{ github.ref == 'refs/heads/main'
+            && (github.event_name == 'schedule'
+                || (github.event_name == 'workflow_dispatch' && inputs.deploy)) }}
     outputs:
       changed: ${{ steps.diff.outputs.changed }}
       commit: ${{ steps.diff.outputs.commit }}
@@ -83,7 +94,8 @@ jobs:
         with:
           # The converter dates each page from its file's last commit.
           fetch-depth: 0
-          persist-credentials: false
+          # Kept only by a run that commits; a dry run pushes nothing.
+          persist-credentials: ${{ env.COMMIT == 'true' }}
 
       - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
         with:
@@ -99,31 +111,49 @@ jobs:
           devbox run -- python3 scripts/refresh-roadmap.py
           devbox run -- python3 scripts/facts.py
 
-      - name: what the hourly commit would carry (dry run, not committed)
+      # Before the commit: what is pushed to main must be something the
+      # build can take.
+      - name: the refreshed sources still convert
+        run: devbox run -- python3 scripts/mkdocs-to-starlight.py
+
+      - name: commit, if anything moved
         id: diff
         run: |
           set -eu
+          # Empty unless this run pushes: the build then checks out the
+          # commit the run started from.
+          echo "commit=" >> "$GITHUB_OUTPUT"
           if git diff --quiet -- docs/; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "nothing moved" | tee -a "$GITHUB_STEP_SUMMARY"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            {
-              echo "### Refresh, dry run: the hourly commit would carry"
-              echo '```'
-              git --no-pager diff --stat -- docs/
-              echo '```'
-              echo "Not committed here: pages.yml makes this commit until the switch."
-            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
-          # Empty in phase 4a: nothing was pushed, so the build checks out
-          # the commit this run started from.
-          echo "commit=" >> "$GITHUB_OUTPUT"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Refresh: what moved"
+            echo '```'
+            git --no-pager diff --stat -- docs/
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$COMMIT" != true ]; then
+            echo "Dry run ($GITHUB_EVENT_NAME on $GITHUB_REF): not committed." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -q -F - <<'MSG'
+          the site catches up with what the repositories say
 
-      # The refreshed sources still render into the Starlight project: what
-      # the hourly commit would carry is something the build can take.
-      - name: the refreshed sources still convert
-        run: devbox run -- python3 scripts/mkdocs-to-starlight.py
+          Written by scripts/refresh-changelog.py, refresh-roadmap.py and
+          scripts/facts.py on the hourly publish schedule. Nothing here is
+          typed by hand.
+          MSG
+          # Fails if main moved since the checkout; the next hour retries
+          # from the new main, and nothing below runs on a failed refresh.
+          git push origin HEAD:main
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "Committed $(git rev-parse --short HEAD) to main." | tee -a "$GITHUB_STEP_SUMMARY"
 
   # What this run builds and whether it may publish.
   plan:
@@ -162,20 +192,16 @@ jobs:
             echo "building the demo from $tag (the site carries $live)"
           fi
 
-      # THE DEPLOY GATE, and the only one. Phase 4a: a dispatch from main
-      # with deploy=true, nothing else -- not a push, not the schedule, never
-      # a pull request.
-      #
-      # Phase 4b turns publishing on by replacing the DEPLOY expression with
-      #   github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-      #     && (github.event_name != 'workflow_dispatch' || inputs.deploy)
-      # and the input's default with true.
+      # THE DEPLOY GATE, and the only one: main, never a pull request, and
+      # a dispatch only when it asked to (deploy defaults to true).
       - name: may this run publish
         id: gate
         env:
-          DEPLOY: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy && github.ref == 'refs/heads/main' }}
+          DEPLOY: >-
+            ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+                && (github.event_name != 'workflow_dispatch' || inputs.deploy) }}
           SKIP: ${{ steps.ui.outputs.skip }}
-          # The refresh's commit when it pushed one (phase 4b), else this
+          # The refresh's commit when it pushed one, else this
           # run's own commit. Never `main`: on a pull request that would
           # build the wrong tree, and main may have moved since.
           REF: ${{ needs.refresh.outputs.commit || github.sha }}
@@ -186,7 +212,7 @@ jobs:
             echo "this run publishes $REF, if every gate passes" | tee -a "$GITHUB_STEP_SUMMARY"
           else
             echo "deploy=false" >> "$GITHUB_OUTPUT"
-            echo "this run publishes nothing: build and gates only (phase 4a)" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "this run publishes nothing: build and gates only" | tee -a "$GITHUB_STEP_SUMMARY"
           fi
           echo "ref=$REF" >> "$GITHUB_OUTPUT"
 
@@ -395,9 +421,9 @@ jobs:
       - name: every page is within two clicks of the front page
         run: devbox run -- python3 scripts/reach.py --site starlight/dist
 
-      # Parity's tie-breaker: a difference from the live site that this
-      # commit's MkDocs build shares is content that moved since the last
-      # deploy, not something the port got wrong.
+      # Parity's reference. Once this workflow publishes, the live site IS
+      # the Starlight build and can no longer tell the port from itself;
+      # this commit's MkDocs build can, until MkDocs is retired.
       - name: the MkDocs build of this commit
         run: devbox run -- mkdocs build --strict
 
@@ -497,10 +523,10 @@ jobs:
           name: mkdocs-site
           path: site
 
-      # The live site is the reference, read when this runs; the summary
-      # says when.
-      - name: every URL, asset, head tag and anchor the live site serves
-        run: python3 scripts/url-parity.py --strict --mkdocs site --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
+      # Against this commit's MkDocs build, not the live site: the live
+      # site is this workflow's own output now.
+      - name: every URL, asset, head tag and anchor the MkDocs build serves
+        run: python3 scripts/url-parity.py --strict --reference site --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: ${{ !cancelled() }}
@@ -520,9 +546,9 @@ jobs:
             && needs.build.result == 'success'
             && needs.screens.result == 'success'
             && needs.parity.result == 'success' }}
-    # pages.yml's group while it deploys, so the two never publish at once;
-    # a run that is not deploying never joins it, and so can never displace
-    # a pending pages.yml run.
+    # pages.yml's group, so a rollback run of it and this never publish at
+    # once; a run that is not deploying never joins it, and so can never
+    # displace a pending deploy.
     concurrency:
       group: ${{ needs.plan.outputs.deploy == 'true' && 'pages' || format('publish-dry-run-{0}', github.run_id) }}
       cancel-in-progress: false
@@ -540,8 +566,8 @@ jobs:
 
   # A green run is not a live site. When this run was meant to publish, fail
   # unless turingpi.xyz serves THIS build: its /build.json names this commit
-  # and this run. When it was not meant to (phase 4a: anything but a
-  # dispatch with deploy=true), say so and pass.
+  # and this run. When it was not meant to (a pull request, another branch,
+  # a dispatch with deploy=false), say so and pass.
   published:
     needs: [plan, build, screens, parity, deploy]
     if: ${{ !cancelled() && needs.plan.result == 'success' }}
@@ -564,7 +590,7 @@ jobs:
             exit 0
           fi
           if [ "$WANTED" != true ]; then
-            echo "this run was not meant to publish (phase 4a: only a dispatch from main with deploy=true does)"
+            echo "this run was not meant to publish (a pull request, another branch, or deploy=false)"
             exit 0
           fi
           if [ "$DEPLOY" != success ]; then

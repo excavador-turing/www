@@ -1,5 +1,16 @@
 name: Pages
 
+# THE ROLLBACK, and nothing else. turingpi.xyz is built with Starlight and
+# published by publish.yaml since phase 4b; this MkDocs workflow runs only
+# when someone runs it, and goes when MkDocs does. To put the MkDocs site
+# back:
+#
+#   gh workflow disable publish.yaml     # or its next push/hour republishes
+#   gh workflow run pages.yml
+#
+# Its hourly schedule and push trigger are gone, so it neither deploys nor
+# commits beside publish.yaml. What follows describes it as it was.
+#
 # This publishes. It does not judge: every check moved to `checks.yml`,
 # which runs on pull requests and blocks the merge instead. The screen gate
 # alone was 132 of the 178 seconds a deploy took, while building the site
@@ -17,15 +28,7 @@ name: Pages
 # schedule is the safety net for when it could not, and does nothing when
 # the site already carries the latest tag.
 on:
-  push:
-    branches: [main]
-  # Re-publishing without a commit: setting a custom domain does not itself
-  # redeploy, and a deployment is what re-binds the domain at GitHub's edges.
   workflow_dispatch:
-  repository_dispatch:
-    types: [ui-released]
-  schedule:
-    - cron: "23 * * * *"
 
 concurrency:
   # Not cancel-in-progress: cancelling a half-finished Pages deployment
