@@ -1,0 +1,57 @@
+---
+// The site's footer: overrides/partials/footer.html, from the same data
+// (mkdocs.yml extra.footer and extra.social, by way of the converter). Below
+// Starlight's own footer, which carries the "last updated" date.
+//
+// The three icons are Font Awesome Free (CC BY 4.0), copied from the
+// mkdocs-material package so they are the same drawings the live site uses.
+import Default from '@astrojs/starlight/components/Footer.astro';
+import footer from '../generated/footer.json';
+
+const svgs = import.meta.glob('../icons/*.svg', { query: '?raw', import: 'default', eager: true });
+const icon = (name: string) =>
+  svgs[`../icons/${name.replace(/^fontawesome\//, '').replace('/', '-')}.svg`] as string | undefined;
+---
+
+<Default />
+
+<div class="tp-footer">
+  <div class="tp-footer__inner">
+    <div class="tp-footer__brand">
+      <b>Turing Pi 2 BMC</b>
+      <span>Firmware for the Turing Pi 2 that undoes its own mistakes.
+      A fork, because upstream's last release was February 2025.</span>
+    </div>
+    {
+      footer.columns.map((col) => (
+        <nav class="tp-footer__col" aria-label={col.title}>
+          <b>{col.title}</b>
+          <ul>
+            {col.links.map((link) => (
+              <li>
+                <a href={link.href} rel={link.external ? 'noopener' : undefined}>{link.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+  <div class="tp-footer__legal">
+    <span>GPL-2.0, like the upstream it forks.
+    <b>Not a Turing Machines product</b> — the board is theirs, at
+    <a href="https://turingpi.com/" rel="noopener">turingpi.com</a>;
+    this firmware is an independent fork.</span>
+    {
+      footer.social.length > 0 && (
+        <div class="tp-footer__social">
+          {footer.social.map((s) => (
+            <a href={s.link} target="_blank" rel="noopener" title={s.name} aria-label={s.name}>
+              <Fragment set:html={icon(s.icon) ?? ''} />
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</div>

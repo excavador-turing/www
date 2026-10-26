@@ -5,7 +5,10 @@
     "uv":        "latest",
     "just":      "latest",
     "gh":        "latest",
-    "lychee":    "latest"
+    "lychee":    "latest",
+    "nodejs":     "26.11.1",
+    "yarn-berry": "4.18.1",
+    "git-lfs":    "3.8.0"
   },
   "env": {
     "UV_PROJECT_ENVIRONMENT": "$PWD/.venv",
