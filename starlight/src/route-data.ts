@@ -1,37 +1,127 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
-import seoData from './generated/seo.json';
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import site from './config/site.json';
 import { facts } from './lib/data';
 import { faqEntities } from './lib/faq';
 import { format, lookup } from './lib/facts.mjs';
+import { NEWS } from './lib/news';
 
-// What overrides/main.html writes into <head>, per page: the <title> as
-// Material writes it, <meta robots> from the page, Open Graph and Twitter
-// tags, the post's publication date, and the JSON-LD. The converter
-// computes each value the way the template does (src/generated/seo.json);
-// this only puts them in place of Starlight's defaults for the same tags.
-//
-// Two parts are not the converter's but read live when the site is built,
-// so they follow their data with nothing to regenerate: the front page's
-// softwareVersion (facts.yaml) and the FAQ's questions (the FAQ page itself).
+// What Material's template (overrides/main.html, until MkDocs was retired)
+// wrote into <head>, per page, and this site still writes: the <title> as
+// Material wrote it, <meta robots> from the page, Open Graph and Twitter
+// tags, the post's publication date, and the JSON-LD. Each value comes from
+// the page's front matter, where tp.htmlTitle and tp.ogTitle say what the
+// nav called the page wherever that is not the page's own title; the
+// numbers and the FAQ's questions are read when the site is built.
 
-type Seo = {
-  title: string;
-  robots?: string;
-  ogType: string;
-  ogTitle: string;
-  ogDescription: string;
-  ogUrl: string;
-  ogImage: string;
-  published?: string;
-  jsonld?: unknown[];
-};
+const IMAGE = 'captures/power-control.png';
+const OS = 'Turing Pi 2 BMC (Buildroot Linux, ARMv7)';
+const CATEGORY = 'DeveloperApplication';
 
-const seo = seoData as Record<string, Seo>;
+type Data = CollectionEntry<'docs'>['data'];
 
-export const onRequest = defineRouteMiddleware((context) => {
+/** Open Graph's and the breadcrumb's name for a page. */
+const ogName = (data: Data) => data.tp?.ogTitle ?? data.title;
+
+let byFile: Map<string | undefined, CollectionEntry<'docs'>> | undefined;
+
+export const onRequest = defineRouteMiddleware(async (context) => {
   const route = context.locals.starlightRoute;
-  const page = seo[context.url.pathname];
-  if (!page) return;
+  const url = context.url.pathname;
+  // The news index's later pages (src/pages/news/page/[page].astro) speak
+  // for the index; every other page that is not in the collection (the
+  // 404) keeps Starlight's head.
+  const paged = new RegExp(`^/${NEWS}/page/\\d+/$`).test(url);
+  const index = await getEntry('docs', NEWS);
+  if (!index) throw new Error(`the news index (${NEWS}) is not in the docs collection`);
+  // A StarlightPage's entry is made up on the spot, not one of the collection.
+  byFile ??= new Map((await getCollection('docs')).map((e) => [e.filePath, e]));
+  const own = paged ? index : byFile.get(route.entry.filePath);
+  if (!own) return;
+  const data: Data = own.data;
+
+  const home = url === '/';
+  const post = !paged && data.date instanceof Date;
+  const canonical = site.site + url;
+  const t = data.tp ?? {};
+  const title = home
+    ? t.htmlTitle ? `${t.htmlTitle} - ${site.title}` : site.title
+    : `${t.htmlTitle ?? data.title} - ${site.title}`;
+  const ogTitle = home ? site.title : ogName(data);
+  const ogDescription = data.description || site.description;
+  const ogImage = `${site.site}/assets/${(!paged && data.image) || IMAGE}`;
+  const published = post ? (data.date as Date).toISOString().slice(0, 10) : undefined;
+
+  const jsonld: Record<string, unknown>[] = [];
+  if (home) {
+    jsonld.push({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: site.title,
+      alternateName: 'Turing Pi 2 BMC firmware (excavador-turing fork)',
+      applicationCategory: CATEGORY,
+      operatingSystem: OS,
+      softwareVersion: String(lookup(facts, 'releases.firmware.newest')),
+      license: 'https://github.com/excavador-turing/BMC-Firmware/blob/hive/LICENSE',
+      codeRepository: 'https://github.com/excavador-turing/BMC-Firmware',
+      isAccessibleForFree: true,
+      url: `${site.site}/`,
+      description: ogDescription,
+      image: ogImage,
+    });
+  } else if (post) {
+    jsonld.push({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: ogTitle,
+      description: ogDescription,
+      image: ogImage,
+      url: canonical,
+      mainEntityOfPage: canonical,
+      datePublished: published,
+      isPartOf: { '@type': 'Blog', name: `${site.title} news`, url: `${site.site}/${NEWS}/` },
+      about: {
+        '@type': 'SoftwareApplication',
+        name: site.title,
+        // The release the post is about: the last part of its URL, v2.44.0.
+        softwareVersion: url.split('/').filter(Boolean).pop(),
+        operatingSystem: OS,
+        applicationCategory: CATEGORY,
+      },
+    });
+  } else if (url === '/faq/') {
+    // The questions, read off the page; each <Fact> as the number a reader
+    // sees there (lib/faq.ts).
+    const qs = faqEntities(route.entry.body ?? '', 'value', (of, filters) => format(facts, of, filters));
+    jsonld.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      url: canonical,
+      mainEntity: qs.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    });
+  }
+  if (!home) {
+    // Material's ancestors: nav sections carry no URL and drop out, so a
+    // page's trail is the site and itself -- except a post, whose parent is
+    // the news index. (The index's later pages have none.)
+    const crumbs: [string, string][] = [[site.title, `${site.site}/`]];
+    if (post) crumbs.push([ogName(index.data), `${site.site}/${NEWS}/`]);
+    crumbs.push([ogTitle, canonical]);
+    jsonld.push({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map(([name, item], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        item,
+      })),
+    });
+  }
 
   const ours = (h: { tag: string; attrs?: Record<string, unknown> }) => {
     if (h.tag !== 'meta') return false;
@@ -41,23 +131,23 @@ export const onRequest = defineRouteMiddleware((context) => {
       name.startsWith('twitter:') || name === 'robots';
   };
   const head = route.head.filter((h) => !ours(h));
-  for (const h of head) if (h.tag === 'title') h.content = page.title;
+  for (const h of head) if (h.tag === 'title') h.content = title;
 
   const meta = (attrs: Record<string, string>) => head.push({ tag: 'meta', attrs, content: '' });
-  if (page.robots) meta({ name: 'robots', content: page.robots });
+  if (t.robots) meta({ name: 'robots', content: t.robots });
   meta({ property: 'og:site_name', content: route.siteTitle });
-  meta({ property: 'og:type', content: page.ogType });
-  meta({ property: 'og:title', content: page.ogTitle });
-  meta({ property: 'og:description', content: page.ogDescription });
-  meta({ property: 'og:url', content: page.ogUrl });
-  meta({ property: 'og:image', content: page.ogImage });
+  meta({ property: 'og:type', content: post ? 'article' : 'website' });
+  meta({ property: 'og:title', content: ogTitle });
+  meta({ property: 'og:description', content: ogDescription });
+  meta({ property: 'og:url', content: canonical });
+  meta({ property: 'og:image', content: ogImage });
   meta({ property: 'og:locale', content: 'en' });
-  if (page.published) meta({ property: 'article:published_time', content: page.published });
+  if (published) meta({ property: 'article:published_time', content: published });
   meta({ name: 'twitter:card', content: 'summary_large_image' });
-  meta({ name: 'twitter:title', content: page.ogTitle });
-  meta({ name: 'twitter:description', content: page.ogDescription });
-  meta({ name: 'twitter:image', content: page.ogImage });
-  for (const doc of live(page.jsonld ?? [], route.entry.body ?? '')) {
+  meta({ name: 'twitter:title', content: ogTitle });
+  meta({ name: 'twitter:description', content: ogDescription });
+  meta({ name: 'twitter:image', content: ogImage });
+  for (const doc of jsonld) {
     head.push({
       tag: 'script',
       attrs: { type: 'application/ld+json' },
@@ -67,29 +157,3 @@ export const onRequest = defineRouteMiddleware((context) => {
   }
   route.head = head;
 });
-
-/** The structured data, with what is read when the site is built filled in. */
-function live(jsonld: unknown[], body: string): unknown[] {
-  return jsonld.map((d) => {
-    const doc = d as Record<string, unknown>;
-    if (doc['@type'] === 'SoftwareApplication' && 'softwareVersion' in doc) {
-      return { ...doc, softwareVersion: String(lookup(facts, 'releases.firmware.newest')) };
-    }
-    if (doc['@type'] === 'FAQPage') {
-      // 'value': each <Fact> as the number a reader sees on the page. The
-      // live site serves the raw Jinja here (`{{ roadmap.count }}`, see
-      // lib/faq.ts); this build fixes it on purpose, and url-parity.py
-      // carries the difference in its allowlist of deliberate fixes.
-      const qs = faqEntities(body, 'value', (of, filters) => format(facts, of, filters));
-      return {
-        ...doc,
-        mainEntity: qs.map(({ q, a }) => ({
-          '@type': 'Question',
-          name: q,
-          acceptedAnswer: { '@type': 'Answer', text: a },
-        })),
-      };
-    }
-    return doc;
-  });
-}

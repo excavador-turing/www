@@ -1,0 +1,810 @@
+{
+ "about": "Every URL turingpi.xyz served from MkDocs, frozen at the switch to Starlight (874940d, 2026-10-26): the pages from its sitemap with each page's heading anchors, and every other file it published except Material's own theme and search index and the demo panes, which are built at deploy. scripts/served-urls.py fails the build when one stops answering. A URL leaves this list only with a redirect in astro.config.mjs, or into `retired` with the reason.",
+ "pages": {
+  "/": [
+   "a-bad-image-takes-itself-back",
+   "every-board-on-one-page-and-none-of-them-exposed",
+   "patch-the-bmc-leave-the-cluster-alone",
+   "software-that-is-still-maintained",
+   "v2440-shipped-7-things-planned"
+  ],
+  "/about/": [],
+  "/changelog/": [],
+  "/changelog/bmc-ui/": [],
+  "/changelog/bmcd/": [
+   "confirmed",
+   "notes",
+   "side-effect-worth-recording"
+  ],
+  "/changelog/firmware/": [
+   "confirmed",
+   "known-at-the-time",
+   "note"
+  ],
+  "/changelog/tpi/": [],
+  "/contributing/": [
+   "a-daemon-or-interface-change-about-nine-minutes",
+   "a-shell-script-seconds",
+   "before-a-pull-request",
+   "how-this-is-built-and-what-checks-it",
+   "opening-the-pull-request",
+   "releasing",
+   "testing-a-change-on-your-board",
+   "three-repositories"
+  ],
+  "/demo/": [],
+  "/faq/": [
+   "can-i-put-the-board-on-the-internet",
+   "can-i-use-my-own-certificate",
+   "does-upgrading-the-firmware-reboot-my-nodes",
+   "flashing-a-module-in-slot-1-or-2-fails-with-usb-interface-not-found-why",
+   "grafanas-save-test-fails-with-failed-to-get-prometheus-heuristics-what-is-wrong",
+   "how-much-of-this-is-written-by-a-machine",
+   "the-clock-says-not-synchronised-what-now",
+   "the-password-form-will-not-let-me-type-is-my-board-broken",
+   "what-changed-recently",
+   "where-do-i-report-something-or-ask-for-a-feature",
+   "which-board-revisions-does-it-run-on",
+   "why-did-my-password-and-certificate-reset-after-i-upgraded"
+  ],
+  "/features/": [],
+  "/features/a-certificate-that-does-not-rot/": [
+   "the-argument"
+  ],
+  "/features/a-console-to-every-module/": [
+   "the-argument"
+  ],
+  "/features/flash-from-the-card/": [
+   "the-argument"
+  ],
+  "/features/fresh-and-fixed/": [
+   "the-argument"
+  ],
+  "/features/one-page-over-every-board/": [
+   "the-argument"
+  ],
+  "/features/pick-a-version/": [
+   "the-argument"
+  ],
+  "/features/see-what-the-board-sees/": [
+   "the-argument"
+  ],
+  "/features/the-board-describes-itself/": [
+   "the-argument"
+  ],
+  "/features/update-without-touching-your-nodes/": [
+   "the-argument"
+  ],
+  "/features/updates-that-undo-themselves/": [
+   "the-argument"
+  ],
+  "/features/who-may-reach-this-board/": [
+   "the-argument"
+  ],
+  "/feedback/": [
+   "something-is-missing",
+   "something-is-unclear",
+   "something-is-wrong"
+  ],
+  "/guides/": [
+   "guides",
+   "reference"
+  ],
+  "/guides/development/": [
+   "building-one-package",
+   "iterating-without-a-release",
+   "the-ab-update-and-what-actually-protects-you",
+   "the-command-line",
+   "the-fast-loop-upload-then-install",
+   "the-full-build",
+   "the-interfaces-api-types-come-from-the-daemon",
+   "things-about-the-board-worth-knowing-before-you-debug-on-it",
+   "what-builds-what"
+  ],
+  "/guides/facing-the-internet/": [
+   "if-you-are-going-to-do-it-anyway",
+   "what-the-board-is",
+   "what-to-do-instead",
+   "why-a-password-is-not-enough-for-that",
+   "why-the-login-cannot-be-delegated"
+  ],
+  "/guides/install/": [
+   "afterwards",
+   "booting-from-the-card-without-installing",
+   "check-what-you-have",
+   "forcing-a-factory-reset",
+   "from-an-sd-card-the-installer",
+   "from-the-command-line",
+   "going-back",
+   "what-you-need"
+  ],
+  "/guides/monitor-it/": [
+   "1-point-a-scrape-at-port-9110",
+   "2-scrape-the-board",
+   "3-import-the-dashboard",
+   "alerting",
+   "memory-and-why-there-are-four-series",
+   "read-the-scrape-panel-first",
+   "the-data-source-is-the-scraper-not-the-board",
+   "the-gates-record",
+   "the-panel-that-draws-nothing-when-healthy",
+   "the-thermal-loop",
+   "what-it-shows"
+  ],
+  "/guides/recover-a-bad-flash/": [
+   "first-it-probably-already-recovered",
+   "if-an-update-is-staged-and-you-have-changed-your-mind",
+   "if-the-board-answers-but-the-interface-is-wrong",
+   "if-the-board-comes-up-but-forgets-its-settings-at-every-reboot",
+   "if-the-board-does-not-answer-at-all",
+   "if-the-board-will-not-boot-at-all",
+   "if-you-gave-the-board-an-address-you-cannot-reach"
+  ],
+  "/guides/segment-the-network/": [
+   "apply-then-confirm",
+   "applying-it-without-locking-yourself-out",
+   "confirm-from-the-network-you-just-changed",
+   "flat",
+   "if-it-goes-wrong",
+   "one-module-on-its-own-network",
+   "split",
+   "the-boards-own-address",
+   "three-shapes-to-choose-from",
+   "trunk",
+   "try-it",
+   "two-networks-one-cable",
+   "what-survives-a-reboot-and-how",
+   "what-the-boards-switch-actually-is",
+   "what-this-does-not-cover",
+   "why-the-countdown-starts-late",
+   "your-own-layout"
+  ],
+  "/guides/upgrade-from-stock/": [
+   "doing-it",
+   "from-the-command-line",
+   "going-back",
+   "through-the-interface",
+   "what-it-costs",
+   "what-the-upgrade-does-not-change",
+   "what-you-have-and-what-you-get"
+  ],
+  "/guides/your-own-certificate/": [
+   "let-it-renew-itself",
+   "put-your-certificate-on-the-board",
+   "trust-your-own-authority-once",
+   "what-the-board-serves-by-default",
+   "what-this-fork-decided-against",
+   "why-not-lets-encrypt"
+  ],
+  "/news/": [
+   "a-fixed-address-from-the-network-tab-and-a-clock-that-says-why",
+   "firmware-v2410",
+   "flashing-names-what-is-in-the-way",
+   "naming-a-vlan-greyed-out-try-it-and-apply-and-blamed-the-board",
+   "the-page-now-says-what-the-board-is-doing-while-it-installs",
+   "the-password-form-could-not-be-typed-into-and-nothing-noticed",
+   "the-sd-card-keeps-the-boards-password-certificate-and-settings",
+   "the-web-interface-checks-the-image-again-and-flashes-from-the-sd-card",
+   "the-web-interface-redesigned-by-sven-van-ginkel",
+   "two-ways-a-board-with-no-dns-failed-to-mention-it"
+  ],
+  "/news/page/2/": [
+   "a-module-armed-for-usb-boot-says-so",
+   "firmware-v2210",
+   "firmware-v2220",
+   "firmware-v2290",
+   "the-console-stops-replaying-its-scrollback-twice",
+   "the-latest-of-all-three-and-the-sd-card-listed",
+   "the-metrics-say-which-module-is-armed-for-usb-boot",
+   "the-switch-gets-vlans-the-board-asks-for-a-password-and-a-module-is-one-click",
+   "tls-made-usable-named-renewed-and-every-key-served",
+   "who-may-reach-this-board-from-the-interface-that-asks-for-the-password"
+  ],
+  "/news/page/3/": [
+   "choose-an-image-off-the-sd-card",
+   "everything-current-the-daemon-the-interface-and-the-cli",
+   "firmware-v2100",
+   "firmware-v2110",
+   "firmware-v2120",
+   "firmware-v2130",
+   "firmware-v2140",
+   "firmware-v2150",
+   "firmware-v2200",
+   "the-install-confirmation-is-a-modal"
+  ],
+  "/news/page/4/": [
+   "firmware-v2160",
+   "firmware-v2170",
+   "firmware-v2180",
+   "firmware-v2190",
+   "firmware-v270",
+   "firmware-v280",
+   "firmware-v281",
+   "firmware-v290",
+   "firmware-v291",
+   "firmware-v292"
+  ],
+  "/news/v2.10.0/": [
+   "changed"
+  ],
+  "/news/v2.11.0/": [
+   "changed",
+   "new",
+   "the-gate-records-what-a-promoted-image-replaced-so-a-rollback-can-be-named"
+  ],
+  "/news/v2.12.0/": [
+   "fixed"
+  ],
+  "/news/v2.13.0/": [
+   "changed",
+   "fixed",
+   "mdnsd-guard",
+   "new"
+  ],
+  "/news/v2.14.0/": [
+   "changed",
+   "etcdefaultsyslogd",
+   "new"
+  ],
+  "/news/v2.15.0/": [
+   "changed",
+   "removed"
+  ],
+  "/news/v2.16.0/": [
+   "changed",
+   "docsarchitecturemd",
+   "fixed",
+   "new"
+  ],
+  "/news/v2.17.0/": [
+   "changed"
+  ],
+  "/news/v2.18.0/": [
+   "fixed"
+  ],
+  "/news/v2.19.0/": [
+   "changed",
+   "fixed"
+  ],
+  "/news/v2.20.0/": [
+   "bmcd-v2280-v2290-bmcd_firmware_last_promotion_timestamp_seconds",
+   "new",
+   "removed"
+  ],
+  "/news/v2.21.0/": [
+   "changed"
+  ],
+  "/news/v2.22.0/": [
+   "bmcd-v2290-v2300-a-proxy-holding-a-certificate-from-a-trusted-ca",
+   "new"
+  ],
+  "/news/v2.23.0/": [
+   "changed",
+   "confirmed",
+   "every-key-an-operator-might-install-is-served",
+   "metrics-says-when-the-serving-certificate-expires",
+   "new"
+  ],
+  "/news/v2.24.0/": [
+   "fixed"
+  ],
+  "/news/v2.25.0/": [
+   "changed",
+   "fixed"
+  ],
+  "/news/v2.26.0/": [
+   "choose-an-image-off-the-sd-card",
+   "fixed",
+   "known-at-the-time",
+   "new"
+  ],
+  "/news/v2.27.0/": [
+   "changed",
+   "every-path-is-confined-to-the-card-in-one-function-with-its-own-tests",
+   "fixed",
+   "new",
+   "optgettypesdcard_files-also-get-apibmcsdcardfiles-what-is-on",
+   "security",
+   "tpi-health",
+   "tpi-sdcard-path"
+  ],
+  "/news/v2.28.0/": [
+   "fixed",
+   "new",
+   "note",
+   "settings-can-say-who-may-get-in",
+   "the-firmware-listing-survives-a-reboot",
+   "who-may-reach-a-board-from-the-interface-that-asks-for-the-password",
+   "who-may-reach-this-board-from-the-interface-that-asks-for-the-password"
+  ],
+  "/news/v2.29.0/": [
+   "fixed"
+  ],
+  "/news/v2.30.0/": [
+   "changed",
+   "fixed",
+   "metrics-now-reports-the-usb-multiplexer-including-which-module-is",
+   "metrics-says-which-module-is-armed-for-usb-boot",
+   "new"
+  ],
+  "/news/v2.31.0/": [
+   "fixed"
+  ],
+  "/news/v2.32.0/": [
+   "a-node-armed-for-usb-boot-says-so-on-its-own-liveness-line",
+   "changed",
+   "new"
+  ],
+  "/news/v2.34.0/": [
+   "a-board-still-on-its-factory-password-can-do-exactly-one-thing",
+   "a-board-still-on-the-password-it-shipped-with-shows-one-page-and-nothing",
+   "a-certificate-card-on-settings",
+   "a-certificates-section-in-the-readme",
+   "a-confirmation-sent-from-the-board-itself-is-refused",
+   "a-page-length-gate-in-ci",
+   "an-access-tab-what-this-board-is-called-and-who-may-reach-it",
+   "applying-a-switch-configuration-and-being-able-to-undo-it",
+   "changed",
+   "fixed",
+   "install-your-own-certificate-and-key-from-the-interface-or-the-api",
+   "new",
+   "security",
+   "the-confirm-window-is-settable-beside-the-buttons-it-belongs-to",
+   "the-page-notices-when-the-board-goes-away-and-notices-when-it-comes",
+   "the-password-validator-no-longer-logs-a-hash-of-what-was-typed",
+   "the-switch-as-one-document-and-the-rules-the-board-refuses",
+   "the-switch-on-the-network-tab-what-it-is-doing-and-how-to-change-it",
+   "tpi-network-switch",
+   "tpi-network-switch-show-table",
+   "tpi-tls-show-tpi-tls-install-cert-key-and-tpi-tls-reset",
+   "vlan-names-are-shown-where-vlan-numbers-are",
+   "vlans-can-be-given-names"
+  ],
+  "/news/v2.35.0/": [
+   "changed",
+   "fixed",
+   "get-typentp-says-what-chrony-thinks-of-each-source",
+   "new",
+   "the-bmcs-address-from-the-network-tab",
+   "the-boards-own-address-applied-then-confirmed-at-the-new-address",
+   "the-boards-own-address-from-the-network-tab",
+   "the-clock-says-why",
+   "the-time-card-says-what-chrony-thinks-of-each-source",
+   "tpi-network-address-show-apply-confirm-revert",
+   "tpi-ntp-prints-what-chrony-thinks-of-each-source"
+  ],
+  "/news/v2.36.0/": [
+   "changed",
+   "fixed",
+   "new",
+   "the-demo-can-be-used-not-only-read-on-the-one-card-whose-subject-is"
+  ],
+  "/news/v2.37.0/": [
+   "a-gate-that-types",
+   "fixed",
+   "new"
+  ],
+  "/news/v2.38.0/": [
+   "changed"
+  ],
+  "/news/v2.39.0/": [
+   "changed",
+   "fixed"
+  ],
+  "/news/v2.40.0/": [
+   "changed"
+  ],
+  "/news/v2.41.0/": [
+   "fixed"
+  ],
+  "/news/v2.42.0/": [
+   "changed"
+  ],
+  "/news/v2.43.0/": [
+   "a-node-can-be-flashed-from-an-image-on-the-sd-card-by-the-path-the-card",
+   "bmcd-sdcard1filepath-flashes-a-node-or-upgrades-the-firmware-from-a",
+   "fixed",
+   "new",
+   "unit-tests-for-the-flash-request-npm-test-and-an-sd-card-listing-with-a"
+  ],
+  "/news/v2.44.0/": [
+   "changed",
+   "fixed"
+  ],
+  "/news/v2.7.0/": [
+   "changed",
+   "new",
+   "re-cut-of-the-forks-work-under-the-new-organisation-carrying-the-versions"
+  ],
+  "/news/v2.8.0/": [
+   "changed"
+  ],
+  "/news/v2.8.1/": [
+   "changed",
+   "new",
+   "turingpilocal-resolves-again"
+  ],
+  "/news/v2.9.0/": [
+   "a-checks-workflow-that-runs-those-tests-and-shellcheck-on-every-push-in",
+   "changed",
+   "contract-tests-for-the-promotion-gate",
+   "new"
+  ],
+  "/news/v2.9.1/": [
+   "changed"
+  ],
+  "/news/v2.9.2/": [
+   "changed"
+  ],
+  "/reference/api-history/": [
+   "operations-per-release",
+   "when-each-operation-arrived"
+  ],
+  "/reference/api/": [
+   "authentication",
+   "the-operations",
+   "two-spellings-of-every-operation",
+   "what-the-document-does-and-does-not-describe"
+  ],
+  "/reference/api/board/": [
+   "delete-apibmcaccessclient-ca",
+   "get-apibmcabout",
+   "get-apibmcaccess",
+   "get-apibmcconfig",
+   "get-apibmchealth",
+   "get-apibmchostname",
+   "get-apibmcinfo",
+   "post-apibmcaccesspassword",
+   "post-apibmcconfig",
+   "post-apibmchostname",
+   "post-apibmcreboot",
+   "post-apibmcreload",
+   "put-apibmcaccessclient-ca"
+  ],
+  "/reference/api/firmware/": [
+   "get-apibmcfirmwareavailable",
+   "get-apibmcfirmwarecheck",
+   "get-apibmcfirmwareslots",
+   "get-apibmcfirmwaresources",
+   "post-apibmcfirmwareinstall",
+   "post-apibmcfirmwaresources"
+  ],
+  "/reference/api/network/": [
+   "get-apibmcnetwork",
+   "get-apibmcntp",
+   "post-apibmcnetworkreset",
+   "post-apibmcntp"
+  ],
+  "/reference/api/nodes/": [
+   "get-apibmcnodes",
+   "get-apibmcpower",
+   "get-apibmcusb",
+   "post-apibmcnode-to-msd",
+   "post-apibmcpower",
+   "post-apibmcreset",
+   "post-apibmcusb",
+   "post-apibmcusb-boot",
+   "post-apibmcusb-bootclear"
+  ],
+  "/reference/api/operations/": [],
+  "/reference/api/storage/": [
+   "get-apibmcsdcard",
+   "get-apibmcsdcardfiles",
+   "post-apibmcsdcardformat"
+  ],
+  "/reference/api/thermal/": [
+   "get-apibmccooling",
+   "get-apibmcthermal",
+   "post-apibmccooling"
+  ],
+  "/reference/cli/": [
+   "being-a-release-behind-is-normal",
+   "exit-codes-that-mean-something",
+   "installing",
+   "listing-and-installing",
+   "two-builds-one-source",
+   "what-110-adds",
+   "what-130-adds"
+  ],
+  "/reference/comparison/": [
+   "hardware-the-board-could-not-see",
+   "monitoring",
+   "platform",
+   "the-two-upstreams-disagree-with-each-other",
+   "updating",
+   "what-is-still-missing"
+  ],
+  "/reference/factory-firmware/": [
+   "firmware-upgrade",
+   "flash-layout",
+   "flash-node",
+   "going-back",
+   "info",
+   "login",
+   "nodes",
+   "the-api-underneath",
+   "the-interface-tab-by-tab",
+   "usb",
+   "what-it-reports-about-itself"
+  ],
+  "/reference/gate-history/": [
+   "how-the-count-is-derived",
+   "the-modules-do-not-notice",
+   "what-a-promotion-actually-proves",
+   "what-the-board-reports",
+   "why-this-page-exists"
+  ],
+  "/reference/known-faults/": [
+   "a-console-that-failed-at-random-and-a-board-that-never-said-why",
+   "a-module-in-flash-mode-looked-exactly-like-dead-hardware",
+   "anything-local-is-trusted",
+   "every-board-shipped-with-the-same-password-and-kept-it",
+   "fixed-and-worth-knowing-about",
+   "flashing-a-module-from-the-sd-card-failed-with-411",
+   "flashing-a-module-in-slot-1-or-2-fails-when-a-mini-pcie-card-uses-usb",
+   "flashing-a-module-may-not-target-the-module-you-chose",
+   "installing-from-the-sd-card-reset-the-password-the-certificate-and-the-settings",
+   "mdns-ate-the-board",
+   "naming-a-vlan-made-the-switch-card-refuse-to-check-the-layout",
+   "nothing-shuts-the-board-down-if-it-overheats",
+   "one-failed-request-blanked-the-whole-interface",
+   "open",
+   "reconnect-wrote-a-second-copy-of-the-scrollback",
+   "the-board-could-stop-checking-for-firmware-for-ever",
+   "the-board-forgets-everything-at-every-reboot",
+   "the-command-line-did-not-work-at-all",
+   "the-firmware-page-froze",
+   "the-password-form-would-not-accept-typing",
+   "the-serial-console-needs-a-certificate-your-browser-trusts",
+   "the-tls-certificate-was-an-expired-fossil",
+   "the-web-interface-skipped-the-image-check-on-every-module-flash",
+   "there-is-no-watchdog",
+   "turingpilocal-stopped-resolving"
+  ],
+  "/reference/metrics/": [
+   "clock",
+   "compute-modules",
+   "firmware",
+   "its-own-port-and-no-credential",
+   "nand",
+   "scraping-it",
+   "temperature-and-cooling",
+   "the-bmc-itself",
+   "the-certificate-it-is-serving",
+   "the-daemon",
+   "the-families",
+   "the-switch"
+  ],
+  "/roadmap/": [
+   "how-a-thing-gets-from-here-to-there",
+   "recently-shipped",
+   "shipped-from-this-list"
+  ],
+  "/why/a-certificate-that-does-not-rot/": [
+   "the-board-tells-you-before-it-expires",
+   "tls-13-and-why-12-was-not-merely-dated",
+   "what-it-does-not-cover",
+   "what-it-is-here",
+   "what-the-stock-certificate-actually-is",
+   "whatever-key-you-install-it-is-served"
+  ],
+  "/why/a-console-to-every-module/": [
+   "it-shows-you-what-happened-before-you-opened-it",
+   "reader-running-is-about-the-bmc-not-the-module",
+   "two-ways-to-type-and-they-are-not-the-same",
+   "what-it-does-not-cover"
+  ],
+  "/why/flash-from-the-card/": [
+   "the-cards-free-space-is-on-the-dialog",
+   "the-interface-never-decides-what-is-flashable",
+   "two-bugs-this-found-on-the-way",
+   "what-it-does-not-cover",
+   "what-the-daemon-answers"
+  ],
+  "/why/fresh-and-fixed/": [
+   "142-releases-and-a-count-that-is-not-decoration",
+   "the-base-is-supported-again",
+   "what-it-does-not-cover",
+   "what-was-actually-broken"
+  ],
+  "/why/one-page-over-every-board/": [
+   "a-board-that-is-down-costs-you-its-card",
+   "everything-the-boards-own-interface-can-do",
+   "the-board-still-works-without-any-of-it",
+   "the-pod-holds-no-credential",
+   "what-exposing-a-board-would-have-cost",
+   "what-it-does-not-cover"
+  ],
+  "/why/pick-a-version/": [
+   "an-upload-is-a-file-not-an-event",
+   "every-source-with-what-it-is-worth",
+   "from-the-shell-too",
+   "the-listing-survives-a-reboot",
+   "what-a-source-cannot-do",
+   "what-it-does-not-cover"
+  ],
+  "/why/see-what-the-board-sees/": [
+   "a-catalogue-not-a-number",
+   "and-when-you-want-the-fan-somewhere-else",
+   "read-from-the-board-never-written-into-a-client",
+   "what-it-does-not-cover",
+   "where-the-reading-lives",
+   "why-is-the-fan-on-4"
+  ],
+  "/why/the-board-describes-itself/": [
+   "the-version-is-pinned-so-a-diff-is-an-api-change",
+   "three-things-are-generated-from-it-not-written",
+   "what-is-in-it",
+   "what-it-does-not-cover"
+  ],
+  "/why/update-without-touching-your-nodes/": [
+   "measured-on-a-nine-node-cluster",
+   "what-happens-instead",
+   "what-it-does-not-cover",
+   "why-upstream-cycles-them-at-all"
+  ],
+  "/why/updates-that-undo-themselves/": [
+   "it-has-actually-said-no",
+   "the-third-check-exists-because-the-first-two-are-not-enough",
+   "what-happens-instead",
+   "what-it-does-not-cover"
+  ],
+  "/why/who-may-reach-this-board/": [
+   "the-rules-and-what-each-one-is-for",
+   "what-it-does-not-cover",
+   "what-the-daemon-will-not-do",
+   "why-it-is-not-the-ordinary-api"
+  ]
+ },
+ "files": [
+  "/404.html",
+  "/CNAME",
+  "/assets/captures/access.png",
+  "/assets/captures/api.png",
+  "/assets/captures/console.png",
+  "/assets/captures/cooling.png",
+  "/assets/captures/dashboard.png",
+  "/assets/captures/firmware.png",
+  "/assets/captures/flash-node.png",
+  "/assets/captures/fleet.png",
+  "/assets/captures/history/about.png",
+  "/assets/captures/history/access.png",
+  "/assets/captures/history/console.png",
+  "/assets/captures/history/firmware.png",
+  "/assets/captures/history/info.png",
+  "/assets/captures/history/login.png",
+  "/assets/captures/history/nodes.png",
+  "/assets/captures/history/sdcard.png",
+  "/assets/captures/news/address-apply.gif",
+  "/assets/captures/news/address-apply.mp4",
+  "/assets/captures/news/address.png",
+  "/assets/captures/news/console-picker.png",
+  "/assets/captures/news/security.png",
+  "/assets/captures/news/switch.png",
+  "/assets/captures/news/time-sources.png",
+  "/assets/captures/power-control.png",
+  "/assets/captures/security.png",
+  "/assets/captures/sources.png",
+  "/assets/cards/card-console.png",
+  "/assets/cards/card-firmware.png",
+  "/assets/cards/card-metrics.png",
+  "/assets/cards/card-network.png",
+  "/assets/cards/card-nodes.png",
+  "/assets/cards/card-settings.png",
+  "/assets/cards/card-thermal.png",
+  "/assets/cards/card-versions.png",
+  "/assets/factory/01-login.png",
+  "/assets/factory/03-nodes.png",
+  "/assets/factory/04-info.png",
+  "/assets/factory/05-usb.png",
+  "/assets/factory/06-flash-node.png",
+  "/assets/factory/07-firmware-upgrade.png",
+  "/assets/factory/08-about.png",
+  "/assets/fork/01-login.png",
+  "/assets/fork/02-info.png",
+  "/assets/fork/03-nodes.png",
+  "/assets/fork/04-usb.png",
+  "/assets/fork/05-flash-node.png",
+  "/assets/fork/06-firmware-upgrade.png",
+  "/assets/fork/07-console.png",
+  "/assets/fork/08-network.png",
+  "/assets/fork/09-settings.png",
+  "/assets/fork/10-about.png",
+  "/assets/icons/access.svg",
+  "/assets/icons/book.svg",
+  "/assets/icons/certificate.svg",
+  "/assets/icons/clock.svg",
+  "/assets/icons/console.svg",
+  "/assets/icons/describe.svg",
+  "/assets/icons/fleet.svg",
+  "/assets/icons/fork.svg",
+  "/assets/icons/fresh.svg",
+  "/assets/icons/metrics.svg",
+  "/assets/icons/name.svg",
+  "/assets/icons/network.svg",
+  "/assets/icons/power.svg",
+  "/assets/icons/rails.svg",
+  "/assets/icons/screen.svg",
+  "/assets/icons/sdcard.svg",
+  "/assets/icons/sensors.svg",
+  "/assets/icons/undo.svg",
+  "/assets/icons/versions.svg",
+  "/assets/turing-pi-2-hand.jpg",
+  "/data/boards.yaml",
+  "/data/facts.yaml",
+  "/data/news-editorial.yaml",
+  "/data/news-posts.json",
+  "/data/roadmap-status.yaml",
+  "/data/roadmap.json",
+  "/data/screens-baseline.json",
+  "/demo/stock/assets/ConfirmationModal-BFFEXrnz.js",
+  "/demo/stock/assets/TabView-3njRyjmT.js",
+  "/demo/stock/assets/TableItem-C6xfZHn8.js",
+  "/demo/stock/assets/about.lazy-rzvk-uho.js",
+  "/demo/stock/assets/firmware-upgrade.lazy-DUSfVjxg.js",
+  "/demo/stock/assets/flash-node.lazy-BsURaBM5.js",
+  "/demo/stock/assets/index-B9Lf9q61.js",
+  "/demo/stock/assets/index-BdQq_4o_.js",
+  "/demo/stock/assets/index-COXci8Ta.css",
+  "/demo/stock/assets/index.lazy-Dq0OCwYT.js",
+  "/demo/stock/assets/info.lazy-BjmklDqh.js",
+  "/demo/stock/assets/inter-cyrillic-400-normal-BLGc9T1a.woff2",
+  "/demo/stock/assets/inter-cyrillic-400-normal-ZzOtrSSW.woff",
+  "/demo/stock/assets/inter-cyrillic-600-normal-BGBWG807.woff2",
+  "/demo/stock/assets/inter-cyrillic-600-normal-BuzJQFbW.woff",
+  "/demo/stock/assets/inter-cyrillic-700-normal-Bc8_fv8J.woff",
+  "/demo/stock/assets/inter-cyrillic-700-normal-bGtGjVdZ.woff2",
+  "/demo/stock/assets/inter-cyrillic-ext-400-normal-BPnxn4xp.woff",
+  "/demo/stock/assets/inter-cyrillic-ext-400-normal-Dc4VJyIJ.woff2",
+  "/demo/stock/assets/inter-cyrillic-ext-600-normal-Bt9VVOA-.woff",
+  "/demo/stock/assets/inter-cyrillic-ext-600-normal-CaqZN2hq.woff2",
+  "/demo/stock/assets/inter-cyrillic-ext-700-normal-Ced3hgUT.woff",
+  "/demo/stock/assets/inter-cyrillic-ext-700-normal-ClVoMEGq.woff2",
+  "/demo/stock/assets/inter-greek-400-normal-BZzXV7-1.woff",
+  "/demo/stock/assets/inter-greek-400-normal-DxZsaF_h.woff2",
+  "/demo/stock/assets/inter-greek-600-normal-CwicyhtI.woff",
+  "/demo/stock/assets/inter-greek-600-normal-Dhlb-90d.woff2",
+  "/demo/stock/assets/inter-greek-700-normal-BRYTaFLL.woff",
+  "/demo/stock/assets/inter-greek-700-normal-Cxpycf-U.woff2",
+  "/demo/stock/assets/inter-greek-ext-400-normal-Bput3-QP.woff2",
+  "/demo/stock/assets/inter-greek-ext-400-normal-DCpCPQOf.woff",
+  "/demo/stock/assets/inter-greek-ext-600-normal-C9WLioJ8.woff",
+  "/demo/stock/assets/inter-greek-ext-600-normal-Cnui8OiR.woff2",
+  "/demo/stock/assets/inter-greek-ext-700-normal-DXvzx4Na.woff",
+  "/demo/stock/assets/inter-greek-ext-700-normal-SzCdnevJ.woff2",
+  "/demo/stock/assets/inter-latin-400-normal-BOOGhInR.woff2",
+  "/demo/stock/assets/inter-latin-400-normal-gitzw0hO.woff",
+  "/demo/stock/assets/inter-latin-600-normal-B5cFAncS.woff",
+  "/demo/stock/assets/inter-latin-600-normal-D273HNI0.woff2",
+  "/demo/stock/assets/inter-latin-700-normal-B8MtJ_2k.woff",
+  "/demo/stock/assets/inter-latin-700-normal-Sckx8rpT.woff2",
+  "/demo/stock/assets/inter-latin-ext-400-normal-C1t-h-pH.woff",
+  "/demo/stock/assets/inter-latin-ext-400-normal-hnt3BR84.woff2",
+  "/demo/stock/assets/inter-latin-ext-600-normal-BnYJhD27.woff2",
+  "/demo/stock/assets/inter-latin-ext-600-normal-CAF0vJDd.woff",
+  "/demo/stock/assets/inter-latin-ext-700-normal-6V9MnIL5.woff",
+  "/demo/stock/assets/inter-latin-ext-700-normal-CzikT_rs.woff2",
+  "/demo/stock/assets/inter-vietnamese-400-normal-BUNmGMP1.woff",
+  "/demo/stock/assets/inter-vietnamese-400-normal-DMkecbls.woff2",
+  "/demo/stock/assets/inter-vietnamese-600-normal-Cc8MFFhd.woff2",
+  "/demo/stock/assets/inter-vietnamese-600-normal-Cm6aH8_k.woff",
+  "/demo/stock/assets/inter-vietnamese-700-normal-CGpBpxLq.woff2",
+  "/demo/stock/assets/inter-vietnamese-700-normal-dAnkLlTo.woff",
+  "/demo/stock/assets/logo-dark-CTe_TGNr.svg",
+  "/demo/stock/assets/logo-light-DgqJr36Z.svg",
+  "/demo/stock/assets/nodes.lazy-DlshaJt6.js",
+  "/demo/stock/assets/progress-WeceNrXV.js",
+  "/demo/stock/assets/select-Dtg0yFL3.js",
+  "/demo/stock/assets/usb.lazy-DrTi2G4u.js",
+  "/feed.xml",
+  "/llms.txt",
+  "/reference/openapi.json",
+  "/robots.txt",
+  "/sitemap.xml"
+ ],
+ "retired": {
+  "/assets/images/favicon.png": "Material's theme icon; Starlight links /favicon.svg from every page, and nothing outside linked the PNG",
+  "/sitemap.xml.gz": "MkDocs's compressed copy of /sitemap.xml; robots.txt names /sitemap.xml, which still answers",
+  "/stylesheets/landing.css": "Material's extra_css, which only MkDocs's pages loaded; its port is src/styles/landing.css, bundled under /_astro/"
+ }
+}
