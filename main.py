@@ -270,7 +270,7 @@ def define_env(env):
             icon = (f'<img src="../assets/icons/{html.escape(p["icon"])}" alt="">'
                     if p["icon"] else "")
             out.append(
-                f'<a class="tp-plate" href="../{html.escape(p["slug"])}/">'
+                f'<a class="tp-plate" href="/features/{html.escape(p["slug"])}/">'
                 f'{icon}<b>{html.escape(p["title"])}</b>'
                 f'<span>{html.escape(p["summary"])}</span></a>')
         out.append("</div>")

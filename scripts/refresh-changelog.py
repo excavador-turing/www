@@ -332,7 +332,7 @@ def write_index(summary: list[dict]) -> pathlib.Path:
     ]
     for s in summary:
         idx.append(
-            f'<a class="tp-plate" href="../{s["slug"]}/"><b>{s["repo"]}</b>'
+            f'<a class="tp-plate" href="/changelog/{s["slug"]}/"><b>{s["repo"]}</b>'
             f'<span>{s["blurb"]}</span>'
             f'<span class="tp-plate__meta">{s["newest"]} · '
             f'{human(s["newest_date"])} · {s["count"]} releases</span></a>')

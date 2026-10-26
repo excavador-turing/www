@@ -252,13 +252,13 @@ def render(items: list[dict], as_of: str) -> str:
         f"Votes read {when} by `just refresh-roadmap`, which runs every hour.",
         "",
         '<div class="tp-next">',
-        '<a href="news/"><b>What shipped →</b><span>One post per firmware '
+        '<a href="/news/"><b>What shipped →</b><span>One post per firmware '
         "release, newest first.</span></a>",
-        '<a href="feedback/"><b>Propose or report →</b><span>Ideas carry '
+        '<a href="/feedback/"><b>Propose or report →</b><span>Ideas carry '
         "votes; faults carry tickets.</span></a>",
-        '<a href="reference/known-faults/"><b>What is not fixed →</b>'
+        '<a href="/reference/known-faults/"><b>What is not fixed →</b>'
         "<span>The honest list, each with a ticket.</span></a>",
-        '<a href="features/"><b>What it does today →</b><span>Every feature, '
+        '<a href="/features/"><b>What it does today →</b><span>Every feature, '
         "with the measurement behind it.</span></a>",
         "</div>",
     ]
@@ -279,7 +279,7 @@ def recent(n: int = 5) -> str:
         ver, _, when = row.partition(" — ")
         when = when.replace(" (not released)", "").replace(" (pre-release)", "")
         slug = slug_of.get(ver, ver)
-        out.append(f'<a href="news/{html.escape(slug)}/"><b>{html.escape(ver)}'
+        out.append(f'<a href="/news/{html.escape(slug)}/"><b>{html.escape(ver)}'
                    f"</b><span>{html.escape(when)}</span></a>")
     out.append("</div>")
     return "\n".join(out)

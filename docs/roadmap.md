@@ -44,11 +44,11 @@ Voted for, built, released. Each card still opens its discussion.
 One post per firmware release, from the repositories' own changelogs — [all of them](news/index.md), or [by feed](feed.xml).
 
 <div class="tp-releases">
-<a href="news/v2.44.0/"><b>v2.44.0</b><span>15 October 2026</span></a>
-<a href="news/v2.43.0/"><b>v2.43.0</b><span>15 October 2026</span></a>
-<a href="news/v2.42.0/"><b>v2.42.0</b><span>6 October 2026</span></a>
-<a href="news/v2.41.0/"><b>v2.41.0</b><span>6 October 2026</span></a>
-<a href="news/v2.40.0/"><b>v2.40.0</b><span>3 October 2026</span></a>
+<a href="/news/v2.44.0/"><b>v2.44.0</b><span>15 October 2026</span></a>
+<a href="/news/v2.43.0/"><b>v2.43.0</b><span>15 October 2026</span></a>
+<a href="/news/v2.42.0/"><b>v2.42.0</b><span>6 October 2026</span></a>
+<a href="/news/v2.41.0/"><b>v2.41.0</b><span>6 October 2026</span></a>
+<a href="/news/v2.40.0/"><b>v2.40.0</b><span>3 October 2026</span></a>
 </div>
 
 ## How a thing gets from here to there
@@ -58,8 +58,8 @@ A feature is a ticket in the maintainer's tracker, a Discussion here, and then a
 Votes read 26 October 2026 by `just refresh-roadmap`, which runs every hour.
 
 <div class="tp-next">
-<a href="news/"><b>What shipped →</b><span>One post per firmware release, newest first.</span></a>
-<a href="feedback/"><b>Propose or report →</b><span>Ideas carry votes; faults carry tickets.</span></a>
-<a href="reference/known-faults/"><b>What is not fixed →</b><span>The honest list, each with a ticket.</span></a>
-<a href="features/"><b>What it does today →</b><span>Every feature, with the measurement behind it.</span></a>
+<a href="/news/"><b>What shipped →</b><span>One post per firmware release, newest first.</span></a>
+<a href="/feedback/"><b>Propose or report →</b><span>Ideas carry votes; faults carry tickets.</span></a>
+<a href="/reference/known-faults/"><b>What is not fixed →</b><span>The honest list, each with a ticket.</span></a>
+<a href="/features/"><b>What it does today →</b><span>Every feature, with the measurement behind it.</span></a>
 </div>
