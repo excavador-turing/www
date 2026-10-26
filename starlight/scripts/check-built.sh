@@ -51,14 +51,14 @@ images=$(find "$dist/assets" -type f \( -name '*.png' -o -name '*.jpg' \) | wc -
 [ "$images" -gt 0 ] || bad "no images under $dist/assets"
 
 # Macros were rendered, not printed, and Material's block syntax was
-# converted, not printed. Visible text only: the FAQ's JSON-LD carries raw
-# `{{ ... }}` on the live site too (main.py parses faq.md before rendering),
-# and reference/metrics quotes a Prometheus template on purpose.
+# converted, not printed: in the visible text and in the JSON-LD, whose FAQ
+# answers carry raw `{{ ... }}` on the live site (main.py parses faq.md
+# before rendering) and real values here since phase 3. Code is skipped:
+# reference/metrics quotes a Prometheus template on purpose.
 leftovers=$(python3 - "$dist" <<'PY'
 import pathlib, re, sys
 for f in sorted(pathlib.Path(sys.argv[1]).rglob("index.html")):
     t = f.read_text(errors="replace")
-    t = re.sub(r'<script type="application/ld\+json">.*?</script>', "", t, flags=re.S)
     t = re.sub(r"<(pre|code)[\s>].*?</\1>", "", t, flags=re.S)
     if re.search(r"\{\{ *[a-z_]+[ .(|]|\{%|<p>(!!!|\?\?\?|===) ", t):
         print(f)

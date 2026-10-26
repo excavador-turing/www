@@ -13,8 +13,8 @@ const CAP = 600;
 /**
  * How a <Fact> reads in the answer text. The live site's FAQPage carries the
  * raw Jinja (`{{ roadmap.count }}`), because main.py parses faq.md before the
- * macros render it -- a bug, kept for now so the build matches the live
- * site byte for byte. 'value' is the fix: one argument at the call site.
+ * macros render it. 'jinja' reproduces that bug; 'value' is the fix, and is
+ * what the route middleware asks for since phase 3.
  */
 export type FactsAs = 'jinja' | 'value';
 

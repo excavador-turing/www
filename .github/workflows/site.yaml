@@ -1,17 +1,26 @@
 name: Site (Starlight)
 
 # The Starlight build of turingpi.xyz, proved on every pull request and on
-# main -- and published NOWHERE. Phase 1 of moving off Material for MkDocs:
-# `pages.yml` still builds and deploys the live site with MkDocs, `checks.yml`
-# still judges it, and neither is touched by this file. There is no deploy
-# job here on purpose; one arrives, under its own name, when the switch does.
+# main -- and published NOWHERE. `pages.yml` still builds and deploys the
+# live site with MkDocs, `checks.yml` still judges it, and neither is touched
+# by this file. There is no deploy job here on purpose; one arrives, under
+# its own name, when the switch does (phase 4).
 #
-#   build   render docs/ into starlight/, a strict Astro build (no warning,
-#           no broken internal link), and what the build must contain --
-#           including that no Git LFS pointer was published as an image;
-#   parity  a REPORT of every URL, asset (by sha256) and head tag
-#           turingpi.xyz serves against the build. It does not fail the run
-#           yet; the job summary is where to read it.
+# Phase 3: every check the MkDocs build passes runs here against this build,
+# and parity with the live site is a gate. `just site-check` runs the same
+# things locally, in the same order.
+#
+#   build    the source checks both builds share; render docs/ into
+#            starlight/, a strict Astro build (no warning, no broken internal
+#            link, no LFS pointer); then the checks of what was built --
+#            descriptions, structured data, llms.txt, internal links, click
+#            depth. Also the MkDocs build of the same commit, which parity
+#            needs to tell a port fault from content that moved;
+#   screens  every page at nine viewports in headless Chrome: nothing
+#            clipped, nothing stretched, every screen fits;
+#   parity   every URL, asset (sha256), head tag and anchor turingpi.xyz
+#            serves, against the build. Fails on anything not in the
+#            script's list of deliberate fixes. The job summary is the report.
 on:
   pull_request:
   workflow_dispatch:
@@ -50,8 +59,53 @@ jobs:
           enable-cache: true
           devbox-version: 0.18.4
 
+      # The sources both builds read, judged by the MkDocs checks
+      # unchanged. checks.yml runs them too; they are here as well so this
+      # workflow stands alone when checks.yml goes (phase 4).
+      - name: the facts file matches its sources
+        run: devbox run -- python3 scripts/facts.py --check
+
+      - name: no page types a number the facts file owns
+        run: devbox run -- python3 scripts/facts-lint.py
+
+      - name: the feature pages have one shape
+        run: devbox run -- python3 scripts/feature-lint.py
+
+      - name: no capture carries the demo ribbon
+        run: devbox run -- python3 scripts/crop-ribbon.py --check
+
       - name: convert, build strictly, check what was built
         run: devbox run -- just site-build
+
+      # The source rules, then each built page carries its description whole
+      # and escaped: MkDocs's template cuts two posts at a `"` today.
+      - name: every page says what it is for, and says it whole
+        run: devbox run -- python3 scripts/description-lint.py --site starlight/dist
+
+      # --strict: no template left unrendered in the data, and no description
+      # that disagrees with the meta tag -- the two faults MkDocs ships.
+      - name: the structured data parses, and carries real values
+        run: devbox run -- python3 scripts/structured-data.py --site starlight/dist --strict
+
+      - name: llms.txt matches the nav, is served as written, and its links land
+        run: devbox run -- python3 scripts/llms.py --check --site starlight/dist
+
+      # Beside starlight-links-validator, which checks the content's links:
+      # this resolves every href and src in the HTML, header, footer and
+      # components included. /favicon.svg is Starlight's default icon link
+      # and there is no favicon yet (phase 4); the exception fails once
+      # the file exists.
+      - name: every internal link lands on a file
+        run: devbox run -- python3 scripts/internal-links.py --site starlight/dist --known-missing /favicon.svg
+
+      - name: every page is within two clicks of the front page
+        run: devbox run -- python3 scripts/reach.py --site starlight/dist
+
+      # Parity's tie-breaker: a difference from the live site that this
+      # commit's MkDocs build shares is content that moved since the last
+      # deploy, not something the port got wrong.
+      - name: the MkDocs build of this commit
+        run: devbox run -- mkdocs build --strict
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -60,10 +114,52 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  parity:
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mkdocs-site
+          path: site
+          if-no-files-found: error
+          retention-days: 7
+
+  screens:
     needs: build
     # Downstream of a job that may be skipped or cancelled: run only on a
     # build that actually succeeded, never on a skip inherited from it.
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # The script and its baseline; the images it measures are dist's,
+      # which the build job made from the LFS objects.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # For the pinned websockets in requirements.txt. Chrome is the
+      # runner's own, as in checks.yml.
+      - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
+        with:
+          enable-cache: true
+          devbox-version: 0.18.4
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: starlight-dist
+          path: starlight/dist
+
+      - name: every screen fits, nothing clipped, nothing stretched
+        run: devbox run -- python3 scripts/screens.py --site starlight/dist --json screens.json
+
+      - name: the measurements, if anything failed
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: screens
+          path: screens.json
+          if-no-files-found: ignore
+
+  parity:
+    needs: build
     if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -79,11 +175,18 @@ jobs:
           name: starlight-dist
           path: starlight/dist
 
-      # Standard library only, so the runner's own Python will do.
-      - name: every URL, asset and head tag the live site serves
-        run: python3 scripts/url-parity.py --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mkdocs-site
+          path: site
+
+      # Standard library only, so the runner's own Python will do. The live
+      # site is the reference, read when this runs; the summary says when.
+      - name: every URL, asset, head tag and anchor the live site serves
+        run: python3 scripts/url-parity.py --strict --mkdocs site --markdown "$GITHUB_STEP_SUMMARY" --json parity.json
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ !cancelled() }}
         with:
           name: url-parity
           path: parity.json

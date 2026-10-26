@@ -18,6 +18,7 @@ somebody else's bundle, built in the deploy and not here.
 """
 from __future__ import annotations
 
+import argparse
 import html.parser
 import pathlib
 import sys
@@ -40,27 +41,42 @@ class Refs(html.parser.HTMLParser):
                 self.refs.append(value)
 
 
-def page_url(f: pathlib.Path) -> str:
-    rel = f.relative_to(SITE).as_posix()
+def page_url(f: pathlib.Path, site: pathlib.Path = SITE) -> str:
+    rel = f.relative_to(site).as_posix()
     return "/" + rel.removesuffix("index.html")
 
 
-def exists(path: str) -> bool:
-    target = SITE / path.lstrip("/")
+def exists(path: str, site: pathlib.Path = SITE) -> bool:
+    target = site / path.lstrip("/")
     if path.endswith("/"):
         return (target / "index.html").is_file()
     return target.is_file() or (target / "index.html").is_file()
 
 
 def main() -> int:
-    if not SITE.is_dir():
-        print("internal-links: no site/ -- run `just build` first", file=sys.stderr)
+    # --site: the same resolver over another build. The Starlight build
+    # (starlight/dist) has starlight-links-validator, which checks the links
+    # in the CONTENT; this checks every href and src in the HTML it built,
+    # header, footer and components included.
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--site", default=str(SITE),
+                    help="the built site to read (default: site/, MkDocs's)")
+    ap.add_argument("--known-missing", action="append", default=[], metavar="PATH",
+                    help="a target this build is known not to have yet; it is "
+                         "not reported, and the run FAILS once it exists, so "
+                         "the exception cannot outlive the fault")
+    args = ap.parse_args()
+    site = pathlib.Path(args.site).resolve()
+    if not site.is_dir():
+        name = site.relative_to(ROOT).as_posix() if site.is_relative_to(ROOT) else str(site)
+        build = "just build" if site == SITE else "just site-build"
+        print(f"internal-links: no {name}/ -- run `{build}` first", file=sys.stderr)
         return 1
-    checked, bad = 0, []
-    for f in sorted(SITE.rglob("*.html")):
+    checked, bad, known_hits = 0, [], set()
+    for f in sorted(site.rglob("*.html")):
         # The 404 page is served at any depth, so it has no depth to resolve
         # against; the demo bundles are not ours to judge.
-        url = page_url(f)
+        url = page_url(f, site)
         if f.name == "404.html" or url.startswith(("/demo/fork/", "/demo/fleet/")):
             continue
         p = Refs()
@@ -73,13 +89,27 @@ def main() -> int:
             if not path or path.startswith(NOT_BUILT_HERE):
                 continue
             checked += 1
-            if not exists(urllib.parse.unquote(path)):
+            if not exists(urllib.parse.unquote(path), site):
+                if path in args.known_missing:
+                    known_hits.add(path)
+                    checked -= 1
+                    continue
                 bad.append(f"{url}  ->  {ref}  ({path})")
     for line in sorted(set(bad)):
         print(f"internal-links: 404: {line}", file=sys.stderr)
+    # An exception that matched nothing is stale: the target was built, or
+    # nothing links it any more. Either way its line must go.
+    stale = sorted(set(args.known_missing) - known_hits)
+    for path in stale:
+        print(f"internal-links: --known-missing {path} is not missing (or not "
+              f"linked) any more: drop the exception", file=sys.stderr)
     if bad:
         print(f"internal-links: {len(set(bad))} broken of {checked} internal links", file=sys.stderr)
         return 1
+    if stale:
+        return 1
+    if known_hits:
+        print(f"internal-links: known missing, by exception: {', '.join(sorted(known_hits))}")
     print(f"internal-links: ok ({checked} internal links resolve)")
     return 0
 

@@ -21,12 +21,22 @@ it from the built pages, not from the source.
 
     just llms            # write docs/llms.txt
     just llms --check    # fail if the committed file is stale
+    scripts/llms.py --check --site starlight/dist   # and what a build serves
+
+`--site` (with --check) also judges the file a BUILT site serves: it is
+this script's output byte for byte, and every link in it on this site lands
+on a built page or file. The Starlight build serves the curated file through
+a route of its own, so "the committed file is right" no longer proves "the
+served file is right". When the build serves starlight-llms-txt's index
+instead (astro.config.mjs `llmsTxt = 'plugin'`, which writes llms-full.txt
+beside it) only the links are judged.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import pathlib
+import re
 import sys
 
 import yaml
@@ -192,11 +202,50 @@ def render() -> str:
     return "\n".join(lines)
 
 
+def check_served(site: pathlib.Path, text: str) -> int:
+    """The llms.txt a built site serves is this one, and its links land."""
+    served = site / "llms.txt"
+    if not served.is_file():
+        print(f"llms: {site} serves no llms.txt", file=sys.stderr)
+        return 1
+    body = served.read_text()
+    plugin = (site / "llms-full.txt").is_file()
+    if not plugin and body != text:
+        print(f"llms: {served} is not what scripts/llms.py writes",
+              file=sys.stderr)
+        return 1
+    base = site_url()
+    links = re.findall(r"\]\((" + re.escape(base) + r"/[^)\s]*)\)", body)
+    missing = []
+    for url in links:
+        path = url[len(base):].split("#", 1)[0]
+        target = site / path.lstrip("/")
+        if not (target.is_file() or (target / "index.html").is_file()):
+            missing.append(url)
+    if not links:
+        print(f"llms: no links to {base} in {served} -- refusing to pass",
+              file=sys.stderr)
+        return 1
+    if missing:
+        print(f"llms: {len(missing)} of {len(links)} links in {served} land "
+              f"on nothing in the build:", file=sys.stderr)
+        for url in missing:
+            print(f"  {url}", file=sys.stderr)
+        return 1
+    mode = "starlight-llms-txt's" if plugin else "the curated one, byte for byte"
+    print(f"  {served} is {mode}; all {len(links)} links on this site land")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--check", action="store_true",
                     help="fail if the committed file is not what this writes")
+    ap.add_argument("--site", help="with --check: also judge the llms.txt "
+                    "this built site serves (e.g. starlight/dist)")
     args = ap.parse_args()
+    if args.site and not args.check:
+        ap.error("--site needs --check")
     text = render()
     if args.check:
         if not OUT.exists() or OUT.read_text() != text:
@@ -204,6 +253,8 @@ def main() -> int:
                   file=sys.stderr)
             return 1
         print("  docs/llms.txt matches the nav")
+        if args.site:
+            return check_served(pathlib.Path(args.site), text)
         return 0
     OUT.write_text(text)
     print(f"  -> {OUT.relative_to(ROOT)}")

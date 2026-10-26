@@ -20,6 +20,7 @@ reader comes back for.
 """
 from __future__ import annotations
 
+import argparse
 import collections
 import html.parser
 import pathlib
@@ -126,15 +127,21 @@ def nav_pages() -> list[str]:
 
 
 def main() -> int:
-    if not (SITE / "index.html").exists():
-        print("no build in site/ -- run `just build` first", file=sys.stderr)
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--site", default=str(SITE),
+                    help="the built site to walk (default: site/, MkDocs's)")
+    site = pathlib.Path(ap.parse_args().site).resolve()
+    if not (site / "index.html").exists():
+        name = site.relative_to(ROOT).as_posix() if site.is_relative_to(ROOT) else str(site)
+        build = "just build" if site == SITE else "just site-build"
+        print(f"no build in {name}/ -- run `{build}` first", file=sys.stderr)
         return 1
 
     clicks: dict[str, int] = {"": 0}
     queue = collections.deque([""])
     while queue:
         here = queue.popleft()
-        f = SITE / here / "index.html"
+        f = site / here / "index.html"
         if not f.exists():
             continue
         parser = Links()
@@ -143,7 +150,7 @@ def main() -> int:
             there = page_of(href, here + "index.html")
             if there is None or there in clicks:
                 continue
-            if not (SITE / there / "index.html").exists():
+            if not (site / there / "index.html").exists():
                 continue
             clicks[there] = clicks[here] + 1
             queue.append(there)

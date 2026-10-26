@@ -253,19 +253,53 @@ site-build: site-install site-convert
 site-dev: site-install site-convert
     cd starlight && yarn dev
 
-# Every URL, asset and head tag turingpi.xyz serves, against starlight/dist.
-# A report, not a gate: it exits 0 whatever it finds. Needs `just site-build`.
-site-parity:
-    ./scripts/url-parity.py
+# Everything the Starlight build must pass before it can replace MkDocs: every
+# check `just check` runs, each against this build where it judges what was
+# built, and URL parity with the live site as a gate. The one local command
+# for the new build; `site.yaml` runs exactly these. The four source checks
+# are the MkDocs ones, unchanged: both builds read the same docs/.
+site-check: facts-check facts-lint feature-lint ribbon-check site-build site-description-lint site-llms-check site-links-internal site-structured-data site-screens site-reach site-parity
 
-# What CI runs for the Starlight build (site.yaml).
-site-check: site-build site-parity
+# Every page says what it is for (the source rules), and the built page
+# carries that description whole: escaped, not cut at a `"` as MkDocs's
+# template cuts two posts today.
+site-description-lint: site-build
+    ./scripts/description-lint.py --site starlight/dist
+
+# The JSON-LD in every built page parses and says what is there, with no
+# template left unrendered in it and no description that disagrees with the
+# page's meta tag -- the two faults MkDocs's build ships (`--strict`).
+site-structured-data: site-build
+    ./scripts/structured-data.py --site starlight/dist --strict
+
+# llms.txt matches the nav, the build serves it byte for byte, and every link
+# in it lands on a built page.
+site-llms-check: site-build
+    ./scripts/llms.py --check --site starlight/dist
+
+# Every href and src in the built HTML resolves, by the same resolver as
+# `just links-internal` -- the header, footer and components included, which
+# starlight-links-validator does not see. /favicon.svg is Starlight's default
+# icon link and the repository has no favicon yet (phase 4 picks one); the
+# exception fails the day the file exists.
+site-links-internal: site-build
+    ./scripts/internal-links.py --site starlight/dist --known-missing /favicon.svg
+
+# The click-depth walk of `just reach`, over the Starlight build.
+site-reach: site-build
+    ./scripts/reach.py --site starlight/dist
 
 # Every screen of the Starlight build at nine viewports, as `just screens`
 # measures the MkDocs one: same script, same baseline, the other build.
-# A report for now; phase 3 makes it a gate. Needs `just site-build`.
-site-screens:
+site-screens: site-build
     ./scripts/screens.py --site starlight/dist
+
+# Every URL, asset, head tag and anchor turingpi.xyz serves, against
+# starlight/dist: a gate. A difference the same commit's MkDocs build shares
+# is content that moved since the live deploy and does not fail; the
+# deliberate fixes are listed, with reasons, in the script (DELIBERATE).
+site-parity: site-build build
+    ./scripts/url-parity.py --strict --mkdocs site
 
 # The hourly refresh, then the Starlight build's inputs from it: what the
 # Pages job will run once it is retargeted (phase 4). The generators still

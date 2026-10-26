@@ -129,9 +129,11 @@ MEASURE = """
   // Scoped to what this site writes. Material's chrome clips on purpose --
   // a collapsed search field, a nav list behind a drawer, the repository
   // facts in the header -- and an unscoped rule reported 2219 of those and
-  // buried the eight that were ours.
+  // buried the eight that were ours. `.md-content` is Material's content
+  // column and `.sl-markdown-content` Starlight's: each build has only its
+  // own, so one selector judges both (`--site starlight/dist`).
   const text = el => (el.innerText || '').trim();
-  const scope = [...document.querySelectorAll('.md-content, [data-screen]')];
+  const scope = [...document.querySelectorAll('.md-content, .sl-markdown-content, [data-screen]')];
   const mine = new Set(scope.flatMap(s => [s, ...s.querySelectorAll('*')]));
   for (const el of mine) {
     const cs = getComputedStyle(el);
@@ -143,6 +145,11 @@ MEASURE = """
     if (overY <= slop && overX <= slop) continue;
     const t = text(el);
     if (!t) continue;                       // a clipped decoration is fine
+    // A box of one pixel or less is the screen-reader-only pattern (`sr-only`,
+    // which Starlight puts in every heading's anchor link): text for a screen
+    // reader, hidden from the eye on purpose rather than cut off by mistake.
+    const box = el.getBoundingClientRect();
+    if (box.width <= 1 && box.height <= 1) continue;
     if (el.closest('[data-screen-ignore]')) continue;
     // Report the innermost offender only: a clipped child clips its parents.
     if ([...el.querySelectorAll('*')].some(k => {
