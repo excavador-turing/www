@@ -1,5 +1,5 @@
 # One site: turingpi.xyz (moved from turing.excavador.xyz, SQU-189), built
-# with Astro Starlight in starlight/. It was Material for MkDocs until
+# with Astro Starlight in site/. It was Material for MkDocs until
 # 2026-10-26, when Material went into maintenance mode.
 #
 # Two toolchains, both from devbox: Node for the site, Python for the
@@ -10,18 +10,18 @@ default:
 
 # Install the build's dependencies exactly as the lockfile says.
 install:
-    cd starlight && yarn install --immutable
+    cd site && yarn install --immutable
 
-# A strict build into starlight/dist: no warning, no broken internal link,
+# A strict build into site/dist: no warning, no broken internal link,
 # no LFS pointer, and what the site must carry (search, llms.txt, the feed).
 build: install
-    starlight/scripts/strict-build.sh
-    starlight/scripts/stamp-build.py
-    starlight/scripts/check-built.sh
+    site/scripts/strict-build.sh
+    site/scripts/stamp-build.py
+    site/scripts/check-built.sh
 
 # The site on http://localhost:4321 with live reload.
 serve: install
-    cd starlight && yarn dev
+    cd site && yarn dev
 
 # Refresh the API document from a bmcd release. `just refresh-api v2.26.0`
 #
@@ -30,7 +30,7 @@ serve: install
 # diff instead of appearing silently the next time CI runs.
 refresh-api version:
     gh release download {{version}} --repo excavador-turing/bmcd \
-        --pattern openapi.json --output starlight/public/reference/openapi.json --clobber
+        --pattern openapi.json --output site/public/reference/openapi.json --clobber
     @just _describe-api
     ./scripts/generate-api-pages.py
 
@@ -40,7 +40,7 @@ refresh-api version:
 _describe-api:
     #!/usr/bin/env python3
     import json
-    doc = json.load(open("starlight/public/reference/openapi.json"))
+    doc = json.load(open("site/public/reference/openapi.json"))
     print("openapi {} from bmcd {}: {} paths, {} schemas".format(
         doc["openapi"], doc["info"]["version"],
         len(doc["paths"]), len(doc["components"]["schemas"])))
@@ -90,11 +90,11 @@ screens-baseline: build
 
 # Every URL turingpi.xyz served under MkDocs still answers: each page, each
 # heading anchor a deep link can name, each file. A URL leaves
-# starlight/served-urls.json only with a redirect, or retired with a reason.
+# site/served-urls.json only with a redirect, or retired with a reason.
 urls: build
     ./scripts/served-urls.py
 
-# Rebuild starlight/src/data/facts.yaml from the pages and data that own each
+# Rebuild site/src/data/facts.yaml from the pages and data that own each
 # number.
 facts:
     ./scripts/facts.py
@@ -128,7 +128,7 @@ facts-check:
 # search result, a link preview and an AI summariser the same sentence about
 # the site and nothing about the page.
 description-lint: build
-    ./scripts/description-lint.py --site starlight/dist
+    ./scripts/description-lint.py --site site/dist
 
 # The JSON-LD in every built page parses and says what is there, with no
 # template left unrendered in it and no description that disagrees with the
@@ -147,11 +147,11 @@ links-internal: build
 # here when you want it now. Needs lychee on the path (devbox has it).
 links: build
     lychee --no-progress --base-url https://turingpi.xyz \
-        --exclude '^https://turingpi\.xyz' --exclude-path starlight/dist/demo \
+        --exclude '^https://turingpi\.xyz' --exclude-path site/dist/demo \
         --exclude localhost --exclude 'turingpi\.local' --exclude '192\.168\.' \
         --exclude 'linkedin\.com' \
         --accept '200..=204,206,301..=308,429' --timeout 20 --max-retries 2 \
-        'starlight/dist/**/*.html'
+        'site/dist/**/*.html'
 
 # The index an assistant reads instead of the nav.
 llms:
@@ -160,7 +160,7 @@ llms:
 # llms.txt matches the nav, the build serves it byte for byte, and every link
 # in it lands on a built page.
 llms-check: build
-    ./scripts/llms.py --check --site starlight/dist
+    ./scripts/llms.py --check --site site/dist
 
 # Fail if a page types a number the facts file owns.
 #
@@ -171,7 +171,7 @@ facts-lint:
     ./scripts/facts-lint.py
 
 clean:
-    rm -rf starlight/dist starlight/.astro
+    rm -rf site/dist site/.astro
 
 # Which bmcd release gained which API operation.
 #
@@ -232,9 +232,9 @@ refresh-demo checkout tag:
     git -C "$src" checkout -q "{{tag}}"
     ( cd "$src" && npm ci --no-audit --no-fund >/dev/null && \
       VITE_DEMO=1 VITE_BASE=/demo/fork/ BMC_UI_VERSION="{{tag}}" npm run build >/dev/null )
-    rm -rf starlight/public/demo/fork && mkdir -p starlight/public/demo/fork
-    cp -a "$src/dist/." starlight/public/demo/fork/
-    echo "demo fork pane: {{tag}} ($(find starlight/public/demo/fork -type f | wc -l) files)"
+    rm -rf site/public/demo/fork && mkdir -p site/public/demo/fork
+    cp -a "$src/dist/." site/public/demo/fork/
+    echo "demo fork pane: {{tag}} ($(find site/public/demo/fork -type f | wc -l) files)"
     python3 scripts/demo-ribbon.py
 
 # The fork demo pane the way the site deploys it: from the latest BMC-UI
@@ -244,4 +244,4 @@ demo-fork-latest checkout:
     set -euo pipefail
     tag=$(gh api repos/excavador-turing/BMC-UI/releases/latest --jq .tag_name)
     just refresh-demo "{{checkout}}" "$tag"
-    echo "$tag" > starlight/public/demo/fork/VERSION
+    echo "$tag" > site/public/demo/fork/VERSION

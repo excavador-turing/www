@@ -11,7 +11,7 @@ The BMC-UI tag is read from what was built, dist/demo/{fork,fleet}/VERSION,
 not from an argument: it is what the site serves. Without the panes (a
 local build, a pull request) it is null.
 
-usage: starlight/scripts/stamp-build.py [dist]   (from anywhere)
+usage: site/scripts/stamp-build.py [dist]   (from anywhere)
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
 def main() -> int:
-    dist = ROOT / (sys.argv[1] if len(sys.argv) > 1 else "starlight/dist")
+    dist = ROOT / (sys.argv[1] if len(sys.argv) > 1 else "site/dist")
     if not (dist / "index.html").is_file():
         print(f"stamp-build: {dist} has no index.html; build first", file=sys.stderr)
         return 1

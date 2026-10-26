@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# What the built site must contain, checked in starlight/dist (or the
+# What the built site must contain, checked in site/dist (or the
 # directory given, relative to the repository root). Each check fails
 # closed: a missing file or an empty match is a failure.
 #
-# usage: starlight/scripts/check-built.sh [dist]
+# usage: site/scripts/check-built.sh [dist]
 set -euo pipefail
 cd "$(dirname "$0")/../.."
-dist=${1:-starlight/dist}
+dist=${1:-site/dist}
 fail=0
 bad() { echo "check-built: $*" >&2; fail=1; }
 
@@ -32,14 +32,14 @@ fi
 # /llms.txt: astro.config.mjs's `llmsTxt` switch. starlight-llms-txt writes
 # llms-full.txt beside it; without that, it must be the curated index,
 # byte for byte what scripts/llms.py wrote.
-if [ ! -e "$dist/llms-full.txt" ] && ! cmp -s "$dist/llms.txt" starlight/src/data/llms.txt; then
+if [ ! -e "$dist/llms-full.txt" ] && ! cmp -s "$dist/llms.txt" site/src/data/llms.txt; then
   bad "llms.txt is neither starlight-llms-txt's (no llms-full.txt) nor src/data/llms.txt"
 fi
 
 # The feed: refresh-changelog.py writes it, and it is served as written, at
 # the address the live site's <head> announces. Every entry links a post
 # that this build has.
-if ! cmp -s "$dist/feed.xml" starlight/public/feed.xml; then
+if ! cmp -s "$dist/feed.xml" site/public/feed.xml; then
   bad "feed.xml is not public/feed.xml byte for byte"
 fi
 while read -r href; do
@@ -84,9 +84,9 @@ while read -r link; do
   path=${link%%#*}
   [ -n "$path" ] || continue
   if [ -s "$dist${path}index.html" ]; then
-    bad "$link is listed in starlight/src/known-broken-links.mjs and now exists: delete the line"
+    bad "$link is listed in site/src/known-broken-links.mjs and now exists: delete the line"
   fi
-done < <(grep -oE '^ +"/[^"]*"' starlight/src/known-broken-links.mjs | tr -d ' "')
+done < <(grep -oE '^ +"/[^"]*"' site/src/known-broken-links.mjs | tr -d ' "')
 
 [ "$fail" -eq 0 ] || exit 1
 echo "check-built: ok ($(find "$dist" -name '*.html' | wc -l) HTML files, $images images, no LFS pointers)"

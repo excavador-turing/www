@@ -4,7 +4,7 @@
 # without its styles or a collection without its entries. The links validator
 # (starlight-links-validator) fails the build itself on a broken internal link.
 #
-# usage: starlight/scripts/strict-build.sh   (from anywhere)
+# usage: site/scripts/strict-build.sh   (from anywhere)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

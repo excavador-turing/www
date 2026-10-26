@@ -10,7 +10,7 @@
 //
 // The mechanism stays. Add a line only for a link the live site really
 // serves broken; delete it when it is fixed, because
-// starlight/scripts/check-built.sh fails while a line names a page that now
+// site/scripts/check-built.sh fails while a line names a page that now
 // exists, so this list can only shrink. Beside it, `just links-internal`
 // fails on any internal link in the built HTML that lands on nothing.
 

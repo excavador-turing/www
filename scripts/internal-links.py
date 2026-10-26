@@ -25,7 +25,7 @@ import sys
 import urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = ROOT / "starlight" / "dist"
+SITE = ROOT / "site" / "dist"
 ORIGIN = "https://turingpi.xyz"
 NOT_BUILT_HERE = ("/demo/fork/", "/demo/fleet/")
 
@@ -56,7 +56,7 @@ def exists(path: str, site: pathlib.Path = SITE) -> bool:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", default=str(SITE),
-                    help="the built site to read (default: starlight/dist)")
+                    help="the built site to read (default: site/dist)")
     ap.add_argument("--known-missing", action="append", default=[], metavar="PATH",
                     help="a target this build is known not to have yet; it is "
                          "not reported, and the run FAILS once it exists, so "

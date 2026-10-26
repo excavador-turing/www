@@ -52,7 +52,7 @@ jobs:
             --no-progress
             --base-url https://turingpi.xyz
             --exclude '^https://turingpi\.xyz'
-            --exclude-path starlight/dist/demo
+            --exclude-path site/dist/demo
             --exclude 'localhost'
             --exclude 'turingpi\.local'
             --exclude '192\.168\.'
@@ -61,7 +61,7 @@ jobs:
             --timeout 20
             --max-retries 2
             --max-concurrency 8
-            'starlight/dist/**/*.html'
+            'site/dist/**/*.html'
           fail: true
           format: markdown
           output: links.md

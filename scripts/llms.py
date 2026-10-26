@@ -19,9 +19,9 @@ page a reader gets, and pouring built HTML back into markdown would publish a
 third version of the text that nobody checks. If an index asks for it, build
 it from the built pages, not from the source.
 
-    just llms            # write starlight/src/data/llms.txt
+    just llms            # write site/src/data/llms.txt
     just llms --check    # fail if the committed file is stale
-    scripts/llms.py --check --site starlight/dist   # and what a build serves
+    scripts/llms.py --check --site site/dist   # and what a build serves
 
 `--site` (with --check) also judges the file a BUILT site serves: it is
 this script's output byte for byte, and every link in it on this site lands
@@ -237,7 +237,7 @@ def main() -> int:
     ap.add_argument("--check", action="store_true",
                     help="fail if the committed file is not what this writes")
     ap.add_argument("--site", help="with --check: also judge the llms.txt "
-                    "this built site serves (e.g. starlight/dist)")
+                    "this built site serves (e.g. site/dist)")
     args = ap.parse_args()
     if args.site and not args.check:
         ap.error("--site needs --check")

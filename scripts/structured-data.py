@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """The structured data on every built page is valid, and says what is there.
 
-`starlight/src/route-data.ts` writes JSON-LD into the head: the front page as
+`site/src/route-data.ts` writes JSON-LD into the head: the front page as
 a piece of software with a version, each release post as an article about
 that version, the FAQ as its questions, and a breadcrumb everywhere. All of
 it is assembled out of page metadata, so a stray quote in a title or a
 description breaks the JSON silently -- the page still renders, and the
 only sign is that a search engine quietly stops reading it.
 
-This parses what was actually built, in starlight/dist.
+This parses what was actually built, in site/dist.
 
     just structured-data
 
@@ -28,7 +28,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SITE = ROOT / "starlight" / "dist"
+SITE = ROOT / "site" / "dist"
 BLOCK = re.compile(r'<script type="application/ld\+json">(.*?)</script>', re.S)
 META_DESC = re.compile(r'<meta name="description" content="([^"]*)"')
 TEMPLATE = re.compile(r"\{\{|\{%")
@@ -57,7 +57,7 @@ def strings(node):
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--site", default=str(SITE),
-                    help="the built site to read (default: starlight/dist)")
+                    help="the built site to read (default: site/dist)")
     ap.add_argument("--strict", action="store_true",
                     help="also refuse unrendered templates in the data, and "
                          "a description that disagrees with the meta tag")

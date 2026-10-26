@@ -77,13 +77,13 @@ jobs:
       # The source rules, then each built page carries its description whole
       # and escaped.
       - name: every page says what it is for, and says it whole
-        run: devbox run -- python3 scripts/description-lint.py --site starlight/dist
+        run: devbox run -- python3 scripts/description-lint.py --site site/dist
 
       - name: the structured data parses, and carries real values
         run: devbox run -- python3 scripts/structured-data.py --strict
 
       - name: llms.txt matches the nav, is served as written, and its links land
-        run: devbox run -- python3 scripts/llms.py --check --site starlight/dist
+        run: devbox run -- python3 scripts/llms.py --check --site site/dist
 
       # Beside starlight-links-validator, which checks the content's links:
       # this resolves every href and src in the HTML, header, footer and
@@ -99,8 +99,8 @@ jobs:
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: starlight-dist
-          path: starlight/dist
+          name: site-dist
+          path: site/dist
           if-no-files-found: error
           retention-days: 7
 
@@ -127,8 +127,8 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: starlight-dist
-          path: starlight/dist
+          name: site-dist
+          path: site/dist
 
       - name: every screen fits, nothing clipped, nothing stretched
         run: devbox run -- python3 scripts/screens.py --json screens.json

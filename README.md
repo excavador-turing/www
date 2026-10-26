@@ -49,7 +49,7 @@ smaller rather than hiding any of them.
 
 ### Every fact has one home
 
-`starlight/src/data/facts.yaml` (`just facts`) holds every number the site
+`site/src/data/facts.yaml` (`just facts`) holds every number the site
 quotes about itself, each with where it came from and when. Pages ask for it —
 `<Fact of="gate.promoted" />`, never `26` — and `just facts-lint` fails a page
 that types one. A page with a component in it is `.mdx`; the rest stay `.md`,
@@ -103,8 +103,8 @@ on `main`: it is what stands between a bad layout and the live site.
 
 | output | recipe | source |
 |---|---|---|
-Pages are under `starlight/src/content/docs/`, data under
-`starlight/src/data/`, everything served as it is under `starlight/public/`.
+Pages are under `site/src/content/docs/`, data under
+`site/src/data/`, everything served as it is under `site/public/`.
 
 | output | recipe | source |
 |---|---|---|
@@ -141,7 +141,7 @@ has no such route and must never be the thing that notices.
   HTML block at the first blank line and reads what follows as Markdown;
   without the blank line after `<div class="…">`, the Markdown inside is
   printed as text.
-- **Every URL ever served is a promise.** `starlight/served-urls.json` lists
+- **Every URL ever served is a promise.** `site/served-urls.json` lists
   what MkDocs served, with every heading anchor; `just urls` fails when one
   stops answering. Move a page with a redirect in `astro.config.mjs`.
 - **`turing.excavador.xyz` is dead** and has been since the docs moved here.
@@ -152,7 +152,7 @@ has no such route and must never be the thing that notices.
 ## Layout
 
 ```
-starlight/
+site/
   src/content/docs/  the pages, each at the path that is its URL
     features/        one page per feature; data in front matter
     why/             the full argument behind each feature

@@ -19,7 +19,7 @@ quote it through a component -- `<Fact of="gate.promoted" />` rather than `26`.
 `scripts/facts-lint.py` fails the build if a page types one of these numbers
 instead of asking for it.
 
-    just facts            # rebuild starlight/src/data/facts.yaml
+    just facts            # rebuild site/src/data/facts.yaml
     just facts --offline  # keep what needs the network, refresh the rest
 
 What comes from where:
