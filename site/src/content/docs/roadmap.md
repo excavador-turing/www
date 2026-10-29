@@ -59,7 +59,7 @@ One post per firmware release, from the repositories' own changelogs — [all of
 
 A feature is a ticket in the maintainer's tracker, a Discussion here, and then a page under [Features](/features/) with the numbers that prove it — in that order. The [known-faults page](/reference/known-faults/) is the other half of this one: what is wrong today, with the ticket that tracks it. A roadmap that lists only what is coming is advertising.
 
-Votes read 28 October 2026 by `just refresh-roadmap`, which runs every hour.
+Votes read 29 October 2026 by `just refresh-roadmap`, which runs every hour.
 
 <div class="tp-next">
 <a href="/news/"><b>What shipped →</b><span>One post per firmware release, newest first.</span></a>
