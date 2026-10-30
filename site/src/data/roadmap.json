@@ -23,7 +23,7 @@
    "number": 27,
    "title": "Remote syslog, and an audit line for every mutating API call",
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/27",
-   "votes": 3,
+   "votes": 4,
    "status": "Open",
    "status_from": "default",
    "summary": "Ship the board's logs somewhere that survives it, and write one line per call that changes state \u2014 who, what, from where."

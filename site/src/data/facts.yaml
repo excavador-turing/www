@@ -64,7 +64,7 @@ roadmap:
   as_of: 2026-10-30
   count: 7
   shipped: 2
-  votes: 20
+  votes: 21
   top: A hardware watchdog, so a hung daemon does not mean a trip to the rack
 platform:
   source: reference/comparison.md, measured on a running board
