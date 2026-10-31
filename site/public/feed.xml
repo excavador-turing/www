@@ -8,6 +8,78 @@
   <updated>2026-10-31T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.46.1: The settings-storage repair is offered on a real board</title>
+    <link href="https://turingpi.xyz/news/v2.46.1/"/>
+    <id>tag:turingpi.xyz,2026-10-31:firmware/2.46.1</id>
+    <updated>2026-10-31T00:00:00Z</updated>
+    <content type="text">bmcd 2.42.1; BMC-UI 4.3.0 and tpi 1.10.0 are unchanged.
+
+### Fixed
+
+- **The settings-storage repair added in v2.46.0 is now offered on a real
+  board.** bmcd 2.42.0 never offered it, because the board's root device
+  shows up as `/dev/root` and bmcd could not tell what it was backed by
+  (`backing: unknown`). bmcd 2.42.1 resolves it from the kernel's `root=`
+  argument. Nothing else changed.</content>
+  </entry>
+  <entry>
+    <title>Firmware v2.46.0: The board says when it is not keeping your settings</title>
+    <link href="https://turingpi.xyz/news/v2.46.0/"/>
+    <id>tag:turingpi.xyz,2026-10-31:firmware/2.46.0</id>
+    <updated>2026-10-31T00:00:00Z</updated>
+    <content type="text">bmcd 2.42.0 and BMC-UI 4.3.0; tpi 1.10.0 is unchanged.
+
+A reader's board kept forgetting its settings after every reboot. The kernel
+log showed `UBIFS error (ubi0:2): ubifs_recover_leb: LEB 16 scanning failed`:
+the flash volume that holds the board's settings had a damaged journal, so
+the board started on a temporary, in-memory copy instead -- and said nothing.
+
+### Changed
+
+- **If the board's settings storage cannot be mounted, it now records why.**
+  The board still starts on temporary settings (every reboot is then a
+  factory reset, as before), but it writes `/etc/safemode.reason` once it is
+  running: the first line is `reason=requested` (KEY1 held at power-on) or
+  `reason=mount_failed`, followed by what the mount step printed and the
+  related `ubi`/`ubifs`/`mtd` kernel lines. The file lives in memory and is
+  gone after a reboot; a normal start writes nothing, so there is no extra
+  flash wear. Failing to write the note never stops the boot. The reason is
+  also printed on the serial console.
+- **The kernel log keeps 8x more.** The in-memory kernel log grows from 16 KiB
+  to 128 KiB, so the messages that explain a failed start (which come early
+  and used to be pushed out by later chatter) are still there when you run
+  `dmesg`. The serial console during early boot now shows errors and worse
+  (`loglevel=4` prints levels below 4) instead of everything, matching the SD
+  installer; the full log is still in `dmesg`. This only changes that early
+  window: `S93startup` already sets the console level to 3 later in boot.
+- **mDNS (the `.local` name) now works on boards whose bridge is not `br0`.**
+  The name service is still bound to exactly one interface -- binding several
+  was measured to cause a reload storm (825 reloads in 12 s) because the
+  switch ports share one address. It now picks that interface when it
+  starts: `br0` if there is one, otherwise the default route's interface if
+  that is a bridge, otherwise the first bridge, otherwise a single plain
+  default-route interface, otherwise `br0` as before. A network split by hand
+  into, for example, `br-wan` and `br-lan` is covered. If the default route
+  only comes up after mDNS has started, the existing five-minute check
+  moves it to the right bridge (at most about five minutes later).
+- **The web interface says when the board is not keeping its settings, and
+  can repair it (bmcd 2.42.0, BMC-UI 4.3.0).** A banner appears when the
+  settings storage could not be mounted, or when safe mode was requested with
+  KEY1 (the two reasons the firmware now records). For a storage fault it
+  offers &quot;Repair settings storage&quot;: this permanently erases the settings
+  volume and reboots the BMC into factory settings, so it asks for
+  confirmation and suggests a plain reboot first. KEY1 always wins: a board
+  held in safe mode by the button is reported as requested. The
+  factory-password gate lets exactly these two storage requests through, so a
+  board on the factory password can see the banner and repair itself.
+
+### Fixed
+
+- **The reboot dialog no longer tells v2.4 owners their nodes keep running.**
+  On a v2.4 board a BMC reboot power-cycles all four compute nodes; the dialog
+  said otherwise. It now says to shut the nodes down first (BMC-UI 4.3.0).</content>
+  </entry>
+  <entry>
     <title>Firmware v2.45.0: The network page works on any bridge layout</title>
     <link href="https://turingpi.xyz/news/v2.45.0/"/>
     <id>tag:turingpi.xyz,2026-10-31:firmware/2.45.0</id>
@@ -1256,105 +1328,5 @@ it comes back.
   USB selector no longer prints its label through its value, and every
   candidate from a GitHub source has a link to its release notes beside
   Install.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.9.0</title>
-    <link href="https://turingpi.xyz/news/v2.9.0/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.9.0</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">### Changed
-
-- bmcd **2.15.1**, `tpi` **1.2.0**, BMC-UI **3.9.0**. Between them this release
-  carries: a firmware catalogue that answers from cache and refreshes behind
-  itself instead of blocking the page for sixteen seconds; park mode, so an
-  uploaded image lands on the SD card and installing stays a separate choice;
-  the hostname and the time servers as settings; configuration export and
-  import before board B; the thermal zone's trip points, so the fan's step has
-  a reason attached; a seven-tab interface reorganised around what a person is
-  doing; and a command line that reaches all of it.
-
-### Added
-
-- **Contract tests for the promotion gate** (`tests/gate.sh`). The gate decides
-  whether a freshly booted image is kept or rejected, and nothing checked it: a
-  change that promoted everything would have been found by a flash, or not at
-  all. The harness sources `S99postupdate`, points its paths at scratch files,
-  stubs `curl`, and asserts both the verdict and the reason for twelve cases —
-  four of which must be **rejections**. It runs under `dash` and under
-  `busybox ash`, the board's own shell.
-- A `checks` workflow that runs those tests and `shellcheck` on every push, in
-  under a minute, separately from the two-hour image build. It also **mutates
-  the gate twice and requires the suite to catch both**: a suite that stays
-  green when a rejection is removed is decorative.
-
-### Changed
-
-- **A release candidate no longer outranks its own release** (SQU-169).
-  `is_newer` in `tpi-selfupdate` used GNU `sort -V` alone, which puts
-  `v2.8.1-rc1` *after* `v2.8.1` — so a board on the finished release was
-  offered its own candidate as an upgrade, and `--check` would have exited 10
-  for ever. It now compares the numeric part first and only then the suffix,
-  where carrying one loses to carrying none. `v2.2.0-unstable-hive.12` is
-  likewise work towards v2.2.0 rather than after it.
-- `tests/version.sh` covers that ordering — eighteen cases including the tenth
-  minor release, which a lexical compare gets wrong — and CI mutates the
-  function back to the old behaviour and requires the suite to notice.
-- `tpi-selfupdate` can be sourced with `TPI_SELFUPDATE_LIB=1` to get its
-  functions without running the update. That is what makes the above testable
-  without a network or a board.
-- `S99postupdate` takes the path to `curl` from `CURL_BIN` rather than a
-  literal, so the harness can exercise the `-x` check and the argument handling
-  instead of bypassing them.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.8.1</title>
-    <link href="https://turingpi.xyz/news/v2.8.1/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.8.1</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">### Added
-
-- **`turingpi.local` resolves again** (SQU-162). Dropping avahi for rootfs
-  headroom (SQU-110) also removed the board's mDNS advertisement, and nothing
-  replaced it — so `tpi` with no `--host` has failed since v2.3.0, because its
-  default host is literally `turingpi.local`, and upstream's documentation
-  tells people to reach the board that way. Nobody noticed here because this
-  estate always passes an address.
-
-  `mdnsd` replaces avahi: BSD-3, about 40 KB, and no D-Bus, expat or libdaemon
-  behind it — which is what made avahi expensive, not avahi itself. The board
-  advertises its own hostname, so a default image is `turingpi.local` again and
-  a renamed board is whatever it was renamed to.
-- The web interface is advertised as `_https._tcp` on 443, so a Bonjour browser
-  finds the board. Port 443 rather than the port-80 redirect: advertising the
-  redirect costs a client two round trips to reach a page that was always going
-  to be served over TLS.
-- **The promotion gate checks that the image is the one that was staged, and
-  that it serves metrics** (SQU-140). The two existing checks prove the image
-  is *alive* — the daemon answers, the switch ports exist — and neither proves
-  it is *correct*: a build whose `/metrics` was completely broken would have
-  been promoted. `release_matches()` now also requires that `/etc/os-release`
-  agrees with the version named in the staged note, and that `/metrics`
-  answers with `bmcd_build_info`.
-
-  Verified on hardware: a note tampered to `v0.0.1` rolled the board back to
-  v2.8.0 in about 35 seconds with the disagreement in `postupdate.log` — the
-  first rollback this firmware has ever performed — and the same image,
-  installed untampered, promoted. Every compute module's uptime continued
-  uninterrupted through both reboots.
-
-  Two details the board taught this change. `/metrics` has **no loopback
-  exception** — only `/api/bmc` does — so the gate asks the daemon for a token
-  via `type=metrics_token`, which mints one if none exists; reading the overlay
-  file instead would have rolled back every good image on a fresh board. And a
-  staged note that names a file but no version now says so, rather than
-  claiming there was no note at all.
-
-### Changed
-
-- bmcd **2.10.1** and `tpi` **1.1.1**. Between them: a parked image is ordered
-  against the running version instead of showing as `unknown`, and
-  `tpi firmware install` can actually install one — 1.1.0 posted it to an
-  endpoint the daemon refuses for local sources, so the resolution succeeded
-  and the install failed with a 400.</content>
   </entry>
 </feed>
