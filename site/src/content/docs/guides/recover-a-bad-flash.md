@@ -31,7 +31,8 @@ and in full, from the board's own log:
 23:29:57 postupdate: rolling back to the volume named rootfs by rebooting
 ```
 
-About 35 seconds, and the compute modules kept running throughout. There is
+About 35 seconds, and the compute modules kept running throughout (on a v2.5;
+a v2.4 power-cycles them on any BMC reboot). There is
 nothing to do except find out why the image was bad.
 
 The log is `/mnt/overlay/postupdate.log`, and it survives the rollback it
@@ -41,10 +42,33 @@ the note is written there instead of `/var/log`, which is a tmpfs.
 ## If the board comes up but forgets its settings at every reboot
 
 If the password is `turing` and the certificate is new after every reboot, the
-settings volume may be damaged and the board is running from RAM. Over SSH:
-`mount | grep ' / '` shows `upperdir=/tmp/safemode/upper`, and
-`dmesg | grep -i ubifs` shows a UBIFS error. (Holding KEY1 at power-on does the
-same on purpose.) Remove the volume and let the firmware make a new one:
+settings volume may be damaged and the board is running from RAM.
+
+**From v2.46.1, start in the web interface.** Every page, the factory-password
+page included, then carries a banner that says the board is not keeping its
+settings, with the kernel's explanation under *Details*. (Install v2.46.1, not
+v2.46.0: the repair button was never offered on a real board in v2.46.0.)
+
+1. Press the banner's plain **Reboot**. A mount failure can be a one-off, and
+   this costs nothing. On a v2.4 board a BMC reboot power-cycles the four
+   compute modules, so shut them down first.
+2. If the banner is still there after the reboot, press **Repair settings
+   storage** and confirm. It removes the volume that could not be mounted and
+   reboots; the next boot makes a new one. **This erases the saved settings for
+   good** (network configuration, certificates, node names). They were not
+   loading, but after the repair nobody can read them. The board then comes
+   back with the password `turing` and a new certificate.
+3. Set the password again and reboot once more, to check it persists.
+
+The button is offered only where it is safe: the built-in flash, with a volume
+that exists. Otherwise the banner says why not. A board started with **KEY1**
+held gets a different banner, which never offers the repair: reboot without
+KEY1 to use your settings.
+
+If you are on an earlier release, or cannot reach the interface, use SSH. Over
+SSH, `mount | grep ' / '` shows `upperdir=/tmp/safemode/upper`, and
+`dmesg | grep -i ubifs` shows a UBIFS error. Remove the volume and let the
+firmware make a new one:
 
 ```console
 # ubirmvol /dev/ubi0 -N overlay
@@ -54,8 +78,11 @@ same on purpose.) Remove the volume and let the firmware make a new one:
 Then set the password again and reboot once more to check it persists. The
 details, and the route without SSH, are in
 [the known-faults entry](/reference/known-faults/#the-board-forgets-everything-at-every-reboot).
-On the reader's board the volume mounted again with no errors; that a new
-password survives the next reboot is the last check, not yet reported.
+What is tested: the SSH repair, on the reader's board, where the volume mounted
+again with no errors (that a new password survives the next reboot is the last
+check, not yet reported); and, on healthy v2.5 boards, that the web repair is
+refused. The banner and the web repair have not been seen on a board that is
+really in this state.
 
 ## If an update is staged and you have changed your mind
 

@@ -25,13 +25,20 @@ which holds no credential of its own.
 
 ## Does upgrading the firmware reboot my nodes?
 
-**No.** Upstream power-cycles all four compute modules to patch the management
+**On a v2.5, no.** Upstream power-cycles all four compute modules to patch the management
 computer beside them; this fork leaves their rails alone. Measured on a
 nine-node cluster during a live upgrade: **0** modules cycled, **0** cluster
 nodes lost, and **48 seconds** for the board itself to come back.
 
 The board's own network drops for those 48 seconds, because the board drives
 the switch. The modules keep running throughout.
+
+That was measured on a v2.5 board, whose nodes have latches on their power
+rails. A v2.4 board drives the rails from the BMC, so there any BMC reboot,
+including the one that boots a new image, power-cycles all four nodes: shut them
+down first. Until v2.46.0 the web interface's reboot dialog said the opposite
+on a v2.4 ([the fault](/reference/known-faults/#the-reboot-dialog-told-v24-owners-their-nodes-keep-running)).
+I have no v2.4 board to measure it on.
 
 [The measurement →](/guides/upgrade-from-stock/)
 
@@ -81,20 +88,35 @@ If you used the `.tpu` (the web interface's Firmware page, `tpi firmware`), the
 settings are not touched by the upgrade, so the other cause is more likely: the
 settings volume is damaged and the board falls back to a factory state in RAM at
 **every** reboot. An upgrade is only when you notice, because that is when the
-BMC reboots. To tell them apart:
+BMC reboots. **From v2.46.0 the board tells you:** every page of the web
+interface, including the factory-password page, shows a banner with the
+kernel's explanation. Install v2.46.1 rather than v2.46.0, because only v2.46.1
+offers the repair button on a real board. To tell the two causes apart:
 
 - After a card install from v2.41.0 or earlier, the reset happens once, at
   install time, and the new password then survives reboots. The board showed
   the installer's prompt on the serial console, or waited on the front panel
   buttons, before it came back.
-- With a damaged volume, the reset repeats at every reboot. Over SSH,
-  `mount | grep ' / '` shows `upperdir=/tmp/safemode/upper`, and
-  `dmesg | grep -i ubifs` shows a UBIFS error. This is
-  [a known fault](/reference/known-faults/#the-board-forgets-everything-at-every-reboot) with a repair.
+- With a damaged volume, the reset repeats at every reboot. On v2.46.0 and
+  later the banner says so. Press its plain **Reboot** first, because a mount
+  failure can be a one-off. If the banner comes back, **Repair settings
+  storage** (offered only where it is safe) removes the volume that could not
+  be mounted and reboots; the next boot makes a new one. It erases the saved
+  settings for good, which were not loading anyway. On an earlier release, or
+  without the web interface, SSH shows it: `mount | grep ' / '` gives
+  `upperdir=/tmp/safemode/upper`, and `dmesg | grep -i ubifs` a UBIFS error.
+  This is
+  [a known fault](/reference/known-faults/#the-board-forgets-everything-at-every-reboot),
+  with the manual repair.
 
 Holding KEY1 at power-on is a deliberate safe mode and also gives the factory
-password; that is expected. To reset on purpose with the new card, put
-`factory-reset.txt` next to `install.txt`.
+password; that is expected, and its banner, from v2.46.0, never offers the
+repair. To reset on purpose with the new card, put `factory-reset.txt` next to
+`install.txt`.
+
+The banner and the repair have been tried on a board with healthy settings
+only (nothing to show, and the repair refused); I have not seen them on a board
+that is really in this state.
 
 [The card, step by step →](/guides/install/#from-an-sd-card-the-installer)
 
@@ -130,6 +152,13 @@ old one is kept as `/etc/network/interfaces.hand-written.<time>`, the newest
 five. On v2.35.0 to v2.44.0 the same board showed no address and every change
 failed with "status code 500", and confirming would have overwritten your file
 without a copy.
+
+The board's `.local` name needed one more release. mDNS is bound to exactly one
+interface, and until v2.46.0 that was always `br0`, which a split board does not
+have. From v2.46.0 it picks `br0` if there is one, otherwise the bridge that
+carries the default route, and re-checks every five minutes. I tried it on the
+stock layout of my own boards, where it still binds `br0`; a hand-split board is
+not something I have here.
 
 [The entry in known faults →](/reference/known-faults/#the-network-page-broke-on-a-board-whose-bridge-is-not-br0)
 
