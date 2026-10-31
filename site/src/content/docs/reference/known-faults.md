@@ -158,16 +158,80 @@ userspace dies stays dead until someone cuts its power.
 
 *Tracked as SQU-106, and it is the most valuable unbuilt thing on the list.*
 
+## Fixed, and worth knowing about
+
 ### The board forgets everything at every reboot
 
-*Reported 2026-10-07, by one reader, on a v2.4 board running v2.42.0.*
+**Silent before v2.46.0 (the board I have a report from ran v2.42.0). v2.46.0
+says so on every page, and v2.46.1 is the release whose repair button is
+offered on a real board.**
+*Reported 2026-10-07, by one reader, on a v2.4 board running v2.42.0.* The
+symptom was the factory-password page and a new self-signed certificate after a
+reboot, and again after the next one. Nothing you changed survived. It is easy
+to mistake for the old card-install reset (below), because an upgrade is the
+usual reason the BMC reboots.
 
-The symptom is the factory-password page and a new self-signed certificate
-after a reboot, and again after the next one. Nothing you change survives. It is
-easy to mistake for the old card-install reset (below), because an upgrade
-is the usual reason the BMC reboots.
+The cause, from reading the firmware's `/sbin/preinit` and
+`/sbin/mount_overlay`: at boot, preinit mounts the UBI volume `overlay` (UBIFS)
+at `/mnt/overlay` and uses it as the root filesystem's writable layer. If the
+mount fails, it starts anyway on a layer in RAM (a tmpfs, `/tmp/safemode`): the
+root password is the factory `turing`, a fresh certificate is generated, and
+nothing survives a reboot. So every reboot was a factory reset, and the board
+said nothing; the factory-password page was the only sign. On the reader's
+board the kernel log said `UBIFS error (ubi0:2): ubifs_recover_leb: LEB 16
+scanning failed`, a journal that would not replay. My guess at what damaged it
+is a power cut while UBIFS was writing; that is one report, I have not
+reproduced it, and as far as I know it is not specific to v2.4 or to v2.42.0. The flash's
+own counters on that board were clean: `ecc_failures` 0, `corrected_bits` 1,
+`bad_blocks` 1.
 
-To check, log in over SSH as root:
+From v2.46.0 (bmcd 2.42.0, BMC-UI 4.3.0), and working from v2.46.1 (bmcd
+2.42.1):
+
+* **The board records why it started on temporary settings.** preinit writes
+  the reason, with what the mount step printed and the related kernel lines, to
+  `/etc/safemode.reason`, which lives in memory. `GET /api/bmc/storage` reports
+  it. A normal start writes nothing.
+* **Every page shows a banner**, including the page that asks for the first
+  password. It gives the kernel's explanation, a link to this page, and a plain
+  **Reboot** button. Press that first: a mount failure can be a one-off.
+* **When the board qualifies, a second button, Repair settings storage.** It
+  asks first, removes the volume that could not be mounted (`ubirmvol /dev/ubi0
+  -N overlay`) and reboots, and the next boot creates a fresh volume. **This
+  erases the saved settings for good**: network configuration, certificates,
+  node names. They were not loading anyway, but after the repair they cannot be
+  rescued. It is offered only on the built-in flash, only when a volume named
+  `overlay` exists and nothing is mounted at `/mnt/overlay`; otherwise the
+  banner says why not. On a v2.4 board the reboot power-cycles the four compute
+  modules, so shut them down first. The board comes back as a factory unit:
+  password `turing`, a new certificate.
+* **Holding KEY1 at power-on is a different banner** (saved settings are not
+  loaded; reboot without KEY1) and never offers the repair.
+* **The kernel log keeps 128 KiB, not 16 KiB**, so the lines that explain a
+  failed mount are still in `dmesg` when you look.
+
+**Install v2.46.1, not v2.46.0.** In v2.46.0 the repair button was never
+offered on a real board: the read-only root shows up as `/dev/root`, which the
+daemon did not resolve, so it could not tell the board boots from the built-in
+flash and refused. We found it on our own board right after flashing v2.46.0
+and fixed it the same day. The banner and the plain Reboot are in both.
+
+The repair endpoint takes JSON with `{"confirm": true}` and a valid login. It
+is reachable before the factory password is changed, because a board in this
+state is always on the factory password; that adds nothing new, since stock
+SSH already accepts `root` / `turing`.
+
+*What was tested, 2026-10-31, on our own v2.5 boards only: on a healthy board
+there is no banner, a repair request is refused with 409 and runs nothing, and
+a repair request with the wrong content type is refused with 415. A board that
+is actually in this state, the banner on it, and the repair itself have **not**
+been tried on hardware. The only board seen in this state is the reader's, and
+what fixed it there was the SSH repair below.*
+
+If you cannot use the buttons (a release before v2.46.1, no web interface), the
+repair is the firmware's own first-boot path: when no `overlay` volume exists
+at boot, `mount_overlay` creates a new one. Over SSH as root, first check that
+this is your board's state:
 
 ```console
 # mount | grep ' / '
@@ -176,36 +240,8 @@ overlay on / type overlay (...,upperdir=/tmp/safemode/upper,workdir=/tmp/safemod
 UBIFS error (ubi0:2): ubifs_recover_leb: LEB 16 scanning failed
 ```
 
-`upperdir=/tmp/safemode/upper` means the root filesystem's writable layer is in
-RAM. The cause, from reading the firmware's `/sbin/preinit` and
-`/sbin/mount_overlay`: at boot, preinit mounts the UBI volume `overlay` (UBIFS)
-at `/mnt/overlay` and uses it as that writable layer. If the mount fails, it
-enters safe mode without saying so: the layer becomes a tmpfs, the root
-password is the factory `turing`, a fresh certificate is generated, and nothing
-survives a reboot. So every reboot is a factory reset. The board gives no
-warning today; the factory-password page is the only sign. Holding KEY1 at
-power-on also enters safe mode, on purpose; `/proc/cmdline` then says
-`safemode`, and that is not this fault.
-
-My guess at the cause is a power cut while UBIFS was writing. That is one
-report, and I have not reproduced it. As far as I know it is not specific to
-v2.4. The flash's own counters, below, make a single interrupted write more
-likely than failing flash.
-
-The firmware does not warn when this happens yet. Fixing that is planned; I am
-not promising a version.
-
-To check your flash, read its error counters:
-
-```console
-# grep . /sys/class/mtd/mtd*/ecc_failures /sys/class/mtd/mtd*/corrected_bits /sys/class/mtd/mtd*/bad_blocks
-```
-
-On the reader's board they were clean: `ecc_failures` 0, `corrected_bits` 1,
-`bad_blocks` 1.
-
-The repair is the firmware's own first-boot path: when no `overlay` volume
-exists at boot, `mount_overlay` creates a new one. Over SSH as root:
+`upperdir=/tmp/safemode/upper` is the sign that the writable layer is in RAM.
+Then, if a plain reboot did not help:
 
 ```console
 # ubirmvol /dev/ubi0 -N overlay
@@ -216,21 +252,41 @@ The settings in the damaged volume are already unreadable, so nothing readable
 is lost. You can try a read-only rescue first, `mkdir /tmp/old && mount -t ubifs -o ro /dev/ubi0_2 /tmp/old`,
 but expect it to fail the same way. After the reboot, set the password again,
 check that `mount | grep /mnt/overlay` shows `ubifs`, and reboot once more to
-confirm it persists.
+confirm it persists. To check your flash, read its error counters:
+`grep . /sys/class/mtd/mtd*/ecc_failures /sys/class/mtd/mtd*/corrected_bits /sys/class/mtd/mtd*/bad_blocks`.
 
 Without SSH, install from an SD card from v2.42.0 with a `factory-reset.txt`
 next to `install.txt`. A plain card install from v2.42.0 does **not** help: it
 keeps the settings volume when its UBIFS superblock is intact, and here the
 damage is deeper.
 
-*2026-10-07: the repair is confirmed on the reader's board as far as the
+*2026-10-07: the SSH repair is confirmed on the reader's board as far as the
 volume goes. After `ubirmvol` and a reboot, `/dev/ubi0_2` is mounted at
 `/mnt/overlay` as `ubifs`, `/` uses `upperdir=/mnt/overlay/upper`, and the
 kernel log shows UBI attaching with `corrupted PEBs: 0` and UBIFS creating a
 fresh 26 MiB `overlay` with no errors. The flash counters were clean. Still to
 be reported: that a newly set password survives the next reboot.*
 
-## Fixed, and worth knowing about
+### The reboot dialog told v2.4 owners their nodes keep running
+
+**Affected firmware v2.9.0 through v2.45.0 (BMC-UI 3.9.0 through 4.2.0); fixed
+in v2.46.0.** The Settings page's reboot dialog, and the notice about booting a
+staged image, said the compute modules "keep running" through a BMC reboot. That is true of a v2.5, which has a latch on each node's power
+rail. A v2.4 has none and the BMC drives the rails directly, so on a v2.4,
+rebooting the BMC power-cycles all four nodes. Anyone who pressed
+Reboot on a v2.4 with something running on the nodes had been told it was safe.
+
+From v2.46.0 (BMC-UI 4.3.0) the dialogs say what applies to the board's
+revision: on a v2.4 they tell you to shut the nodes down first. The repair
+button above carries the same warning.
+
+*The range is measured from the tags, 2026-10-31. The words entered BMC-UI in
+`0918e3b`, 2026-09-09, and the first BMC-UI tag that contains it is v3.9.0
+(v3.8.0 has no such line); the first firmware tag that pins v3.9.0 is v2.9.0.
+v4.3.0 changes the dialogs and is pinned by v2.46.0, so v2.45.0 is the last
+affected tag. That a v2.4 power-cycles its nodes on a BMC reboot is what the
+firmware changelog and the daemon's documentation say; we have only v2.5
+boards and did not test it.*
 
 ### The Network page broke on a board whose bridge is not br0
 
@@ -276,6 +332,11 @@ your layout and leaves it alone. Change the address over SSH in your own file,
 as you did before; the page will pick the change up. If you use the page's
 Apply on a hand-written file, you will be asked first and you will have a copy.
 Before v2.45.0 the only safe course was not to press Apply on such a board.
+
+The board's `.local` name did not follow your layout in v2.45.0: it was still
+bound to `br0`, which a split board does not have. From v2.46.0 it is bound to
+one interface chosen by the order in [the mDNS entry](#mdns-ate-the-board) (the
+bridge that carries the default route, on a typical split).
 
 *The range is measured from the tags: v2.35.0 is the first firmware tag that
 pins bmcd 2.38.0, which introduced `GET/PUT /api/bmc/network/address`
@@ -637,6 +698,16 @@ $ ssh root@<bmc> /etc/init.d/S50mdnsd restart
 
 Measured on a board that had been up 36 minutes: available memory went from
 54.4 MB back to 88.5 MB, and `mdnsd` from 36.0 MB back to 1.9 MB.
+
+*Added 2026-10-31: that line named `br0`, so on a board with no `br0` (a bridge
+split by hand into `br-wan` and `br-lan`) the `.local` name was not bound to
+anything useful. Since v2.46.0 the interface is chosen when the daemon starts,
+and it is still exactly one, for the reason above: `br0`, otherwise the bridge
+that carries the default route, otherwise the first bridge, otherwise the
+default-route device, otherwise `br0` as before. A check every five minutes
+moves it if the default route came up late. Tested on our own v2.5 boards only,
+and only the stock layout, where it still binds `br0`; a hand-split board has
+not been tried.*
 
 We introduced this. `turingpi.local` stopped resolving when avahi was dropped
 for rootfs headroom, and `mdnsd` was chosen as the small replacement. We

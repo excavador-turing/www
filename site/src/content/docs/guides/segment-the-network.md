@@ -279,7 +279,10 @@ from v2.45.0 the page shows the address of the interface that carries it and
 lists every interface the board has, but the address card is read-only and
 says why: the change belongs in your own file, over SSH, and the page notices
 when the file changes. Before v2.45.0 such a board showed no address and
-failed every change with a 500. Where the file is hand-written but still has
+failed every change with a 500. The board's `.local` name follows from v2.46.0:
+mDNS is bound to one interface, `br0` if there is one, otherwise the bridge that
+carries the default route, and re-checked every five minutes (tried on the stock
+layout only, where it stays on `br0`). Where the file is hand-written but still has
 `br0`, and you press Apply, the card says that a confirmed change
 replaces the whole file, asks before it does, and keeps the old one as
 `/etc/network/interfaces.hand-written.<time>` (the newest five are kept). The

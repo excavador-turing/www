@@ -214,3 +214,26 @@ v2.45.0:
     now finds the address on whatever interface carries it, says what it is
     looking at, and replaces a hand-written file only after you confirm,
     keeping a copy.
+
+# v2.46.0 -- bmcd 2.42.0 and BMC-UI 4.3.0; tpi 1.10.0 is unchanged. The banner
+# only appears on a board that is not keeping its settings, and none of the
+# boards we have is in that state, so the site has no picture of it and draws
+# none: no capture. v2.46.1 follows the same day; the summary says to install
+# that one.
+v2.46.0:
+  title: The board says when it is not keeping your settings
+  summary: >-
+    A board that could not mount its settings volume used to start on
+    temporary ones in silence, so every reboot looked like a factory reset.
+    Now every page says so and why, and offers a plain Reboot and, where it is
+    safe, a Repair; install v2.46.1, because the repair was never offered on a
+    real board in this release.
+
+# v2.46.1 -- bmcd 2.42.1, the same day as v2.46.0 and nothing else. No capture.
+v2.46.1:
+  title: The settings-storage repair is offered on a real board
+  summary: >-
+    In v2.46.0 the Repair button never appeared, because the board's root
+    device shows as /dev/root and the daemon could not tell where it had
+    booted from. Found on our own board right after flashing v2.46.0 and fixed
+    the same day; the v2.46.0 post has the rest.
