@@ -1,15 +1,68 @@
 ---
 title: BMC-UI
-description: 'Every BMC-UI release and what changed in it: 41 entries, newest v4.2.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-UI release and what changed in it: 42 entries, newest v4.3.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmc-ui
 tableOfContents: false
 ---
 
 The web interface the board serves.
 
-Newest release **v4.2.0**, 31 October 2026. 41 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v4.3.0**, 31 October 2026. 42 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v4.3.0 — 31 October 2026</summary>
+
+This release needs bmcd 2.42.0 for `GET /api/bmc/storage` and
+`POST /api/bmc/storage/repair`. On an older daemon the question gets a 404 and
+the interface shows nothing new.
+
+**Added**
+
+- **A banner on every page when the board's settings will not survive a
+  reboot.** A board whose settings storage could not be mounted runs on
+  factory defaults, and everything looks normal until the next power cut puts
+  back whatever you had changed, the password included. The banner says so
+  above every page, and on the page that asks for a first password, with the
+  daemon's own detail under a "Details" disclosure and a link to the known
+  faults page. A board started with KEY1 held (safemode) gets its own, shorter
+  banner: saved settings are not loaded, reboot without KEY1 to use them.
+  The question is asked once per page load, never polled.
+- **A plain reboot, first.** The daemon only knows that the mount failed, and
+  that can be a one-off, so the banner offers the Settings page's Reboot
+  beside the repair and recommends trying it before anything else. It is
+  offered even where the repair is not, because the daemon's reason there
+  ("there is no settings volume to remove; reboot the BMC to recreate it")
+  points at it.
+- **Repair settings storage, which erases what is saved on the volume.**
+  Where the daemon says the volume that could not be mounted can be removed,
+  the banner offers a button that asks first. The settings saved on that
+  volume (network configuration, certificates, node names, app data) are not
+  loading now, but they are still there, and the repair erases them for good:
+  they cannot be recovered. The board then comes back on factory settings
+  (password `turing`). On a Turing Pi 2 v2.4 the reboot also power-cycles all
+  four nodes, so shut them down first. After the confirmation the page waits
+  for the board exactly as the Reboot button does. Where it cannot be
+  repaired from here, the banner shows the daemon's reason instead. A refusal
+  shows the daemon's own message. The request is sent as `application/json`,
+  which the daemon requires.
+- **The reboot dialog no longer tells v2.4 owners their nodes keep running;
+  on v2.4 they are power-cycled.** A Turing Pi 2 v2.4 has no latch on its node
+  power rails, which the BMC drives directly, so any BMC reboot power-cycles
+  all four nodes; a v2.5 has latches and its nodes keep running. The Settings
+  reboot dialog and its note, the dialog that reboots to start a staged
+  firmware, the banner's reboot and the repair dialog now choose their
+  warning by the board revision, and say both when the revision is unknown.
+- The demo can show both banners: `?storage=broken` (a settings volume that
+  could not be mounted, repairable) and `?storage=keyhold` (KEY1 held at
+  power-on); `?board=v2.4` shows a v2.4 revision for the reboot dialogs. The
+  fixtures are written, not captured.
+- The generated API types are now from bmcd v2.42.0 (they were v2.36.0), and
+  the storage banner is typed from them.
+- Unit tests for the banner's decisions (`src/lib/api/storageView.test.mjs`).
+
+</details>
+
+<details class="note">
 <summary>v4.2.0 — 31 October 2026</summary>
 
 This release needs bmcd 2.41.0 for the new fields. On an older daemon the

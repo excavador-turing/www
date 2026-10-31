@@ -14,18 +14,18 @@ gate:
 releases:
   source: "changelog/*.md, written by `just refresh-changelog` from each repository's CHANGELOG.md"
   firmware:
-    newest: v2.45.0
-    count: 42
+    newest: v2.46.1
+    count: 44
   bmcd:
-    newest: 2.41.0
-    count: 47
+    newest: 2.42.1
+    count: 49
   ui:
-    newest: v4.2.0
-    count: 41
+    newest: v4.3.0
+    count: 42
   tpi:
     newest: v1.10.0
     count: 15
-  total: 145
+  total: 150
 features:
   source: features/*.mdx -- a feature is a page
   count: 11
