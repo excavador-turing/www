@@ -47,7 +47,7 @@ visible on one page rather than discovered later.
 | | upstream | fork |
 |---|---|---|
 | Bad image | power cut, hard-cutting four modules | **reboots back by itself** |
-| Modules during a flash | power-cycled | **untouched** |
+| Modules during a flash | power-cycled | **untouched** (v2.5; a v2.4 cycles them on any BMC reboot) |
 | What is staged | not reported | **version, checksum, source** |
 | Newer release available? | mirror that stops at v2.0.5 | **from any configured source** |
 | Install a chosen version | — | **from the web interface** |

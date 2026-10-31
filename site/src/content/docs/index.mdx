@@ -90,7 +90,7 @@ import { Fact, NewsLede } from '~/components/macros';
 
 ## Patch the BMC, leave the cluster alone
 
-<p>Upstream power-cycles all four compute modules to update the management computer beside them. This fork leaves their rails alone, so patching the board that manages your cluster does not take the cluster down.</p>
+<p>Upstream power-cycles all four compute modules to update the management computer beside them. This fork leaves their rails alone, so patching the board that manages your cluster does not take the cluster down. Measured on a Turing Pi 2 v2.5; a v2.4 drives its node rails from the BMC itself, so there any BMC reboot power-cycles all four.</p>
 
 <div class="tp-proof">
 <div><b>0</b><span>modules power-cycled by a BMC update</span></div>

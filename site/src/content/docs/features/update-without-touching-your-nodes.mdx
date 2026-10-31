@@ -16,7 +16,7 @@ feature:
   proofs:
   - n: '0'
     of: modules power-cycled by a BMC update
-    source: measured on a nine-node cluster during a live upgrade
+    source: measured on a nine-node cluster of v2.5 boards during a live upgrade
     as_of: '2026-09-08'
   - n: '0'
     of: cluster nodes lost
@@ -59,6 +59,8 @@ import { FeatureScreen } from '~/components/macros';
 ## The argument
 
 Upstream cycles the modules because its update path resets the board's USB multiplexer and power rails together. Separating them is most of the change. The cost of not separating them is that patching a management computer becomes a cluster outage, which is the opposite of what a BMC is for.
+
+**This holds on a Turing Pi 2 v2.5, which latches the node power rails; that is where it was measured.** On a v2.4 the rails are driven from the BMC's own pins, so any BMC reboot, an upgrade included, power-cycles all four nodes: shut them down first. [The fault entry, with the range](/reference/known-faults/#the-reboot-dialog-told-v24-owners-their-nodes-keep-running).
 
 [The full argument, with every measurement →](/why/update-without-touching-your-nodes/)
 
