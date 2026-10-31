@@ -232,6 +232,57 @@ be reported: that a newly set password survives the next reboot.*
 
 ## Fixed, and worth knowing about
 
+### The Network page broke on a board whose bridge is not br0
+
+**Affected v2.35.0 through v2.44.0, the releases that have the address card;
+fixed in v2.45.0.** A reader had split the board's bridge by hand long ago:
+`/etc/network/interfaces` held `br-wan` on `ge0` and `br-lan` on `ge1`, and no
+`br0`. After the upgrade the dashboard showed no address and `tpi info` printed
+"Unknown" for it. The Network page said *"The last change could not be applied,
+and the previous address was put back at once."* and *"The board's interface
+file was written by hand and could not be read…"*, and every change failed at
+once with *"Request failed with status code 500"*. A user report on Discord is
+how I learned of it (2026-10-31).
+
+The cause is that the daemon named `br0` everywhere: to read the address, to
+change it, to restart the network. On a board with no `br0` there was nothing
+to read and nothing to change, and the page had no sentence for that.
+
+From v2.45.0 (bmcd 2.41.0, BMC-UI 4.2.0):
+
+* **The address is read from the interface that carries it.** `br0` when it has
+  an address, otherwise the interface holding the default route, under whatever
+  name. The dashboard and `tpi info` show it, and the Network page lists every
+  interface with an address, its MAC and which one has the default route.
+* **A board without `br0` is told so.** The address card manages `br0` only; on
+  your layout it turns read-only and says that changes go through
+  `/etc/network/interfaces` over SSH, or by restoring the default layout. The
+  change is refused with a 409 and a sentence, and nothing on the board is
+  touched.
+* **A hand-written file is replaced only if you say so.** The card asks first,
+  and the old file is kept as `/etc/network/interfaces.hand-written.<time>`
+  (the newest five are kept). The image's own stock file needs no confirmation
+  and is not copied. Before this, confirming an address change rewrote the whole
+  file with `lo` and `br0` only and kept nothing, so a second bridge, a VLAN or
+  a `post-up` line was gone for good.
+* **Errors say what failed.** The daemon's own message replaces the bare 500.
+  The red banner now shows when the change failed and why, and goes away after
+  ten minutes instead of staying for as long as the daemon remembers it.
+* **Restoring the file by hand is noticed** without a reboot or a daemon
+  restart.
+
+If your board is split by hand, upgrade and nothing is undone: the page reads
+your layout and leaves it alone. Change the address over SSH in your own file,
+as you did before; the page will pick the change up. If you use the page's
+Apply on a hand-written file, you will be asked first and you will have a copy.
+Before v2.45.0 the only safe course was not to press Apply on such a board.
+
+*The range is measured from the tags: v2.35.0 is the first firmware tag that
+pins bmcd 2.38.0, which introduced `GET/PUT /api/bmc/network/address`
+(v2.34.0 pins bmcd 2.37.0, which has no such endpoint), and v2.44.0 is the last
+before the fix. Checked 2026-10-31. The cause comes from the report and from reading the
+daemon; I have not seen the reporter's board.*
+
 ### The web interface skipped the image check on every module flash
 
 **Affected BMC-UI 3.25.0 through 4.0.1, which is firmware v2.26.0 to v2.42.0;

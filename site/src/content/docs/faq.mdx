@@ -117,6 +117,22 @@ Power the node off, take the mini-PCIe card out, flash, and put it back. Or move
 
 This comes from one user report on Discord (2026-10-15) and from reading the firmware source and the factory tests, not from a schematic, so I call it likely, not proven. [The entry in known faults](/reference/known-faults/#flashing-a-module-in-slot-1-or-2-fails-when-a-mini-pcie-card-uses-usb) has the details.
 
+## I split the board's network into two bridges by hand. Will the web interface undo it?
+
+**No.** From v2.45.0 the Network page reads the layout you made, shows the
+address from whichever interface carries it, and lists every interface the
+board has. It manages `br0` only, so on a board without `br0` it says so and
+leaves the card read-only; change the file over SSH, and the page notices.
+
+If you do apply an address on a board whose `/etc/network/interfaces` was
+written by hand, it asks first. Only if you agree is the file replaced, and the
+old one is kept as `/etc/network/interfaces.hand-written.<time>`, the newest
+five. On v2.35.0 to v2.44.0 the same board showed no address and every change
+failed with "status code 500", and confirming would have overwritten your file
+without a copy.
+
+[The entry in known faults →](/reference/known-faults/#the-network-page-broke-on-a-board-whose-bridge-is-not-br0)
+
 ## Which board revisions does it run on?
 
 **v2.5.2**, on the two boards this fork is developed against, and **v2.4**,
