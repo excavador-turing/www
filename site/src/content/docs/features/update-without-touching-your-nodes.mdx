@@ -58,9 +58,7 @@ import { FeatureScreen } from '~/components/macros';
 
 ## The argument
 
-Upstream cycles the modules because its update path resets the board's USB multiplexer and power rails together. Separating them is most of the change. The cost of not separating them is that patching a management computer becomes a cluster outage, which is the opposite of what a BMC is for.
-
-**This holds on a Turing Pi 2 v2.5, which latches the node power rails; that is where it was measured.** On a v2.4 the rails are driven from the BMC's own pins, so any BMC reboot, an upgrade included, power-cycles all four nodes: shut them down first. [The fault entry, with the range](/reference/known-faults/#the-reboot-dialog-told-v24-owners-their-nodes-keep-running).
+Upstream cycles the modules because its update path resets the board's USB multiplexer and power rails together. Separating them is most of the change. **Measured on a v2.5, which latches the node rails;** a v2.4 drives them from the BMC's pins, so any BMC reboot power-cycles all four nodes ([the fault](/reference/known-faults/#the-reboot-dialog-told-v24-owners-their-nodes-keep-running)).
 
 [The full argument, with every measurement →](/why/update-without-touching-your-nodes/)
 
