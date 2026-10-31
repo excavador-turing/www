@@ -23,7 +23,7 @@ restores a state that was never true.
 
 The daemon **reads the power state from the hardware on start** instead of
 re-applying it from a file. There is nothing to restore, so nothing is
-switched. A module that was running before the upgrade is still running
+switched. On a v2.5, a module that was running before the upgrade is still running
 during and after it, with no interruption to its power.
 
 Staging is separate from applying, too. Writing a new image arms the next
@@ -33,6 +33,8 @@ once it does move, [the image has to prove itself](/features/updates-that-undo-t
 before it is kept.
 
 ## Measured on a nine-node cluster
+
+**On a Turing Pi 2 v2.5.** A v2.5 latches the node power rails, so a BMC that restarts leaves them as they were. A v2.4 has no latch and drives the rails from the BMC's own pins, so on a v2.4 any BMC reboot power-cycles all four nodes, whatever the daemon does, and they should be shut down first. Everything on this page was measured on v2.5 boards; I have no v2.4 to measure. See [the fault entry](/reference/known-faults/#the-reboot-dialog-told-v24-owners-their-nodes-keep-running).
 
 Board B was upgraded from stock firmware to this fork while its four modules
 were running Kubernetes workloads, including an etcd member of the cluster's

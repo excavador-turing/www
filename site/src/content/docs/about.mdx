@@ -36,7 +36,7 @@ newer, following the documented update path walks it *backwards*. Neither
 route publishes a checksum.
 
 That would be survivable if the firmware were finished. It was not. A
-firmware update power-cycled the compute modules. There was no temperature
+firmware update power-cycled the compute modules (this fork's fix is measured on a v2.5; a v2.4 still cycles them on any BMC reboot). There was no temperature
 sensor anywhere, so the fan ran flat out against nothing. And a bad image
 meant a trip to the rack, because an image was promoted as soon as it
 booted — which proves the kernel started and nothing else.
