@@ -272,6 +272,20 @@ nothing new runs at boot.
 **One change at a time.** A switch layout waiting to be confirmed and an
 address change are two windows; the card says so when the other is pending.
 
+**A layout you made by hand.** The card manages `br0`, because that is the
+bridge the image ships. If you split the bridge yourself in
+`/etc/network/interfaces` (say `br-wan` on `ge0` and `br-lan` on `ge1`), then
+from v2.45.0 the page shows the address of the interface that carries it and
+lists every interface the board has, but the address card is read-only and
+says why: the change belongs in your own file, over SSH, and the page notices
+when the file changes. Before v2.45.0 such a board showed no address and
+failed every change with a 500. Where the file is hand-written but still has
+`br0`, and you press Apply, the card says that a confirmed change
+replaces the whole file, asks before it does, and keeps the old one as
+`/etc/network/interfaces.hand-written.<time>` (the newest five are kept). The
+image's own stock file is replaced without the question and is not copied.
+[The fault, with the range →](/reference/known-faults/#the-network-page-broke-on-a-board-whose-bridge-is-not-br0)
+
 ### What survives a reboot, and how
 
 Two files, two different lives. The stanza is written to

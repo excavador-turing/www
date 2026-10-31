@@ -201,3 +201,16 @@ v2.44.0:
     when it does not, the error lists the other USB devices on the node and
     says a card in the mini-PCIe slot may be the cause. A failed or cancelled
     flash powers the node off and puts the USB route back.
+
+# v2.45.0 -- bmcd 2.41.0 and BMC-UI 4.2.0. The Network page and the dashboard
+# on a board whose bridge is not br0; the demo shows the layouts (?layout=split,
+# ?layout=handwritten) but the site's captures are of the stock layout, which
+# is the one thing this release does not change, so no capture.
+v2.45.0:
+  title: The network page works on any bridge layout
+  summary: >-
+    A board whose interfaces file was split by hand into two bridges, with no
+    br0, showed no address and failed every change with a bare 500. The page
+    now finds the address on whatever interface carries it, says what it is
+    looking at, and replaces a hand-written file only after you confirm,
+    keeping a copy.
