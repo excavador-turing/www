@@ -5,8 +5,7 @@
    "a-bad-image-takes-itself-back",
    "every-board-on-one-page-and-none-of-them-exposed",
    "patch-the-bmc-leave-the-cluster-alone",
-   "software-that-is-still-maintained",
-   "v2440-shipped-7-things-planned"
+   "software-that-is-still-maintained"
   ],
   "/about/": [],
   "/changelog/": [],
@@ -177,7 +176,6 @@
    "why-not-lets-encrypt"
   ],
   "/news/": [
-   "a-fixed-address-from-the-network-tab-and-a-clock-that-says-why",
    "firmware-v2410",
    "flashing-names-what-is-in-the-way",
    "naming-a-vlan-greyed-out-try-it-and-apply-and-blamed-the-board",
@@ -197,7 +195,6 @@
    "the-latest-of-all-three-and-the-sd-card-listed",
    "the-metrics-say-which-module-is-armed-for-usb-boot",
    "the-switch-gets-vlans-the-board-asks-for-a-password-and-a-module-is-one-click",
-   "tls-made-usable-named-renewed-and-every-key-served",
    "who-may-reach-this-board-from-the-interface-that-asks-for-the-password"
   ],
   "/news/page/3/": [
@@ -208,7 +205,6 @@
    "firmware-v2120",
    "firmware-v2130",
    "firmware-v2140",
-   "firmware-v2150",
    "firmware-v2200",
    "the-install-confirmation-is-a-modal"
   ],
@@ -218,7 +214,6 @@
    "firmware-v2180",
    "firmware-v2190",
    "firmware-v270",
-   "firmware-v280",
    "firmware-v281",
    "firmware-v290",
    "firmware-v291",
@@ -602,7 +597,6 @@
    "what-the-daemon-answers"
   ],
   "/why/fresh-and-fixed/": [
-   "142-releases-and-a-count-that-is-not-decoration",
    "the-base-is-supported-again",
    "what-it-does-not-cover",
    "what-was-actually-broken"
@@ -805,6 +799,12 @@
  "retired": {
   "/assets/images/favicon.png": "Material's theme icon; Starlight links /favicon.svg from every page, and nothing outside linked the PNG",
   "/sitemap.xml.gz": "MkDocs's compressed copy of /sitemap.xml; robots.txt names /sitemap.xml, which still answers",
-  "/stylesheets/landing.css": "Material's extra_css, which only MkDocs's pages loaded; its port is src/styles/landing.css, bundled under /_astro/"
+  "/stylesheets/landing.css": "Material's extra_css, which only MkDocs's pages loaded; its port is src/styles/landing.css, bundled under /_astro/",
+  "/#v2440-shipped-7-things-planned": "the heading is built from the newest release and the roadmap count (`v2.44.0 shipped, 7 things planned`), so its anchor changes with every release; the section is still the front page's \"just shipped\" block",
+  "/why/fresh-and-fixed/#142-releases-and-a-count-that-is-not-decoration": "the heading starts with the total release count, so its anchor changes with every release; the section is still on the page",
+  "/news/#a-fixed-address-from-the-network-tab-and-a-clock-that-says-why": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address",
+  "/news/page/2/#tls-made-usable-named-renewed-and-every-key-served": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address",
+  "/news/page/3/#firmware-v2150": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address",
+  "/news/page/4/#firmware-v280": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address"
  }
 }
