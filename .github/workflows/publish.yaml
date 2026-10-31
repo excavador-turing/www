@@ -409,6 +409,9 @@ jobs:
       - name: every page is within two clicks of the front page
         run: devbox run -- python3 scripts/reach.py
 
+      - name: the served-URL gate judges as it says
+        run: devbox run -- python3 scripts/served-urls.py --self-test
+
       - name: every URL the site has served still answers
         run: devbox run -- python3 scripts/served-urls.py
 

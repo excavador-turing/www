@@ -9,8 +9,16 @@
 // and only there, the value is put in as text, read from the same
 // facts.yaml with the same filters (src/lib/facts.mjs). Runs before
 // heading-ids.mjs.
+//
+// The text, but not the id. A heading that quotes a fact gets an id from its
+// words alone: "## <Fact of="releases.total" /> releases, and a count" is
+// `releases-and-a-count`, not `145-releases-and-a-count`. MkDocs wrote the
+// value into the anchor, and so every release moved it -- six anchors had to
+// leave site/served-urls.json by hand (0e442f4) for exactly that. An id that
+// does not change with the number is one the permanent-URL list can keep.
 import { readFileSync } from 'node:fs';
 import { format, parseFacts } from '../lib/facts.mjs';
+import { slugify } from './heading-ids.mjs';
 
 const HEADINGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
 
@@ -36,6 +44,12 @@ export function factsInHeadings({ file }) {
             up = up.type === 'root' ? undefined : ctx.parent(up);
           }
           if (!up) return;
+          // The first <Fact> met in a heading names its id, from the heading's
+          // text before any fact is put in. (Heading-ids keeps an id set.)
+          if (!up.properties?.id) {
+            const id = slugify(ctx.textContent(up));
+            if (id) ctx.setProperty(up, 'id', id);
+          }
           // Read per document, so the dev server sees a refreshed file.
           facts ??= parseFacts(readFileSync(file, 'utf8'));
           ctx.replaceNode(node, { type: 'text', value: format(facts, attr(node, 'of'), attr(node, 'filters') ?? '') });
