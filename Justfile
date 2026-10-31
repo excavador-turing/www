@@ -90,8 +90,11 @@ screens-baseline: build
 
 # Every URL turingpi.xyz served under MkDocs still answers: each page, each
 # heading anchor a deep link can name, each file. A URL leaves
-# site/served-urls.json only with a redirect, or retired with a reason.
+# site/served-urls.json only with a redirect, or retired with a reason. The
+# entries of a paginated list a generator writes (the news index) may change
+# page; see `paginated` there.
 urls: build
+    ./scripts/served-urls.py --self-test
     ./scripts/served-urls.py
 
 # Rebuild site/src/data/facts.yaml from the pages and data that own each

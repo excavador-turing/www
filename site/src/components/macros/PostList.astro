@@ -3,6 +3,11 @@
 // title and its excerpt, then the page numbers. What Material's blog plugin
 // rendered at /news/ and /news/page/<n>/ (src/pages/news/page/[page].astro),
 // with the same heading ids, so links into the list keep landing.
+//
+// Each entry's heading carries `data-paginated`. Which page an entry is on
+// changes with every release (a new post pushes the oldest of each page onto
+// the next), so scripts/served-urls.py takes a listed anchor as served on any
+// page of the list, and finds the entries by that attribute.
 import { render } from 'astro:content';
 import Excerpt from './Excerpt.astro';
 import { slugify, unique } from '../../plugins/heading-ids.mjs';
@@ -34,7 +39,7 @@ const items = await Promise.all(
         <p class="tp-post__meta">
           <time datetime={isoDate(post.data.date)}>{humanDate(post.data.date)}</time>
         </p>
-        <h2 id={id}>
+        <h2 id={id} data-paginated>
           <a href={postUrl(post)}>{post.data.title}</a>
         </h2>
         <div class="tp-post__excerpt">

@@ -144,6 +144,18 @@ has no such route and must never be the thing that notices.
 - **Every URL ever served is a promise.** `site/served-urls.json` lists
   what MkDocs served, with every heading anchor; `just urls` fails when one
   stops answering. Move a page with a redirect in `astro.config.mjs`.
+  An anchor whose heading is generated must not move with the data: a
+  `<Fact>` in a heading is in its text but not in its id
+  (`src/plugins/facts-in-headings.mjs`), so `## <Fact …/> releases` is
+  `#releases` whatever the count. The one list that has to move anchors is a
+  paginated one -- the news index, whose entries change page with every
+  release -- and it is named in `paginated` in the file, with the reason: its
+  entries (headings the generator marks `data-paginated`) count as served on
+  any page of the list. The rule cannot reach a written page (the gate fails
+  a `paginated` page with no marked heading) or a written heading (only a
+  marked one stands in for a moved anchor). `scripts/served-urls.py
+  --self-test` checks that; a new generated list gets the mark and a line
+  in `paginated`, nothing else.
 - **`turing.excavador.xyz` is dead** and has been since the docs moved here.
   Never link it.
 - **This site is not Turing Machines.** The footer says so on every page, and

@@ -1,10 +1,11 @@
 {
- "about": "Every URL turingpi.xyz served from MkDocs, frozen at the switch to Starlight (874940d, 2026-10-26): the pages from its sitemap with each page's heading anchors, and every other file it published except Material's own theme and search index and the demo panes, which are built at deploy. scripts/served-urls.py fails the build when one stops answering. A URL leaves this list only with a redirect in astro.config.mjs, or into `retired` with the reason.",
+ "about": "Every URL turingpi.xyz served from MkDocs, frozen at the switch to Starlight (874940d, 2026-10-26): the pages from its sitemap with each page's heading anchors, and every other file it published except Material's own theme and search index and the demo panes, which are built at deploy. scripts/served-urls.py fails the build when one stops answering. A URL leaves this list only with a redirect in astro.config.mjs, or into `retired` with the reason. `paginated` names a list a generator writes in pages (the news index): the entries of such a list keep their place in `pages` and count as served on any page of the list, because every release moves the oldest entry of each page onto the next. See the docstring of scripts/served-urls.py.",
  "pages": {
   "/": [
    "a-bad-image-takes-itself-back",
    "every-board-on-one-page-and-none-of-them-exposed",
    "patch-the-bmc-leave-the-cluster-alone",
+   "shipped-things-planned",
    "software-that-is-still-maintained"
   ],
   "/about/": [],
@@ -176,6 +177,7 @@
    "why-not-lets-encrypt"
   ],
   "/news/": [
+   "a-fixed-address-from-the-network-tab-and-a-clock-that-says-why",
    "firmware-v2410",
    "flashing-names-what-is-in-the-way",
    "naming-a-vlan-greyed-out-try-it-and-apply-and-blamed-the-board",
@@ -195,6 +197,7 @@
    "the-latest-of-all-three-and-the-sd-card-listed",
    "the-metrics-say-which-module-is-armed-for-usb-boot",
    "the-switch-gets-vlans-the-board-asks-for-a-password-and-a-module-is-one-click",
+   "tls-made-usable-named-renewed-and-every-key-served",
    "who-may-reach-this-board-from-the-interface-that-asks-for-the-password"
   ],
   "/news/page/3/": [
@@ -205,6 +208,7 @@
    "firmware-v2120",
    "firmware-v2130",
    "firmware-v2140",
+   "firmware-v2150",
    "firmware-v2200",
    "the-install-confirmation-is-a-modal"
   ],
@@ -214,6 +218,7 @@
    "firmware-v2180",
    "firmware-v2190",
    "firmware-v270",
+   "firmware-v280",
    "firmware-v281",
    "firmware-v290",
    "firmware-v291",
@@ -597,6 +602,7 @@
    "what-the-daemon-answers"
   ],
   "/why/fresh-and-fixed/": [
+   "releases-and-a-count-that-is-not-decoration",
    "the-base-is-supported-again",
    "what-it-does-not-cover",
    "what-was-actually-broken"
@@ -796,15 +802,14 @@
   "/robots.txt",
   "/sitemap.xml"
  ],
+ "paginated": {
+  "/news/": "the news index lists the posts newest first, ten to a page (src/lib/news.ts, PostList.astro), so each release pushes the oldest entry of every page onto the next and its anchor follows; /news/page/2/ and on are its pages. An entry is a heading the generator marks data-paginated; the posts themselves answer at their own addresses"
+ },
  "retired": {
   "/assets/images/favicon.png": "Material's theme icon; Starlight links /favicon.svg from every page, and nothing outside linked the PNG",
   "/sitemap.xml.gz": "MkDocs's compressed copy of /sitemap.xml; robots.txt names /sitemap.xml, which still answers",
   "/stylesheets/landing.css": "Material's extra_css, which only MkDocs's pages loaded; its port is src/styles/landing.css, bundled under /_astro/",
-  "/#v2440-shipped-7-things-planned": "the heading is built from the newest release and the roadmap count (`v2.44.0 shipped, 7 things planned`), so its anchor changes with every release; the section is still the front page's \"just shipped\" block",
-  "/why/fresh-and-fixed/#142-releases-and-a-count-that-is-not-decoration": "the heading starts with the total release count, so its anchor changes with every release; the section is still on the page",
-  "/news/#a-fixed-address-from-the-network-tab-and-a-clock-that-says-why": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address",
-  "/news/page/2/#tls-made-usable-named-renewed-and-every-key-served": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address",
-  "/news/page/3/#firmware-v2150": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address",
-  "/news/page/4/#firmware-v280": "a news index entry; the index is paginated newest first, so each new release post pushes older entries onto the next page (checked 2026-10-31 on the v2.45.0 post) and the anchor follows them. The post itself still answers at its own address"
+  "/#v2440-shipped-7-things-planned": "the heading quoted the newest release and the roadmap count in its anchor (`v2.44.0 shipped, 7 things planned`), so the anchor changed with every release; the section is still the front page's \"just shipped\" block, now at /#shipped-things-planned, which does not change",
+  "/why/fresh-and-fixed/#142-releases-and-a-count-that-is-not-decoration": "the heading started with the total release count in its anchor, so the anchor changed with every release; the section is still on the page, now at #releases-and-a-count-that-is-not-decoration, which does not change"
  }
 }
