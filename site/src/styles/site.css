@@ -10,6 +10,31 @@
  * unlayered, not by out-specifying them.
  */
 
+/* ---- widths ------------------------------------------------------------------
+   Starlight's column is 45rem, which on a 1920px window leaves two fifths of
+   the main area empty. The column is 60rem; what stays at a readable measure
+   is running text, not the column: prose is capped below, and cards, tables,
+   code and figures take the whole column. Starlight derives the table of
+   contents' width, the header's search box and the pages without a sidebar
+   from this one variable, so nothing else needs to know. */
+:root {
+  --sl-content-width: 60rem;
+  --tp-measure: 50rem;
+}
+/* A reader's eye loses its line past about a hundred characters, so the text
+   of a paragraph or a list stops there and the column goes on without it. */
+.sl-markdown-content :is(p, ul, ol, dl) {
+  max-inline-size: var(--tp-measure);
+}
+/* The front page's demo is the interface, not a page of prose: while it is
+   open the column is as wide as the window allows, up to 100rem, less the
+   gutters the content panel already pads it with (1rem on a phone, 1.5rem on
+   a desktop). Page.astro sets a width on every page without a sidebar, so
+   this one is a step more specific. */
+:root[data-tp-demo-open]:not([data-has-sidebar]) {
+  --sl-content-width: 100rem;
+}
+
 /* ---- the layouts: Starlight's "a gap between any two blocks" would push every cell of a grid down */
 .sl-markdown-content
   :is(.tp-proof, .tp-next, .tp-plates, .tp-ideas, .tp-releases, .tp-vs, .tp-vs__row, .tp-maker, .tp-maker__who, .tp-posts, .tp-post)
