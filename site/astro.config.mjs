@@ -135,25 +135,18 @@ export default defineConfig({
           },
         },
       ],
-      // Roboto, as Material loads it (from this site, not from Google);
-      // landing.css is the port of Material's extra_css; site.css is the
-      // frame.
-      customCss: [
-        '@fontsource/roboto/300.css',
-        '@fontsource/roboto/400.css',
-        '@fontsource/roboto/400-italic.css',
-        '@fontsource/roboto/700.css',
-        '@fontsource/roboto-mono/400.css',
-        './src/styles/landing.css',
-        './src/styles/site.css',
-      ],
+      // Starlight's own look: its palette, retuned to this site's blue
+      // (theme.css), its system fonts, and the few rules the site's own
+      // layouts need (site.css).
+      customCss: ['./src/styles/theme.css', './src/styles/site.css'],
       sidebar: config('sidebar.json'),
       routeMiddleware: './src/route-data.ts',
+      // Two overrides, for what CSS and route data cannot do: the site's
+      // footer (its links are how the front page reaches every section) and
+      // the title (a page whose layout carries its own H1, a post's date).
       components: {
         Footer: './src/components/Footer.astro',
-        Header: './src/components/Header.astro',
         PageTitle: './src/components/PageTitle.astro',
-        Sidebar: './src/components/Sidebar.astro',
       },
       plugins: [
         // Fails the build on a broken internal link or anchor.

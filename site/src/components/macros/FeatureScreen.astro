@@ -1,5 +1,5 @@
 ---
-// Screen one of a feature page: the claim, its numbers, the picture --
+// The top of a feature page: the claim, its numbers, the picture --
 // main.py's feature_screen(), from the page's own `feature:` and `since:`.
 //
 // Each of the eleven pages carries its data in front matter and this renders
@@ -48,42 +48,40 @@ const since = String(sinceRaw ?? '').trim();
 const sinceHref = since && newsPosts[since] ? `/news/${newsPosts[since]}/` : '/changelog/firmware/';
 ---
 
-<section class="tp-feature" data-screen="feature">
-  <div class="tp-feature__say">
-    <span class="tp-eyebrow">Feature</span>
-    <h1>{title}</h1>
+<section class="tp-feature">
+  <span class="tp-eyebrow">Feature</span>
+  <h1>{title}</h1>
+  {
+    since && (
+      <a class="tp-since" href={sinceHref}>
+        <small class="tp-tag">in this fork since {since}</small>
+      </a>
+    )
+  }
+  <p class="lede">{f.lede}</p>
+  <div class="tp-proof">
     {
-      since && (
-        <a class="tp-since" href={sinceHref}>
-          <small class="tp-tag">in this fork since {since}</small>
-        </a>
-      )
+      f.proofs.map((p) => (
+        <div>
+          <b>{p.n}</b>
+          <span>{p.of}</span>
+        </div>
+      ))
     }
-    <p class="lede">{f.lede}</p>
-    <div class="tp-proof">
-      {
-        f.proofs.map((p) => (
-          <div>
-            <b>{p.n}</b>
-            <span>{p.of}</span>
-          </div>
-        ))
-      }
-    </div>
-    <p class="tp-provenance">{provenance}</p>
-    <div class="tp-next">
-      {
-        next.map((link) => (
-          <a href={absolute(link.href)}>
-            <b>{link.text} →</b>
-            <span>{link.note}</span>
-          </a>
-        ))
-      }
-    </div>
   </div>
-  <figure class="tp-feature__show">
+  <p class="tp-provenance">{provenance}</p>
+  <figure>
     <img src={`/assets/captures/${f.capture}`} alt={f.alt ?? f.caption} />
     <figcaption>{f.caption}</figcaption>
   </figure>
+  <div class="tp-next">
+    {
+      next.map((link) => (
+        <a href={absolute(link.href)}>
+          <b>{link.text} →</b>
+          <span>{link.note}</span>
+        </a>
+      ))
+    }
+  </div>
 </section>

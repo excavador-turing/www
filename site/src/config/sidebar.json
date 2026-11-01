@@ -105,9 +105,11 @@
             "label": "Who may reach this board",
             "link": "/why/who-may-reach-this-board/"
           }
-        ]
+        ],
+        "collapsed": true
       }
-    ]
+    ],
+    "collapsed": true
   },
   {
     "label": "Docs",
@@ -151,7 +153,8 @@
             "label": "Developing",
             "link": "/guides/development/"
           }
-        ]
+        ],
+        "collapsed": true
       },
       {
         "label": "Reference",
@@ -239,11 +242,14 @@
                 "label": "tpi",
                 "link": "/changelog/tpi/"
               }
-            ]
+            ],
+            "collapsed": true
           }
-        ]
+        ],
+        "collapsed": true
       }
-    ]
+    ],
+    "collapsed": true
   },
   {
     "label": "News",
@@ -272,6 +278,7 @@
         "label": "Contributing",
         "link": "/contributing/"
       }
-    ]
+    ],
+    "collapsed": true
   }
 ]

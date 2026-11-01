@@ -32,6 +32,15 @@ the CSS releases that -- on a phone, where a screenshot, a heading, a
 paragraph and three numbers genuinely do not fit 667px -- the page stacks and
 scrolls, and `scripts/screens.py` stops asking.
 
+Since the move to Starlight's own layout (the front page is its `splash`
+template with a hero, the feature pages flow in its content column) no page
+marks a `data-screen`, so the **fit** check has nothing to measure today. That
+is deliberate, not an oversight: the one-screen promise was what the old
+layouts' 700 lines of tuned CSS existed to keep. The check stays, for a page
+that makes the promise again, and the other three -- clipped text, a stretched
+picture, a document wider than the window -- still run on every page at every
+viewport, the front page's three demo views included.
+
 `just screens` measures every built page at nine viewports. It is in
 `site.yaml`, which runs on pull requests, and again before every deploy.
 
