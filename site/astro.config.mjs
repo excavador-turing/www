@@ -33,11 +33,46 @@ const curatedLlmsTxt = {
   },
 };
 
+// Starlight's default (prefetch every link on hover), stated here so the Vite
+// plugin below fills in the same values Astro's prefetch script is configured with.
+const prefetch = { prefetchAll: true, defaultStrategy: 'hover' };
+
+// Astro's prefetch script (astro/dist/prefetch/index.js) holds the placeholders
+// __PREFETCH_PREFETCH_ALL__, __PREFETCH_DEFAULT_STRATEGY__ and
+// __EXPERIMENTAL_CLIENT_PRERENDER__, which Astro's `astro:prefetch` Vite plugin
+// replaces in a transform hook. That hook matches the module id against the
+// literal path `astro/dist/prefetch/index.js`. With `nodeLinker: pnpm`
+// (site/.yarnrc.yml) the id is the real path,
+// node_modules/.store/astro-virtual-<hash>/package/dist/..., which does not
+// match, so the placeholders shipped. Starlight bundles every page-level
+// script into one page.<hash>.js, so the ReferenceError at the top of the
+// prefetch module stopped the rest of that file (prefetch's own init, and the
+// whole of astro-mermaid's) from running on every page.
+// This plugin does the same replacement whatever the layout. Drop it once Astro
+// matches the package directory; site/scripts/check-built.sh fails the build if
+// a placeholder ever ships again.
+const fillPrefetchPlaceholders = () => ({
+  name: 'turingpi:fill-prefetch-placeholders',
+  enforce: 'pre',
+  transform(code, id) {
+    if (!/[\\/]dist[\\/]prefetch[\\/]index\.js(\?|$)/.test(id)) return null;
+    if (!code.includes('__PREFETCH_PREFETCH_ALL__')) return null;
+    return {
+      code: code
+        .replace('__PREFETCH_PREFETCH_ALL__', JSON.stringify(prefetch.prefetchAll))
+        .replace('__PREFETCH_DEFAULT_STRATEGY__', JSON.stringify(prefetch.defaultStrategy))
+        .replace('__EXPERIMENTAL_CLIENT_PRERENDER__', 'false'),
+      map: null,
+    };
+  },
+});
+
 export default defineConfig({
   site: site.site,
   // MkDocs serves directory URLs with a trailing slash, and every inbound
   // link to this site is one of those.
   trailingSlash: 'always',
+  prefetch,
   build: { format: 'directory' },
   markdown: {
     processor: satteri({
@@ -55,6 +90,7 @@ export default defineConfig({
     }),
   },
   vite: {
+    plugins: [fillPrefetchPlaceholders()],
     // Mermaid's diagram engines are one large lazily loaded chunk; the size
     // warning is expected for it and the build allows no other warning.
     build: { chunkSizeWarningLimit: 4000 },

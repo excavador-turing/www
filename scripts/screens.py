@@ -35,6 +35,12 @@ What it fails on, per page and viewport:
   aspect    an image box whose shape is not the picture's shape, which is how
             a picture sized from leftover height ends up as empty plate
   hscroll   the document wider than the window
+
+And once per page, whatever the baseline says: a page that throws an
+uncaught exception or logs a console error while it loads. Page scripts are
+bundled together, so one exception stops every script after it in the file;
+an unreplaced build-time placeholder shipped exactly that way, silently, for
+every page of the site.
 """
 from __future__ import annotations
 
@@ -222,6 +228,8 @@ class Browser:
         self.n = 0
         self.replies: dict[int, asyncio.Future] = {}
         self.events: dict[tuple[str, str], asyncio.Future] = {}
+        # Uncaught exceptions and console.error calls, per tab session.
+        self.errors: dict[str, list[str]] = {}
         self.reader = asyncio.create_task(self._read())
 
     async def _read(self):
@@ -233,12 +241,26 @@ class Browser:
                     if fut and not fut.done():
                         fut.set_result(msg)
                 else:
+                    self._note_error(msg)
                     key = (msg.get("sessionId", ""), msg.get("method", ""))
                     fut = self.events.pop(key, None)
                     if fut and not fut.done():
                         fut.set_result(msg)
         except Exception:
             pass
+
+    def _note_error(self, msg):
+        method, p = msg.get("method"), msg.get("params", {})
+        if method == "Runtime.exceptionThrown":
+            d = p.get("exceptionDetails", {})
+            text = (d.get("exception") or {}).get("description") or d.get("text", "")
+            self.errors.setdefault(msg.get("sessionId", ""), []).append(
+                text.splitlines()[0] if text else "uncaught exception")
+        elif method == "Runtime.consoleAPICalled" and p.get("type") == "error":
+            text = " ".join(str(a.get("value", a.get("description", "")))
+                            for a in p.get("args", []))
+            self.errors.setdefault(msg.get("sessionId", ""), []).append(
+                "console.error: " + text[:200])
 
     async def send(self, method, params=None, session=None):
         self.n += 1
@@ -355,9 +377,10 @@ async def run(pages, port, quiet=False):
                 time.sleep(0.25)
     if not ws_url:
         print("chrome did not come up", file=sys.stderr)
-        return 1, {}
+        return 1, {}, {}
 
     results: dict[str, dict] = {}
+    console: dict[str, list[str]] = {}
     try:
         async with websockets.connect(ws_url, max_size=None) as ws:
             b = Browser(ws)
@@ -373,7 +396,10 @@ async def run(pages, port, quiet=False):
                     except asyncio.QueueEmpty:
                         return
                     url = f"http://127.0.0.1:{port}/{page}"
+                    b.errors[s] = []
                     await b.goto(s, url)
+                    if not page.startswith("#"):
+                        console[page] = list(b.errors[s])
                     per = {}
                     for label, w, h in VIEWPORTS:
                         per[label] = await b.measure(s, w, h)
@@ -394,7 +420,7 @@ async def run(pages, port, quiet=False):
         except subprocess.TimeoutExpired:
             chrome.kill()
 
-    return 0, results
+    return 0, results, console
 
 
 def faults_of(results) -> dict[str, str]:
@@ -489,6 +515,21 @@ def report(results, baseline: pathlib.Path | None, update: bool) -> int:
     return 0
 
 
+def console_report(console) -> int:
+    """Pages that threw or logged an error while loading. Never baselined."""
+    bad = {p: e for p, e in sorted(console.items()) if e}
+    if not bad:
+        print(f"  {len(console)} pages loaded with a clean console")
+        return 0
+    print(f"\n{len(bad)} pages raised errors while loading:\n", file=sys.stderr)
+    for page, errs in bad.items():
+        for e in dict.fromkeys(errs):
+            print(f"  /{page}: {e}", file=sys.stderr)
+    print("\nA script that throws stops every script after it in its bundle.",
+          file=sys.stderr)
+    return 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--site", default=str(ROOT / "site" / "dist"))
@@ -515,7 +556,7 @@ def main() -> int:
     started = time.time()
     httpd, port = serve(site)
     try:
-        code, results = asyncio.run(run(pages, port, args.quiet))
+        code, results, console = asyncio.run(run(pages, port, args.quiet))
     finally:
         httpd.shutdown()
     if code:
@@ -525,6 +566,8 @@ def main() -> int:
         pathlib.Path(args.json).write_text(json.dumps(results, indent=1))
     baseline = None if args.no_baseline else pathlib.Path(args.baseline)
     rc = report(results, baseline, args.update_baseline)
+    if not args.update_baseline:
+        rc = console_report(console) or rc
     print(f"  {time.time() - started:.1f}s")
     return rc
 
