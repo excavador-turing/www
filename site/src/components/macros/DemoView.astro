@@ -1,0 +1,63 @@
+---
+// The front page's second view: the interface itself, one pane at a time, as
+// large as the window allows. #demo/stock, #demo/fork and #demo/fleet open it
+// (the hero's button, the footer and the old /demo/ address all link there);
+// anything else shows the page. Hidden until the script says otherwise, so a
+// reader without script sees the page and nothing broken.
+//
+// The panes are built at deploy from the interface's own repository, so the
+// frames load on demand, the first time a pane is named.
+import { LinkButton } from '@astrojs/starlight/components';
+---
+
+<div class="tp-demo" data-tp-demo hidden>
+  <div class="tp-demo__bar">
+    <LinkButton href="#overview" variant="minimal" icon="left-arrow">Overview</LinkButton>
+    <span class="tp-demo__note">
+      Readings are real, captured off a board; controls refuse and say why; the console replays a recording.{' '}
+      <a href="/about/">What is and isn't real</a> ·{' '}
+      <a href="/demo/fork/" target="_blank" rel="noopener">full size</a>
+    </span>
+    <nav class="tp-demo__panes" aria-label="Which interface">
+      <LinkButton href="#demo/stock" variant="secondary" data-pane="stock">Stock firmware</LinkButton>
+      <LinkButton href="#demo/fork" variant="secondary" data-pane="fork">This fork</LinkButton>
+      <LinkButton href="#demo/fleet" variant="secondary" data-pane="fleet">The fleet</LinkButton>
+    </nav>
+  </div>
+  <div class="tp-demo__stage">
+    <iframe data-pane="stock" data-src="demo/stock/" title="Stock Turing Pi 2 interface, demo" hidden></iframe>
+    <iframe data-pane="fork" data-src="demo/fork/" title="This fork's interface, demo" hidden></iframe>
+    <iframe data-pane="fleet" data-src="demo/fleet/" title="The fleet interface over every board, demo" hidden></iframe>
+  </div>
+</div>
+
+<script>
+  // The view is the URL's hash. Starlight has no client-side router, so a
+  // link to a hash on this page is an ordinary hashchange.
+  const root = document.querySelector<HTMLElement>('[data-tp-demo]');
+  const home = document.querySelector<HTMLElement>('[data-tp-home]');
+  if (root && home) {
+    const apply = () => {
+      const h = location.hash.replace(/^#/, '');
+      const demo = h.startsWith('demo');
+      const pane = demo ? h.split('/')[1] || 'fork' : null;
+      root.hidden = !demo;
+      home.hidden = demo;
+      // The hero, the footer and the page's own scroll belong to the page
+      // view; CSS hides them while the demo is open.
+      document.documentElement.toggleAttribute('data-tp-demo-open', demo);
+      root.querySelectorAll<HTMLElement>('[data-pane]').forEach((el) => {
+        const on = el.dataset.pane === pane;
+        if (el instanceof HTMLIFrameElement) {
+          el.hidden = !on;
+          if (on && !el.getAttribute('src')) el.setAttribute('src', el.dataset.src ?? '');
+        } else {
+          el.setAttribute('aria-current', String(on));
+        }
+      });
+      if (!demo && h === 'overview') window.scrollTo(0, 0);
+    };
+    window.addEventListener('hashchange', apply);
+    apply();
+  }
+</script>

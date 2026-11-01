@@ -8,6 +8,7 @@
 //   {{ comparison_table() }}  <ComparisonTable />  reference/comparison's rows
 //   {{ news_lede() }}         <NewsLede />         the newest post's lede
 //   (the blog plugin)         <PostList />         the news index
+//   (the front page's script) <DemoView />         the interface in a frame
 export { default as Fact } from './Fact.astro';
 export { default as FeatureScreen } from './FeatureScreen.astro';
 export { default as FeaturePlates } from './FeaturePlates.astro';
@@ -15,3 +16,4 @@ export { default as BoardReports } from './BoardReports.astro';
 export { default as ComparisonTable } from './ComparisonTable.astro';
 export { default as NewsLede } from './NewsLede.astro';
 export { default as PostList } from './PostList.astro';
+export { default as DemoView } from './DemoView.astro';

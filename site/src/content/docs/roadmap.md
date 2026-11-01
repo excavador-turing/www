@@ -2,7 +2,6 @@
 title: Roadmap
 description: 'What is planned for the Turing Pi 2 BMC firmware and what has shipped: 7 open ideas ordered by your vote, proposed and voted on in GitHub Discussions.'
 slug: roadmap
-template: splash
 tableOfContents: false
 tp:
   hideTitle: true
