@@ -182,7 +182,7 @@ def render(items: list[dict], as_of: str) -> str:
             f"shipped: {len(planned)} open ideas ordered by your vote, "
             f"proposed and voted on in GitHub Discussions.")
     fm = {"title": "Roadmap", "description": desc, "slug": "roadmap",
-          "template": "splash", "tableOfContents": False,
+          "tableOfContents": False,
           # The page's H1 is the hero band's.
           "tp": {"hideTitle": True}}
     lines = [
