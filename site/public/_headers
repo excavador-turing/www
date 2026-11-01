@@ -1,0 +1,69 @@
+# Response headers for turingpi.xyz, read by Cloudflare Workers static assets
+# (https://developers.cloudflare.com/workers/static-assets/headers/). Edit it, then run
+# `site/scripts/check-csp.mjs` (it runs inside `just build`). GitHub Pages ignores this
+# file; it takes effect once the site is served by the Worker.
+#
+# Rules are applied top to bottom and the headers of every matching rule are MERGED: a
+# second Content-Security-Policy is enforced together with the first, a second
+# X-Frame-Options corrupts the first. A rule that must differ therefore detaches the
+# header (`! Name`) before it sets its own.
+#
+# Not set here: Strict-Transport-Security. The zone sets HSTS and replaces any value the
+# origin sends, so a line here would only be a second, unread copy.
+#
+# Content-Security-Policy of the site (/*):
+# - script-src names each inline script by its sha256, with no 'unsafe-inline'. Starlight,
+#   Pagefind and the page components each emit a few (theme setup, the search dialog, the
+#   front page's own script). site/scripts/check-csp.mjs, run by
+#   site/scripts/check-built.sh and so by CI, fails when a page runs an inline script that
+#   is not listed here, or a listed one is no longer used, and prints the tokens to paste.
+# - 'wasm-unsafe-eval' is for Pagefind's WebAssembly search; it allows WebAssembly and not eval().
+# - Mermaid is bundled into /_astro/ and renders client side: it needs only 'self' scripts and
+#   the inline styles below.
+# - style-src keeps 'unsafe-inline' (an EXCEPTION). Starlight, Expressive Code and Mermaid set
+#   CSS custom properties and SVG styles in style="" attributes, which cannot be listed by
+#   hash. Style injection cannot run script, and script-src is strict.
+# - img-src data: is for inline SVG backgrounds. Every picture is served from this origin.
+# - font-src data: is for the small Roboto subsets that the build inlines into the stylesheet
+#   as data: URIs; every other font is a file of this origin.
+# - The two Cloudflare Web Analytics origins are the only external ones. The site's HTML carries
+#   no beacon of its own; Cloudflare's Web Analytics injects it at the edge when it is switched
+#   on for the zone: the script from static.cloudflareinsights.com, the report to
+#   cloudflareinsights.com. Without them the beacon would be blocked and the visit not counted.
+# - The demo panes are same-origin iframes of the front page (/demo/<pane>/); framing by
+#   'self' is allowed for them below, by nobody else. frame-ancestors 'none' stops framing
+#   everywhere else; X-Frame-Options repeats it for old browsers.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-4/UlCOn9nWh/VVVSRtc1LRBvxVX1Jl2jVe9t3sS3PW4=' 'sha256-7eCV4jtsr4t4knb3c4FCRPeu7GGZeOUGE3XvWix0XOQ=' 'sha256-GkZBRnvSuhtx/cvzvukVkX2JJZW+DdPlVr7BX8Tefqo=' 'sha256-VWo5Wp4aqSj6nSgMpeAp9cKieaoIfwFUAunAVugI5gA=' 'sha256-VgrgcKBvIM3XpiLJ6fEv1Vy6YHBwlKLkYtFdfBMouTo=' 'sha256-f/zAUE74ucc3JYp4r4QQvkJofoQdkOIhHYK+jeZ6eko=' 'sha256-hP48sUywTAXyg22qvpdOC/cYIA8MfPdKEbPC/mvGk4M=' 'sha256-nVO98WGdJA5yup1/MAdukGqUlS6Psuf7JJFF5ikWqbQ=' 'sha256-sB2bKD4U3sCRcfwalOgDhyCjHzP5LoENPdq/oxjocts=' 'sha256-ucPfdYc9FPIvbmnn9ECv3eLKYLt8/heMPFQ+hNTn6jY=' 'sha256-wX2yOADeV+NMngflD5uYi3vl50SHC4sfM1EmylVjlX4=' 'sha256-xP4TLKzB6hcrCLQfQrTEg8qxfZ1b3HlE1OWO+7uZf1o=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), autoplay=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), publickey-credentials-get=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# The demo panes: BMC-UI builds (fork, fleet) and the committed stock interface, answering from
+# captured fixtures, no request leaves the origin. Each has its own rule so that /demo/, which
+# is a page of the site, keeps the site's policy. Differences from /*: frame-ancestors 'self'
+# (the front page frames them), no X-Frame-Options (DENY would stop that; frame-ancestors is
+# what current browsers read), no WebAssembly, no Cloudflare origins. Their inline scripts
+# are the ribbon (scripts/demo-ribbon.py) and, in the stock pane, its fixture shim;
+# check-csp.mjs hashes them like the site's. fork and fleet exist only in the publish build.
+/demo/stock/*
+  ! Content-Security-Policy
+  ! X-Frame-Options
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-96iO9kzPQZN22twnamWAwR79Rvr9L9E/IZTNrqgF7ok=' 'sha256-TWY8W/fxpFHnNDR7vE4b4vCwVvpwHXrXyBg26Bei3g0='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
+
+/demo/fork/*
+  ! Content-Security-Policy
+  ! X-Frame-Options
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-96iO9kzPQZN22twnamWAwR79Rvr9L9E/IZTNrqgF7ok='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
+
+/demo/fleet/*
+  ! Content-Security-Policy
+  ! X-Frame-Options
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-96iO9kzPQZN22twnamWAwR79Rvr9L9E/IZTNrqgF7ok='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
+
+# Astro's hashed output: the name changes with the content, so a copy is good forever.
+# Not /pagefind/* (stable names), not the pictures or fonts under /assets/, and not HTML.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

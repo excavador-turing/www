@@ -25,3 +25,6 @@ __pycache__/
 !/site/.yarn/releases/
 !/site/.yarn/plugins/
 /site/.pnp.*
+
+# wrangler dev/deploy scratch (site/wrangler.jsonc).
+/site/.wrangler/
