@@ -24,8 +24,7 @@
 #   CSS custom properties and SVG styles in style="" attributes, which cannot be listed by
 #   hash. Style injection cannot run script, and script-src is strict.
 # - img-src data: is for inline SVG backgrounds. Every picture is served from this origin.
-# - font-src data: is for the small Roboto subsets that the build inlines into the stylesheet
-#   as data: URIs; every other font is a file of this origin.
+# - font-src is 'self': the site uses the system font stack of Starlight and embeds no font.
 # - The two Cloudflare Web Analytics origins are the only external ones. The site's HTML carries
 #   no beacon of its own; Cloudflare's Web Analytics injects it at the edge when it is switched
 #   on for the zone: the script from static.cloudflareinsights.com, the report to
@@ -34,7 +33,7 @@
 #   'self' is allowed for them below, by nobody else. frame-ancestors 'none' stops framing
 #   everywhere else; X-Frame-Options repeats it for old browsers.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-4/UlCOn9nWh/VVVSRtc1LRBvxVX1Jl2jVe9t3sS3PW4=' 'sha256-7eCV4jtsr4t4knb3c4FCRPeu7GGZeOUGE3XvWix0XOQ=' 'sha256-GkZBRnvSuhtx/cvzvukVkX2JJZW+DdPlVr7BX8Tefqo=' 'sha256-VWo5Wp4aqSj6nSgMpeAp9cKieaoIfwFUAunAVugI5gA=' 'sha256-VgrgcKBvIM3XpiLJ6fEv1Vy6YHBwlKLkYtFdfBMouTo=' 'sha256-f/zAUE74ucc3JYp4r4QQvkJofoQdkOIhHYK+jeZ6eko=' 'sha256-hP48sUywTAXyg22qvpdOC/cYIA8MfPdKEbPC/mvGk4M=' 'sha256-nVO98WGdJA5yup1/MAdukGqUlS6Psuf7JJFF5ikWqbQ=' 'sha256-sB2bKD4U3sCRcfwalOgDhyCjHzP5LoENPdq/oxjocts=' 'sha256-ucPfdYc9FPIvbmnn9ECv3eLKYLt8/heMPFQ+hNTn6jY=' 'sha256-wX2yOADeV+NMngflD5uYi3vl50SHC4sfM1EmylVjlX4=' 'sha256-xP4TLKzB6hcrCLQfQrTEg8qxfZ1b3HlE1OWO+7uZf1o=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-j1xLb1C4FQ63eAoS/wj1EeJ0YVScMMMG3I+Nux7EKWk=' 'sha256-7eCV4jtsr4t4knb3c4FCRPeu7GGZeOUGE3XvWix0XOQ=' 'sha256-GkZBRnvSuhtx/cvzvukVkX2JJZW+DdPlVr7BX8Tefqo=' 'sha256-VWo5Wp4aqSj6nSgMpeAp9cKieaoIfwFUAunAVugI5gA=' 'sha256-VgrgcKBvIM3XpiLJ6fEv1Vy6YHBwlKLkYtFdfBMouTo=' 'sha256-f/zAUE74ucc3JYp4r4QQvkJofoQdkOIhHYK+jeZ6eko=' 'sha256-hP48sUywTAXyg22qvpdOC/cYIA8MfPdKEbPC/mvGk4M=' 'sha256-nVO98WGdJA5yup1/MAdukGqUlS6Psuf7JJFF5ikWqbQ=' 'sha256-sB2bKD4U3sCRcfwalOgDhyCjHzP5LoENPdq/oxjocts=' 'sha256-ucPfdYc9FPIvbmnn9ECv3eLKYLt8/heMPFQ+hNTn6jY=' 'sha256-wX2yOADeV+NMngflD5uYi3vl50SHC4sfM1EmylVjlX4=' 'sha256-xP4TLKzB6hcrCLQfQrTEg8qxfZ1b3HlE1OWO+7uZf1o=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
