@@ -51,6 +51,22 @@ done < <(grep -oE '<link href="https://turingpi\.xyz/news/[^"]*"' "$dist/feed.xm
 [ -s "$dist/pagefind/pagefind.js" ] || bad "no Pagefind entry point in $dist/pagefind"
 [ -n "$(ls "$dist"/pagefind/index 2>/dev/null)" ] || bad "no Pagefind index shards in $dist/pagefind/index"
 
+# Bundled scripts: no Astro or Vite build-time placeholder (__PREFETCH_PREFETCH_ALL__
+# and the like) may survive into the output. Starlight bundles the page-level
+# scripts into one file, so a single unreplaced placeholder throws a
+# ReferenceError there and stops every script after it. The pattern is the
+# prefixes Astro uses, not any __NAME__: Mermaid's own CSS has class names such as
+# __APA__. scripts/screens.py is the same guard in a real browser.
+placeholder='__(PREFETCH|EXPERIMENTAL|ASTRO|VITE)_[A-Z0-9_]*__'
+if [ -d "$dist/_astro" ]; then
+  left=$(grep -rEl "$placeholder" "$dist/_astro" --include='*.js' || true)
+  if [ -n "$left" ]; then
+    bad "an unreplaced build-time placeholder is left in: $(echo "$left" | head -3 | tr '\n' ' ')($(grep -rEoh "$placeholder" "$dist/_astro" --include='*.js' | sort -u | head -5 | tr '\n' ' '))"
+  fi
+else
+  bad "no $dist/_astro: the site has no bundled scripts"
+fi
+
 # No Git LFS pointer may be published as the file it stands for. A checkout
 # without `lfs: true` builds green and serves 130-byte text files as every
 # image and font -- URL parity cannot see it, so it is checked here, on
