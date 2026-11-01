@@ -108,6 +108,26 @@ on `main`: it is what stands between a bad layout and the live site.
 > block a merge anyway, because by the time a deploy runs the change is
 > already on `main`.
 
+### A second origin: the Cloudflare Worker
+
+The same build is also uploaded to a Cloudflare Worker with static assets,
+`turingpi-site` (`site/wrangler.jsonc`), by the `worker` job of `publish.yaml`.
+GitHub Pages stays the live origin until DNS moves; the job runs beside the
+Pages deploy and cannot delay or fail it. It uploads the `site-dist` artifact
+of the build job (it does not rebuild), and it skips with a notice until the
+`cloudflare` environment holds `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID`. The Worker, its domains and DNS are declared outside
+this repository, which holds no account id.
+
+- `just worker-dry-run` and `just worker-deploy` are the two recipes; the
+  dry run needs no credential and runs on every pull request.
+- `site/public/_headers` carries the security headers (a Content-Security-Policy
+  with each inline script named by its hash, `/_astro/*` cached for a year).
+  `site/scripts/check-csp.mjs`, run by `just build`, fails when a page's inline
+  script is not in it, or an entry is no longer used, and prints the tokens to
+  paste. The demo panes have their own rules because the front page frames them.
+- HSTS is not set there: the zone sets it.
+
 ## What is generated, and by what
 
 | output | recipe | source |

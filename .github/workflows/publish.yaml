@@ -6,7 +6,7 @@ name: Publish
 # What runs:
 #
 #   push to main                           plan, build, screens,
-#                                          deploy, `published`.
+#                                          deploy, `worker`, `published`.
 #   the hourly schedule, a dispatch        refresh first, which commits what
 #   from main                              the repositories moved; then all
 #                                          of the above, unless the site
@@ -16,6 +16,14 @@ name: Publish
 #   from another branch                    refresh is a dry run.
 #   a pull request that changes this       the same, so a change to the
 #   pipeline (paths below)                 publish path is proved before main.
+#
+# Two origins are published from ONE build: GitHub Pages (`deploy`, the live
+# site; `published` judges it) and the Cloudflare Worker `turingpi-site`
+# (`worker`), which serves nothing yet -- DNS still points at Pages. `worker`
+# uploads the `site-dist` artifact of the build job, the same files the Pages
+# artifact was made from, and it can neither delay nor fail `deploy`: they run
+# side by side and `published` does not wait for it. Until the secrets of the
+# GitHub environment `cloudflare` exist it says so in a notice and succeeds.
 #
 # Not here: repository_dispatch. Nothing sends `ui-released`: BMC-UI's
 # release.yaml deliberately holds no credential for this repository and says
@@ -368,6 +376,11 @@ jobs:
       - name: build strictly, stamp, check what was built
         run: devbox run -- just build
 
+      # `wrangler deploy --dry-run` on exactly the tree that is uploaded
+      # below: no credential, nothing published.
+      - name: the Worker accepts the build (dry run)
+        run: devbox run -- just worker-dry-run
+
       - name: the panes are served where the live site serves them, as built
         env:
           TAG: ${{ needs.plan.outputs.tag }}
@@ -507,6 +520,110 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # The same build, uploaded to the Cloudflare Worker `turingpi-site` (static
+  # assets, site/wrangler.jsonc). It sits beside `deploy`, not behind it: the
+  # Pages deploy is the live site and nothing here may hold it up. Its
+  # conditions are `deploy`'s, so a pull request, another branch, a dispatch
+  # with deploy=false and a skipped plan never reach it. Nothing needs it, so
+  # nothing downstream can inherit a skip from it; its own `if` still names
+  # each gate it depends on, because `!cancelled()` alone would run it after a
+  # failed one.
+  #
+  # The Worker, its custom domains and the DNS records are declared elsewhere;
+  # this job only uploads a new version of the Worker. Secrets live in the
+  # GitHub environment `cloudflare` and reach single steps, never the job.
+  worker:
+    name: deploy (Cloudflare Worker)
+    needs: [plan, build, screens]
+    if: ${{ !cancelled()
+            && needs.plan.outputs.deploy == 'true'
+            && needs.build.result == 'success'
+            && needs.screens.result == 'success' }}
+    # One Worker deploy at a time across every run. A deploy that waits is
+    # replaced by a newer one; a running deploy is never cancelled.
+    concurrency:
+      group: cloudflare-deploy
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    environment: cloudflare
+    env:
+      COMMIT: ${{ needs.build.outputs.commit }}
+      RUN: ${{ needs.build.outputs.run }}
+    steps:
+      # Decide in seconds, and without printing a value, whether the environment
+      # is set up. An empty token is the expected state until the Worker exists:
+      # skip with a notice and succeed. A token without an account id is a
+      # mistake: fail.
+      - name: is the Worker deploy set up
+        id: gate
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -eu
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice title=Worker deploy skipped::the secret CLOUDFLARE_API_TOKEN of the environment cloudflare is not set, so nothing was uploaded to the Worker. GitHub Pages is unaffected."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::the secret CLOUDFLARE_ACCOUNT_ID of the environment cloudflare is not set"
+            exit 1
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      # The Justfile, site/package.json and site/wrangler.jsonc, at the commit
+      # that was built. Not the build: that is the artifact below.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        with:
+          ref: ${{ needs.plan.outputs.ref }}
+          persist-credentials: false
+
+      - uses: jetify-com/devbox-install-action@8c6a66ed6273138b1915457069de78cb52fe3bd7 # v0.15.0
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        with:
+          enable-cache: true
+          devbox-version: 0.18.4
+
+      # What the build job uploaded from site/dist, and what the Pages artifact
+      # (the `github-pages` tar) was made from a step later: the same files,
+      # not a rebuild.
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        with:
+          name: site-dist
+          path: site/dist
+
+      - name: it is the build this run made, and it fits the Worker
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        run: |
+          set -eu
+          got=$(jq -r '"\(.commit) \(.run)"' site/dist/build.json)
+          [ "$got" = "$COMMIT $RUN" ] \
+            || { echo "::error::site/dist/build.json says '$got', this run built '$COMMIT $RUN'"; exit 1; }
+          [ -s site/dist/_headers ] || { echo "::error::site/dist has no _headers"; exit 1; }
+          # Workers Free: 20,000 asset files per version, 25 MiB per file.
+          files=$(find site/dist -type f | wc -l)
+          echo "$files asset files, build $COMMIT (run $RUN)"
+          [ "$files" -le 20000 ] || { echo "::error::$files asset files; the Free plan allows 20,000 per version"; exit 1; }
+          big=$(find site/dist -type f -size +25M | head -3)
+          [ -z "$big" ] || { echo "::error::over 25 MiB, which the Worker refuses: $big"; exit 1; }
+
+      - name: install wrangler
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        run: devbox run -- just install
+
+      - name: upload the Worker
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: devbox run -- just worker-deploy
 
   # A green run is not a live site. When this run was meant to publish, fail
   # unless turingpi.xyz serves THIS build: its /build.json names this commit

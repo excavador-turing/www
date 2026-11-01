@@ -74,6 +74,13 @@ jobs:
       - name: build strictly, stamp, check what was built
         run: devbox run -- just build
 
+      # The Cloudflare Worker `turingpi-site` takes the same build. Uploads
+      # nothing and needs no credential: it reads site/wrangler.jsonc and the
+      # files in site/dist, and says what it would deploy. Pull requests never
+      # deploy (publish.yaml does, on main).
+      - name: the Worker accepts the build (dry run)
+        run: devbox run -- just worker-dry-run
+
       # The source rules, then each built page carries its description whole
       # and escaped.
       - name: every page says what it is for, and says it whole

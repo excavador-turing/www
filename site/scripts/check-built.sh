@@ -67,6 +67,24 @@ else
   bad "no $dist/_astro: the site has no bundled scripts"
 fi
 
+# Response headers (CSP, framing, caching): the Worker serves them from _headers, which
+# site/public/_headers puts in the build. check-csp.mjs hashes every inline script in the
+# pages and compares with the CSP, so an Astro or Starlight upgrade that changes one fails
+# here with the tokens to paste.
+[ -s "$dist/_headers" ] || bad "no _headers: site/public/_headers did not reach the output"
+site/scripts/check-csp.mjs "$dist" || bad "the Content-Security-Policy does not match the pages (above)"
+
+# The Worker configuration (site/wrangler.jsonc): neither workers.dev nor preview URLs, no
+# routes, no KV, no account. The Worker, its domains and the DNS records live outside this
+# repository, and so do the account and zone ids.
+cfg=site/wrangler.jsonc
+grep -q '"name": "turingpi-site"' "$cfg" || bad "$cfg does not name the Worker turingpi-site"
+grep -q '"workers_dev": false' "$cfg" || bad "$cfg does not set workers_dev false"
+grep -q '"preview_urls": false' "$cfg" || bad "$cfg does not set preview_urls false"
+if grep -Eq '^\s*"(routes?|kv_namespaces|account_id|zone_id|main)"' "$cfg"; then
+  bad "$cfg declares routes, KV, an account or Worker code; those live outside this repository"
+fi
+
 # No Git LFS pointer may be published as the file it stands for. A checkout
 # without `lfs: true` builds green and serves 130-byte text files as every
 # image and font -- URL parity cannot see it, so it is checked here, on
