@@ -67,8 +67,8 @@ worker-dry-run:
     cd site && WRANGLER_SEND_METRICS=false yarn wrangler deploy --dry-run
 
 # Deploy the build in site/dist to the Cloudflare Worker `turingpi-site`. Only the
-# worker job of .github/workflows/publish.yaml runs this, on the build it
-# published to Pages. Needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, and
+# worker job of .github/workflows/publish.yaml runs this, on the build the
+# gates judged. Needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, and
 # no `just build`: the files to upload are the ones already in site/dist.
 worker-deploy:
     cd site && WRANGLER_SEND_METRICS=false yarn wrangler deploy

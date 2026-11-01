@@ -658,7 +658,6 @@
  },
  "files": [
   "/404.html",
-  "/CNAME",
   "/assets/captures/access.png",
   "/assets/captures/api.png",
   "/assets/captures/console.png",
@@ -806,6 +805,7 @@
   "/news/": "the news index lists the posts newest first, ten to a page (src/lib/news.ts, PostList.astro), so each release pushes the oldest entry of every page onto the next and its anchor follows; /news/page/2/ and on are its pages. An entry is a heading the generator marks data-paginated; the posts themselves answer at their own addresses"
  },
  "retired": {
+  "/CNAME": "GitHub Pages's custom-domain file, which only that host read; turingpi.xyz is served by a Cloudflare Worker, whose custom domains are bound outside the site, and nothing outside linked the file",
   "/assets/images/favicon.png": "Material's theme icon; Starlight links /favicon.svg from every page, and nothing outside linked the PNG",
   "/sitemap.xml.gz": "MkDocs's compressed copy of /sitemap.xml; robots.txt names /sitemap.xml, which still answers",
   "/stylesheets/landing.css": "Material's extra_css, which only MkDocs's pages loaded; its port is src/styles/landing.css, bundled under /_astro/",

@@ -13,7 +13,7 @@ ordered by votes, with the count on every row.
     just refresh-roadmap          # rewrite the roadmap page and its data
     just refresh-roadmap --check  # fail if the page is stale
 
-Committed like the changelog and for the same reason. The hourly Pages job
+Committed like the changelog and for the same reason. The hourly publish job
 runs it and commits when the numbers move, which is the only way a vote cast
 today reaches the site without somebody remembering.
 

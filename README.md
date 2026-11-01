@@ -1,9 +1,9 @@
 # turingpi.xyz
 
 The site for [this fork of the Turing Pi 2 BMC firmware](https://github.com/excavador-turing).
-Astro Starlight, built by CI, deployed to GitHub Pages. It was Material for
-MkDocs until 2026-10-26, when Material went into maintenance mode; every URL
-it served still answers (`just urls`).
+Astro Starlight, built by CI, served by a Cloudflare Worker (static assets). It
+was Material for MkDocs until 2026-10-26, when Material went into maintenance
+mode; every URL it served still answers (`just urls`).
 
 ```
 just            # the recipes
@@ -95,12 +95,14 @@ the only one.
 
 ### The deploy publishes; it does not judge
 
-`publish.yaml` builds the site and deploys it: on every push to `main`, and
-every hour after committing whatever the repositories moved (the refresh).
-Every `just check` gate runs before the deploy, and the `published` job fails
-unless turingpi.xyz then serves that exact build (`/build.json` names the
-commit). `site.yaml` runs the same checks on pull requests. Make it required
-on `main`: it is what stands between a bad layout and the live site.
+`publish.yaml` builds the site and deploys it to the Worker: on every push to
+`main`, and every hour after committing whatever the repositories moved (the
+refresh). Every `just check` gate runs before the deploy, and the `published`
+job fails unless the Worker deploy succeeded and turingpi.xyz then serves that
+exact build (`/build.json` names the commit and the run, fetched with a fresh
+query string each try so no edge cache answers for it). `site.yaml` runs the
+same checks on pull requests. Make it required on `main`: it is what stands
+between a bad layout and the live site.
 
 > The screen gate used to be 132 seconds of a 178-second deploy, while
 > building the site took 3. Publishing a typo waited two minutes on a browser
@@ -108,16 +110,15 @@ on `main`: it is what stands between a bad layout and the live site.
 > block a merge anyway, because by the time a deploy runs the change is
 > already on `main`.
 
-### A second origin: the Cloudflare Worker
+### The origin: a Cloudflare Worker (static assets)
 
-The same build is also uploaded to a Cloudflare Worker with static assets,
-`turingpi-site` (`site/wrangler.jsonc`), by the `worker` job of `publish.yaml`.
-GitHub Pages stays the live origin until DNS moves; the job runs beside the
-Pages deploy and cannot delay or fail it. It uploads the `site-dist` artifact
-of the build job (it does not rebuild), and it skips with a notice until the
-`cloudflare` environment holds `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID`. The Worker, its domains and DNS are declared outside
-this repository, which holds no account id.
+The site is served by a Cloudflare Worker with static assets, `turingpi-site`
+(`site/wrangler.jsonc`), and nowhere else. The `worker` job of `publish.yaml`
+uploads the `site-dist` artifact of the build job (it does not rebuild), after
+every gate has passed. The job fails if the `cloudflare` environment lacks
+`CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID`: without them the site cannot
+publish. The Worker, its domains and DNS are declared outside this repository,
+which holds no account id.
 
 - `just worker-dry-run` and `just worker-deploy` are the two recipes; the
   dry run needs no credential and runs on every pull request.
@@ -208,5 +209,6 @@ site/
 scripts/             every generator and every check
 ```
 
-The analytics beacon is Cloudflare's: turingpi.xyz is proxied, and Web
-Analytics adds it at the edge, so the site emits none of its own.
+The analytics beacon is Cloudflare's: turingpi.xyz is served through
+Cloudflare, and Web Analytics adds it at the edge, so the site emits none of
+its own.
