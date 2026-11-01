@@ -160,6 +160,109 @@ userspace dies stays dead until someone cuts its power.
 
 ## Fixed, and worth knowing about
 
+### The Firmware page did not list new releases
+
+**Affected v2.11.0 through v2.46.1, on any board whose list of this fork's
+releases takes longer than two minutes to build; fixed in v2.47.0.** The
+Firmware page showed the badge "Update available · v2.46.1" and, below it, a
+list with only v2.44.0 (running), v2.1.0 and v2.0.5. The subtitle stayed on
+*checking the sources now*, **Check now** stayed greyed out, and nothing
+changed until the page was reloaded. A community member saw exactly this on a
+board running v2.44.0 with no SD card.
+
+The cause is two clocks that disagreed. The board's updater built the list of
+this fork's releases by splitting GitHub's answer on `},{`, which only exists
+in compact JSON; GitHub sends it pretty-printed, so every line of an answer of
+about 690 KB became its own piece and cost five processes on a 116 MB board.
+It took 170 seconds for 44 releases, and longer with every release published.
+The page, meanwhile, stopped asking after 120 seconds, so it gave up and showed
+the list without the fork's source, which is the one that has the newest
+release. The badge comes from a cheaper check, so it knew about a release the
+list did not.
+
+From v2.47.0 (BMC-Firmware's `tpi-selfupdate`, BMC-UI 4.4.0) the list is built
+in one pass in **5 seconds** and the page keeps asking for up to eleven
+minutes. The badge is also an install button, so a release the list has not
+caught up with can still be installed from it. A board still on v2.46.1 or
+earlier has the old updater and the old page: it needs the upgrade done a
+different way, and the way is the same one for every version:
+
+```console
+$ ssh root@BMC 'tpi-selfupdate --tag v2.47.0 --reboot'
+```
+
+That downloads the release, verifies it against the published `SHA256SUMS`,
+stages it and reboots into it; the board rolls back on its own if the new image
+fails its health gate. **On a v2.4 board the reboot power-cycles the four
+compute modules, so shut them down first; a v2.5 keeps them running.** Without
+SSH, open the Firmware page, wait about four minutes and reload: the board
+keeps building its list in the background, and the second look has it.
+
+*The range is measured from the tags and commits, 2026-11-01. The page started
+polling a catalogue that refreshes behind its answer in BMC-UI 3.8.0 and bmcd
+2.11.0 (first pinned together by v2.9.0), and the two-minute limit arrived in
+BMC-UI 3.9.3 (`bd32047`, 2026-09-09), whose first firmware tag is v2.11.0
+(v2.11.0 itself was built but not installed on our board, so
+v2.12.0 is the first that was). `tpi-selfupdate --list` has split on `},{` since
+it was written (`e88602be`, v2.7.0). How long it took depends on how many
+releases the repository has: 170 s was measured on a Turing Pi 2 v2.5.1 board
+running v2.46.1 with 44 releases, 2026-11-01, and 5 s with the new updater on
+the same board. We have no measurement of the list time before v2.46.1 (the report came
+from v2.44.0), so which earlier releases were visibly affected is not known; the shorter the list, the shorter
+the wait.*
+
+### Upload .tpu could not install on a board without an SD card
+
+**Affected v2.9.0 through v2.46.1; fixed in v2.47.0.** On a board with no SD
+card the Firmware page's **Upload .tpu** did nothing useful. The upload ended
+in a toast that was easy to miss, and **Next boot** still said *nothing
+staged*. With a card in the board it worked, and still does.
+
+The web interface has asked the board to *park* an uploaded image since it
+stopped installing straight away: the image is written to the SD card and
+installing it is a separate choice (see [an upload is a file, not an
+event](/why/pick-a-version/#an-upload-is-a-file-not-an-event)). A board without
+a card has nowhere to park it, so the daemon refused, and the interface had no
+other way to upload. The daemon's own message even suggested uploading without
+parking, which the web interface could not do.
+
+From v2.47.0 (BMC-UI 4.4.0, bmcd 2.42.2) the dialog installs directly when the
+board has no card: the image is written to the spare slot and staged for the
+next boot, with the same reboot warning as the Reboot button. bmcd 2.42.2 says
+whether the card is mounted (`mounted` on the SD card entry of `GET
+/api/bmc/info`), so the dialog no longer guesses. An error stays in the dialog
+until you dismiss it, with an **Install directly instead** button beside a
+refusal. If you are on an earlier release, `tpi firmware upload` without
+`--park`, or `tpi-selfupdate --tag` as above, installs without a card.
+
+*The range is measured from the tags, 2026-11-01. The upload form parks since
+BMC-UI 3.9.0 (`a5ea571`, 2026-09-09) against bmcd's park mode (bmcd 2.12.0,
+`d83d7433b`); the first firmware tag that pins both is v2.9.0, which carries
+bmcd 2.15.1 and BMC-UI 3.9.0. Until BMC-UI 4.4.0 no version offers an upload
+without parking. Known from a user report and from the code, not tried on a board of
+ours: our boards have cards.*
+
+### The (i) help links led to a dead host
+
+**Affected v2.15.0 through v2.46.1; fixed in v2.47.0.** The **(i)** beside a
+setting on the Firmware, Fan, Console and Nodes pages opens a short
+explanation, with a *Read more* link to the longer one on this site. Those
+links went to `turing.excavador.xyz`, the site's old address, which answers a
+Cloudflare 502 and will not be redirected. The two Console links also named
+the wrong page, so even on a working host they landed at the top instead of at
+the note.
+
+BMC-UI 4.4.0 builds every link from `turingpi.xyz` and the two Console links
+point at [the console argument](/why/a-console-to-every-module/), where their
+anchors are. The Grafana dashboard's description, which is not part of the
+image, had the same dead link and is fixed in the same release.
+
+*The range is measured from the tags, 2026-11-01. The (i) notes arrived in
+BMC-UI 3.16.0 (`77a74fe`, 2026-09-09), whose first firmware tag is v2.15.0,
+with the address hard-coded; this site moved to turingpi.xyz on 2026-09-11
+(`25bfe0c`), which is when the links stopped answering. BMC-UI 3.31.0 says it
+fixed the old host and missed this one.*
+
 ### The board forgets everything at every reboot
 
 **Silent before v2.46.0 (the board I have a report from ran v2.42.0). v2.46.0

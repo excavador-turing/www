@@ -237,3 +237,16 @@ v2.46.1:
     device shows as /dev/root and the daemon could not tell where it had
     booted from. Found on our own board right after flashing v2.46.0 and fixed
     the same day; the v2.46.0 post has the rest.
+
+# v2.47.0 -- bmcd 2.42.2 and BMC-UI 4.4.0; tpi 1.10.0 is unchanged. The page
+# that changes is the Firmware page, but what it fixes is a list that never
+# arrives and an upload that has nowhere to go, and the demo's captures are of
+# a healthy board, which looks the same before and after: no capture.
+v2.47.0:
+  title: The Firmware page shows new releases, and the update badge installs them
+  summary: >-
+    A board's Firmware page used to say "Update available" and then list only
+    old versions, and Upload .tpu could do nothing at all on a board without
+    an SD card. The list now builds in 5 seconds instead of 170, the page
+    keeps checking until it arrives, the badge installs the version it names,
+    and Upload installs directly when there is no card.

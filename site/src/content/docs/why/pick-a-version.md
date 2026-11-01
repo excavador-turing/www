@@ -45,6 +45,13 @@ happens. It appears in the list beside every other candidate, marked
 `unverified` because that is what a file of unknown provenance is, and
 installing it is a separate and visible choice.
 
+A board with no SD card has nowhere to park an image. Until v2.47.0 the web
+interface could not upload to one at all
+([the fault](/reference/known-faults/#upload-tpu-could-not-install-on-a-board-without-an-sd-card));
+from v2.47.0 it says so and installs the image directly, staged for the next
+boot. The daemon's `mounted` flag on the SD card entry is what tells it which
+case it is in.
+
 That also makes the development loop honest. Park a build, install it, reboot,
 park the next one — each step is a thing you did, not a side effect.
 
