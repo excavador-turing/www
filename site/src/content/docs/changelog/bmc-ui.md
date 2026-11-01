@@ -10,6 +10,22 @@ The web interface the board serves.
 Newest release **v4.4.0**, 1 November 2026. 43 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>Unreleased — merged, not yet on a board</summary>
+
+**Changed**
+
+- **Choosing a node is one click.** Console, Flash Node and USB picked one of
+  four modules from a dropdown: open it, then choose. They now share a
+  `NodePicker`, a horizontal radio group (`role="radiogroup"`, named by its
+  visible label, one tab stop, arrows move and choose, Space and Enter choose)
+  that fits four options on one row at a phone's width. The value, the
+  `?node=` preselection and every API call are unchanged. A new gate,
+  `npm run node-picker-test`, drives the demo build with real mouse and key
+  events.
+
+</details>
+
+<details class="note">
 <summary>v4.4.0 — 1 November 2026</summary>
 
 The firmware page keeps checking until the list arrives, the update badge
