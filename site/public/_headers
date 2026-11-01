@@ -1,7 +1,7 @@
 # Response headers for turingpi.xyz, read by Cloudflare Workers static assets
 # (https://developers.cloudflare.com/workers/static-assets/headers/). Edit it, then run
-# `site/scripts/check-csp.mjs` (it runs inside `just build`). GitHub Pages ignores this
-# file; it takes effect once the site is served by the Worker.
+# `site/scripts/check-csp.mjs` (it runs inside `just build`). The Worker applies this
+# file to every response it serves.
 #
 # Rules are applied top to bottom and the headers of every matching rule are MERGED: a
 # second Content-Security-Policy is enforced together with the first, a second

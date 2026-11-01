@@ -74,7 +74,8 @@ jobs:
       - name: build strictly, stamp, check what was built
         run: devbox run -- just build
 
-      # The Cloudflare Worker `turingpi-site` takes the same build. Uploads
+      # The site is served by the Cloudflare Worker `turingpi-site` (static
+      # assets), which takes this same build. Uploads
       # nothing and needs no credential: it reads site/wrangler.jsonc and the
       # files in site/dist, and says what it would deploy. Pull requests never
       # deploy (publish.yaml does, on main).
