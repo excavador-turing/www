@@ -20,12 +20,12 @@ releases:
     newest: 2.42.2
     count: 50
   ui:
-    newest: v4.4.0
-    count: 43
+    newest: v4.5.0
+    count: 44
   tpi:
     newest: v1.10.0
     count: 15
-  total: 153
+  total: 154
 features:
   source: features/*.mdx -- a feature is a page
   count: 11
@@ -63,7 +63,7 @@ roadmap:
   as_of: 2026-11-01
   count: 7
   shipped: 2
-  votes: 21
+  votes: 22
   top: A hardware watchdog, so a hung daemon does not mean a trip to the rack
 platform:
   source: reference/comparison.md, measured on a running board

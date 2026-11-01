@@ -1,16 +1,19 @@
 ---
 title: BMC-UI
-description: 'Every BMC-UI release and what changed in it: 43 entries, newest v4.4.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-UI release and what changed in it: 44 entries, newest v4.5.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmc-ui
 tableOfContents: false
 ---
 
 The web interface the board serves.
 
-Newest release **v4.4.0**, 1 November 2026. 43 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v4.5.0**, 1 November 2026. 44 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
-<summary>Unreleased — merged, not yet on a board</summary>
+<summary>v4.5.0 — 1 November 2026</summary>
+
+Choosing a node is one click: Console, Flash Node and USB show the four nodes
+side by side instead of in a dropdown.
 
 **Changed**
 

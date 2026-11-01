@@ -38,6 +38,15 @@
    "summary": "The only way to put an SSH key on the BMC, or take one off, is to log in over SSH and edit `/root/.ssh/authorized_keys` by hand."
   },
   {
+   "number": 46,
+   "title": "ACME against a private CA, so the certificate renews itself",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/46",
+   "votes": 2,
+   "status": "Open",
+   "status_from": "discussion",
+   "summary": "ACME is a protocol, not a company."
+  },
+  {
    "number": 22,
    "title": "OpenTelemetry: traces, logs and metrics over OTLP, opt-in",
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/22",
@@ -72,15 +81,6 @@
    "status": "Shipped in v2.33.0",
    "status_from": "discussion",
    "summary": "If you run a private certificate authority \u2014 step-ca, your router's, your own \u2014 you can already trust its root in your browser and get a green padlock on anything it issues."
-  },
-  {
-   "number": 46,
-   "title": "ACME against a private CA, so the certificate renews itself",
-   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/46",
-   "votes": 1,
-   "status": "Open",
-   "status_from": "discussion",
-   "summary": "ACME is a protocol, not a company."
   }
  ]
 }
