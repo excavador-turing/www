@@ -1,10 +1,10 @@
 ---
-// The site's footer, as Material's overrides/partials/footer.html drew it,
-// from src/config/footer.json. Below Starlight's own footer, which carries
-// the "last updated" date.
+// The site's footer, from src/config/footer.json, below Starlight's own,
+// which carries the "last updated" date. Its links are how the front page
+// reaches every section (scripts/reach.py counts them): Starlight has no
+// top navigation, and the sidebar is not on the front page.
 //
-// The three icons are Font Awesome Free (CC BY 4.0), copied from the
-// mkdocs-material package so they are the same drawings the live site uses.
+// The three icons are Font Awesome Free (CC BY 4.0).
 import Default from '@astrojs/starlight/components/Footer.astro';
 import footer from '../config/footer.json';
 
@@ -38,8 +38,8 @@ const icon = (name: string) =>
     }
   </div>
   <div class="tp-footer__legal">
-    <span>GPL-2.0, like the upstream it forks.
-    <b>Not a Turing Machines product</b> — the board is theirs, at
+    <span>GPL-2.0, like the upstream it forks.{' '}
+    <b>Not a Turing Machines product</b> — the board is theirs, at{' '}
     <a href="https://turingpi.com/" rel="noopener">turingpi.com</a>;
     this firmware is an independent fork.</span>
     {

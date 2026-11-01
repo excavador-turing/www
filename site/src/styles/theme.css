@@ -1,0 +1,45 @@
+/*
+ * The colour theme: Starlight's accent and gray scales at this site's hue
+ * (231, the blue the links have always been), for both schemes. Nothing here
+ * is the site's own invention: it is the variable set Starlight documents
+ * for theming, in the shape its colour theme editor writes, and every other
+ * colour on the site comes from it.
+ *
+ * Contrast, measured (WCAG 2.x), on the pairs the theme draws:
+ *   text on the page            light 11.9, dark 10.0
+ *   muted text (gray-3), worst  light 6.1 (on code), dark 5.1 (on nav)
+ *   link text on the page       light 7.5, dark 9.9
+ *   link text on accent-low     light 5.7, dark 9.4
+ *   button label on accent      light 7.5, dark 6.3
+ * so every text pair clears AA (4.5); body text clears AAA (7) in both.
+ * Starlight's own defaults miss AA in two places -- the dark primary button
+ * (2.8) and gray-3 on the dark sidebar (4.5 less a hair) -- which is why the
+ * dark accent is lighter and gray-3 a step brighter than the defaults'.
+ */
+:root {
+  --sl-color-white: hsl(0, 0%, 100%);
+  --sl-color-gray-1: hsl(231, 20%, 94%);
+  --sl-color-gray-2: hsl(231, 6%, 77%);
+  --sl-color-gray-3: hsl(231, 6%, 60%);
+  --sl-color-gray-4: hsl(231, 7%, 36%);
+  --sl-color-gray-5: hsl(231, 10%, 23%);
+  --sl-color-gray-6: hsl(231, 14%, 16%);
+  --sl-color-black: hsl(231, 10%, 10%);
+  --sl-color-accent-low: hsl(231, 54%, 16%);
+  --sl-color-accent: hsl(231, 100%, 76%);
+  --sl-color-accent-high: hsl(231, 100%, 85%);
+}
+:root[data-theme='light'] {
+  --sl-color-white: hsl(231, 10%, 10%);
+  --sl-color-gray-1: hsl(231, 14%, 16%);
+  --sl-color-gray-2: hsl(231, 10%, 23%);
+  --sl-color-gray-3: hsl(231, 7%, 36%);
+  --sl-color-gray-4: hsl(231, 6%, 56%);
+  --sl-color-gray-5: hsl(231, 6%, 77%);
+  --sl-color-gray-6: hsl(231, 20%, 94%);
+  --sl-color-gray-7: hsl(231, 19%, 97%);
+  --sl-color-black: hsl(0, 0%, 100%);
+  --sl-color-accent-low: hsl(231, 70%, 92%);
+  --sl-color-accent: hsl(231, 52%, 46%);
+  --sl-color-accent-high: hsl(231, 70%, 28%);
+}

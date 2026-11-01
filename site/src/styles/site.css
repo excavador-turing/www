@@ -1,459 +1,292 @@
 /*
- * The chrome around the pages: what Material for MkDocs drew and Starlight
- * draws differently. landing.css (the port of docs/stylesheets/landing.css)
- * styles the pages' own tp-* layouts; this file makes the frame look like
- * the site it replaces -- Roboto, a black header with a strip of tabs, blue
- * links, light headings, Material's collapsible blocks and buttons -- rather
- * than like a Starlight template.
+ * What Starlight does not draw. Its own look carries the site (theme.css is
+ * the palette, the fonts are its system stacks, the header, the sidebar,
+ * asides, <details>, tables and code are untouched); this file is the
+ * layouts that pages and generators write as plain HTML -- the stat strip,
+ * the link cards, the roadmap's idea cards -- and the front page's demo
+ * view. Every colour, size and border is one of Starlight's variables.
  *
- * Starlight's own styles are all in cascade layers, so a rule here wins
- * over them by being unlayered, not by out-specifying them.
+ * Starlight's rules are in cascade layers, so a rule here wins by being
+ * unlayered, not by out-specifying them.
  */
 
-/* ---- type and colour -------------------------------------------------- */
-
-/* Material's fonts (mkdocs.yml leaves `theme.font` at its default), served
-   from this site rather than from Google: the @fontsource packages, pinned. */
-:root {
-  --sl-font: 'Roboto';
-  --sl-font-mono: 'Roboto Mono';
-  /* Material's typeset: wider than Starlight's 45rem column. */
-  --sl-content-width: 54rem;
-  /* The header is two rows, the bar and the tabs: 96px, Material's two
-     2.4rem rows, so a screen that fit under Material's header fits here
-     (scripts/screens.py measures it). */
-  --tp-bar-h: 3.25rem;
-  --tp-tabs-h: 2.75rem;
-  --sl-nav-height: calc(var(--tp-bar-h) + var(--tp-tabs-h));
-}
-
-/* Links are Material's indigo, as on every page of the live site; the
-   board's lime is for emphasis (the tabs, the proof strips), not for text. */
-:root[data-theme='light'] {
-  --sl-color-accent-low: #e8eaf6;
-  --sl-color-accent: #4051b5;
-  --sl-color-accent-high: #2b3a8f;
-  --sl-color-text-accent: #4051b5;
-}
-:root,
-:root[data-theme='dark'] {
-  --sl-color-accent-low: #1d2244;
-  --sl-color-accent: #6c7fd8;
-  --sl-color-accent-high: #c3cbf5;
-  --sl-color-text-accent: #8a9cf4;
-}
-
-/* Material's headings: light, smaller than Starlight's, and the page title
-   grey (its typeset: h1 2em at 300, h2 1.5625em at 300, h3 1.25em at 400).
-   The tp-* layouts set their own, more specifically, in landing.css. */
-.sl-markdown-content :is(h1, h2):not(:where(.not-content *)) {
-  font-weight: 300;
-}
-.sl-markdown-content h3:not(:where(.not-content *)) {
-  font-weight: 400;
-}
-.sl-markdown-content :is(h2, .sl-heading-wrapper.level-h2) {
-  font-size: 1.5625rem;
-}
-.sl-markdown-content :is(h3, .sl-heading-wrapper.level-h3) {
-  font-size: 1.25rem;
-}
-.content-panel h1#_top {
-  font-size: 2rem;
-  font-weight: 300;
-  color: color-mix(in srgb, var(--sl-color-white) 60%, transparent);
-}
-
-/* Material's links are not underlined; the colour says it. */
-.sl-markdown-content a:not(:where(.not-content *)) {
-  text-decoration: none;
-}
-.sl-markdown-content a:not(:where(.not-content *)):hover {
-  text-decoration: underline;
-}
-
-/* ---- the header: a black bar, and the tabs under it -------------------- */
-/* (The tabs show on every screen; below 50rem a page with a sidebar also
-   has Starlight's menu, which holds the whole nav, as Material's drawer did.) */
-
-/* Black in both schemes (mkdocs.yml: primary black), so the header carries
-   Starlight's dark palette whatever the page's. */
-.page > .header {
-  padding: 0;
-  border-bottom: 0;
-  background-color: #000;
-  color-scheme: dark;
-  --sl-color-white: #fff;
-  --sl-color-gray-1: #eceef2;
-  --sl-color-gray-2: #c0c2c7;
-  --sl-color-gray-3: #888b96;
-  --sl-color-gray-4: #545861;
-  --sl-color-gray-5: #353841;
-  --sl-color-gray-6: #24272f;
-  --sl-color-black: #17181c;
-  --sl-color-bg-nav: #000;
-  --sl-color-hairline-shade: #000;
-  --sl-color-text-accent: var(--tp-lime);
-  box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.4rem rgba(0, 0, 0, 0.2);
-}
-.tp-header {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.tp-header__bar {
-  height: var(--tp-bar-h);
-  flex: none;
-  padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
-}
-:root[data-has-sidebar] .tp-header__bar {
-  padding-inline-end: calc(var(--sl-nav-gap) + var(--sl-nav-pad-x) + var(--sl-menu-button-size));
-}
-@media (min-width: 50rem) {
-  :root[data-has-sidebar] .tp-header__bar {
-    padding-inline-end: var(--sl-nav-pad-x);
-  }
-}
-.tp-header .site-title {
-  color: #fff;
-  font-weight: 700;
-}
-/* On a phone too: Material had a drawer there, and Starlight's menu exists
-   only on pages with a sidebar -- the front page, Features and News have
-   none, so without the tabs a phone could not leave them. They scroll
-   sideways when they do not fit. */
-.tp-tabs {
-  height: var(--tp-tabs-h);
-  padding-inline: var(--sl-nav-pad-x);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-.tp-tabs ul {
-  display: flex;
-  gap: clamp(1.1rem, 2.5vw, 1.75rem);
-  scrollbar-width: none;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  overflow-x: auto;
-}
-.tp-tabs a {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #fff;
-  opacity: 0.72;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.tp-tabs a:hover,
-.tp-tabs a[aria-current='true'] {
-  opacity: 1;
-}
-.tp-tabs a[aria-current='true'] {
-  box-shadow: inset 0 -2px 0 var(--tp-lime);
-}
-
-/* The phone menu's button sits in the bar, not across the bar and tabs. */
-.sidebar button[popovertarget] {
-  top: calc((var(--tp-bar-h) - var(--sl-menu-button-size)) / 2);
-}
-
-/* ---- the sidebar: the current tab's pages only, on a wide screen -------- */
-
-@media (min-width: 50rem) {
-  .tp-sidebar[data-tab] ul.top-level > li {
-    display: none;
-  }
-  .tp-sidebar[data-tab='1'] ul.top-level > li:nth-child(1),
-  .tp-sidebar[data-tab='2'] ul.top-level > li:nth-child(2),
-  .tp-sidebar[data-tab='3'] ul.top-level > li:nth-child(3),
-  .tp-sidebar[data-tab='4'] ul.top-level > li:nth-child(4),
-  .tp-sidebar[data-tab='5'] ul.top-level > li:nth-child(5),
-  .tp-sidebar[data-tab='6'] ul.top-level > li:nth-child(6),
-  .tp-sidebar[data-tab='7'] ul.top-level > li:nth-child(7),
-  .tp-sidebar[data-tab='8'] ul.top-level > li:nth-child(8),
-  .tp-sidebar[data-tab='9'] ul.top-level > li:nth-child(9) {
-    display: block;
-  }
-  /* The tab's own group: its name as a small label, not a fold, and its
-     pages at the top level. */
-  .tp-sidebar[data-tab] ul.top-level > li > details > summary {
-    font-size: var(--sl-text-sm);
-    font-weight: 700;
-    color: var(--sl-color-gray-3);
-    pointer-events: none;
-  }
-  .tp-sidebar[data-tab] ul.top-level > li > details > summary .caret {
-    display: none;
-  }
-  .tp-sidebar[data-tab] ul.top-level > li > details > ul {
-    margin-inline-start: 0;
-    padding-inline-start: 0;
-    border-inline-start: 0;
-  }
-}
-/* The current page in blue type, as Material marks it, not a filled bar. */
-.tp-sidebar a[aria-current='page'],
-.tp-sidebar a[aria-current='page']:hover {
-  background: none;
-  color: var(--sl-color-text-accent);
-  font-weight: 600;
-}
-
-/* A post's sidebar (Sidebar.astro): the way back and the date. */
-.tp-post-aside {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  font-size: var(--sl-text-sm);
-}
-.tp-post-aside a {
-  color: var(--sl-color-gray-2);
-  text-decoration: none;
-}
-.tp-post-aside a:hover {
-  color: var(--sl-color-text-accent);
-}
-.tp-post-aside b {
-  display: block;
-  color: var(--sl-color-gray-3);
-  font-size: var(--sl-text-xs);
-  margin-bottom: 0.25rem;
-}
-.tp-post-aside__back {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--sl-color-hairline);
-}
-@media (min-width: 50rem) {
-  .tp-sidebar--post .tp-sidebar__nav {
-    display: none;
-  }
-}
-@media (max-width: 49.99rem) {
-  .tp-post-aside {
-    display: none;
-  }
-}
-
-/* ---- pages whose layout carries its own H1 ------------------------------ */
-
-/* The title panel holds only the #_top anchor (PageTitle.astro's <span>,
-   where a page writes its own H1): no padding, no rule under it. */
-.content-panel:has(> .sl-container > span#_top:only-child) {
-  padding: 0;
-}
-.content-panel:has(> .sl-container > span#_top:only-child) + .content-panel {
-  border-top: 0;
-}
-
-/* The tp-* layouts set their own spacing; Starlight's "a gap between any
-   two blocks" would push every cell of a grid down. */
+/* ---- the layouts: Starlight's "a gap between any two blocks" would push every cell of a grid down */
 .sl-markdown-content
-  :is(
-    .tp-landing, .tp-view, .tp-screen, .tp-hero__say, .tp-chapter__say, .tp-proof, .tp-actions,
-    .tp-news, .tp-news__grid, .tp-news__col, .tp-what-grid, .tp-what, .tp-dest, .tp-bar,
-    .tp-feature, .tp-feature__say, .tp-next, .tp-plates, .tp-plate, .tp-vs, .tp-vs__row,
-    .tp-index, .tp-index__head, .tp-hero-band, .tp-maker, .tp-maker__who, .tp-maker__links,
-    .tp-ideas, .tp-releases, .tp-posts, .tp-post, figure
-  )
+  :is(.tp-proof, .tp-next, .tp-plates, .tp-ideas, .tp-releases, .tp-vs, .tp-vs__row, .tp-maker, .tp-maker__who, .tp-posts, .tp-post)
   > * {
   margin-top: 0;
 }
-.sl-markdown-content
-  :is(.tp-hero, .tp-chapter, .tp-hero-band, .tp-index__head, .tp-feature, .tp-news)
-  .sl-anchor-link {
-  display: none;
-}
-.sl-markdown-content :is(.tp-landing, .tp-hero-band, .tp-feature, .tp-index, .tp-maker) a {
+
+/* One surface for everything that is a card: a link to somewhere, a row of
+   the comparison, a post, the maintainer. */
+.sl-markdown-content :is(a.tp-plate, a.tp-idea, .tp-next a, .tp-releases a, .tp-vs__row, .tp-maker, .tp-post) {
+  display: block;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background: var(--sl-color-black);
+  color: inherit;
   text-decoration: none;
 }
-.sl-markdown-content :is(.tp-landing, .tp-hero-band, .tp-index__head, .tp-news) .sl-heading-wrapper {
-  /* The layouts style their h1/h2 as children; the wrapper Starlight puts
-     round a heading for its anchor link would sit in between. */
-  display: contents;
+.sl-markdown-content :is(a.tp-plate, a.tp-idea, .tp-next a, .tp-releases a):hover {
+  border-color: var(--sl-color-text-accent);
 }
-.sl-markdown-content :is(.tp-landing, .tp-hero-band, .tp-index__head, .tp-news) .sl-heading-wrapper > :first-child {
+.sl-markdown-content :is(.tp-plate, .tp-next a, .tp-releases a) b,
+.sl-markdown-content .tp-idea__title,
+.sl-markdown-content .tp-vs__what {
   display: block;
-  padding-inline-end: 0;
+  color: var(--sl-color-white);
+  font-weight: 600;
+}
+.sl-markdown-content :is(.tp-plate span, .tp-next span, .tp-releases span, .tp-idea__what) {
+  display: block;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
 }
 
-/* Wide pages. The front page and the pages that open with a hero band set
-   their own width (landing.css); a feature page and the Features index sit
-   in Material's 61rem grid, which is 1220px whatever the root size. */
-.main-pane:has(:is(.tp-landing, .tp-hero-band, .tp-feature, .tp-index)) .content-panel {
-  padding-inline: 0;
+.tp-plates,
+.tp-ideas,
+.tp-releases,
+.tp-next {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem;
 }
-.main-pane:has(:is(.tp-feature, .tp-index)) .content-panel .sl-container {
-  margin: 0 auto;
-  padding: 0 1rem 2.5rem;
-  max-width: 1220px;
+.tp-releases {
+  grid-template-columns: repeat(auto-fill, minmax(min(9rem, 100%), 1fr));
 }
-.main-pane:has(:is(.tp-feature, .tp-index, .tp-hero-band)) footer .meta {
-  display: none;
+.sl-markdown-content a.tp-plate img {
+  width: 2.5rem;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+.tp-plate__meta {
+  margin-top: 0.5rem;
+}
+.sl-markdown-content .tp-next--argument > a:first-child {
+  grid-column: 1 / -1;
 }
 
-/* ---- Material's pieces --------------------------------------------------- */
+/* The stat strip: a few numbers somebody measured, and what each counts. */
+.tp-proof {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+.tp-proof > div {
+  padding-top: 0.5rem;
+  border-top: 3px solid var(--sl-color-accent);
+}
+.sl-markdown-content .tp-proof b {
+  display: block;
+  font-size: var(--sl-text-3xl);
+  line-height: 1.1;
+  color: var(--sl-color-white);
+  font-variant-numeric: tabular-nums;
+}
+.sl-markdown-content .tp-proof span {
+  display: block;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
 
-/* A figure is centred on its picture, its caption italic and no wider than
-   a line of comfortable reading (Material's typeset, 24rem at 20px). */
-.sl-markdown-content figure {
-  margin-inline: auto;
-  max-width: 100%;
+/* ---- a feature page and the pages that open like one -------------------- */
+.tp-feature {
+  display: grid;
+  gap: 1rem;
+}
+.tp-feature > * {
+  margin: 0;
+}
+.tp-eyebrow {
+  display: block;
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sl-color-text-accent);
+}
+.sl-markdown-content .tp-hero-band h1,
+.sl-markdown-content .tp-feature h1,
+.sl-markdown-content .tp-index__head h1 {
+  font-size: var(--sl-text-h1);
+  line-height: var(--sl-line-height-headings);
+  margin-block: 0.25rem 0.75rem;
+}
+.sl-markdown-content .tp-feature p.lede,
+.sl-markdown-content :is(.tp-hero-band, .tp-index__head) > p {
+  font-size: var(--sl-text-lg);
+  color: var(--sl-color-gray-2);
+}
+.sl-markdown-content .tp-provenance {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
+.sl-markdown-content a.tp-since {
+  justify-self: start;
+  text-decoration: none;
+}
+/* A label: the tag on a changelog item and "in this fork since". */
+.sl-markdown-content small.tp-tag {
+  display: inline-block;
+  padding: 0 0.5rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 999px;
+  font-size: var(--sl-text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+
+/* The front page's hero picture is a capture of the interface, which is the
+   evidence the headline rests on, so it gets half the row rather than the
+   thumbnail Starlight's box (hero.image.html) gives a logo, and fills it at
+   its own shape. */
+@media (min-width: 50rem) {
+  :root[data-has-hero] .hero {
+    grid-template-columns: 5fr 6fr;
+  }
+  :root[data-has-hero] .hero > .hero-html {
+    width: 100%;
+  }
+}
+.hero-html img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+}
+
+/* A capture is shown whole, at the width of the column, and framed. */
+.sl-markdown-content figure img {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
 }
 .sl-markdown-content figcaption {
-  font-style: italic;
-  max-width: 30rem;
-  margin-inline: auto;
-}
-
-/* .md-button: the hero's two buttons, and any page's attr_list button. */
-.sl-markdown-content a.md-button {
-  display: inline-block;
-  padding: 0.625em 2em;
-  border: 0.125rem solid currentColor;
-  border-radius: 0.125rem;
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--sl-color-text-accent);
-  transition: color 125ms, background-color 125ms, border-color 125ms;
-}
-.sl-markdown-content a.md-button--primary {
-  background: var(--sl-color-text-accent);
-  border-color: var(--sl-color-text-accent);
-  color: var(--sl-color-white);
-}
-
-/* pymdownx.details: the collapsed blocks -- three hundred and fifty of them
-   hold a changelog entry each. Material's look: a coloured rule on the left,
-   a tinted title row, a chevron that turns. */
-.sl-markdown-content details:is(.note, .tip, .warning, .danger, .info, .abstract) {
-  padding-inline-start: 0;
-  border: 1px solid var(--tp-line);
-  border-inline-start: 0.25rem solid var(--tp-admon, #448aff);
-  border-radius: 0.375rem;
   font-size: var(--sl-text-sm);
-}
-.sl-markdown-content details.note {
-  /* landing.css greys the note's frame; its rule is the board's lime. */
-  --tp-admon: var(--tp-lime);
-}
-.sl-markdown-content details.tip {
-  --tp-admon: #00bfa5;
-}
-.sl-markdown-content details.warning {
-  --tp-admon: #ff9100;
-}
-.sl-markdown-content details.danger {
-  --tp-admon: #ff1744;
-}
-.sl-markdown-content details > summary {
-  position: relative;
-  margin-inline-start: 0;
-  cursor: pointer;
-  list-style: none;
-  padding: 0.5rem 2.25rem 0.5rem 0.75rem;
-  font-weight: 700;
-  background: color-mix(in srgb, var(--tp-admon, #448aff) 10%, transparent);
-}
-.sl-markdown-content details > summary::-webkit-details-marker {
-  display: none;
-}
-.sl-markdown-content details > summary::before {
-  content: none;
-}
-.sl-markdown-content details[open] > summary {
-  margin-bottom: 0.75rem;
-}
-.sl-markdown-content details > summary::after {
-  content: '';
-  position: absolute;
-  inset-inline-end: 0.75rem;
-  top: 50%;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: translateY(-70%) rotate(-45deg);
-  transition: transform 150ms ease;
-  opacity: 0.6;
-}
-.sl-markdown-content details[open] > summary::after {
-  transform: translateY(-50%) rotate(45deg);
-}
-.sl-markdown-content details > :not(summary) {
-  margin-inline: 0.75rem;
-}
-.sl-markdown-content details > :last-child:not(summary) {
-  margin-bottom: 0.75rem;
-}
-.sl-markdown-content details.note > summary {
-  background: var(--tp-plate);
-}
-.sl-markdown-content details.note[open] > summary {
-  border-bottom: 1px solid var(--tp-line);
-}
-
-/* Material's admonitions: a white box with a coloured rule on the left and
-   a tinted title row, not Starlight's filled panel. */
-.starlight-aside {
-  padding: 0;
-  border: 1px solid var(--tp-line);
-  border-inline-start: 0.25rem solid var(--sl-color-asides-border);
-  border-radius: 0.25rem;
-  background: var(--sl-color-bg);
-  font-size: var(--sl-text-sm);
-}
-.starlight-aside__title {
-  margin: 0;
-  padding: 0.5rem 0.75rem;
-  font-size: var(--sl-text-sm);
-  color: var(--sl-color-white);
-  background: color-mix(in srgb, var(--sl-color-asides-border) 10%, transparent);
-}
-.starlight-aside__icon {
-  color: var(--sl-color-asides-border);
-}
-.starlight-aside__content {
-  padding: 0.75rem;
-}
-
-/* The board reports table: the short columns never wrap, their heads
-   neither (Starlight lets a cell break anywhere). */
-.sl-markdown-content table.tp-boards th {
-  white-space: nowrap;
-  overflow-wrap: normal;
-}
-
-/* landing.css draws a lime rule over each h2 on these pages. Here an h2 sits
-   inline inside Starlight's anchor wrapper, so the wrapper carries the rule
-   and the spacing, and the rule spans the column as it does on the live site. */
-.main-pane:has(.tp-hero-band) .sl-markdown-content .sl-heading-wrapper.level-h2 {
-  margin: 3rem 0 0.875rem;
-  padding-top: 1.75rem;
-  border-top: 3px solid var(--tp-lime);
-}
-.main-pane:has(.tp-post__meta--page) .sl-markdown-content .sl-heading-wrapper.level-h2 {
-  margin-top: 2.5rem;
-  padding-top: 1.25rem;
-  border-top: 3px solid var(--tp-lime);
-}
-.main-pane:has(.tp-hero-band, .tp-post__meta--page) .sl-markdown-content .sl-heading-wrapper.level-h2 > h2 {
-  margin: 0;
-  padding-top: 0;
-  border-top: 0;
-}
-
-/* A post's date, under its title. */
-.tp-post__meta--page {
-  margin-top: 0.5rem;
   color: var(--sl-color-gray-3);
-  font-size: var(--sl-text-sm);
 }
 
-/* The news index's page numbers (Material's md-pagination). */
+/* ---- upstream against this fork ------------------------------------------ */
+.tp-vs {
+  display: grid;
+  gap: 0.75rem;
+  margin-block: 1.5rem;
+}
+.tp-vs__row {
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  font-size: var(--sl-text-sm);
+}
+.tp-vs__them::before,
+.tp-vs__us::before {
+  display: block;
+  font-size: var(--sl-text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+.tp-vs__them::before {
+  content: 'upstream';
+}
+.tp-vs__us::before {
+  content: 'this fork';
+  color: var(--sl-color-text-accent);
+}
+@media (max-width: 50rem) {
+  .tp-vs__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- the roadmap: the ideas as cards -------------------------------------- */
+.sl-markdown-content a.tp-idea {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.25rem;
+}
+.sl-markdown-content .tp-idea__votes {
+  grid-row: 1 / span 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline-end: 1rem;
+  border-inline-end: 1px solid var(--sl-color-gray-5);
+  font-size: var(--sl-text-3xl);
+  line-height: 1;
+  color: var(--sl-color-white);
+  font-variant-numeric: tabular-nums;
+}
+.sl-markdown-content .tp-idea__votes small {
+  margin-top: 0.25rem;
+  font-size: var(--sl-text-2xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+.sl-markdown-content .tp-idea__status {
+  justify-self: start;
+  padding: 0 0.625rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 999px;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
+.sl-markdown-content .tp-idea--started .tp-idea__status {
+  background: var(--sl-color-accent-low);
+  border-color: transparent;
+  color: var(--sl-color-text-accent);
+}
+.sl-markdown-content .tp-idea--shipped .tp-idea__status {
+  background: var(--sl-color-text-accent);
+  border-color: transparent;
+  color: var(--sl-color-black);
+}
+
+/* ---- About: who makes this -------------------------------------------------- */
+.tp-maker {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.5rem;
+  margin-block: 2rem;
+}
+.tp-maker__who {
+  display: grid;
+  gap: 0.25rem;
+}
+.tp-maker__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+@media (max-width: 50rem) {
+  .tp-maker {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- news ---------------------------------------------------------------- */
+.tp-posts {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+.sl-markdown-content .tp-post__meta {
+  font-size: var(--sl-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+.sl-markdown-content .tp-post h2 {
+  font-size: var(--sl-text-h4);
+}
 .tp-pagination {
   display: flex;
   gap: 0.5rem;
@@ -466,6 +299,160 @@
   text-align: center;
 }
 .tp-pagination__current {
-  background: var(--tp-plate);
-  font-weight: 700;
+  background: var(--sl-color-gray-6);
+  font-weight: 600;
+}
+
+/* The board reports: three short columns and one that wraps, then a card
+   each on a phone, since a table that scrolls sideways there goes unread. */
+.sl-markdown-content table.tp-boards td:nth-child(-n + 3) {
+  white-space: nowrap;
+}
+.sl-markdown-content table.tp-boards .tp-boards__who {
+  display: block;
+  color: var(--sl-color-gray-3);
+}
+@media (max-width: 50rem) {
+  .sl-markdown-content table.tp-boards thead {
+    display: none;
+  }
+  .sl-markdown-content table.tp-boards,
+  .sl-markdown-content table.tp-boards :is(tbody, tr, td) {
+    display: block;
+    white-space: normal;
+  }
+  .sl-markdown-content table.tp-boards td {
+    padding: 0.125rem 0;
+    border: 0;
+  }
+  .sl-markdown-content table.tp-boards td:nth-child(-n + 3) {
+    display: inline-block;
+    margin-inline-end: 1rem;
+  }
+}
+
+/* ---- the front page's demo view ------------------------------------------ */
+/* One interface at a time, as large as the window allows: a flex column that
+   takes the height the header leaves (svh, the smallest a phone's viewport
+   gets, so fitting it fits always), the frame taking what the bar leaves. The
+   hero and the footer step out of the way while it is open. */
+.tp-demo:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  height: calc(100svh - var(--sl-nav-height) - 1rem);
+}
+.tp-demo__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-bottom: 0.5rem;
+}
+.tp-demo__note {
+  flex: 1 1 20rem;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
+.tp-demo__panes {
+  display: flex;
+  gap: 0.5rem;
+}
+.tp-demo__bar .sl-link-button {
+  padding: 0.25rem 0.75rem;
+  font-size: var(--sl-text-sm);
+}
+.tp-demo__panes .sl-link-button[aria-current='true'] {
+  background: var(--sl-color-accent);
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-black);
+}
+.tp-demo__stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.tp-demo [hidden] {
+  display: none !important;
+}
+.tp-demo__stage iframe:not([hidden]) {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background: #fff;
+}
+:root[data-tp-demo-open] :is(.hero, .tp-footer, main footer) {
+  display: none;
+}
+
+/* ---- the site's footer ----------------------------------------------------- */
+.tp-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--sl-color-gray-5);
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
+.tp-footer__inner {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+}
+.tp-footer :is(.tp-footer__brand, .tp-footer__col) > b {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--sl-color-white);
+}
+.tp-footer__col ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tp-footer__col li {
+  margin: 0 0 0.25rem;
+}
+.tp-footer__legal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sl-color-gray-5);
+}
+.tp-footer__social {
+  display: flex;
+  flex: none;
+  gap: 0.75rem;
+}
+.tp-footer__social a {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--sl-color-gray-3);
+}
+.tp-footer__social a:hover {
+  color: var(--sl-color-text-accent);
+}
+.tp-footer__social svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+@media (max-width: 64rem) {
+  .tp-footer__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tp-footer__brand {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 36rem) {
+  .tp-footer__legal {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
