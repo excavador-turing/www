@@ -5,8 +5,102 @@
   <link href="https://turingpi.xyz/feed.xml" rel="self"/>
   <link href="https://turingpi.xyz/news/"/>
   <id>https://turingpi.xyz/feed.xml</id>
-  <updated>2026-10-31T00:00:00Z</updated>
+  <updated>2026-11-01T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
+  <entry>
+    <title>Firmware v2.47.0: The Firmware page shows new releases, and the update badge installs them</title>
+    <link href="https://turingpi.xyz/news/v2.47.0/"/>
+    <id>tag:turingpi.xyz,2026-11-01:firmware/2.47.0</id>
+    <updated>2026-11-01T00:00:00Z</updated>
+    <content type="text">bmcd 2.42.2 and BMC-UI 4.4.0; tpi 1.10.0 is unchanged.
+
+New firmware releases now show up in the Firmware page's list, the &quot;Update
+available&quot; badge installs what it names, an upload works on a board without an
+SD card, a board without a card stops showing an SD warning, and the (i) help
+links reach turingpi.xyz.
+
+If your Firmware page does not show v2.47.0 (boards on v2.46.1 or earlier can
+take minutes to list it): on the BMC over SSH run
+`tpi-selfupdate --tag v2.47.0 --reboot`. It downloads the image, checks its
+checksum, stages it and reboots; if the new image fails its health gate, the
+board goes back to the previous one by itself. Or leave the Firmware page open
+for about four minutes and reload. On a Turing Pi 2 v2.4 a BMC reboot
+power-cycles the nodes; on a v2.5 they keep running.
+
+### Added
+
+- **The &quot;Update available&quot; badge installs the version it names (BMC-UI
+  4.4.0).** Pressing it opens the same confirmation as the list's Install
+  button, which says which source and repository it installs from. If no
+  configured source is the repository the update check named, the badge is
+  information only and says why. It is disabled while an install, an upload
+  or a flash runs, or an update is already staged.
+
+### Fixed
+
+- **The Firmware page keeps checking until the list arrives (BMC-UI 4.4.0).**
+  The page polled the catalogue for two minutes and then stuck on &quot;checking
+  the sources now&quot; with a greyed-out Check now, until it was reloaded. It now
+  keeps asking while the daemon says it is refreshing, for up to eleven
+  minutes (every 2 s at first, then every 5 s after 30 s and every 10 s after
+  two minutes, and not at all while the tab is hidden). If it does give up it
+  says &quot;Still checking — the list may be out of date. Reload later.&quot; and
+  Check now works again.
+- **One slow or hung firmware source no longer costs the others (bmcd
+  2.42.2).** Each source has its own 360 s deadline instead of the whole check
+  being cut off after ten minutes with nothing kept. A source that overruns
+  reports `timed out after 360 s` and the rest are cached as usual; the
+  updater and its `curl` are killed as a group, so hung downloads do not pile
+  up on the board. When the only errors are slow sources (or a card that is
+  inserted but not mounted), the retry waits 15 minutes instead of 2, so a
+  slow board does not hammer GitHub's 60 requests an hour. Concurrent
+  requests with nothing cached now share one refresh instead of each
+  starting their own.
+- **Uploading a `.tpu` to a board with no SD card works (BMC-UI 4.4.0, bmcd
+  2.42.2).** The dialog always asked to park the image on the card, and a
+  card-less board refused with a toast and nothing else. When the board has
+  no card the dialog now says so and installs directly, written to the spare
+  slot and staged for the next boot, with the same reboot warning as the
+  slots panel. With a card nothing changes. If the daemon still refuses, the
+  reason stays in the dialog with &quot;Install directly instead&quot; beside it. The
+  daemon's message no longer tells the web interface to &quot;insert one, or
+  upload without parking&quot;, and a successful park now shows up in the list
+  straight away instead of up to 30 minutes later.
+- **A board without an SD card no longer shows an SD warning (bmcd 2.42.2).**
+  The `SD card` source answered an error when no card was mounted (or the
+  card had no `firmware` folder), which shortened the catalogue's cache to two
+  minutes, kept it off the flash, and left &quot;SD card: This source returned
+  nothing usable&quot; on the page for ever. It now reports nothing. A card that
+  is there and unreadable, or inserted but not mounted (unsupported or damaged
+  filesystem), is still reported. `GET /api/bmc/info` also says whether the
+  card is mounted (`mounted` on the &quot;SD card&quot; entry); the interface no longer
+  draws an unmounted card as a second storage row.
+- **The (i) notes reach turingpi.xyz (BMC-UI 4.4.0).** Every &quot;Read more&quot; link
+  on the Firmware, Fan, Console and Nodes pages went to the dead docs host
+  and ended in an error; they now go to `https://turingpi.xyz`, and the two
+  Console notes land on the right section.
+- **New releases never appeared in the Firmware page's list on a board.**
+  Listing the 44 releases of this repository took about three minutes on a
+  real board (170 s for `tpi-selfupdate --list`, measured 2026-11-01 on
+  v2.46.1), and the page stops waiting after two, so the list came back
+  without the GitHub source and the newest releases were never shown.
+  `tpi-selfupdate` split the response on `},{`, which only exists in compact
+  JSON; GitHub sends it pretty-printed (about 690 KB and 11,000 lines), so
+  every line became its own piece and cost five forks, and the time grew with
+  every release published. It is now one `awk` pass over the whole response
+  (0.12 s against 6.1 s before on a workstation, same 44 releases), and the
+  same pass now reads `prerelease`, which sits on a line the old code never
+  looked at, so a pre-release is finally listed as one. Output and ordering
+  are unchanged. `tests/listing.sh` now runs against a trimmed copy of the
+  real response (`tests/fixtures/github-releases.json`) and fails if a
+  listing scales with the number of lines.
+
+- **The Grafana dashboard's description linked to the dead docs host.**
+  `dashboards/turingpi-bmc.json` sent readers to the metrics catalogue at
+  `turing.excavador.xyz`, which answers a Cloudflare 502; it now points at
+  `https://turingpi.xyz/reference/metrics/`. The dashboard is not part of the
+  image.</content>
+  </entry>
   <entry>
     <title>Firmware v2.46.1: The settings-storage repair is offered on a real board</title>
     <link href="https://turingpi.xyz/news/v2.46.1/"/>
@@ -1314,19 +1408,5 @@ it comes back.
   always, with the rest behind &quot;show N more&quot;. The previous rule showed only
   versions at or above the running one, which left an empty card the moment
   the board ran something no source had published yet.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.9.1</title>
-    <link href="https://turingpi.xyz/news/v2.9.1/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.9.1</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">### Changed
-
-- `tpi` **1.2.1** and BMC-UI **3.9.1**. The CLI in v2.9.0 was the one whose
-  every fork command failed against a real board — the first release of the
-  tool ever run against one found five bugs, all fixed here. The interface's
-  USB selector no longer prints its label through its value, and every
-  candidate from a GitHub source has a link to its release notes beside
-  Install.</content>
   </entry>
 </feed>

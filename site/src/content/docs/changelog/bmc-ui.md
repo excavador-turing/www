@@ -1,15 +1,101 @@
 ---
 title: BMC-UI
-description: 'Every BMC-UI release and what changed in it: 42 entries, newest v4.3.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-UI release and what changed in it: 43 entries, newest v4.4.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmc-ui
 tableOfContents: false
 ---
 
 The web interface the board serves.
 
-Newest release **v4.3.0**, 31 October 2026. 42 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v4.4.0**, 1 November 2026. 43 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v4.4.0 — 1 November 2026</summary>
+
+The firmware page keeps checking until the list arrives, the update badge
+installs the version it names, an upload installs directly on a board without
+an SD card, and the (i) links reach turingpi.xyz.
+
+This release reads `mounted` on the SD card in `GET /api/bmc/info`, which
+bmcd 2.42.2 sends. On an older daemon the page falls back to comparing the
+card's size with the BMC's own volume, and the daemon's own refusal still
+offers "Install directly instead".
+
+**Fixed**
+
+- **The (i) notes still pointed at the dead docs host.** `InfoNote` built every
+  "Read more" link from `https://turing.excavador.xyz`, which answers a
+  Cloudflare 502 and will not be redirected, so each (i) on the Firmware, Fan,
+  Console and Nodes pages led to an error. 3.31.0 says it fixed this host and
+  missed `InfoNote`. It now uses `https://turingpi.xyz`.
+
+  The two Console notes also named the wrong page: their anchors live on
+  `/why/a-console-to-every-module/`, not on the feature page, so the link
+  landed at the top instead of at the note. Every path `InfoNote` is given
+  answers 200 on `turingpi.xyz`.
+
+  ESLint now rejects the old host in any string or template literal under
+  `src/`, so a third copy cannot come back unnoticed.
+
+- **The firmware page no longer gives up on a slow catalogue and sticks.**
+  Seen on a board running v2.44.0: "Update available · v2.46.1" in the slots
+  panel, a list with only v2.44.0, v2.1.0 and v2.0.5, "checking the sources
+  now" that never changed and a greyed-out Check now, until the page was
+  reloaded. The page polled the catalogue for two minutes, on the strength of
+  a 16 s refresh measured with one source; building the fork's release list
+  alone takes 170 s on a real board, and the daemon allows a refresh ten
+  minutes. It now keeps asking while the daemon says it is refreshing, for up
+  to eleven minutes, backing off from every 2 s to every 5 s after 30 s and
+  every 10 s after two minutes, and not at all while the tab is hidden. If it
+  does give up it says "Still checking — the list may be out of date. Reload
+  later." and Check now works again; pressing it starts a fresh eleven
+  minutes.
+- **Uploading a `.tpu` to a board with no SD card no longer fails with a toast
+  and nothing else.** The dialog always asked the daemon to park the image on
+  the card, and a card-less board refuses ("/mnt/sdcard is not mounted…").
+  When the board has no card the dialog now says so and installs directly:
+  written to the spare slot and staged for the next boot, confirmed with the
+  same reboot warning (by board revision) as the slots panel's Reboot button.
+  With a card nothing changes: the image is parked and appears in the list.
+  From bmcd 2.42.2 the Info storage list says whether the card is mounted
+  (`mounted` on the "SD card" entry) and the dialog uses that exactly; before
+  it, the dialog goes by whether that entry's size is the BMC's own volume.
+  Where that is wrong, or unreadable, the daemon's refusal now stays in the
+  dialog until dismissed, with "Install directly instead" beside it. A card
+  that is not mounted is no longer drawn as a second storage row on the Info
+  page (its sizes are the BMC's) nor given a usage line in the SD card
+  picker.
+  Upload errors in general persist in the dialog rather than only as a toast,
+  and a finished upload refreshes the list and the slots panel (so "Next boot"
+  shows what was staged).
+- A refused install shows the daemon's reason after "Nothing has been
+  staged." (already staged, unknown source), not only the generic line.
+
+**Added**
+
+- **The "Update available" badge installs the version it names.** It comes
+  from the cheap update check, which knows of a release long before the
+  catalogue has listed it. Pressing it opens the same confirmation as the
+  list's Install button, which says which source and repository it installs
+  from and, when the list does not have the version yet, that too. The source
+  is the GitHub source whose location is the repository the check named, and
+  no other: another source listing the same version string does not count.
+  If no configured source is that repository the badge is information only,
+  with a line saying why. What the dialog shows is fixed when the badge is
+  pressed and is what is sent, even if the list refreshes underneath; it never
+  asks the updater to allow a downgrade unless the list says the version is
+  older and the dialog says so. It is disabled while an install, an upload or
+  a flash runs, or an update is already staged.
+- The demo can show both: `?card=none` is a board with no SD card (as bmcd
+  2.42.2 reports it), and `?firmware=stale` is a board running v2.44.0 whose update check offers
+  v2.46.1 and whose list does not have it (and says it is checking for the
+  first 25 seconds). Written changes to the captures, not captures.
+- The generated API types are now from bmcd v2.42.2 (they were v2.42.0); the
+  card question reads `mounted` from them instead of a local type.
+
+</details>
+
+<details class="note">
 <summary>v4.3.0 — 31 October 2026</summary>
 
 This release needs bmcd 2.42.0 for `GET /api/bmc/storage` and
