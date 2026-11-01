@@ -1,13 +1,13 @@
 ---
 title: BMC-Firmware
-description: 'Every BMC-Firmware release and what changed in it: 45 entries, newest v2.47.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-Firmware release and what changed in it: 46 entries, newest v2.48.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/firmware
 tableOfContents: false
 ---
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.47.0**, 1 November 2026. 45 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.48.0**, 1 November 2026. 46 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](/feed.xml).
 
@@ -21,6 +21,24 @@ $ sha256sum -c SHA256SUMS
 :::
 
 <details class="note" open>
+<summary>v2.48.0 — 1 November 2026</summary>
+
+BMC-UI 4.5.0; bmcd 2.42.2 and tpi 1.10.0 are unchanged.
+
+Console, Flash Node and USB show the four nodes side by side, so choosing one
+is a single click instead of opening a dropdown first. Nothing else changes.
+
+**Changed**
+
+- **Choosing a node is one click (BMC-UI 4.5.0).** The three pages that asked
+  which node to act on now share one control: a row of Node 1 to Node 4 you can
+  click, or move through with the arrow keys. The node you arrived with from
+  another page (`?node=`) is still preselected, and what each page sends to
+  the board is unchanged.
+
+</details>
+
+<details class="note">
 <summary>v2.47.0 — 1 November 2026</summary>
 
 bmcd 2.42.2 and BMC-UI 4.4.0; tpi 1.10.0 is unchanged.

@@ -47,11 +47,11 @@ Voted for, built, released. Each card still opens its discussion.
 One post per firmware release, from the repositories' own changelogs — [all of them](/news/), or [by feed](/feed.xml).
 
 <div class="tp-releases">
+<a href="/news/v2.48.0/"><b>v2.48.0</b><span>1 November 2026</span></a>
 <a href="/news/v2.47.0/"><b>v2.47.0</b><span>1 November 2026</span></a>
 <a href="/news/v2.46.1/"><b>v2.46.1</b><span>31 October 2026</span></a>
 <a href="/news/v2.46.0/"><b>v2.46.0</b><span>31 October 2026</span></a>
 <a href="/news/v2.45.0/"><b>v2.45.0</b><span>31 October 2026</span></a>
-<a href="/news/v2.44.0/"><b>v2.44.0</b><span>15 October 2026</span></a>
 </div>
 
 ## How a thing gets from here to there
