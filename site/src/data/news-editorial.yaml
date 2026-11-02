@@ -250,3 +250,16 @@ v2.47.0:
     an SD card. The list now builds in 5 seconds instead of 170, the page
     keeps checking until it arrives, the badge installs the version it names,
     and Upload installs directly when there is no card.
+
+# v2.48.0 -- BMC-UI 4.5.0 only; bmcd 2.42.2 and tpi 1.10.0 are unchanged. The
+# picture is the Console page of the fork demo pane at 4.5.0 (1120x800 at
+# 2x, the demo ribbon hidden), which is where the new picker is easiest to see.
+v2.48.0:
+  title: Choosing a node is one click
+  summary: >-
+    Console, Flash Node and USB used to keep the four nodes in a dropdown: open
+    it, then choose. Now Node 1 to Node 4 sit in a row, one click picks one,
+    and the arrow keys move along it. The node you arrive with from another
+    page is still the one selected.
+  capture: captures/news/node-picker.png
+  caption: The Console page — Node 1 to Node 4 in one row, the chosen one filled in, where a dropdown used to be.
