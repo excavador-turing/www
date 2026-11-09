@@ -63,8 +63,8 @@ roadmap:
   as_of: 2026-11-09
   count: 7
   shipped: 2
-  votes: 22
-  top: A hardware watchdog, so a hung daemon does not mean a trip to the rack
+  votes: 23
+  top: Remote syslog, and an audit line for every mutating API call
 platform:
   source: reference/comparison.md, measured on a running board
   rows: 13

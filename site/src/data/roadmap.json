@@ -11,6 +11,15 @@
    "summary": "**VLANs on the board's switch \u2014 shipped in firmware v2.33.0, with three ways to use them**"
   },
   {
+   "number": 27,
+   "title": "Remote syslog, and an audit line for every mutating API call",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/27",
+   "votes": 5,
+   "status": "Open",
+   "status_from": "default",
+   "summary": "Ship the board's logs somewhere that survives it, and write one line per call that changes state \u2014 who, what, from where."
+  },
+  {
    "number": 24,
    "title": "A hardware watchdog, so a hung daemon does not mean a trip to the rack",
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/24",
@@ -18,15 +27,6 @@
    "status": "Open",
    "status_from": "default",
    "summary": "The SoC has a watchdog and this firmware does not arm it."
-  },
-  {
-   "number": 27,
-   "title": "Remote syslog, and an audit line for every mutating API call",
-   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/27",
-   "votes": 4,
-   "status": "Open",
-   "status_from": "default",
-   "summary": "Ship the board's logs somewhere that survives it, and write one line per call that changes state \u2014 who, what, from where."
   },
   {
    "number": 29,
