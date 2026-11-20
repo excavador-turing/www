@@ -139,12 +139,41 @@ def changelog_of(repo: str) -> str:
               f"repos/{ORG}/{repo}/contents/CHANGELOG.md")
 
 
+def shipped_releases(out: list[dict]) -> dict[str, dict]:
+    """Bare version -> release, for the ones that shipped.
+
+    A draft is not out yet, and a pre-release (v2.51.0-rc.1) is a board test,
+    not something to flash: neither gets a row on the changelog page, a post
+    in the news or an entry in the feed. The stable release that follows it
+    carries the story, and an rc that was never promoted is simply not there.
+    """
+    return {r["tagName"].lstrip("v"): r for r in out
+            if not r.get("isDraft") and not r.get("isPrerelease")}
+
+
 def released(repo: str) -> dict[str, dict]:
     """Published releases by bare version, so the page can say what shipped."""
     out = json.loads(gh("release", "list", "--repo", f"{ORG}/{repo}",
                         "--limit", "300", "--json",
                         "tagName,publishedAt,isPrerelease,isDraft"))
-    return {r["tagName"].lstrip("v"): r for r in out if not r.get("isDraft")}
+    return shipped_releases(out)
+
+
+def self_test() -> int:
+    """The release filter judges as it says: no drafts, no pre-releases."""
+    rows = [
+        {"tagName": "v2.51.0", "isDraft": False, "isPrerelease": False},
+        {"tagName": "v2.51.0-rc.1", "isDraft": False, "isPrerelease": True},
+        {"tagName": "v2.52.0", "isDraft": True, "isPrerelease": False},
+        {"tagName": "v2.50.0", "isDraft": False},
+    ]
+    got = sorted(shipped_releases(rows))
+    want = ["2.50.0", "2.51.0"]
+    if got != want:
+        print(f"self-test failed: {got} != {want}", file=sys.stderr)
+        return 1
+    print("  the release filter skips drafts and pre-releases")
+    return 0
 
 
 def sections(text: str) -> list[dict]:
@@ -285,8 +314,6 @@ def render(slug: str, repo: str, blurb: str) -> dict:
         rel = e.get("released")
         when = (rel.get("publishedAt", "")[:10] if rel else None) or e["date"]
         title = f"{e['version']} — {human(when)}"
-        if rel and rel.get("isPrerelease"):
-            title += " (pre-release)"
         if not rel:
             # Normal for the three components that reach a board inside a
             # firmware image, and a gap worth seeing for the firmware itself.
@@ -561,9 +588,7 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         slug_of[e["version"]] = e["version"]
         title = meta.get("title") or (
             "Firmware " + " and ".join(g["version"] for g in group))
-        if rel and rel.get("isPrerelease"):
-            title += " (pre-release)"
-        elif not rel:
+        if not rel:
             title += " (not released)"
         raw = e["body"] or ""
         parsed = e["source"] == "changelog"
@@ -816,7 +841,11 @@ def main(argv: list[str]) -> int:
     ap.add_argument("components", nargs="*")
     ap.add_argument("--check", action="store_true",
                     help="fail if the committed pages are not what this writes")
+    ap.add_argument("--self-test", action="store_true",
+                    help="check the release filter and exit")
     args = ap.parse_args(argv[1:])
+    if args.self_test:
+        return self_test()
 
     wanted = set(args.components)
     chosen = [c for c in COMPONENTS

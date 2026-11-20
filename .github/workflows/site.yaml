@@ -102,6 +102,9 @@ jobs:
       - name: every page is within two clicks of the front page
         run: devbox run -- python3 scripts/reach.py
 
+      - name: the changelog refresh skips pre-releases
+        run: devbox run -- python3 scripts/refresh-changelog.py --self-test
+
       - name: the served-URL gate judges as it says
         run: devbox run -- python3 scripts/served-urls.py --self-test
 

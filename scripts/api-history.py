@@ -38,13 +38,13 @@ OUT = CONTENT / "reference" / "api-history.md"
 
 
 def releases(limit: int) -> list[str]:
-    """Published, non-draft release tags, newest first."""
+    """Published, non-draft, non-prerelease tags, newest first."""
     raw = subprocess.run(
         ["gh", "release", "list", "--repo", REPO, "--limit", str(limit),
-         "--json", "tagName,isDraft"],
+         "--json", "tagName,isDraft,isPrerelease"],
         capture_output=True, text=True, check=True,
     ).stdout
-    return [r["tagName"] for r in json.loads(raw) if not r["isDraft"]]
+    return [r["tagName"] for r in json.loads(raw) if not r["isDraft"] and not r["isPrerelease"]]
 
 
 def document(tag: str) -> dict | None:
