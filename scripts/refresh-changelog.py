@@ -458,6 +458,12 @@ def parse_entry(body: str) -> tuple[list[str], dict[str, list[dict]]]:
     return notes, cats
 
 
+def version_key(tag: str) -> tuple[int, ...]:
+    """v2.51.0 -> (2, 51, 0); anything that is not numbers sorts first."""
+    nums = re.findall(r"\d+", tag.split("-")[0])
+    return tuple(int(n) for n in nums) if nums else (0,)
+
+
 def dot(lead: str) -> str:
     """The lead closed with a full stop, unless it already ends in ! or ?."""
     return lead if lead.endswith(("!", "?")) else lead + "."
@@ -493,13 +499,16 @@ def split_item(text: str) -> tuple[str, str, str]:
     return lead, short, rest
 
 
-def render_item(item: dict, tag: str | None) -> list[str]:
+def render_item(item: dict, tag: str | None, flat: bool = False) -> list[str]:
     if "note" in item:
         return [demote(item["note"]), ""]
     lead, short, rest = split_item(item["text"])
-    # A lead wrapped over two lines in the CHANGELOG would otherwise break the
-    # heading in two: the second half became a paragraph under it.
-    out = [f"### {re.sub(r'\s*\n\s*', ' ', lead)}"]
+    # A lead wrapped over two lines in the CHANGELOG breaks the heading in two:
+    # the second half becomes a paragraph under it. `flat` joins the lines, but
+    # only for posts from v2.51.0 on: the older posts' heading anchors are URLs
+    # MkDocs served (site/served-urls.json), cut at the line break, and joining
+    # their lines would move them.
+    out = [f"### {re.sub(r'\s*\n\s*', ' ', lead) if flat else lead}"]
     if tag:
         out.append(f'<small class="tp-tag">{tag}</small>')
     out.append("")
@@ -593,6 +602,7 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         group = [e] + [by_version[c] for c in (meta.get("covers") or [])
                        if c in by_version]
         slug_of[e["version"]] = e["version"]
+        flat_headings = version_key(e["version"]) >= (2, 51, 0)
         title = meta.get("title") or (
             "Firmware " + " and ".join(g["version"] for g in group))
         if not rel:
@@ -755,7 +765,8 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
                 # the table of contents lists them. Changed and Fixed are a
                 # compact list -- twenty headings for twenty adjustments
                 # made the contents a wall and the features invisible in it.
-                lines += (render_item(it, tag) if cat in ("Added", "Security")
+                lines += (render_item(it, tag, flat=flat_headings)
+                          if cat in ("Added", "Security")
                           else render_fix(it, tag))
             lines.append("")
         for r, v, c in comps:
