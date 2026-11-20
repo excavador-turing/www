@@ -5,8 +5,71 @@
   <link href="https://turingpi.xyz/feed.xml" rel="self"/>
   <link href="https://turingpi.xyz/news/"/>
   <id>https://turingpi.xyz/feed.xml</id>
-  <updated>2026-11-14T00:00:00Z</updated>
+  <updated>2026-11-20T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
+  <entry>
+    <title>Firmware v2.50.0: Settings survive a power cut, and the switch no longer cuts the board off</title>
+    <link href="https://turingpi.xyz/news/v2.50.0/"/>
+    <id>tag:turingpi.xyz,2026-11-20:firmware/2.50.0</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <content type="text">bmcd 2.44.0 and BMC-UI 4.6.1; tpi 1.10.0 is unchanged.
+
+Fixes &lt;https://github.com/excavador-turing/BMC-Firmware/issues/81&gt; (a power cut
+could leave a settings file empty) and
+&lt;https://github.com/excavador-turing/BMC-Firmware/issues/82&gt; (Split and Trunk
+cut the BMC off), and lets a node's console speed go back to its default.
+
+Thanks to the people outside the project whose work is in this release:
+[@danste22](https://github.com/danste22) found both problems by reading the
+code, reported them as #81 and #82, and wrote the first fixes
+([bmcd#48](https://github.com/excavador-turing/bmcd/pull/48) and
+[bmcd#49](https://github.com/excavador-turing/bmcd/pull/49), carried on as
+[bmcd#51](https://github.com/excavador-turing/bmcd/pull/51) and
+[bmcd#52](https://github.com/excavador-turing/bmcd/pull/52));
+[@cloudlabworks](https://github.com/cloudlabworks) wrote the fix for a
+forgotten session token counting as a wrong password
+([bmcd#39](https://github.com/excavador-turing/bmcd/pull/39)) and corrected the
+toolchain note in the daemon's Justfile
+([bmcd#40](https://github.com/excavador-turing/bmcd/pull/40)).
+
+### Fixed
+
+- **A power cut just after confirming a change could leave a settings file empty
+  (bmcd 2.44.0, [#81](https://github.com/excavador-turing/BMC-Firmware/issues/81)).**
+  The switch table, `/etc/network/interfaces`, the access overrides, the
+  managed client CA and the TLS key and certificate were written to a temporary
+  file and renamed, but never flushed to flash. On the board's flash a power
+  cut right after confirm could leave a file with the right name and nothing in
+  it: the switch fell back to Flat with no message, or the board came up with
+  no network. Each of them is now flushed, and so is its directory, before the
+  change counts as saved. Thanks @danste22
+  ([bmcd#48](https://github.com/excavador-turing/bmcd/pull/48) →
+  [#51](https://github.com/excavador-turing/bmcd/pull/51)).
+- **Going from Flat to Split or Trunk cut the BMC off and the change was
+  reverted (bmcd 2.44.0, [#82](https://github.com/excavador-turing/BMC-Firmware/issues/82)).**
+  The switch plan took the front ports out of VLAN 1 but left the BMC's own
+  bridge address in it, so the board became unreachable and the confirm window
+  undid the change. The plan now puts the BMC in the VLAN the table gives it,
+  joining the new one before leaving the old, so it is never in none. Thanks
+  @danste22 ([bmcd#49](https://github.com/excavador-turing/bmcd/pull/49) →
+  [#52](https://github.com/excavador-turing/bmcd/pull/52)).
+- **A session token the board had forgotten counted as a wrong password (bmcd
+  2.44.0).** A browser tab left open across a reboot sent its old token on
+  every request, and each refusal counted toward banning that address, so the
+  right password typed from the same machine could then be refused. An unknown
+  token is still refused, but no longer counts. Thanks @cloudlabworks
+  ([bmcd#39](https://github.com/excavador-turing/bmcd/pull/39)).
+- **Setting a node's console speed to `null` did nothing (bmcd 2.44.0).** A
+  node's speed starts as `null`, meaning 115200, but sending `null` again
+  answered 200 and kept the speed that was stored. `null` now clears it and
+  the open port goes back to 115200 at once, without disconnecting the web
+  console. Leaving the speed out of a request still keeps it.
+
+### Changed
+
+- **BMC-UI 4.6.1** takes its API types from bmcd 2.44.0. Nothing in the
+  interface changes.</content>
+  </entry>
   <entry>
     <title>Firmware v2.49.0</title>
     <link href="https://turingpi.xyz/news/v2.49.0/"/>
@@ -1412,31 +1475,5 @@ instead of flashing.
 
   `S00sysrq` sets the runtime value to match, so the intent is visible in the
   init scripts and not only in a kernel config.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.11.0</title>
-    <link href="https://turingpi.xyz/news/v2.11.0/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.11.0</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">Built but **not installed**: the board wedged before this could be flashed and
-needs a physical power cycle first (SQU-172). This is the image to install when
-it comes back.
-
-### Changed
-
-- bmcd **2.19.0**: the health gate's history as a metric
-  (`bmcd_firmware_promotion_total`), the daemon's own resident set
-  (`bmcd_process_resident_bytes`), a `refreshing` flag that can no longer stick
-  through a panic, and a rollback slot whose version can finally be named.
-- BMC-UI **3.10.1**: a red warning on v2.5 boards that flashing may not target
-  the module you chose, a bounded poll on the firmware page, and Reset network
-  made destructive with a confirmation that says what it costs.
-- `tpi` **1.2.2**: `firmware install` works — it had never worked in any
-  release — and `firmware list --refresh` waits for the daemon's re-poll.
-
-### Added
-
-- The gate records what a promoted image replaced, so a rollback can be named
-  rather than reported as &quot;version not readable&quot;.</content>
   </entry>
 </feed>
