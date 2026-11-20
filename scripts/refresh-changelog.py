@@ -458,6 +458,11 @@ def parse_entry(body: str) -> tuple[list[str], dict[str, list[dict]]]:
     return notes, cats
 
 
+def dot(lead: str) -> str:
+    """The lead closed with a full stop, unless it already ends in ! or ?."""
+    return lead if lead.endswith(("!", "?")) else lead + "."
+
+
 def split_item(text: str) -> tuple[str, str, str]:
     """(lead, short, rest): the bold lead, the first sentence or two, the rest."""
     m = ITEM_LEAD.match(text)
@@ -492,7 +497,9 @@ def render_item(item: dict, tag: str | None) -> list[str]:
     if "note" in item:
         return [demote(item["note"]), ""]
     lead, short, rest = split_item(item["text"])
-    out = [f"### {lead}"]
+    # A lead wrapped over two lines in the CHANGELOG would otherwise break the
+    # heading in two: the second half became a paragraph under it.
+    out = [f"### {re.sub(r'\s*\n\s*', ' ', lead)}"]
     if tag:
         out.append(f'<small class="tp-tag">{tag}</small>')
     out.append("")
@@ -508,7 +515,7 @@ def render_fix(item: dict, tag: str | None) -> list[str]:
     if "note" in item:
         return [demote(item["note"]), ""]
     lead, short, rest = split_item(item["text"])
-    line = f"- **{lead}.**"
+    line = f"- **{dot(lead)}**"
     if short:
         line += f" {short}"
     if tag:
@@ -602,8 +609,8 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
             for it in cats.get(cat, []):
                 if "text" in it:
                     lead, short, _ = split_item(it["text"])
-                    first_lead = lead + "."
-                    first_item = f"{lead}. {short}".strip()
+                    first_lead = dot(lead)
+                    first_item = f"{dot(lead)} {short}".strip()
                     break
             if first_lead:
                 break
