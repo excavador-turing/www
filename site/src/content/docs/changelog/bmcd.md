@@ -1,15 +1,86 @@
 ---
 title: bmcd
-description: 'Every bmcd release and what changed in it: 51 entries, newest 2.43.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every bmcd release and what changed in it: 52 entries, newest 2.44.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmcd
 tableOfContents: false
 ---
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.43.0**, 14 November 2026. 51 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.44.0**, 20 November 2026. 52 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>2.44.0 — 20 November 2026</summary>
+
+Answers <https://github.com/excavador-turing/BMC-Firmware/issues/81> and
+<https://github.com/excavador-turing/BMC-Firmware/issues/82>, and takes the
+serial speed back to its default.
+
+Thanks to the people outside the project who made this release:
+[@cloudlabworks](https://github.com/cloudlabworks) for
+[#39](https://github.com/excavador-turing/bmcd/pull/39) and
+[#40](https://github.com/excavador-turing/bmcd/pull/40), and
+[@danste22](https://github.com/danste22) for
+[#48](https://github.com/excavador-turing/bmcd/pull/48) (carried on as
+[#51](https://github.com/excavador-turing/bmcd/pull/51)) and
+[#49](https://github.com/excavador-turing/bmcd/pull/49) (carried on as
+[#52](https://github.com/excavador-turing/bmcd/pull/52)). Their original
+commits are in those pull requests.
+
+**Changed**
+
+- **The toolchain named in the Justfile and the README is 1.98.1.** Both still
+  said 1.85, which CI left behind long ago; `rust-toolchain.toml` has pinned
+  1.98.1, the version the firmware builds with. Documentation only.
+  (thanks [@cloudlabworks](https://github.com/cloudlabworks), #40; the README
+  in #53)
+
+**Fixed**
+
+- **A session token the daemon had forgotten counted as a wrong password.**
+  Tokens live in memory, so a restart forgets all of them, and an expired
+  token is dropped from the store. A browser tab or script still sending one
+  got a 401 for each request, and each 401 counted toward the peer's ban
+  exactly like a wrong password. A page that fires several requests at once
+  could therefore ban its own address after a BMC reboot, and the correct
+  password typed from that machine was then refused with a 429. An unknown
+  token is still refused with the same 401 and `Bearer` challenge, but no
+  longer counts. A 64-character random token cannot be guessed, so counting
+  it gave no protection. A ban that already stands still refuses tokens.
+  (thanks [@cloudlabworks](https://github.com/cloudlabworks), [#39](https://github.com/excavador-turing/bmcd/pull/39))
+
+- **Confirmed config files are flushed to flash before rename.**
+  `switch.json`, `/etc/network/interfaces`, access overrides, the managed
+  client CA, and TLS key/cert pairs were written with temp+rename and no
+  `fsync`. On the UBIFS overlay a power cut just after confirm could leave a
+  correctly named empty or truncated file — Flat with no UI error for the
+  switch document, or no network at boot for `interfaces`. One helper,
+  `write_durably`, now syncs the data and the directory (one `<name>.tmp`
+  per target, opened exclusively, a stale one from an interrupted write
+  removed first; a directory sync failure after rename is logged, not
+  treated as a failed write). (thanks [@danste22](https://github.com/danste22), [#48](https://github.com/excavador-turing/bmcd/pull/48) → [#51](https://github.com/excavador-turing/bmcd/pull/51); fixes BMC-Firmware#81)
+
+- **Split and Trunk left the BMC on VLAN 1.** `plan()` skipped `PortId::Bmc`
+  because it has no netdev. The BMC's membership is the bridge `self` entry
+  (`bridge vlan … dev br0 … self`). Without that, Flat→Split/Trunk cleared
+  VID 1 from the front ports while `br0` stayed on the kernel default, the
+  board went unreachable, and the confirm window reverted the change. The
+  planner now emits those `self` lines, the BMC's new VLAN added BEFORE the
+  old one is deleted so the BMC is never in none, and a failed delete of a
+  `self` entry (a bridge that never had it) no longer stops the plan.
+  (thanks [@danste22](https://github.com/danste22), [#49](https://github.com/excavador-turing/bmcd/pull/49) → [#52](https://github.com/excavador-turing/bmcd/pull/52); fixes BMC-Firmware#82)
+
+- **`{"NodeN":{"uart_baud":null}}` answered 200 and changed nothing.** The
+  serial speed of a node starts as `null` (the default, 115200), but there was
+  no way back to it: a request could not tell `null` from a field left out, and
+  both kept the stored speed. Now `null` clears the stored speed and the open
+  port goes back to 115200 at once, without disconnecting the web console; a
+  field left out of a request still keeps what is stored. A configuration
+  import behaves as before: a file with no speed for a node leaves it alone.
+
+</details>
+
+<details class="note">
 <summary>2.43.0 — 14 November 2026</summary>
 
 Answers <https://github.com/excavador-turing/BMC-Firmware/issues/76>.
