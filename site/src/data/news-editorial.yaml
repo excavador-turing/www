@@ -281,3 +281,18 @@ v2.50.0:
     session token counting toward a ban
     ([bmcd#39](https://github.com/excavador-turing/bmcd/pull/39)). Thank you
     both.
+
+# v2.51.0 -- Linux 6.18.63. bmcd 2.44.0, BMC-UI 4.6.1 and tpi 1.10.0 are
+# unchanged. The kernel port is @danste22's (PR #85, from his #79), building on
+# upstream work by Sven Rademakers and Sam Edwards, and the post says so with
+# their names. The interface does not change, so no capture.
+v2.51.0:
+  title: A new kernel, the switch driver inside it, and an update that rolls itself back without a gateway
+  summary: >-
+    The board now runs the mainline Linux 6.18 kernel, and the Realtek switch is
+    driven by the driver that ships in it. The EEPROM and the clock chip share
+    two pins with the switch and now take turns safely, and an update rolls
+    itself back if the board loses its gateway. Thanks to
+    [@danste22](https://github.com/danste22) (Daniel) for the kernel port
+    ([#85](https://github.com/excavador-turing/BMC-Firmware/pull/85)), building
+    on upstream work by Sven Rademakers and Sam Edwards.

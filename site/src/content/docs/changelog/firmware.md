@@ -1,13 +1,13 @@
 ---
 title: BMC-Firmware
-description: 'Every BMC-Firmware release and what changed in it: 48 entries, newest v2.50.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-Firmware release and what changed in it: 49 entries, newest v2.51.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/firmware
 tableOfContents: false
 ---
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.50.0**, 20 November 2026. 48 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.51.0**, 20 November 2026. 49 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](/feed.xml).
 
@@ -21,6 +21,50 @@ $ sha256sum -c SHA256SUMS
 :::
 
 <details class="note" open>
+<summary>v2.51.0 — 20 November 2026</summary>
+
+Linux 6.18.63. bmcd 2.44.0, BMC-UI 4.6.1 and tpi 1.10.0 are unchanged.
+
+**Changed**
+
+- **Linux 6.18.63 LTS and the mainline rtl8365mb switch driver over SMI, by
+  @danste22 (#85), thanks!** The kernel moves from 6.12.109 to 6.18.63. The
+  Realtek switch is now driven by the mainline `rtl8365mb` code (VLAN, FDB and
+  bridge offload, backported commit by commit) on a GPIO SMI bus, and a new
+  arbiter, written by @danste22, shares the two pins with the EEPROM and the
+  RTC. The node power rails still hold across a BMC reboot through a rewritten
+  `preserve-boot-state` patch. The default flat `br0` behaviour is unchanged.
+  It ran on a board for 30 minutes as v2.51.0-rc.1 before this release. The
+  hardware LAG patches of #79 are not part of it and follow in a separate change.
+
+  Credit where it is due: the preserve-boot-state patch builds on work by Sven
+  Rademakers, and the RTL8370MB-CG chip row, the mv64xxx bus-error fix and the
+  Turing Pi 2 GPIO aggregator compatible on work by Sam Edwards, all from
+  turing-machines/BMC-Firmware; the PWM fan driver is Aleksandr Shubin's and
+  the switch driver is mainline Linux by its authors, Alvin Šipraga and Luiz
+  Angelo Daros de Luca. Copyright lines are kept.
+
+**Added**
+
+- **The promotion gate also requires `ge0` and `ge1`, a readable EEPROM and a
+  bound RTC driver.** After a new image boots, the switch, the EEPROM and the
+  RTC now share two pins, so a broken hand-over between them has to stop the
+  update. Interfaces are checked for existence, never for carrier: a board with
+  an uplink unplugged still passes.
+- **The promotion gate also requires the default gateway to answer again, if
+  it answered when the update was staged.** `osupdate` (so both `tpi-selfupdate`
+  and an upload through the web interface) now runs `/sbin/stage-gateway-note`,
+  which records the default gateway and whether it answered a ping in
+  `/mnt/overlay/staged-gateway`. On the tentative boot the gate retries for up
+  to 60 s and rolls back if the gateway stays silent, so a switch driver that
+  probes but carries no traffic can no longer make a board permanent and
+  unreachable. A board with no gateway, or one that never answered, is not
+  blocked. The check needs the staging tools of the image that is *running*, so
+  it first protects the update after the one that installs it.
+
+</details>
+
+<details class="note">
 <summary>v2.50.0 — 20 November 2026</summary>
 
 bmcd 2.44.0 and BMC-UI 4.6.1; tpi 1.10.0 is unchanged.

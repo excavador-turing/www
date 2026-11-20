@@ -8,6 +8,50 @@
   <updated>2026-11-20T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.51.0: A new kernel, the switch driver inside it, and an update that rolls itself back without a gateway</title>
+    <link href="https://turingpi.xyz/news/v2.51.0/"/>
+    <id>tag:turingpi.xyz,2026-11-20:firmware/2.51.0</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <content type="text">Linux 6.18.63. bmcd 2.44.0, BMC-UI 4.6.1 and tpi 1.10.0 are unchanged.
+
+### Changed
+
+- **Linux 6.18.63 LTS and the mainline rtl8365mb switch driver over SMI, by
+  @danste22 (#85), thanks!** The kernel moves from 6.12.109 to 6.18.63. The
+  Realtek switch is now driven by the mainline `rtl8365mb` code (VLAN, FDB and
+  bridge offload, backported commit by commit) on a GPIO SMI bus, and a new
+  arbiter, written by @danste22, shares the two pins with the EEPROM and the
+  RTC. The node power rails still hold across a BMC reboot through a rewritten
+  `preserve-boot-state` patch. The default flat `br0` behaviour is unchanged.
+  It ran on a board for 30 minutes as v2.51.0-rc.1 before this release. The
+  hardware LAG patches of #79 are not part of it and follow in a separate change.
+
+  Credit where it is due: the preserve-boot-state patch builds on work by Sven
+  Rademakers, and the RTL8370MB-CG chip row, the mv64xxx bus-error fix and the
+  Turing Pi 2 GPIO aggregator compatible on work by Sam Edwards, all from
+  turing-machines/BMC-Firmware; the PWM fan driver is Aleksandr Shubin's and
+  the switch driver is mainline Linux by its authors, Alvin Šipraga and Luiz
+  Angelo Daros de Luca. Copyright lines are kept.
+
+### Added
+
+- **The promotion gate also requires `ge0` and `ge1`, a readable EEPROM and a
+  bound RTC driver.** After a new image boots, the switch, the EEPROM and the
+  RTC now share two pins, so a broken hand-over between them has to stop the
+  update. Interfaces are checked for existence, never for carrier: a board with
+  an uplink unplugged still passes.
+- **The promotion gate also requires the default gateway to answer again, if
+  it answered when the update was staged.** `osupdate` (so both `tpi-selfupdate`
+  and an upload through the web interface) now runs `/sbin/stage-gateway-note`,
+  which records the default gateway and whether it answered a ping in
+  `/mnt/overlay/staged-gateway`. On the tentative boot the gate retries for up
+  to 60 s and rolls back if the gateway stays silent, so a switch driver that
+  probes but carries no traffic can no longer make a board permanent and
+  unreachable. A board with no gateway, or one that never answered, is not
+  blocked. The check needs the staging tools of the image that is *running*, so
+  it first protects the update after the one that installs it.</content>
+  </entry>
+  <entry>
     <title>Firmware v2.50.0: Settings survive a power cut, and the switch no longer cuts the board off</title>
     <link href="https://turingpi.xyz/news/v2.50.0/"/>
     <id>tag:turingpi.xyz,2026-11-20:firmware/2.50.0</id>
@@ -1443,37 +1487,5 @@ instead of flashing.
   watchdog, where the failure mode is losing the machine entirely, a threshold
   check that does nothing on a healthy system is cheap insurance — and if it
   ever fires, the log line is the field evidence that something still reloads.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.12.0</title>
-    <link href="https://turingpi.xyz/news/v2.12.0/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.12.0</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">### Fixed
-
-- **A serial console could reboot the board by accident.** The kernel boots
-  with `console=ttyS0` and a BREAK on that line triggers SysRq, with the next
-  byte taken as the command. USB-serial adapters assert BREAK whenever a port
-  is opened, closed or reconfigured, and nothing guarded it. The kernel's own
-  help for `MAGIC_SYSRQ_SERIAL` describes the hazard exactly: *&quot;a disconnected
-  TTL level serial which can generate some garbage that can lead to spurious
-  false sysrq detects.&quot;*
-
-  The first instinct was to mask the dangerous commands off. That was the wrong
-  trade: this board has **no watchdog**, so a serial reset is the only remedy
-  short of walking to the rack, and it is worth keeping.
-
-  So the trigger is guarded rather than the commands removed.
-  `MAGIC_SYSRQ_SERIAL_SEQUENCE=&quot;sysrq&quot;` means a BREAK on its own now does
-  nothing; the sequence must follow it before any command is accepted. Garbage
-  cannot produce that and a person typing it means it. The full command set
-  stays available:
-
-      BREAK, then &quot;sysrq&quot;, then the key
-        b  reboot        o  power off      s  sync
-        w  blocked tasks m  memory         t  all tasks
-
-  `S00sysrq` sets the runtime value to match, so the intent is visible in the
-  init scripts and not only in a kernel config.</content>
   </entry>
 </feed>

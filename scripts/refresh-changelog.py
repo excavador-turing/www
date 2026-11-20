@@ -139,12 +139,41 @@ def changelog_of(repo: str) -> str:
               f"repos/{ORG}/{repo}/contents/CHANGELOG.md")
 
 
+def shipped_releases(out: list[dict]) -> dict[str, dict]:
+    """Bare version -> release, for the ones that shipped.
+
+    A draft is not out yet, and a pre-release (v2.51.0-rc.1) is a board test,
+    not something to flash: neither gets a row on the changelog page, a post
+    in the news or an entry in the feed. The stable release that follows it
+    carries the story, and an rc that was never promoted is simply not there.
+    """
+    return {r["tagName"].lstrip("v"): r for r in out
+            if not r.get("isDraft") and not r.get("isPrerelease")}
+
+
 def released(repo: str) -> dict[str, dict]:
     """Published releases by bare version, so the page can say what shipped."""
     out = json.loads(gh("release", "list", "--repo", f"{ORG}/{repo}",
                         "--limit", "300", "--json",
                         "tagName,publishedAt,isPrerelease,isDraft"))
-    return {r["tagName"].lstrip("v"): r for r in out if not r.get("isDraft")}
+    return shipped_releases(out)
+
+
+def self_test() -> int:
+    """The release filter judges as it says: no drafts, no pre-releases."""
+    rows = [
+        {"tagName": "v2.51.0", "isDraft": False, "isPrerelease": False},
+        {"tagName": "v2.51.0-rc.1", "isDraft": False, "isPrerelease": True},
+        {"tagName": "v2.52.0", "isDraft": True, "isPrerelease": False},
+        {"tagName": "v2.50.0", "isDraft": False},
+    ]
+    got = sorted(shipped_releases(rows))
+    want = ["2.50.0", "2.51.0"]
+    if got != want:
+        print(f"self-test failed: {got} != {want}", file=sys.stderr)
+        return 1
+    print("  the release filter skips drafts and pre-releases")
+    return 0
 
 
 def sections(text: str) -> list[dict]:
@@ -285,8 +314,6 @@ def render(slug: str, repo: str, blurb: str) -> dict:
         rel = e.get("released")
         when = (rel.get("publishedAt", "")[:10] if rel else None) or e["date"]
         title = f"{e['version']} — {human(when)}"
-        if rel and rel.get("isPrerelease"):
-            title += " (pre-release)"
         if not rel:
             # Normal for the three components that reach a board inside a
             # firmware image, and a gap worth seeing for the firmware itself.
@@ -431,6 +458,17 @@ def parse_entry(body: str) -> tuple[list[str], dict[str, list[dict]]]:
     return notes, cats
 
 
+def version_key(tag: str) -> tuple[int, ...]:
+    """v2.51.0 -> (2, 51, 0); anything that is not numbers sorts first."""
+    nums = re.findall(r"\d+", tag.split("-")[0])
+    return tuple(int(n) for n in nums) if nums else (0,)
+
+
+def dot(lead: str) -> str:
+    """The lead closed with a full stop, unless it already ends in ! or ?."""
+    return lead if lead.endswith(("!", "?")) else lead + "."
+
+
 def split_item(text: str) -> tuple[str, str, str]:
     """(lead, short, rest): the bold lead, the first sentence or two, the rest."""
     m = ITEM_LEAD.match(text)
@@ -461,11 +499,16 @@ def split_item(text: str) -> tuple[str, str, str]:
     return lead, short, rest
 
 
-def render_item(item: dict, tag: str | None) -> list[str]:
+def render_item(item: dict, tag: str | None, flat: bool = False) -> list[str]:
     if "note" in item:
         return [demote(item["note"]), ""]
     lead, short, rest = split_item(item["text"])
-    out = [f"### {lead}"]
+    # A lead wrapped over two lines in the CHANGELOG breaks the heading in two:
+    # the second half becomes a paragraph under it. `flat` joins the lines, but
+    # only for posts from v2.51.0 on: the older posts' heading anchors are URLs
+    # MkDocs served (site/served-urls.json), cut at the line break, and joining
+    # their lines would move them.
+    out = [f"### {re.sub(r'\s*\n\s*', ' ', lead) if flat else lead}"]
     if tag:
         out.append(f'<small class="tp-tag">{tag}</small>')
     out.append("")
@@ -481,7 +524,7 @@ def render_fix(item: dict, tag: str | None) -> list[str]:
     if "note" in item:
         return [demote(item["note"]), ""]
     lead, short, rest = split_item(item["text"])
-    line = f"- **{lead}.**"
+    line = f"- **{dot(lead)}**"
     if short:
         line += f" {short}"
     if tag:
@@ -559,11 +602,10 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
         group = [e] + [by_version[c] for c in (meta.get("covers") or [])
                        if c in by_version]
         slug_of[e["version"]] = e["version"]
+        flat_headings = version_key(e["version"]) >= (2, 51, 0)
         title = meta.get("title") or (
             "Firmware " + " and ".join(g["version"] for g in group))
-        if rel and rel.get("isPrerelease"):
-            title += " (pre-release)"
-        elif not rel:
+        if not rel:
             title += " (not released)"
         raw = e["body"] or ""
         parsed = e["source"] == "changelog"
@@ -577,8 +619,8 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
             for it in cats.get(cat, []):
                 if "text" in it:
                     lead, short, _ = split_item(it["text"])
-                    first_lead = lead + "."
-                    first_item = f"{lead}. {short}".strip()
+                    first_lead = dot(lead)
+                    first_item = f"{dot(lead)} {short}".strip()
                     break
             if first_lead:
                 break
@@ -723,7 +765,8 @@ def write_news(summary: list[dict]) -> list[pathlib.Path]:
                 # the table of contents lists them. Changed and Fixed are a
                 # compact list -- twenty headings for twenty adjustments
                 # made the contents a wall and the features invisible in it.
-                lines += (render_item(it, tag) if cat in ("Added", "Security")
+                lines += (render_item(it, tag, flat=flat_headings)
+                          if cat in ("Added", "Security")
                           else render_fix(it, tag))
             lines.append("")
         for r, v, c in comps:
@@ -816,7 +859,11 @@ def main(argv: list[str]) -> int:
     ap.add_argument("components", nargs="*")
     ap.add_argument("--check", action="store_true",
                     help="fail if the committed pages are not what this writes")
+    ap.add_argument("--self-test", action="store_true",
+                    help="check the release filter and exit")
     args = ap.parse_args(argv[1:])
+    if args.self_test:
+        return self_test()
 
     wanted = set(args.components)
     chosen = [c for c in COMPONENTS
