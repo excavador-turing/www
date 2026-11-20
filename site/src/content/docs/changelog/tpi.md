@@ -1,15 +1,52 @@
 ---
 title: tpi
-description: 'Every tpi release and what changed in it: 15 entries, newest v1.10.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every tpi release and what changed in it: 16 entries, newest v1.11.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/tpi
 tableOfContents: false
 ---
 
 The command-line client.
 
-Newest release **v1.10.0**, 21 September 2026. 15 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v1.11.0**, 20 November 2026. 16 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v1.11.0 — 20 November 2026</summary>
+
+`tpi network switch` can set up an LACP uplink. It is
+[@danste22](https://github.com/danste22)'s work
+([#16](https://github.com/excavador-turing/tpi/pull/16)), carried on as
+[#17](https://github.com/excavador-turing/tpi/pull/17) with his commit kept
+under his authorship, and review fixes on top. Thank you, Daniel.
+
+**Added**
+
+- **`tpi network switch` LACP uplink.** `--preset flat-lag` / `trunk-lag`, or
+  `--second-uplink lag` on `flat` / `trunk`, send the board
+  `{"preset":"flat|trunk","second_uplink":"lag"}` so ge0+ge1 become LACP
+  `bond0`. `show` and `presets` now print the port table under flat+lag too,
+  so `bond0` is visible, and say that ge0 and ge1 are the bond's members
+  (their empty rows are not a fault). Needs a bmcd that accepts
+  `second_uplink: lag` (and ifupdown-ng's bond executor to confirm), and LACP
+  on both ports of the switch at the other end. (thanks [@danste22](https://github.com/danste22), [#16](https://github.com/excavador-turing/tpi/pull/16)/[#17](https://github.com/excavador-turing/tpi/pull/17))
+
+- **`tpi network switch apply --replace-hand-written`.** LACP needs `bond0`
+  declared in `/etc/network/interfaces`, so over a hand-written file the board
+  refuses it with a 409. With the flag the request carries
+  `replace_hand_written: true`, and a confirmed change replaces the file
+  (the board keeps a copy beside it). Without it, that 409 now says so in
+  `tpi`'s words and names the flag; the 409 for a `bond0` the board did not
+  make says how to remove it. Every other change needs neither. (review of [#16](https://github.com/excavador-turing/tpi/pull/16))
+
+**Changed**
+
+- **`--preset flat --second-uplink redundant|off` is refused.** It used to be
+  ignored without a word; flat takes only `--second-uplink lag` (or
+  `--preset flat-lag`). `--preset split` refuses `--second-uplink` as well.
+  (thanks [@danste22](https://github.com/danste22), [#16](https://github.com/excavador-turing/tpi/pull/16)/[#17](https://github.com/excavador-turing/tpi/pull/17))
+
+</details>
+
+<details class="note">
 <summary>v1.10.0 — 21 September 2026</summary>
 
 **Added**

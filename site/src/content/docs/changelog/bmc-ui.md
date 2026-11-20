@@ -1,15 +1,60 @@
 ---
 title: BMC-UI
-description: 'Every BMC-UI release and what changed in it: 46 entries, newest v4.6.1, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-UI release and what changed in it: 47 entries, newest v4.7.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmc-ui
 tableOfContents: false
 ---
 
 The web interface the board serves.
 
-Newest release **v4.6.1**, 20 November 2026. 46 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v4.7.0**, 20 November 2026. 47 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v4.7.0 — 20 November 2026</summary>
+
+LACP on the Switch page: ge0 and ge1 can be bundled into one 802.3ad bond. It
+is [@danste22](https://github.com/danste22)'s work
+([#58](https://github.com/excavador-turing/BMC-UI/pull/58)), carried on as
+[#60](https://github.com/excavador-turing/BMC-UI/pull/60) with his two commits
+kept under his authorship, and review fixes on top. Thank you, Daniel.
+
+**Added**
+
+- **LACP on the Switch page** (thanks [@danste22](https://github.com/danste22),
+  [#58](https://github.com/excavador-turing/BMC-UI/pull/58)). The board's
+  `flat-lag` and `trunk-lag` presets are in the list, and an LACP switch beside
+  VLAN filtering and spanning tree bundles ge0 and ge1 into `bond0`. With LACP
+  on, ge0 and ge1 are locked as empty slaves, `bond0` carries the uplink VLANs,
+  and spanning tree is off. The running view shows an LACP badge. The switch at
+  the other end needs LACP on both ports, and the description says so. The draft
+  logic moved out of `SwitchConfig.tsx` into `switchDraft.ts`, with tests.
+- **Replacing a hand-written network file.** LACP needs `bond0` declared in
+  `/etc/network/interfaces`. When the board answers that the file was written
+  by hand, the page says so and shows "Replace my hand-written network file";
+  Apply stays off until it is ticked, then sends `replace_hand_written`. The
+  board keeps a copy of the old file. A `bond0` the board did not create is
+  explained rather than retried.
+- The LACP switch appears only on a board that shows it can do LACP (a preset
+  that uses it, or LACP already running), so a daemon from before bmcd's LACP
+  support does not get a control it would refuse. Turning LACP off on a flat
+  layout gives back the flat layout: spanning tree follows VLAN filtering, as in
+  the board's presets.
+
+**Changed**
+
+- **The API types are generated from bmcd v2.45.0,** the first daemon with LACP
+  ([bmcd#56](https://github.com/excavador-turing/bmcd/pull/56), also
+  [@danste22](https://github.com/danste22)'s, from
+  [bmcd#50](https://github.com/excavador-turing/bmcd/pull/50)).
+  `bmcd-release.txt` and `src/lib/api/schema.d.ts`, with `npm run api:refresh`.
+  The hand-written switch types in `src/lib/api/get.ts` now follow the
+  generated ones (`SecondUplink`, the port membership, `SwitchDocument`, the
+  preset's `preset` field), so a change in the daemon's document shows up as a
+  type error here.
+
+</details>
+
+<details class="note">
 <summary>v4.6.1 — 20 November 2026</summary>
 
 The API types now follow bmcd v2.44.0, the daemon the next firmware ships.
