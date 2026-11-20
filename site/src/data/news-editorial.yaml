@@ -263,3 +263,21 @@ v2.48.0:
     page is still the one selected.
   capture: captures/news/node-picker.png
   caption: The Console page — Node 1 to Node 4 in one row, the chosen one filled in, where a dropdown used to be.
+
+# v2.50.0 -- bmcd 2.44.0 and BMC-UI 4.6.1; tpi 1.10.0 is unchanged. Two of the
+# four fixes were found, reported and first written by people outside the
+# project, and the post says so with their names and links. The interface does
+# not change (4.6.1 only moves its API types to the new daemon), so no capture.
+v2.50.0:
+  title: Settings survive a power cut, and the switch no longer cuts the board off
+  summary: >-
+    A settings file is no longer left empty by a power cut right after you
+    confirm a change, and going from Flat to Split or Trunk no longer strands
+    the board's own address on the wrong VLAN. Both were found and first fixed
+    by [@danste22](https://github.com/danste22), who reported them as
+    [#81](https://github.com/excavador-turing/BMC-Firmware/issues/81) and
+    [#82](https://github.com/excavador-turing/BMC-Firmware/issues/82), and
+    [@cloudlabworks](https://github.com/cloudlabworks) fixed a forgotten
+    session token counting toward a ban
+    ([bmcd#39](https://github.com/excavador-turing/bmcd/pull/39)). Thank you
+    both.
