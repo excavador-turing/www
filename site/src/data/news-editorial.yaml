@@ -296,3 +296,22 @@ v2.51.0:
     [@danste22](https://github.com/danste22) (Daniel) for the kernel port
     ([#85](https://github.com/excavador-turing/BMC-Firmware/pull/85)), building
     on upstream work by Sven Rademakers and Sam Edwards.
+
+# v2.52.0 -- LACP uplink (bmcd 2.46.0 carries 2.45.0's LACP, BMC-UI 4.7.0,
+# tpi 1.11.0) and the power state that survives a BMC reboot on 6.18. The LACP
+# work is @danste22's end to end (kernel patches #79, carried on as #87; bmcd,
+# BMC-UI and tpi from his pull requests), and the post says so first. The
+# power-state fix builds on his gpio-latch patch, from an idea of Sven
+# Rademakers, worded as bmcd 2.46.0's own notes word it. The interface gains a
+# switch on the Switch page, but no capture is taken before the release.
+v2.52.0:
+  title: Two uplink ports as one LACP link, and the power state survives a BMC reboot
+  summary: >-
+    The two uplink ports can now be one LACP link, and a BMC reboot keeps the
+    nodes' power state as it was. LACP is off unless you turn it on. The switch
+    chip's own trunk hardware carries the bond, and the whole LACP work is
+    [@danste22](https://github.com/danste22)'s (Daniel): the kernel patches, the
+    bonding, the daemon, the interface and the command line
+    ([#79](https://github.com/excavador-turing/BMC-Firmware/pull/79)). Thank
+    you, Daniel. The power-state fix builds on his gpio-latch patch, from an
+    idea of Sven Rademakers.
