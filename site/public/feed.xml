@@ -5,8 +5,122 @@
   <link href="https://turingpi.xyz/feed.xml" rel="self"/>
   <link href="https://turingpi.xyz/news/"/>
   <id>https://turingpi.xyz/feed.xml</id>
-  <updated>2026-11-20T00:00:00Z</updated>
+  <updated>2026-11-21T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
+  <entry>
+    <title>Firmware v2.52.0: Two uplink ports as one LACP link, and the power state survives a BMC reboot</title>
+    <link href="https://turingpi.xyz/news/v2.52.0/"/>
+    <id>tag:turingpi.xyz,2026-11-21:firmware/2.52.0</id>
+    <updated>2026-11-21T00:00:00Z</updated>
+    <content type="text">LACP on the two uplink ports, and the nodes' power state kept across a BMC
+reboot on Linux 6.18. Pins **bmcd 2.46.0**, **BMC-UI 4.7.0** and **tpi 1.11.0**
+(they were 2.44.0, 4.6.1 and 1.10.0); the kernel stays at 6.18.63.
+
+LACP is off unless you turn it on: a board that does not use it changes in
+nothing.
+
+Thank you, [@danste22](https://github.com/danste22) (Daniel Steinhauf). The
+whole LACP work in this release is his: the kernel's hardware LAG patches for
+the RTL8370MB-CG, the bonding, the SMI arbiter driver, the bmcd LACP uplink,
+the BMC-UI Switch page and the `tpi` commands. He also tested it on a board
+against a Zyxel LACP switch and wrote up the result
+([#79](https://github.com/excavador-turing/BMC-Firmware/pull/79),
+[#87](https://github.com/excavador-turing/BMC-Firmware/pull/87),
+[bmcd#50](https://github.com/excavador-turing/bmcd/pull/50) →
+[bmcd#56](https://github.com/excavador-turing/bmcd/pull/56),
+[BMC-UI#58](https://github.com/excavador-turing/BMC-UI/pull/58) →
+[#60](https://github.com/excavador-turing/BMC-UI/pull/60),
+[tpi#16](https://github.com/excavador-turing/tpi/pull/16) →
+[#17](https://github.com/excavador-turing/tpi/pull/17)). His commits keep his
+authorship, and the copyright and `Signed-off-by` lines are his.
+
+### Added
+
+- **LACP uplink: `ge0` and `ge1` as one 802.3ad `bond0` on the RTL8370
+  hardware LAG, by @danste22 (#79, #87, bmcd#50, BMC-UI#58, tpi#16), thanks!**
+  Three kernel patches (`net-dsa/0014` to `0016`) offload a Linux bond onto the
+  switch chip's own trunk hardware, `CONFIG_BONDING` is built in, and the
+  kernel command line carries `bonding.max_bonds=0`, so no `bond0` exists until
+  ifupdown-ng creates the configured one. bmcd 2.46.0 creates `bond0` (802.3ad,
+  `layer2+3` hash, fast LACP) over `ge0` and `ge1` when the switch asks for
+  `second_uplink: lag`, and writes it into `/etc/network/interfaces` so the bond
+  is up before the daemon starts. BMC-UI 4.7.0 has the LACP switch and the
+  `flat-lag` and `trunk-lag` presets on the Switch page, and tpi 1.11.0 has
+  `tpi network switch apply --preset flat-lag` (or `trunk-lag`, or
+  `--second-uplink lag`). A change goes through the usual confirm window and is
+  put back automatically if it is not confirmed; if the uplink never forwards
+  after an apply, bmcd reverts anyway, 60 s after the window would have ended. A
+  hand-written `/etc/network/interfaces` needs an explicit opt-in (the checkbox,
+  `--replace-hand-written`, or `replace_hand_written: true`), and only when the
+  change turns LACP on. A `bond0` that bmcd did not create is refused. The
+  switch at the other end needs LACP on both ports. Nothing creates a bond by
+  itself: without one in `/etc/network/interfaces` the board stays the flat
+  `br0` it is today. `tests/lag-parts.sh` checks the kernel pieces offline. The
+  patches keep their `From:` and `Signed-off-by:` headers.
+
+  Tested by @danste22 on a Zyxel LACP switch: both ports in one aggregator,
+  `ge0` alone (the bond keeps its carrier and nothing is sent to the dead
+  port), the automatic revert in both directions, and an upstream without LACP.
+  We tested it on two boards with LACP off, which is how every board runs it by
+  default. Each part was carried on from his pull request with his commits kept
+  under his authorship ([bmcd#56](https://github.com/excavador-turing/bmcd/pull/56),
+  [BMC-UI#60](https://github.com/excavador-turing/BMC-UI/pull/60),
+  [tpi#17](https://github.com/excavador-turing/tpi/pull/17)).
+
+### Fixed
+
+- **A reboot of the BMC on the 6.18 kernel is read as a warm boot again
+  (bmcd 2.46.0).** bmcd up to 2.45.0 logged `cold boot: restoring persisted
+  power state` after every reboot of the BMC on 6.18 (v2.51.0), with all four
+  modules running, where on 6.12 it adopted the live state. The saved state was
+  then restored over the live one, so a node that was off in the database but on
+  in fact was switched off. bmcd now reads which nodes are powered from the
+  latch shadow word that the kernel's gpio-latch patch keeps in SoC SRAM (the
+  cooperative contract with the bootloader that
+  [@danste22](https://github.com/danste22) carried to 6.18, with the original
+  idea from Sven Rademakers, whose 2024 patch in turing-machines/BMC-Firmware
+  started it; thanks to both), and requests the node enable lines with that
+  value, so starting the daemon no longer pulses running modules either
+  ([bmcd#58](https://github.com/excavador-turing/bmcd/pull/58)). A cold boot
+  still restores the persisted state. No kernel change.
+- **`tpi-selfupdate` cleans up after a failed update and says what to do
+  ([#102](https://github.com/excavador-turing/BMC-Firmware/pull/102)).** A
+  write that failed on the last partial LEB (`ubiupdatevol: ... error 110`)
+  left the ~39 MB download in `/mnt/overlay`, which has very little room, and
+  printed nothing about the state the board was in. After a write error other
+  than EIO UBI goes read-only until the next boot, so retrying is useless and
+  even `tpi reboot` can fail. The download is now removed on every exit
+  (failure, checksum mismatch, interrupted transfer, SIGINT/SIGTERM) and only
+  that file, under a name carrying the PID so a file already in the directory
+  is never touched. A failed write exits 1 and states that the running firmware
+  is untouched and will boot, that UBI may be read-only, and to power-cycle the
+  board and retry or flash from the SD card. `--keep` keeps the image only
+  after a successful write.
+- **Staging says when it is not on the SD card.** The card was already
+  preferred; it is now also required to be writable (a card remounted read-only
+  after an error used to be picked and then failed), and the script names the
+  reason when it falls back to the overlay or `/tmp`.
+
+### Changed
+
+- **bmcd 2.46.0, BMC-UI 4.7.0 and tpi 1.11.0** are the pinned versions (the
+  latest of each).
+
+### Known issue
+
+- **One over-the-air write was seen to fail, on one board.** Writing the image
+  with `tpi-selfupdate` failed with a UBI write timeout on the final block
+  (`ubiupdatevol: error 110`). The firmware the board was running is untouched
+  and still boots. Power-cycle the board, then retry or flash from the SD card
+  (`tpi-selfupdate` now says so itself). The cause is not found yet.
+
+### Tests
+
+- `tests/selfupdate-failure.sh` covers the failure paths with stubbed `curl`,
+  `df` and `osupdate`, under dash and busybox ash; the mutation check in
+  `checks.yml` fails if the cleanup, the advice or the writability test is
+  removed.</content>
+  </entry>
   <entry>
     <title>Firmware v2.51.0: A new kernel, the switch driver inside it, and an update that rolls itself back without a gateway</title>
     <link href="https://turingpi.xyz/news/v2.51.0/"/>
@@ -1430,62 +1544,5 @@ instead of flashing.
   tmpfs and the overlay is the wrong answer, on a NAND with five free
   eraseblocks and a workload guaranteed to grow. A default pointing at a host
   nobody configured would make every boot wait on a DNS lookup.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.13.0</title>
-    <link href="https://turingpi.xyz/news/v2.13.0/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.13.0</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">### Changed
-
-- BMC-UI **v3.10.1 → v3.14.0**, four releases of interface work:
-
-  - The console replays the module's scrollback when you open it, instead of
-    showing a blank terminal however long the module has been running, and
-    gains a **Redraw** button.
-  - The reboot dialogs stop claiming the compute modules lose power. They do
-    not, and this fork's not cutting them is one of the things it exists for.
-    Both live places said otherwise, in all six languages.
-  - Rebooting from Settings now says when a firmware is staged, so a reboot for
-    an unrelated reason no longer silently applies an update.
-  - An upload no longer offers a reboot that would do nothing. It parks the
-    image on the SD card, and the message says so.
-  - **Install OS** is red, like every other consequential action, and the
-    shared confirmation dialog commits in red rather than in the colour of
-    Save.
-  - The firmware sources editor no longer breaks at 390 px.
-
-### Fixed
-
-- **mDNS was eating the board** (SQU-175). This is the cause of both outages on
-  2026-09-09, and it was ours.
-
-  `mdnsd` binds every interface it can see. On this board that means the DSA
-  switch ports — `node1`..`node4`, `ge0`, `dsa` — which share one MAC and one
-  link-local address, because they are ports of a single switch rather than
-  separate hosts. mdnsd announced on each, saw its own announcement arrive on
-  the others, and called that a name conflict. Every conflict triggers a config
-  reload, and mdnsd 0.12 leaks on reload.
-
-  Measured on the board: **825 reloads in twelve seconds**, and the process
-  growing **956 kB a minute** on a machine with 118 MB of RAM and no swap. That
-  is ninety minutes from boot to a board that answers ping and nothing else.
-  The same storm wrote those 825 log lines into `/var/log`, which is on the
-  58 MB tmpfs, so it was consuming memory from both ends.
-
-  `/etc/default/mdnsd` now binds it to `br0`, the only interface with an
-  address and the one the default route uses. After the change, on the same
-  board: **zero reloads in ninety seconds, and 8 kB of growth.**
-
-### Added
-
-- **`mdnsd-guard`**, run every five minutes from cron. Restarts mdnsd if its
-  resident set passes 20 MB, and logs the size that triggered it.
-
-  A net under the fix above, not a substitute for it. The leak is upstream's
-  and still present; only its trigger has been removed. On a board with no
-  watchdog, where the failure mode is losing the machine entirely, a threshold
-  check that does nothing on a healthy system is cheap insurance — and if it
-  ever fires, the log line is the field evidence that something still reloads.</content>
   </entry>
 </feed>
