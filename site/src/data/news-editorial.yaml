@@ -315,3 +315,21 @@ v2.52.0:
     ([#79](https://github.com/excavador-turing/BMC-Firmware/pull/79)). Thank
     you, Daniel. The power-state fix builds on his gpio-latch patch, from an
     idea of Sven Rademakers.
+
+# v2.53.0 -- a small release: the kernel exports the latch shadow word and the
+# boot cookie in sysfs (BMC-Firmware#104), bmcd 2.47.0 reads them first
+# (bmcd#61) and says what a BMC reboot does on each board revision (bmcd#62),
+# tpi 1.11.1 says the same in `tpi reboot --help` (tpi#19). Tested on two v2.5
+# boards, with a power pull. The shadow-word contract is @danste22's
+# (Daniel Steinhauf's), from Sven Rademakers' 2024 patch, worded as v2.52.0's
+# entry words it. No interface change, so no capture.
+v2.53.0:
+  title: Node power state without /dev/mem, and honest reboot text for v2.4 boards
+  summary: >-
+    A small, careful release. The kernel now tells bmcd which nodes are
+    powered through sysfs, so the daemon no longer needs `/dev/mem` for it. On
+    v2.5 boards a BMC reboot still leaves the nodes running, and the API and
+    `tpi reboot` help now say plainly that a v2.4 board power-cycles its
+    nodes. Tested on real hardware, including a power pull. Thank you, Daniel
+    Steinhauf ([@danste22](https://github.com/danste22)) and Sven Rademakers,
+    for the shadow-word contract this builds on.
