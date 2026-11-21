@@ -1,15 +1,29 @@
 ---
 title: tpi
-description: 'Every tpi release and what changed in it: 16 entries, newest v1.11.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every tpi release and what changed in it: 17 entries, newest v1.11.1, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/tpi
 tableOfContents: false
 ---
 
 The command-line client.
 
-Newest release **v1.11.0**, 20 November 2026. 16 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v1.11.1**, 21 November 2026. 17 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v1.11.1 — 21 November 2026</summary>
+
+`tpi reboot --help` says what is true of both board revisions.
+
+**Fixed**
+
+- **`tpi reboot --help` now says what happens on both board revisions.** It
+  claimed the compute modules keep running throughout. That is true on a v2.5
+  board, where the daemon adopts the live power state; on a v2.4 board a BMC
+  reboot power-cycles all four modules. Help text only.
+
+</details>
+
+<details class="note">
 <summary>v1.11.0 — 20 November 2026</summary>
 
 `tpi network switch` can set up an LACP uplink. It is

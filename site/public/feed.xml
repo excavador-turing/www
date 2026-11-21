@@ -8,6 +8,78 @@
   <updated>2026-11-21T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.53.0</title>
+    <link href="https://turingpi.xyz/news/v2.53.0/"/>
+    <id>tag:turingpi.xyz,2026-11-21:firmware/2.53.0</id>
+    <updated>2026-11-21T00:00:00Z</updated>
+    <content type="text">A small, careful release. The kernel now tells bmcd which nodes are powered
+through sysfs, so the daemon no longer needs `/dev/mem` for it, and the API and
+`tpi reboot` help say plainly what a BMC reboot does on each board revision.
+Pins **bmcd 2.47.0**, **tpi 1.11.1** and **BMC-UI 4.7.0** (they were 2.46.0,
+1.11.0 and 4.7.0); the kernel stays at 6.18.63.
+
+Thank you, [@danste22](https://github.com/danste22) (Daniel Steinhauf) and
+Sven Rademakers. The shadow-word contract that this release exports through
+sysfs is the one Daniel carried to the 6.18 kernel (`tp2/power/0002`), from the
+original idea in Sven's 2024 patch in turing-machines/BMC-Firmware; thanks to
+both.
+
+### Added
+
+- **The latch shadow word and the boot cookie in sysfs.** A new kernel patch,
+  `tp2/power/0003`, makes the gpio-latch driver export two read-only
+  attributes on its platform device: `/sys/bus/platform/devices/gpio-latch/shadow`
+  (the shadow word, `0x%08x`) and `.../shadow_valid` (`1` when the bootloader's
+  boot cookie is present). A daemon no longer needs `/dev/mem` to learn which
+  nodes are powered. The words stay in SoC SRAM and `/dev/mem` reads them as
+  before, so bmcd 2.46.0 keeps working. The shadow-word contract is the one
+  [@danste22](https://github.com/danste22) carried to 6.18 (`tp2/power/0002`,
+  from Sven Rademakers' 2024 patch); that patch is untouched. The attributes are
+  documented in `Documentation/ABI/testing/sysfs-platform-gpio-latch`
+  ([#104](https://github.com/excavador-turing/BMC-Firmware/pull/104)).
+
+### Changed
+
+- **bmcd 2.47.0 reads which nodes are powered from `shadow` and `shadow_valid`
+  in sysfs, and no longer needs `/dev/mem` for it
+  ([bmcd#61](https://github.com/excavador-turing/bmcd/pull/61)).** On
+  firmware without `tp2/power/0003` it falls back to `/dev/mem`, and on a v2.4
+  board, which has no latch, to the node enable lines. What counts as a powered
+  node does not change.
+- **A v2.4 board power-cycles its modules on a BMC reboot, and bmcd says so
+  ([bmcd#62](https://github.com/excavador-turing/bmcd/pull/62)).** The
+  `/reboot` API text and the README now say that a BMC reboot keeps the modules
+  running on a v2.5 board and power-cycles them on a v2.4 board.
+- **tpi 1.11.1: `tpi reboot --help` is correct for v2.4 and v2.5
+  ([tpi#19](https://github.com/excavador-turing/tpi/pull/19)).** It says the
+  same as the API, for both board revisions. Help text only.
+- **bmcd 2.47.0, BMC-UI 4.7.0 and tpi 1.11.1** are the pinned versions (the
+  latest of each).
+
+### Tests
+
+- bmcd has new tests that pin how a switch change handles failure at the
+  confirm, apply and revert steps
+  ([bmcd#60](https://github.com/excavador-turing/bmcd/pull/60)).
+
+### Tested
+
+- On two v2.5 boards with v2.53.0-rc.1: a BMC reboot and a restart of bmcd both
+  adopt the live power state, with no node reset.
+- Earlier the same day, on the same two boards with v2.52.0, which reads the
+  same shadow contract from `/dev/mem`: a BMC reboot with one node off kept it
+  off, and a real power pull restored the saved state (a node that was off
+  stayed off).
+
+### Known issue
+
+- **One over-the-air write was seen to fail, on one board (v2.52.0).** Writing
+  the image with `tpi-selfupdate` failed with a UBI write timeout on the final
+  block (`ubiupdatevol: error 110`). The firmware the board was running is
+  untouched and still boots. If an over-the-air write fails, power-cycle the
+  board, then retry or flash from the SD card. The cause is not found yet.</content>
+  </entry>
+  <entry>
     <title>Firmware v2.52.0: Two uplink ports as one LACP link, and the power state survives a BMC reboot</title>
     <link href="https://turingpi.xyz/news/v2.52.0/"/>
     <id>tag:turingpi.xyz,2026-11-21:firmware/2.52.0</id>
@@ -1497,52 +1569,5 @@ instead of flashing.
 
 - **`/mnt/overlay/metrics-token`.** Nothing writes or reads it. An existing
   file is harmless and is simply ignored; the daemon will not recreate one.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.14.0</title>
-    <link href="https://turingpi.xyz/news/v2.14.0/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.14.0</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">### Changed
-
-- **bmcd v2.19.0 → v2.23.0**, four releases:
-
-    - **A fan can be held at a step** (SQU-170). `opt=set&amp;type=cooling` takes
-      `mode=manual` to pause the zone's governor and `mode=auto` to hand the
-      fan back. Until now a written step was returned to the governor's own
-      choice within a poll, which is what made the interface's slider a
-      control that lied. A held fan is taken back above the zone's hottest
-      `active` trip, because this board declares no `critical` trip and
-      nothing else would intervene.
-
-    - **A flash targets the module that was asked for** (SQU-105). All four
-      modules sit behind one hub on a v2.5 board, and the daemon used to take
-      whichever answered first — a flash of node 2 could write node 1 and
-      report success. The node-to-port mapping is read from this board's own
-      device tree rather than assumed.
-
-    - **An audit line per mutating call** (SQU-108), naming the action, node,
-      caller, address and outcome, and naming the loopback bypass explicitly
-      when there was no credential at all. Sent to the system log as well as
-      the rotating file, because `/tmp` and `/var/log` are both tmpfs here.
-
-    - **`bmcd_process_threads`**, the companion to the resident-set metric.
-
-- **`tpi` v1.2.2 → v1.3.0**: `cooling set --hold` and `--auto`, and a Governor
-  column that says `-` rather than `running` on a daemon that does not report
-  it.
-
-- **BMC-UI v3.14.0 → v3.15.0**: the fan slider now sits behind an explicit
-  Override switch, offered only where the daemon reports it can actually hold
-  a step.
-
-### Added
-
-- **`/etc/default/syslogd`**, carrying the remote-logging knob documented and
-  deliberately unset (SQU-108). `syslogd -R &lt;host&gt;:&lt;port&gt;` sends this board's
-  kernel and daemon logs somewhere that survives a reboot; `/var/log` is a
-  tmpfs and the overlay is the wrong answer, on a NAND with five free
-  eraseblocks and a workload guaranteed to grow. A default pointing at a host
-  nobody configured would make every boot wait on a DNS lookup.</content>
   </entry>
 </feed>

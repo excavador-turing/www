@@ -1,13 +1,13 @@
 ---
 title: BMC-Firmware
-description: 'Every BMC-Firmware release and what changed in it: 50 entries, newest v2.52.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-Firmware release and what changed in it: 51 entries, newest v2.52.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/firmware
 tableOfContents: false
 ---
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.52.0**, 21 November 2026. 50 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.52.0**, 21 November 2026. 51 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](/feed.xml).
 
@@ -21,6 +21,78 @@ $ sha256sum -c SHA256SUMS
 :::
 
 <details class="note" open>
+<summary>v2.53.0 — 21 November 2026 (not released)</summary>
+
+A small, careful release. The kernel now tells bmcd which nodes are powered
+through sysfs, so the daemon no longer needs `/dev/mem` for it, and the API and
+`tpi reboot` help say plainly what a BMC reboot does on each board revision.
+Pins **bmcd 2.47.0**, **tpi 1.11.1** and **BMC-UI 4.7.0** (they were 2.46.0,
+1.11.0 and 4.7.0); the kernel stays at 6.18.63.
+
+Thank you, [@danste22](https://github.com/danste22) (Daniel Steinhauf) and
+Sven Rademakers. The shadow-word contract that this release exports through
+sysfs is the one Daniel carried to the 6.18 kernel (`tp2/power/0002`), from the
+original idea in Sven's 2024 patch in turing-machines/BMC-Firmware; thanks to
+both.
+
+**Added**
+
+- **The latch shadow word and the boot cookie in sysfs.** A new kernel patch,
+  `tp2/power/0003`, makes the gpio-latch driver export two read-only
+  attributes on its platform device: `/sys/bus/platform/devices/gpio-latch/shadow`
+  (the shadow word, `0x%08x`) and `.../shadow_valid` (`1` when the bootloader's
+  boot cookie is present). A daemon no longer needs `/dev/mem` to learn which
+  nodes are powered. The words stay in SoC SRAM and `/dev/mem` reads them as
+  before, so bmcd 2.46.0 keeps working. The shadow-word contract is the one
+  [@danste22](https://github.com/danste22) carried to 6.18 (`tp2/power/0002`,
+  from Sven Rademakers' 2024 patch); that patch is untouched. The attributes are
+  documented in `Documentation/ABI/testing/sysfs-platform-gpio-latch`
+  ([#104](https://github.com/excavador-turing/BMC-Firmware/pull/104)).
+
+**Changed**
+
+- **bmcd 2.47.0 reads which nodes are powered from `shadow` and `shadow_valid`
+  in sysfs, and no longer needs `/dev/mem` for it
+  ([bmcd#61](https://github.com/excavador-turing/bmcd/pull/61)).** On
+  firmware without `tp2/power/0003` it falls back to `/dev/mem`, and on a v2.4
+  board, which has no latch, to the node enable lines. What counts as a powered
+  node does not change.
+- **A v2.4 board power-cycles its modules on a BMC reboot, and bmcd says so
+  ([bmcd#62](https://github.com/excavador-turing/bmcd/pull/62)).** The
+  `/reboot` API text and the README now say that a BMC reboot keeps the modules
+  running on a v2.5 board and power-cycles them on a v2.4 board.
+- **tpi 1.11.1: `tpi reboot --help` is correct for v2.4 and v2.5
+  ([tpi#19](https://github.com/excavador-turing/tpi/pull/19)).** It says the
+  same as the API, for both board revisions. Help text only.
+- **bmcd 2.47.0, BMC-UI 4.7.0 and tpi 1.11.1** are the pinned versions (the
+  latest of each).
+
+##### Tests
+
+- bmcd has new tests that pin how a switch change handles failure at the
+  confirm, apply and revert steps
+  ([bmcd#60](https://github.com/excavador-turing/bmcd/pull/60)).
+
+##### Tested
+
+- On two v2.5 boards with v2.53.0-rc.1: a BMC reboot and a restart of bmcd both
+  adopt the live power state, with no node reset.
+- Earlier the same day, on the same two boards with v2.52.0, which reads the
+  same shadow contract from `/dev/mem`: a BMC reboot with one node off kept it
+  off, and a real power pull restored the saved state (a node that was off
+  stayed off).
+
+##### Known issue
+
+- **One over-the-air write was seen to fail, on one board (v2.52.0).** Writing
+  the image with `tpi-selfupdate` failed with a UBI write timeout on the final
+  block (`ubiupdatevol: error 110`). The firmware the board was running is
+  untouched and still boots. If an over-the-air write fails, power-cycle the
+  board, then retry or flash from the SD card. The cause is not found yet.
+
+</details>
+
+<details class="note">
 <summary>v2.52.0 — 21 November 2026</summary>
 
 LACP on the two uplink ports, and the nodes' power state kept across a BMC

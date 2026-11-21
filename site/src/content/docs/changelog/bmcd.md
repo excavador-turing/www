@@ -1,15 +1,53 @@
 ---
 title: bmcd
-description: 'Every bmcd release and what changed in it: 54 entries, newest 2.46.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every bmcd release and what changed in it: 55 entries, newest 2.47.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmcd
 tableOfContents: false
 ---
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.46.0**, 20 November 2026. 54 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.47.0**, 21 November 2026. 55 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>2.47.0 — 21 November 2026</summary>
+
+The daemon reads the latch shadow word from the kernel's sysfs attributes, and
+says the v2.4 caveat where the reboot endpoint claimed the modules keep running.
+
+The shadow-word contract is the one that the kernel's gpio-latch patch keeps
+with the bootloader, which [@danste22](https://github.com/danste22) (Daniel
+Steinhauf) carried to 6.18 (with the original idea from Sven Rademakers, whose
+2024 patch in turing-machines/BMC-Firmware started it). Thanks to both.
+
+**Changed**
+
+- **The reboot endpoint no longer says the compute modules keep running on
+  every board.** The OpenAPI summary of `POST /api/bmc/reboot` and the README
+  now say what is true of both revisions: on a v2.5 board the modules keep
+  running (the daemon adopts the live power state), on a v2.4 board a BMC
+  reboot power-cycles them. Text only; no behaviour changes.
+- **The switch rollback paths are now covered by tests.** A confirm whose
+  `switch.json` write fails keeps the change pending (and the same token
+  confirms once the disk allows it, or the window puts the old configuration
+  back); an apply that fails in the middle of a plan runs the way back and
+  reports the first error; the timer's revert goes on past a failing command.
+  The behaviour itself shipped in 2.45.0; this pins it.
+- **The latch shadow is read from the kernel's sysfs attributes first.** Where
+  the firmware's gpio-latch driver exports `shadow` and `shadow_valid` under
+  `/sys/bus/platform/devices/gpio-latch/`, the daemon reads the boot cookie
+  state and the shadow word from there and no longer maps SoC SRAM through
+  `/dev/mem`. On firmware without the attributes (every firmware up to and
+  including v2.52.0), or when they cannot be read or make no sense, it reads
+  `/dev/mem` as before, and on a v2.4 board or where neither can be read it
+  still reads the node enable lines. What counts as a powered node does not
+  change. The shadow-word contract with the bootloader is the one
+  [@danste22](https://github.com/danste22) carried to 6.18, from Sven
+  Rademakers' 2024 patch.
+
+</details>
+
+<details class="note">
 <summary>2.46.0 — 20 November 2026</summary>
 
 A reboot of the BMC on the 6.18 kernel is no longer read as a cold boot.

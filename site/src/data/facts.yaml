@@ -15,17 +15,17 @@ releases:
   source: "changelog/*.md, written by `just refresh-changelog` from each repository's CHANGELOG.md"
   firmware:
     newest: v2.52.0
-    count: 50
+    count: 51
   bmcd:
-    newest: 2.46.0
-    count: 54
+    newest: 2.47.0
+    count: 55
   ui:
     newest: v4.7.0
     count: 47
   tpi:
-    newest: v1.11.0
-    count: 16
-  total: 167
+    newest: v1.11.1
+    count: 17
+  total: 170
 features:
   source: features/*.mdx -- a feature is a page
   count: 11
