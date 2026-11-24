@@ -354,3 +354,27 @@ v2.54.0:
     `/run/bmcd/local-token`. Thank you, Daniel Steinhauf
     ([@danste22](https://github.com/danste22)), for a careful security review
     of the BMC and for the fixes across bmcd, tpi, BMC-UI and the firmware.
+
+# v2.55.0 -- bmcd 2.49.0 ends the transition v2.54.0 began: every state change
+# over GET now answers 405 (BMC-Firmware#109, bmcd#73 by @danste22, carried on
+# as bmcd#83 with his authorship). Also a Content-Security-Policy on the web
+# interface (bmcd#81, BMC-Firmware#99), two dependency decisions written down
+# (bmcd#80, #82), and bmcd and tpi built with their own release profile
+# (BMC-Firmware#117, spotted by Daniel in his review): bmcd 14.3 to 9.1 MB, tpi
+# 5.0 to 2.8 MB. tpi 2.0.0 and BMC-UI 4.8.0 are unchanged. The breaking change
+# leads; the post thanks Daniel. No interface change, so no capture. Written
+# ahead of the release; the post appears when v2.55.0 exists.
+v2.55.0:
+  title: "Every state change over GET is now refused, a Content-Security-Policy for the interface, and smaller binaries"
+  summary: >-
+    Breaking: a request that changes state over GET now answers 405 with
+    `Allow: POST`, a Bearer token included. Scripts must use `curl -X POST`, a
+    workstation `tpi` must be 2.0 or newer, and a web UI served apart from the
+    board must be BMC-UI 4.8.0 or newer. The interface is also served with a
+    Content-Security-Policy, and `bmcd` and `tpi` are built to their own
+    release profile, so the daemon shrinks from 14.3 to 9.1 MB and `tpi` from
+    5.0 to 2.8 MB. Thank you, Daniel Steinhauf
+    ([@danste22](https://github.com/danste22)), for the issue
+    ([#109](https://github.com/excavador-turing/BMC-Firmware/issues/109)), the
+    fix ([bmcd#73](https://github.com/excavador-turing/bmcd/pull/73)) and the
+    review that found the rest.
