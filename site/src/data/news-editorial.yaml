@@ -391,7 +391,7 @@ v2.55.0:
 # on a board or in a script. Tested on both v2.5 boards. No capture. Written
 # ahead of the release; the post appears when v2.57.0 exists.
 v2.57.0:
-  title: "Three security fixes in the daemon, found by adberger and in our own review, plus faster RK1 flashing"
+  title: "Three security fixes in the daemon, found by adberger and in our own review, and the RK1 flash path on rockusb 0.4"
   summary: >-
     A percent-encoded path such as `/api/b%6dc` no longer slips past the
     refusal of a state change over GET and the cross-site refusal (it is now a
