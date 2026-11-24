@@ -12,9 +12,9 @@ What changed in each release, taken from each repository's own `CHANGELOG.md`. F
 
 <div class="tp-plates">
 <a class="tp-plate" href="/changelog/firmware/"><b>BMC-Firmware</b><span>The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.</span><span class="tp-plate__meta">v2.55.0 · 24 November 2026 · 53 releases</span></a>
-<a class="tp-plate" href="/changelog/bmcd/"><b>bmcd</b><span>The daemon: the API, the update logic, the metrics.</span><span class="tp-plate__meta">2.49.0 · 24 November 2026 · 57 releases</span></a>
+<a class="tp-plate" href="/changelog/bmcd/"><b>bmcd</b><span>The daemon: the API, the update logic, the metrics.</span><span class="tp-plate__meta">2.50.1 · 24 November 2026 · 59 releases</span></a>
 <a class="tp-plate" href="/changelog/bmc-ui/"><b>BMC-UI</b><span>The web interface the board serves.</span><span class="tp-plate__meta">v4.8.1 · 24 November 2026 · 49 releases</span></a>
-<a class="tp-plate" href="/changelog/tpi/"><b>tpi</b><span>The command-line client.</span><span class="tp-plate__meta">v2.0.0 · 24 November 2026 · 18 releases</span></a>
+<a class="tp-plate" href="/changelog/tpi/"><b>tpi</b><span>The command-line client.</span><span class="tp-plate__meta">v2.0.1 · 24 November 2026 · 19 releases</span></a>
 </div>
 
 These four version together. The firmware image carries a `bmcd`, a `BMC-UI` and a `tpi`, and the board's Dashboard names all four — so a firmware version is the one to quote when reporting anything.

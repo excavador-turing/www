@@ -1,15 +1,100 @@
 ---
 title: bmcd
-description: 'Every bmcd release and what changed in it: 57 entries, newest 2.49.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every bmcd release and what changed in it: 59 entries, newest 2.50.1, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmcd
 tableOfContents: false
 ---
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.49.0**, 24 November 2026. 57 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.50.1**, 24 November 2026. 59 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>2.50.1 — 24 November 2026</summary>
+
+A security release: a percent-encoded path could get past the refusal of a
+state change over `GET`/`HEAD` and the cross-site refusal (BMC-Firmware#132),
+and `bmcd.bin` was renamed into place without a flush (BMC-Firmware#130). Both
+were reported by adberger ([@adberger](https://github.com/adberger)), who found
+them with a deterministic simulation test of the board and by reading the code.
+Thank you.
+
+**Security**
+
+- **A percent-encoded path no longer slips past the GET and cross-site
+  refusals.** The policy that answers 405 to a state change over `GET` or
+  `HEAD` and 403 to a cross-site one compared the raw request path with
+  `/api/bmc`, while the router matches the percent-decoded path, so
+  `/api/b%6dc`, `/api/bm%63` and `/%61pi/bmc` reached the same handlers as
+  `/api/bmc` without either refusal. Authentication still applied; what was
+  lost is the protection against a credential the browser attaches by itself
+  (a client certificate, or a trusted proxy's identity header). Now:
+  - the policy, the factory-password gate and the login path all read the
+    path the router matched (`ServiceRequest::match_info`), so they cannot
+    disagree with the router;
+  - as defence in depth, a request under `/api/bmc` whose path has a `%` in
+    it is refused with 400 before anything else is asked of it. No client
+    encodes the path of this API (the web interface and `tpi` send fixed words
+    and a numeric upload handle); query strings may still be encoded;
+  - the legacy `?opt=set` handler itself answers 405 to `GET` and `HEAD`, so a
+    spelling the middleware missed still cannot change state.
+
+  Tests put the middleware behind a router, as `main` does, and send every
+  spelling of the report, double encodings, doubled slashes, dot segments and
+  other case over `GET`, `HEAD` and `POST`, with and without
+  `Sec-Fetch-Site: cross-site`, and check that a legitimate `POST`, a read and
+  an encoded query are still served. Reported by adberger
+  ([@adberger](https://github.com/adberger)) in BMC-Firmware#132, found by
+  deterministic simulation testing. Thank you. (BMC-Firmware#132)
+
+**Fixed**
+
+- **`bmcd.bin` is replaced durably.** The store that holds the power state, the
+  USB mode and the node information was written to a `.new` file beside it and
+  renamed over `bmcd.bin` with no flush of the data before the rename. On UBIFS
+  a power cut could leave the rename on flash and the data not, and bmcd then
+  started on new, default storage. It now goes through `write_durably`, like the switch,
+  address, TLS and access files: the data is flushed before the rename and the
+  directory after it, a temporary left by an interrupted write is cleared, and
+  a write that fails leaves the old file in place and the store marked
+  changed, so the next sync tries again. Reported by adberger
+  ([@adberger](https://github.com/adberger)) in BMC-Firmware#130, found by
+  reading the code while building a deterministic simulation test for the
+  board. Thank you. (BMC-Firmware#130)
+
+</details>
+
+<details class="note">
+<summary>2.50.0 — 24 November 2026</summary>
+
+Two changes, both from
+Daniel Steinhauf ([@danste22](https://github.com/danste22)): his move to
+`rockusb` 0.4 (step 3 of BMC-Firmware#93, three RK1 flashes tested on a board)
+and the `opt-level` suggestion he made in the same issue. Thank you, Daniel.
+
+**Changed**
+
+- **`sha2`, `crc` and `crc32fast` are built at `opt-level = 3`.** The release
+  profile stays `"z"` (size) for everything else; these three crates run the
+  per-byte loops of a flash (the SHA-256 of the image as it streams in, the
+  CRC-64 of what is written to the node, the CRC-32 of the board information
+  EEPROM), where size-optimised code is slowest, and cost a few KB at level 3. Suggested by Daniel Steinhauf
+  ([@danste22](https://github.com/danste22)) in BMC-Firmware#93. Since
+  BMC-Firmware#117 the firmware build leaves this profile alone, so it is what
+  reaches the board. (BMC-Firmware#93)
+- **The RK1 flash path uses `rockusb` 0.4.** `rockusb` 0.2.0 to 0.4.0, the
+  library that puts an RK1 (RK3588) into USB download mode and loads its SPL
+  loader before the eMMC is written; the bytes sent to the board are the same.
+  Written by Daniel Steinhauf ([@danste22](https://github.com/danste22)) in
+  [#85](https://github.com/excavador-turing/bmcd/pull/85), who flashed an RK1
+  three times with it (step 3 of BMC-Firmware#93). New in the lock:
+  `maybe-async-cfg` and the proc-macro crates it builds with (`manyhow`,
+  `proc-macro-utils`, `pulldown-cmark`, `syn` 1), and `strum` 0.28; `thiserror`
+  1 goes. All come from crates.io and passed `cargo deny`.
+
+</details>
+
+<details class="note">
 <summary>2.49.0 — 24 November 2026</summary>
 
 The release that ends the transition 2.48.0 began: a state change over GET is

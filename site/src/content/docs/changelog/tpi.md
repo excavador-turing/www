@@ -1,15 +1,34 @@
 ---
 title: tpi
-description: 'Every tpi release and what changed in it: 18 entries, newest v2.0.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every tpi release and what changed in it: 19 entries, newest v2.0.1, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/tpi
 tableOfContents: false
 ---
 
 The command-line client.
 
-Newest release **v2.0.0**, 24 November 2026. 18 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.0.1**, 24 November 2026. 19 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/tpi/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v2.0.1 — 24 November 2026</summary>
+
+A refactor, with no change in behaviour. Thank you,
+[@danste22](https://github.com/danste22).
+
+**Changed**
+
+- **The token and certificate-pin file helpers exist once.** `private_dir`,
+  `write_private` and the endpoint key lived twice, in `request.rs` and in
+  `tls_verify.rs`; they are now in `src/cache.rs` and both modules use them
+  from there. Token and pin files keep their names, paths and modes (0600
+  files, 0700 directories) and are still written through a rename. Authored by
+  [@danste22](https://github.com/danste22) in
+  [#33](https://github.com/excavador-turing/tpi/pull/33), for BMC-Firmware
+  [#115](https://github.com/excavador-turing/BMC-Firmware/issues/115).
+
+</details>
+
+<details class="note">
 <summary>v2.0.0 — 24 November 2026</summary>
 
 A security release. Every fix here comes from
