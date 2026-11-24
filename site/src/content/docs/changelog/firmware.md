@@ -1,13 +1,13 @@
 ---
 title: BMC-Firmware
-description: 'Every BMC-Firmware release and what changed in it: 52 entries, newest v2.54.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-Firmware release and what changed in it: 53 entries, newest v2.55.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/firmware
 tableOfContents: false
 ---
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.54.0**, 24 November 2026. 52 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.55.0**, 24 November 2026. 53 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](/feed.xml).
 
@@ -21,6 +21,93 @@ $ sha256sum -c SHA256SUMS
 :::
 
 <details class="note" open>
+<summary>v2.55.0 — 24 November 2026</summary>
+
+Pins **bmcd 2.49.0** (it was 2.48.0); tpi stays at 2.0.0 and BMC-UI at 4.8.0.
+The kernel stays at 6.18.63. The daemon now refuses every state change over GET,
+and the daemon and tpi are built smaller. Read "Breaking changes" before you
+update a board that a script or an older client talks to.
+
+Thanks to Daniel Steinhauf ([@danste22](https://github.com/danste22)) for
+[BMC-Firmware#109](https://github.com/excavador-turing/BMC-Firmware/issues/109)
+and its fix, bmcd [#73](https://github.com/excavador-turing/bmcd/pull/73)
+(carried on as [#83](https://github.com/excavador-turing/bmcd/pull/83), his
+authorship kept), and for the review that found the rest
+([#93](https://github.com/excavador-turing/BMC-Firmware/issues/93),
+[#99](https://github.com/excavador-turing/BMC-Firmware/issues/99)).
+
+##### Upgrading
+
+This is the release that ends v2.54.0's transition for state changes over GET.
+Three things change for whatever talks to a board. The details are under
+"Breaking changes".
+
+1. **Scripts and integrations that change state with GET must use POST**
+   (`curl -X POST`), with a Bearer token as before. A Bearer token no longer
+   saves a GET: it answers 405 with `Allow: POST`.
+2. **A workstation `tpi` must be 2.0 or newer.** Older `tpi` sends GET for a
+   state change and is refused. `tpi` 2.0.0 sends POST (and still needs its
+   one-time `--pin` for a self-signed board, see v2.54.0).
+3. **A web UI served separately from the board** (for example behind a reverse
+   proxy) **must be BMC-UI 4.8.0 or newer**. The one this firmware ships is
+   4.8.0. A custom `www` bundle that needs an inline script or an external host
+   has to be built to the new Content-Security-Policy.
+
+##### Breaking changes
+
+- **Every state change over GET is refused, whatever the credential** (bmcd
+  2.49.0, bmcd#73/#83, BMC-Firmware#109). v2.54.0 still served the GET forms of
+  a state change (every `opt=set` type, the upload cancel and the backup) with a
+  Bearer token, so that older clients kept working. That transition is over:
+  those requests answer 405 with `Allow: POST`, with a Bearer token, with Basic
+  or with none. A workstation `tpi` must be 2.0 or newer, a separately served
+  BMC-UI must be 4.8.0 or newer (the BMC-UI this firmware ships is 4.8.0), and
+  scripts must use `curl -X POST`. The backup, the cancel and the transfer are
+  routed on POST only, and the OpenAPI document no longer lists their GET forms.
+
+**Security**
+
+- **The web interface is served with a Content-Security-Policy** (bmcd 2.49.0,
+  bmcd#81, BMC-Firmware#99). `script-src 'self'`, no inline script and no
+  `eval`, so an injected `<script>` does not run, and a page cannot post a form
+  elsewhere. It was written against the BMC-UI 4.8.0 bundle. Safari before 15.4
+  does not match a same-host WebSocket against `connect-src 'self'`, so the
+  serial console needs Safari 15.4 or newer.
+- **Two dependency decisions are written down** (bmcd 2.49.0, bmcd#80, #82): the
+  `cookie` 0.16 advisory is accepted because the affected code is not compiled
+  in, and bincode 1 stays for `bmcd.bin` on purpose, each with its reason in
+  `deny.toml`.
+
+**Changed**
+
+- **bmcd and tpi are built with their own release profile.** Buildroot's cargo
+  infrastructure sets `CARGO_PROFILE_RELEASE_OPT_LEVEL`, `_LTO` and
+  `_CODEGEN_UNITS` for every package, and environment variables outrank the
+  manifest, so the `[profile.release]` of bmcd and tpi (fat LTO, one codegen
+  unit, `opt-level = "z"`) never reached the image: both were built at `-O2`
+  with no LTO and 16 codegen units. `tp2bmc/external.mk` now unsets those three
+  variables for the two packages, and the profile in their `Cargo.toml` decides.
+  The build log also prints the installed size of both binaries. Spotted by
+  Daniel Steinhauf ([@danste22](https://github.com/danste22)) in his review.
+  Measured in two full CI builds of the same tree: `/usr/bin/bmcd` 14.3 MB to
+  9.1 MB (-36.5 %), `/usr/bin/tpi` 5.0 MB to 2.8 MB (-44.0 %); the build takes
+  about four minutes longer. (#117)
+  Refs [#93](https://github.com/excavador-turing/BMC-Firmware/issues/93).
+
+##### Tested
+
+- On two Turing Pi 2 v2.5 boards, eight compute nodes, with v2.55.0-rc.1
+  (2026-11-24): the update over the network with `tpi-selfupdate`; a BMC reboot
+  adopts the live power state with no node power-cycled; the switch VLAN
+  configuration is unchanged; the power latch shadow is valid.
+- Every state change sent as GET answers 405 with `Allow: POST`, while the same
+  change sent as POST works.
+- Response times do not change with the smaller build: about 0.13 s per request
+  on the board, the same as with v2.54.0-rc.1.
+
+</details>
+
+<details class="note">
 <summary>v2.54.0 — 24 November 2026</summary>
 
 A security release, from a careful review of the BMC by Daniel Steinhauf

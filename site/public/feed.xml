@@ -8,6 +8,93 @@
   <updated>2026-11-24T00:00:00Z</updated>
   <author><name>excavador-turing</name></author>
   <entry>
+    <title>Firmware v2.55.0: Every state change over GET is now refused, a Content-Security-Policy for the interface, and smaller binaries</title>
+    <link href="https://turingpi.xyz/news/v2.55.0/"/>
+    <id>tag:turingpi.xyz,2026-11-24:firmware/2.55.0</id>
+    <updated>2026-11-24T00:00:00Z</updated>
+    <content type="text">Pins **bmcd 2.49.0** (it was 2.48.0); tpi stays at 2.0.0 and BMC-UI at 4.8.0.
+The kernel stays at 6.18.63. The daemon now refuses every state change over GET,
+and the daemon and tpi are built smaller. Read &quot;Breaking changes&quot; before you
+update a board that a script or an older client talks to.
+
+Thanks to Daniel Steinhauf ([@danste22](https://github.com/danste22)) for
+[BMC-Firmware#109](https://github.com/excavador-turing/BMC-Firmware/issues/109)
+and its fix, bmcd [#73](https://github.com/excavador-turing/bmcd/pull/73)
+(carried on as [#83](https://github.com/excavador-turing/bmcd/pull/83), his
+authorship kept), and for the review that found the rest
+([#93](https://github.com/excavador-turing/BMC-Firmware/issues/93),
+[#99](https://github.com/excavador-turing/BMC-Firmware/issues/99)).
+
+### Upgrading
+
+This is the release that ends v2.54.0's transition for state changes over GET.
+Three things change for whatever talks to a board. The details are under
+&quot;Breaking changes&quot;.
+
+1. **Scripts and integrations that change state with GET must use POST**
+   (`curl -X POST`), with a Bearer token as before. A Bearer token no longer
+   saves a GET: it answers 405 with `Allow: POST`.
+2. **A workstation `tpi` must be 2.0 or newer.** Older `tpi` sends GET for a
+   state change and is refused. `tpi` 2.0.0 sends POST (and still needs its
+   one-time `--pin` for a self-signed board, see v2.54.0).
+3. **A web UI served separately from the board** (for example behind a reverse
+   proxy) **must be BMC-UI 4.8.0 or newer**. The one this firmware ships is
+   4.8.0. A custom `www` bundle that needs an inline script or an external host
+   has to be built to the new Content-Security-Policy.
+
+### Breaking changes
+
+- **Every state change over GET is refused, whatever the credential** (bmcd
+  2.49.0, bmcd#73/#83, BMC-Firmware#109). v2.54.0 still served the GET forms of
+  a state change (every `opt=set` type, the upload cancel and the backup) with a
+  Bearer token, so that older clients kept working. That transition is over:
+  those requests answer 405 with `Allow: POST`, with a Bearer token, with Basic
+  or with none. A workstation `tpi` must be 2.0 or newer, a separately served
+  BMC-UI must be 4.8.0 or newer (the BMC-UI this firmware ships is 4.8.0), and
+  scripts must use `curl -X POST`. The backup, the cancel and the transfer are
+  routed on POST only, and the OpenAPI document no longer lists their GET forms.
+
+### Security
+
+- **The web interface is served with a Content-Security-Policy** (bmcd 2.49.0,
+  bmcd#81, BMC-Firmware#99). `script-src 'self'`, no inline script and no
+  `eval`, so an injected `&lt;script&gt;` does not run, and a page cannot post a form
+  elsewhere. It was written against the BMC-UI 4.8.0 bundle. Safari before 15.4
+  does not match a same-host WebSocket against `connect-src 'self'`, so the
+  serial console needs Safari 15.4 or newer.
+- **Two dependency decisions are written down** (bmcd 2.49.0, bmcd#80, #82): the
+  `cookie` 0.16 advisory is accepted because the affected code is not compiled
+  in, and bincode 1 stays for `bmcd.bin` on purpose, each with its reason in
+  `deny.toml`.
+
+### Changed
+
+- **bmcd and tpi are built with their own release profile.** Buildroot's cargo
+  infrastructure sets `CARGO_PROFILE_RELEASE_OPT_LEVEL`, `_LTO` and
+  `_CODEGEN_UNITS` for every package, and environment variables outrank the
+  manifest, so the `[profile.release]` of bmcd and tpi (fat LTO, one codegen
+  unit, `opt-level = &quot;z&quot;`) never reached the image: both were built at `-O2`
+  with no LTO and 16 codegen units. `tp2bmc/external.mk` now unsets those three
+  variables for the two packages, and the profile in their `Cargo.toml` decides.
+  The build log also prints the installed size of both binaries. Spotted by
+  Daniel Steinhauf ([@danste22](https://github.com/danste22)) in his review.
+  Measured in two full CI builds of the same tree: `/usr/bin/bmcd` 14.3 MB to
+  9.1 MB (-36.5 %), `/usr/bin/tpi` 5.0 MB to 2.8 MB (-44.0 %); the build takes
+  about four minutes longer. (#117)
+  Refs [#93](https://github.com/excavador-turing/BMC-Firmware/issues/93).
+
+### Tested
+
+- On two Turing Pi 2 v2.5 boards, eight compute nodes, with v2.55.0-rc.1
+  (2026-11-24): the update over the network with `tpi-selfupdate`; a BMC reboot
+  adopts the live power state with no node power-cycled; the switch VLAN
+  configuration is unchanged; the power latch shadow is valid.
+- Every state change sent as GET answers 405 with `Allow: POST`, while the same
+  change sent as POST works.
+- Response times do not change with the smaller build: about 0.13 s per request
+  on the board, the same as with v2.54.0-rc.1.</content>
+  </entry>
+  <entry>
     <title>Firmware v2.54.0: A security release: POST for state changes, verified certificates, and a careful audit by Daniel Steinhauf</title>
     <link href="https://turingpi.xyz/news/v2.54.0/"/>
     <id>tag:turingpi.xyz,2026-11-24:firmware/2.54.0</id>
@@ -1646,51 +1733,5 @@ instead of flashing.
   has the version. The successful path pays nothing. The refusal itself stays:
   posting an unresolved version would fail in the middle of a download rather
   than before it starts.</content>
-  </entry>
-  <entry>
-    <title>Firmware v2.16.0</title>
-    <link href="https://turingpi.xyz/news/v2.16.0/"/>
-    <id>tag:turingpi.xyz,2026-09-09:firmware/2.16.0</id>
-    <updated>2026-09-09T00:00:00Z</updated>
-    <content type="text">### Changed
-
-- **bmcd v2.27.0 → v2.28.0.** The ten handlers that assembled their answer
-  with `json!` now serialise named types, so every read operation in the
-  OpenAPI document describes what it answers with and none is left as &quot;not
-  described here&quot;. The shapes are reconstructions of what the daemon already
-  sent, odd corners preserved and explained: power, USB and SD card answer a
-  one-element array because that is upstream's shape; node power reports
-  strings because an unreadable rail is `Unknown` and a boolean could not say
-  so; the SD card's used-bytes field is `use` on the wire because `use` is
-  what upstream sent and a Rust keyword.
-
-  **Naming a cooling device that does not exist now answers 400, not 500.**
-  A client branches on status, and 500 is the retryable one — so the old
-  answer asked callers to retry something that could never change.
-
-- **BMC-UI v3.17.0 → v3.18.0.** Twenty-three hand-written response interfaces
-  become aliases onto types generated from the `openapi.json` bmcd publishes,
-  and CI regenerates and diffs, so a hand edit or a pin moved without
-  regenerating fails there rather than on a board. Nothing changes on screen.
-
-  Two things this shook out. The generated types are stricter than the
-  hand-written ones — schemars cannot tell a field always sent as `null` from
-  one omitted when empty — so a reading is now recognised by a type guard
-  rather than by a runtime check the compiler could not see. And BMC-UI's
-  quality workflow had been `pull_request` only, in a fork that never opens
-  one, so its lint, build and tests had never run in CI at all.
-
-### Added
-
-- **`docs/architecture.md`** — where the daemon, the interface and the
-  listeners live, the board measurements the arrangement rests on, and what
-  was declined along the way. Linked from the README.
-
-### Fixed
-
-- **CI's shell install no longer fails on a third-party apt repository it does
-  not use.** A hash mismatch in the runner image's Google Chrome repository
-  failed the promotion-gate job on a documentation-only change. The step now
-  drops the runner's third-party `.list` files before updating.</content>
   </entry>
 </feed>

@@ -1,15 +1,77 @@
 ---
 title: bmcd
-description: 'Every bmcd release and what changed in it: 56 entries, newest 2.48.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every bmcd release and what changed in it: 57 entries, newest 2.49.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmcd
 tableOfContents: false
 ---
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.48.0**, 24 November 2026. 56 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.49.0**, 24 November 2026. 57 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>2.49.0 — 24 November 2026</summary>
+
+The release that ends the transition 2.48.0 began: a state change over GET is
+refused whatever the credential, so the clients (`tpi` 2.0, BMC-UI 4.8.0) must
+be on POST first. It also sends a Content-Security-Policy with the web
+interface, and records two dependency decisions.
+
+Thanks to Daniel Steinhauf ([@danste22](https://github.com/danste22)) for
+BMC-Firmware#109 and its fix (#73, carried by #83, his commit is in the history
+under his name), and for the review that found the rest (BMC-Firmware#93,
+#99).
+
+##### Breaking changes
+
+- **Every state change over GET is refused, whatever the credential.** 2.48.0
+  still served the GET forms of a state change (every `opt=set` type, the
+  upload cancel and the backup) when they carried a Bearer token, so that older
+  `tpi` and BMC-UI kept working. That transition is over: those requests now
+  answer 405 with `Allow: POST`, with a Bearer token, with Basic or with none.
+  The backup, the cancel and the transfer are routed on POST only, and the
+  OpenAPI document no longer lists their GET forms. A workstation `tpi` must be
+  2.0 or newer, a separately served BMC-UI must be 4.8.0 or newer, and scripts
+  must use `curl -X POST`. (#73, carried by #83;
+  BMC-Firmware#109, found by Daniel Steinhauf
+  ([@danste22](https://github.com/danste22)), who also wrote the fix.)
+
+**Security**
+
+- **RUSTSEC-2026-0594 (`cookie` 0.16, via actix-web) is accepted, with the
+  reason in `deny.toml`.** The advisory is AES-GCM nonce reuse in
+  `PrivateJar::add` and `add_original` after `fork()`. That API exists only
+  behind cookie's `private` feature, which actix-web does not enable (the
+  lockfile has no `aes-gcm`), bmcd sets no cookies and authenticates with
+  Bearer tokens, and the daemon does not fork. The fixed cookie 0.18.3 is out
+  of reach: the newest actix-web (4.20.0) still requires `cookie ^0.16`. To be
+  revisited when an actix-web release moves to a fixed cookie. Found by the
+  weekly advisories job that Daniel Steinhauf ([@danste22](https://github.com/danste22))
+  asked for in BMC-Firmware#93. (#80)
+- **The interface is served with a script-restricting Content-Security-Policy.**
+  The UI responses carried only `frame-ancestors 'none'`; they now send
+  `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
+  img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src
+  'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'`, so an
+  injected `<script>` or inline handler does not run and a page cannot post a
+  form elsewhere. It was written against the BMC-UI 4.8.0 bundle: one module
+  script and its chunks from the same origin, no inline script, no `eval`, no
+  worker, fonts as files, and the API, the upload and the serial console
+  WebSocket on the same host. `'unsafe-inline'` stays for styles only (the
+  terminal and the theme switch add `<style>` elements). `connect-src 'self'`
+  matches a same-host WebSocket in current browsers (Safari before 15.4 did
+  not). The policy applies to the documents the board serves; when the
+  interface is served by a fleet pod, that pod's policy governs the page and
+  the board only answers API calls, which a CSP does not restrict. A custom
+  `www` bundle that needs more (an external host, an inline script) has to be
+  built to this policy. (#81, BMC-Firmware#99; found in the review by Daniel
+  Steinhauf ([@danste22](https://github.com/danste22)).)
+- **bincode 1 stays for `bmcd.bin`, on purpose:** see `deny.toml`
+  (RUSTSEC-2025-0141). (#82)
+
+</details>
+
+<details class="note">
 <summary>2.48.0 — 24 November 2026</summary>
 
 A security release. It carries the fixes from a review of the BMC's web and

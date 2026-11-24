@@ -1,15 +1,30 @@
 ---
 title: BMC-UI
-description: 'Every BMC-UI release and what changed in it: 48 entries, newest v4.8.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-UI release and what changed in it: 49 entries, newest v4.8.1, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmc-ui
 tableOfContents: false
 ---
 
 The web interface the board serves.
 
-Newest release **v4.8.0**, 24 November 2026. 48 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v4.8.1**, 24 November 2026. 49 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v4.8.1 — 24 November 2026</summary>
+
+**Fixed**
+
+- **Console node selector: the selected node stays readable on hover**
+  ([#69](https://github.com/excavador-turing/BMC-UI/pull/69)). Hovering the
+  selected segment of the node picker turned its text to the page foreground
+  colour, dark on the dark selected background in the light theme and light on
+  light in the dark theme. The selected segment now keeps its own colours on
+  hover. The picker is shared, so the Console, Flash Node and USB pages are all
+  fixed.
+
+</details>
+
+<details class="note">
 <summary>v4.8.0 — 24 November 2026</summary>
 
 Thanks to Daniel Steinhauf ([@danste22](https://github.com/danste22)) for the
