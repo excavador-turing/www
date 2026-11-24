@@ -378,3 +378,26 @@ v2.55.0:
     ([#109](https://github.com/excavador-turing/BMC-Firmware/issues/109)), the
     fix ([bmcd#73](https://github.com/excavador-turing/bmcd/pull/73)) and the
     review that found the rest.
+
+# v2.56.0 -- bmcd 2.50.0, tpi 2.0.1, BMC-UI 4.8.1. The RK1 flash path moves to
+# rockusb 0.4 (bmcd#85 by @danste22, who flashed an RK1 three times with it; step
+# 3 of BMC-Firmware#93), sha2/crc/crc32fast are built at opt-level 3 (bmcd#86,
+# Daniel's suggestion in #93), the token and pin file helpers exist once in tpi
+# (tpi#33 by Daniel, BMC-Firmware#115), and the BMC-UI node picker keeps the
+# selected node readable on hover (BMC-UI#69). Nothing to do on a board or in a
+# script. Tested on two v2.5 boards; the RK1 path is Daniel's test, not ours. No
+# capture. Written ahead of the release; the post appears when v2.56.0 exists.
+v2.56.0:
+  title: "RK1 flashing on rockusb 0.4, faster checksums, and a console node picker you can read under the pointer"
+  summary: >-
+    The RK1 flash path moves to `rockusb` 0.4, written and tested on an RK1 by
+    Daniel Steinhauf ([@danste22](https://github.com/danste22),
+    [bmcd#85](https://github.com/excavador-turing/bmcd/pull/85)). The three
+    checksum crates a node flash runs through are now built for speed, as he
+    suggested in
+    [#93](https://github.com/excavador-turing/BMC-Firmware/issues/93), and the
+    token and certificate-pin helpers in `tpi` exist once
+    ([tpi#33](https://github.com/excavador-turing/tpi/pull/33), his too). In
+    the web interface the selected node stays readable when you hover it on
+    the Console, Flash Node and USB pages. There is nothing to do on a board or
+    in a script. We have no RK1, so that path is tested by Daniel, not by us.
