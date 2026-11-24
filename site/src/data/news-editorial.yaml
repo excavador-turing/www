@@ -333,3 +333,24 @@ v2.53.0:
     nodes. Tested on real hardware, including a power pull. Thank you, Daniel
     Steinhauf ([@danste22](https://github.com/danste22)) and Sven Rademakers,
     for the shadow-word contract this builds on.
+
+# v2.54.0 -- a security release, from a careful review of the BMC by Daniel
+# Steinhauf (@danste22): bmcd 2.48.0, tpi 2.0.0, BMC-UI 4.8.0 and the board
+# keeping its TLS key on renewal (BMC-Firmware#108). Issues BMC-Firmware#88 to
+# #101, #110 and #112 are fixed; #109 (refuse every state change on GET)
+# waits for the next release so the clients move first. Tested on both v2.5
+# boards. The post says what changes for users, the four upgrade notes in one
+# sentence, and thanks Daniel. No interface change worth a capture.
+v2.54.0:
+  title: "A security release: POST for state changes, verified certificates, and a careful audit by Daniel Steinhauf"
+  summary: >-
+    State changes now need POST or a token, `tpi` verifies the board's
+    certificate against a one-time pin, logout revokes the token, backups no
+    longer carry secrets, and firmware upload and login are safer. Before you
+    update: pin a self-signed board once with `tpi --pin` (or use
+    `--insecure`), move scripts that change state with GET and Basic auth to
+    POST or a Bearer token, run BMC-UI 4.8.0 or newer if the interface is
+    served apart from the board, and let on-board scripts use
+    `/run/bmcd/local-token`. Thank you, Daniel Steinhauf
+    ([@danste22](https://github.com/danste22)), for a careful security review
+    of the BMC and for the fixes across bmcd, tpi, BMC-UI and the firmware.
