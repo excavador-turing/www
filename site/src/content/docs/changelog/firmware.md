@@ -1,13 +1,13 @@
 ---
 title: BMC-Firmware
-description: 'Every BMC-Firmware release and what changed in it: 51 entries, newest v2.53.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-Firmware release and what changed in it: 52 entries, newest v2.54.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/firmware
 tableOfContents: false
 ---
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.53.0**, 21 November 2026. 51 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.54.0**, 24 November 2026. 52 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](/feed.xml).
 
@@ -21,7 +21,7 @@ $ sha256sum -c SHA256SUMS
 :::
 
 <details class="note" open>
-<summary>Unreleased — merged, not yet on a board</summary>
+<summary>v2.54.0 — 24 November 2026</summary>
 
 A security release, from a careful review of the BMC by Daniel Steinhauf
 ([@danste22](https://github.com/danste22)). It pins **bmcd 2.48.0**,
@@ -67,6 +67,22 @@ the replacement pull requests that carried his commits (his authorship is kept):
   [#67](https://github.com/excavador-turing/BMC-UI/pull/67)) and
   [#65](https://github.com/excavador-turing/BMC-UI/pull/65).
 - **BMC-Firmware:** [#108](https://github.com/excavador-turing/BMC-Firmware/pull/108).
+
+##### Upgrading
+
+Four things change for whatever talks to a board. The details are under
+"Breaking changes".
+
+1. **Workstation `tpi` 2.0.0 verifies certificates.** Pin a self-signed board
+   once with `tpi --host <board> --pin <sha256>` (or `TPI_PIN`), or use
+   `--insecure`.
+2. **Scripts that change state with GET and Basic auth must switch to POST or a
+   Bearer token.** GET with a Bearer token still works in this release only.
+3. **A web UI served separately from the board** (for example behind a reverse
+   proxy) **must be BMC-UI 4.8.0 or newer**, because state changes now need
+   POST.
+4. **On-board scripts reach the API with `/run/bmcd/local-token`**
+   (`Authorization: Bearer $(cat /run/bmcd/local-token)`).
 
 ##### Breaking changes
 
@@ -160,6 +176,13 @@ the replacement pull requests that carried his commits (his authorship is kept):
   none or the key is not the certificate's own. The SHA-256 of the certificate
   changes, the key does not. A board whose key must be replaced needs
   `/etc/ssl/certs/bmcd_key.pem` deleted before the generator runs.
+
+##### Tested
+
+- On both of our v2.5 boards with v2.54.0-rc.1: the over-the-air update; a BMC
+  reboot adopts the live power state with no node reset; the on-board `tpi`
+  works without a password; the API refuses unauthenticated loopback calls; the
+  TLS key is unchanged across a reboot; the fleet UI works through a gateway.
 
 </details>
 
