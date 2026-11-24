@@ -378,3 +378,31 @@ v2.55.0:
     ([#109](https://github.com/excavador-turing/BMC-Firmware/issues/109)), the
     fix ([bmcd#73](https://github.com/excavador-turing/bmcd/pull/73)) and the
     review that found the rest.
+
+# v2.57.0 -- a security release: bmcd 2.50.2. Three fixes in the daemon: a
+# percent-encoded path no longer slips past the GET and cross-site refusals
+# (BMC-Firmware#132, found by adberger), bmcd.bin is replaced durably so a power
+# cut cannot leave the daemon on default storage (BMC-Firmware#130, adberger),
+# and the serial console WebSocket refuses a handshake opened from another site
+# (found in our own review). Carries the never-published v2.56.0: RK1 flashing
+# on rockusb 0.4 (bmcd#85), sha2/crc/crc32fast built at full speed (bmcd#86,
+# Daniel's suggestion in BMC-Firmware#93), tpi 2.0.1 (tpi#33, BMC-Firmware#115)
+# and BMC-UI 4.8.1 (the selected node stays readable on hover). Nothing to do
+# on a board or in a script. Tested on both v2.5 boards. No capture. Written
+# ahead of the release; the post appears when v2.57.0 exists.
+v2.57.0:
+  title: "Three security fixes in the daemon, found by adberger and in our own review, plus faster RK1 flashing"
+  summary: >-
+    A percent-encoded path such as `/api/b%6dc` no longer slips past the
+    refusal of a state change over GET and the cross-site refusal (it is now a
+    400), the file that holds the power state is flushed to flash before it is
+    renamed into place, so a power cut cannot leave the daemon on default
+    storage, and the serial console WebSocket refuses a handshake opened from
+    another site. Nothing to do on a board or in a script. The release also
+    carries the RK1 flash path on `rockusb` 0.4 and checksums built for speed,
+    `tpi` 2.0.1 and BMC-UI 4.8.1, where the selected node stays readable on
+    hover. Thank you, adberger ([@adberger](https://github.com/adberger)), for
+    [#132](https://github.com/excavador-turing/BMC-Firmware/issues/132) and
+    [#130](https://github.com/excavador-turing/BMC-Firmware/issues/130), and
+    Daniel Steinhauf ([@danste22](https://github.com/danste22)) for the RK1
+    flash path, the `opt-level` suggestion and the `tpi` clean-up.
