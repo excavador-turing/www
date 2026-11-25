@@ -105,6 +105,9 @@ jobs:
       - name: the changelog refresh skips pre-releases
         run: devbox run -- python3 scripts/refresh-changelog.py --self-test
 
+      - name: the roadmap never links to an Unreleased news post
+        run: devbox run -- python3 scripts/refresh-roadmap.py --self-test
+
       - name: the served-URL gate judges as it says
         run: devbox run -- python3 scripts/served-urls.py --self-test
 

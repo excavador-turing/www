@@ -47,7 +47,7 @@ Voted for, built, released. Each card still opens its discussion.
 One post per firmware release, from the repositories' own changelogs — [all of them](/news/), or [by feed](/feed.xml).
 
 <div class="tp-releases">
-<a href="/news/Unreleased/"><b>Unreleased</b><span>merged, not yet on a board</span></a>
+<a href="/changelog/firmware/"><b>Unreleased</b><span>merged, not yet on a board</span></a>
 <a href="/news/v2.57.0/"><b>v2.57.0</b><span>25 November 2026</span></a>
 <a href="/news/v2.55.0/"><b>v2.55.0</b><span>24 November 2026</span></a>
 <a href="/news/v2.54.0/"><b>v2.54.0</b><span>24 November 2026</span></a>

@@ -276,21 +276,69 @@ def recent(n: int = 5) -> str:
     # A release covered by another's post links to that post.
     posts_map = DATA_DIR / "news-posts.json"
     slug_of = json.loads(posts_map.read_text()) if posts_map.exists() else {}
+    return release_cards(rows, slug_of, n)
+
+
+# The heading of the firmware changelog's open block, which the changelog
+# writes while the firmware has merged changes no release carries yet.
+UNRELEASED = "Unreleased"
+# Where that block is read: it has no news post and never will, so a card
+# for it links to the changelog page, not to /news/Unreleased/.
+CHANGELOG_PAGE = "/changelog/firmware/"
+
+
+def release_cards(rows: list[str], slug_of: dict[str, str], n: int) -> str:
+    """The cards for the first `n` changelog headings.
+
+    A released version links to its news post. The Unreleased block is not a
+    release and has no post: its card links to the changelog page. A link to
+    /news/Unreleased/ failed the strict build's link check, and with it every
+    scheduled publish for as long as the firmware had unreleased changes.
+    """
     out = ['<div class="tp-releases">']
     for row in rows[:n]:
         ver, _, when = row.partition(" — ")
         when = when.replace(" (not released)", "").replace(" (pre-release)", "")
-        slug = slug_of.get(ver, ver)
-        out.append(f'<a href="/news/{html.escape(slug)}/"><b>{html.escape(ver)}'
+        if ver == UNRELEASED:
+            href = CHANGELOG_PAGE
+        else:
+            href = f"/news/{html.escape(slug_of.get(ver, ver))}/"
+        out.append(f'<a href="{href}"><b>{html.escape(ver)}'
                    f"</b><span>{html.escape(when)}</span></a>")
     out.append("</div>")
     return "\n".join(out)
 
 
+def self_test() -> int:
+    """An Unreleased heading never becomes a /news/ link."""
+    rows = ["Unreleased — merged, not yet on a board",
+            "v2.57.0 — 25 November 2026",
+            "v2.55.0 — 24 November 2026 (not released)"]
+    got = release_cards(rows, {"v2.55.0": "v2.57.0"}, 5)
+    bad = []
+    if "/news/Unreleased/" in got or "/news/unreleased" in got.lower():
+        bad.append("Unreleased links to a news post")
+    if f'<a href="{CHANGELOG_PAGE}"><b>Unreleased</b>' not in got:
+        bad.append("Unreleased does not link to the changelog page")
+    if '<a href="/news/v2.57.0/"><b>v2.57.0</b>' not in got:
+        bad.append("a released version lost its news link")
+    if '<a href="/news/v2.57.0/"><b>v2.55.0</b>' not in got:
+        bad.append("a covered release lost its post's link")
+    for b in bad:
+        print(f"self-test failed: {b}", file=sys.stderr)
+    if not bad:
+        print("  the roadmap's release cards never link to /news/Unreleased/")
+    return 1 if bad else 0
+
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--self-test", action="store_true",
+                    help="check the release cards and exit")
     args = ap.parse_args(argv[1:])
+    if args.self_test:
+        return self_test()
 
     items = fetch()
     as_of = dt.date.today().isoformat()
