@@ -1,15 +1,42 @@
 ---
 title: bmcd
-description: 'Every bmcd release and what changed in it: 59 entries, newest 2.50.1, taken from the repository''s own CHANGELOG.md.'
+description: 'Every bmcd release and what changed in it: 60 entries, newest 2.50.2, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmcd
 tableOfContents: false
 ---
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.50.1**, 24 November 2026. 59 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.50.2**, 24 November 2026. 60 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>2.50.2 — 24 November 2026</summary>
+
+A security release: the serial console WebSocket refuses a handshake opened from
+another site. Found in our own review of 2.50.1.
+
+**Security**
+
+- **The serial console WebSocket refuses a handshake opened from another
+  site.** `/api/bmc/serial/ws` reads and writes a node's UART. A handshake is
+  a `GET`, so the cross-site refusal, which is applied to state changes, did
+  not see it, and a browser does not hold a WebSocket to the same-origin
+  policy. Behind a reverse proxy that authenticates with a client certificate
+  the browser sends no token of its own, so a page on another site, or on a
+  sibling host of the same site, could open the console. Directly on the board
+  it was not reachable this way: the web interface puts a bearer token in the
+  subprotocol and a browser's Basic credential is refused. A handshake whose
+  `Sec-Fetch-Site` is anything but `same-origin` or `none` is now 403, and
+  without that header (an older browser) so is one whose `Origin` is not the
+  `Host`: host and port are compared, the scheme is not, and a missing port is
+  the scheme's default. A client that sends neither header (`tpi`, `curl`) is
+  served as before, and the web interface, which opens the socket on its own
+  host, is not affected. Found in our own review. The refusal is made before
+  any credential, certificate or identity header is read.
+
+</details>
+
+<details class="note">
 <summary>2.50.1 — 24 November 2026</summary>
 
 A security release: a percent-encoded path could get past the refusal of a

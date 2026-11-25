@@ -1,13 +1,13 @@
 ---
 title: BMC-Firmware
-description: 'Every BMC-Firmware release and what changed in it: 53 entries, newest v2.55.0, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-Firmware release and what changed in it: 54 entries, newest v2.57.0, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/firmware
 tableOfContents: false
 ---
 
 The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.
 
-Newest release **v2.55.0**, 24 November 2026. 53 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v2.57.0**, 25 November 2026. 54 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-Firmware/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 [Every release on GitHub](https://github.com/excavador-turing/BMC-Firmware/releases) carries a `.tpu` OTA package, an `.img` recovery image and a `SHA256SUMS` to check them against. New ones come through [the feed](/feed.xml).
 
@@ -21,16 +21,16 @@ $ sha256sum -c SHA256SUMS
 :::
 
 <details class="note" open>
-<summary>Unreleased — merged, not yet on a board</summary>
+<summary>v2.57.0 — 25 November 2026</summary>
 
 v2.56.0 was never published; its changes ship in v2.57.0, together with the
 security fixes below.
 
-Pins **bmcd 2.50.1** (v2.55.0 had 2.49.0), **tpi 2.0.1** (2.0.0) and **BMC-UI
-4.8.1** (4.8.0). The kernel stays at 6.18.63. Two security fixes in the daemon
-reported by adberger, the RK1 flash path moves to `rockusb` 0.4, the hashing and
-checksum loops are built for speed, and the console node picker is readable
-under the pointer. There is nothing to do on a board or in a script: no
+Pins **bmcd 2.50.2** (v2.55.0 had 2.49.0), **tpi 2.0.1** (2.0.0) and **BMC-UI
+4.8.1** (4.8.0). The kernel stays at 6.18.63. Three security fixes in the
+daemon (two reported by adberger), the RK1 flash path moves to `rockusb` 0.4,
+the hashing and checksum loops are built for speed, and the console node picker
+is readable under the pointer. There is nothing to do on a board or in a script: no
 behaviour a client relies on changes.
 
 Thanks to adberger ([@adberger](https://github.com/adberger)) for
@@ -68,6 +68,16 @@ an API request (no client we know of does) now gets 400.
   renamed into place without flushing its data, so a power cut on UBIFS could
   leave bmcd starting on new, default storage. It is written through
   `write_durably` now: data flushed before the rename, directory after.
+- **The serial console WebSocket refuses a handshake opened from another site**
+  (bmcd 2.50.2, bmcd#93, found in our own review). The console reads and writes
+  a node's UART. A handshake is a `GET`, so the cross-site refusal for state
+  changes did not see it, and a browser does not hold a WebSocket to the
+  same-origin policy. Behind a reverse proxy that authenticates with a client
+  certificate the browser sends no token of its own, so a page on another site
+  could open the console; directly on the board it was not reachable this way.
+  A handshake whose `Sec-Fetch-Site` is not `same-origin` or `none` is now 403,
+  and without that header one whose `Origin` is not the `Host`. `tpi`, `curl`
+  and BMC-UI, which opens the socket on its own host, are served as before.
 
 **Changed**
 
@@ -87,27 +97,33 @@ an API request (no client we know of does) now gets 400.
   `[profile.release]`, so this is what reaches the image.
 - **The token and certificate-pin file helpers exist once in `tpi`** (tpi 2.0.1,
   tpi#33, BMC-Firmware#115). A refactor by Daniel Steinhauf with no change in
-  behaviour: the same files, paths and modes. #115 is closed once
-  the release that carries this is out.
+  behaviour: the same files, paths and modes.
 - **BMC-UI 4.8.1: the selected node stays readable on hover** (BMC-UI#69). In the
   node picker of the Console, Flash Node and USB pages, hovering the selected
   segment turned its text to the page colour, dark on dark in the light theme and
   light on light in the dark theme. It keeps its own colours now.
 
-##### Tested so far
+##### Tested
 
-The hardware test of v2.57.0 follows the pre-release.
-
-- On two Turing Pi 2 v2.5 boards, eight compute nodes, with the pre-release of
-  the changes above that did not include the security fixes (2026-11-24): the
-  update over the network; a BMC reboot adopts the live power state with no node
-  power-cycled; the switch VLAN configuration is unchanged; the power latch
-  shadow is valid.
-- Every state change sent as GET still answers 405 with `Allow: POST`, while the
-  same change sent as POST works.
-- Response times do not change: about 0.135 s per request on the board.
+- On two Turing Pi 2 v2.5 boards, eight compute nodes, with v2.57.0-rc.2
+  (2026-11-24): both boards updated over the network, board B first, then board
+  A; every gate passed and no compute node lost power. A BMC reboot adopts the
+  live power state, the switch VLAN configuration is unchanged and the power
+  latch shadow is valid.
+- The security fixes, on the hardware:
+  - a percent-encoded path under `/api/bmc` (`/api/b%6dc`) answers 400;
+  - the serial console WebSocket handshake answers 403 when `Sec-Fetch-Site` is
+    `cross-site` or `same-site`, and 403 for a foreign `Origin`;
+  - it answers 101 (the socket opens) when `Origin` equals the `Host`, and 101
+    with no `Origin` at all (`tpi`, `curl`);
+  - a state change sent as GET answers 405 with `Allow: POST`, while the same
+    change sent as POST works.
+- The serial console connects in a browser (confirmed 2026-11-25).
+- Components in the image: bmcd 2.50.2, tpi 2.0.1, BMC-UI 4.8.1.
 - BMC-UI 4.8.1: the selected node stays readable on hover (confirmed in a
   browser).
+- Response times did not change with the earlier v2.56.0 pre-release: about
+  0.135 s per request on the board.
 - The RK1 flash path (`rockusb` 0.4) was tested by Daniel Steinhauf
   ([@danste22](https://github.com/danste22)), three flashes on an RK1. We have
   no RK1, so we did not test it.
