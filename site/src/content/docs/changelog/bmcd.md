@@ -1,15 +1,141 @@
 ---
 title: bmcd
-description: 'Every bmcd release and what changed in it: 60 entries, newest 2.50.2, taken from the repository''s own CHANGELOG.md.'
+description: 'Every bmcd release and what changed in it: 63 entries, newest 2.51.2, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmcd
 tableOfContents: false
 ---
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.50.2**, 24 November 2026. 60 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.51.2**, 25 November 2026. 63 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>2.51.2 — 25 November 2026</summary>
+
+**Fixed**
+
+- **The Power page's "last power on" time restarts when the BMC reboots and
+  powers the nodes back on.** On a v2.4 board a reboot of the BMC (after a
+  firmware update, for one) cuts the power of the nodes, and the daemon switches
+  them back on at start. The daemon compared the nodes it was restoring with
+  the state it had stored, saw no change, and left the time of the last switch
+  from the UI or the API, so the page showed a stale one. A cold boot now stamps
+  every node it powers on with the time of the start and clears the stamp of the
+  ones it leaves off; a restart of the daemon under running nodes keeps the
+  stamps as they were. Reported by DingoDogz (Discord). Thank you. A reboot of a
+  node from inside the node does not cut its power, so the BMC cannot see it and
+  the time does not change.
+
+</details>
+
+<details class="note">
+<summary>2.51.1 — 25 November 2026</summary>
+
+**Fixed**
+
+- **The web serial console no longer closes when the browser falls behind the
+  UART.** At 1500000 baud the console ended with `close code 1011: channel
+  lagged by 2`. The read fan-out held 8 chunks, and a client that fell that far
+  behind got an error from the broadcast channel, which the session turned
+  into a close. Reported by DingoDogz (Discord), on an RK1 running Talos. Thank
+  you. A client that lags now stays attached, and the stream carries a line
+  where the output was lost, `[bmcd: N chunks of console output skipped, the
+  browser fell behind]`; it is logged at most once every ten seconds per
+  client. The fan-out holds 256 chunks, 2 MiB at most per node (a chunk is one
+  read of the port, at most 8 KiB). The worker also no longer stops reading a
+  node when the last client leaves at the moment a chunk arrives.
+
+</details>
+
+<details class="note">
+<summary>2.51.0 — 25 November 2026</summary>
+
+Update safety. Five reports against the firmware's update path, four of them
+from Adrian Berger ([@adberger](https://github.com/adberger)), whose
+deterministic simulation of a board under power cuts, reboots and concurrent
+installs found them, and one from Daniel Steinhauf
+([@danste22](https://github.com/danste22)). The scripts that do the work are in
+BMC-Firmware; this is the daemon's half. Thank you both.
+
+Two fixes to how the daemon handles a node's power, reported by Daniel
+Steinhauf ([@danste22](https://github.com/danste22), BMC-Firmware#122) and
+[@adberger](https://github.com/adberger) (BMC-Firmware#129). Thank you both.
+
+**Added**
+
+- **`POST opt=set&type=firmware_unstage` cancels a staged update**
+  (BMC-Firmware#124, Daniel Steinhauf). The next boot starts the firmware that
+  is running, and `firmware_slots` reports nothing staged. POST only, like every
+  state change; also `POST /api/bmc/firmware/unstage`, documented in the OpenAPI
+  document. It runs the firmware's `/sbin/osunstage`, which clears `nextboot`
+  *before* it removes the notes. It takes the staging lock first, so an install
+  that is still writing is a 409, and it is a 409 too while the new firmware is
+  being checked on its first boot. With nothing staged it is not an error and
+  answers 200. It answers with the slots document, so a client sees the result
+  without a second request.
+- **One staging lock** (BMC-Firmware#127, Adrian Berger). The upload path,
+  `firmware_install` and the firmware's scripts share one `flock` on
+  `/run/firmware-stage.lock`. A second stager gets a 409 `an update is being
+  staged; try again when it has finished`, taken before any byte is sent.
+
+**Changed**
+
+- **`force=1` means "cancel what is staged, then stage this", on both
+  `type=firmware` and `firmware_install`** (BMC-Firmware#128, Adrian Berger).
+  `firmware_install` answered 409 "pass force=1 to replace it" and then, with
+  `force=1`, skipped its own check and ran `tpi-selfupdate`, which has no force
+  option and refused with a 400. Both endpoints now cancel the staged update
+  first (the same operation as `firmware_unstage`, under the lock) and go on to
+  stage; the 409 names all three ways out: reboot, `firmware_unstage`, `force=1`.
+  If the install that follows fails, nothing is staged and the board boots what
+  it runs. The upload path used to write over the staged volume with `nextboot`
+  still pointing at it.
+- **A firmware transfer is refused while another transfer is running**
+  (BMC-Firmware#127). `request_transfer` replaced the running transfer;
+  dropping its context cancels its copy but not an `osupdate` already writing.
+  A node flash keeps replacing, as before.
+- **The upload path hands `osupdate` its staged-version note, instead of
+  writing it afterwards** (BMC-Firmware#126, Adrian Berger). `osupdate` installs
+  it and syncs it before it arms `nextboot`; a reboot or a power cut between the
+  two used to arm an image with no note, and the promotion gate then skipped its
+  version check. The note body is unchanged.
+- **The promotion history counts "tentative boot; checking" lines**, not any
+  line containing "tentative boot". `S99postupdate` now also writes "tentative
+  boot did not complete; staged vX discarded" when a power cut left the notes of
+  an update that never booted (BMC-Firmware#131, Adrian Berger); that line is
+  not an attempt.
+- **A node that was running is switched back on after a flash.** The end of a
+  flash used to switch the node off whatever it had been doing, so a node that
+  was running stayed dark until somebody switched it on, and a script that
+  flashed and then waited for the node to boot waited forever. The daemon now
+  notes whether the node was on before it switches it off to flash. After a
+  successful flash (and the CRC check, when it runs) a node that was on is held
+  off for the settle time and switched on again with the USB boot pin released,
+  so it boots the new image; a node that was off stays off. After a failed or
+  cancelled flash the node is left off, so a half-written image does not boot,
+  and the log says why. The log line for the end of a flash now says what
+  happened to the node: "switched back on" or "left off", with the reason.
+  **Behaviour change:** anyone who relied on a flashed node staying off must
+  switch it off before flashing. (BMC-Firmware#122)
+- **`type=reset` goes through the same path as a power request.** The reset
+  drove the rails directly and never touched the power state the API reports,
+  so a reset of a node that was off powered it on while the API still said off,
+  and a power-off sent during a reset was undone when the reset turned the rail
+  back on: the API said off and the module ran. Now a reset and a power request
+  are serialised by one lock and recorded the same way, and the lock is held for
+  the writes only, never while the node is held off. The node reads off while it
+  is held off and on again when it is back. A power request that names the node
+  during a reset cancels the switch-on that is waiting, so a power-off leaves the
+  node off and the state says off. (BMC-Firmware#129)
+- **A reset of a node that is off is refused with a 409** ("Node 2 is off, so
+  there is nothing to reset; switch it on first"), where it used to power the
+  node on. BMC-UI already disables the reset button for a node that is off.
+  **Behaviour change:** a client that used `type=reset` to switch a node on must
+  use `type=power`. (BMC-Firmware#129)
+
+</details>
+
+<details class="note">
 <summary>2.50.2 — 24 November 2026</summary>
 
 A security release: the serial console WebSocket refuses a handshake opened from

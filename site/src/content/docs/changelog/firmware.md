@@ -21,6 +21,222 @@ $ sha256sum -c SHA256SUMS
 :::
 
 <details class="note" open>
+<summary>Unreleased — merged, not yet on a board</summary>
+
+**Update safety.** Five reports against the update path: an interrupted
+staging could promote an image the gate should reject, two installs could race,
+`firmware_install` offered `force=1` and then refused it, a power cut left a
+staged version on the page for ever, and there was no way to cancel a staged
+update short of a shell. Thanks to Adrian Berger
+([@adberger](https://github.com/adberger)), whose deterministic simulation of a
+board under power cuts, reboots and concurrent installs found #126, #127, #128
+and #131, each with a reproduction; and to Daniel Steinhauf
+([@danste22](https://github.com/danste22)), who asked for the cancel in #124.
+This is the firmware's half; the daemon's, `tpi`'s and the interface's are in
+bmcd, tpi and BMC-UI, and ship together with it in v2.58.0.
+
+Pins **bmcd 2.51.2** (v2.57.0 had 2.50.2), **tpi 2.1.0** (2.0.1) and **BMC-UI
+4.9.1** (4.8.1). The kernel stays at 6.18.63.
+
+**Not yet tested with real power cuts**, which a simulation cannot replace: the
+window in #126 depends on how long the NAND takes to write. It ships in firmware
+v2.58.0, with bmcd 2.51.x and tpi 2.1.0; `tpi firmware unstage` needs bmcd 2.51.0
+or newer, and the new bmcd needs the new scripts.
+
+**Added**
+
+- **A node in mass-storage mode gets a stable `/dev/disk/by-tpi/nodeN` link**
+  ([#145](https://github.com/excavador-turing/BMC-Firmware/pull/145), landed as
+  [#148](https://github.com/excavador-turing/BMC-Firmware/pull/148), Refs #140).
+  A node attached with `tpi advanced msd -n N` showed up as `/dev/sdX`, a name
+  that changes between attaches. The new `mdev-tpi-msd-symlink` helper maps a
+  whole-disk `sd[a-z]` on hub port `1-1.N` or `2-1.N` to
+  `/dev/disk/by-tpi/nodeN` and removes the link when the disk or the hub port
+  goes away. Written by Daniel Steinhauf
+  ([@danste22](https://github.com/danste22)), who ran it on node 1 of one board;
+  we will check nodes 2 to 4 on ours.
+- **`/sbin/osunstage` cancels a staged update**
+  ([#124](https://github.com/excavador-turing/BMC-Firmware/issues/124), Daniel
+  Steinhauf). Under the staging lock it clears `nextboot` first (the commit
+  point of a cancel), then removes both notes and what an interrupted stager
+  left in the staging directories. It leaves the `rootfs_new` volume, which
+  nothing boots without `nextboot` and the next staging removes, and the images
+  parked on the SD card. With nothing staged it says so and succeeds. Refused
+  with exit status 4 while a tentative boot is being judged, and 75 while a stager
+  holds the lock. bmcd runs it for `POST opt=set&type=firmware_unstage`, `tpi
+  firmware unstage` calls that, and the Firmware page has a "Cancel staged
+  update" button.
+- **`firmware_unstage` in the daemon, `tpi firmware unstage`, and "Cancel staged
+  update" on the Firmware page** (bmcd 2.51.0 and bmcd#92, tpi 2.1.0 and tpi#36,
+  BMC-UI 4.9.0 and BMC-UI#74; BMC-Firmware#124, asked for by Daniel Steinhauf,
+  [@danste22](https://github.com/danste22)). `POST opt=set&type=firmware_unstage`
+  (also `POST /api/bmc/firmware/unstage`) runs `osunstage`. The command names what
+  it cancelled, says so when nothing was staged (not an error), and says when it
+  removed the note of an update that was never armed. The page asks for a
+  confirmation that names the version and what stays. `tpi` and the page need
+  bmcd 2.51.0 or newer on the board; an older one is told so.
+- **One staging lock in the daemon**, shared with the firmware's scripts (bmcd
+  2.51.0, bmcd#92, BMC-Firmware#127): a second stager gets a 409 `an update is
+  being staged; try again when it has finished`, before any byte is sent.
+- **The Console says when its output looks like the wrong speed, and shows each
+  node's speed** (BMC-UI 4.9.1, BMC-UI#75). A module whose console runs faster than
+  the node's stored speed shows replacement characters and control bytes, and
+  nothing on the page said why. When a high share of the last 4 KiB is unreadable,
+  a notice says "This looks like the wrong console speed. RK1 uses 1500000, CM4
+  and most others 115200.", names the speed the node is set to, and links to Power
+  Control. Reported by DingoDogz on Discord.
+
+**Fixed**
+
+- **Every note the promotion gate reads is written, and synced, before
+  `nextboot` is armed** ([#126](https://github.com/excavador-turing/BMC-Firmware/issues/126),
+  Adrian Berger). `osupdate` armed `nextboot` first and the notes after. A power
+  cut or a reboot from another client in that window produced a tentative boot
+  with neither note, the gate logged "no staged note; version check skipped" and
+  "no gateway answered before the update; gateway check skipped", and an image
+  whose switch registers its ports and carries no frame was made permanent.
+  `osupdate IMAGE [NOTE]` now takes the staged-version note from the stager
+  (`tpi-selfupdate` and bmcd write it before they call it), writes the gateway
+  note, writes both through a rename, syncs, and arms `nextboot` as its last
+  step. If anything fails before that, the notes are removed again.
+- **`S99postupdate` rejects a tentative boot with no staged note** (#126). A
+  staged note that says the gateway note was written first
+  (`GATE_NOTES=1`, written by the new `osupdate`) and finds none is rejected
+  too. A staged note from an older stager does not carry the mark, so the first
+  update *from* an older firmware keeps the old reading of a missing gateway
+  note, which is "recorded nothing" on a board with no default route; and a board
+  with no overlay directory, which cannot hold a note, is not refused.
+- **`stage-gateway-note` tries five times before it records `none`** (#126). A
+  network blip during one 2 s ping recorded `GATEWAY_PING=none` right after a
+  download through the same gateway had worked, and the gate then skipped its
+  network check for that image. It also always leaves a note now: a board with no
+  default route records `GATEWAY_PING=none` and an empty gateway, so a *missing*
+  note is only ever an interrupted staging.
+- **Installs are serialised** ([#127](https://github.com/excavador-turing/BMC-Firmware/issues/127),
+  Adrian Berger). One `flock` on `/run/firmware-stage.lock`, held for the whole
+  of an upload through bmcd, of `firmware_install`, of `tpi-selfupdate` and of
+  `osupdate` run by hand. A second stager is told `an update is being staged;
+  try again when it has finished` and nothing is touched (bmcd answers 409).
+  The lock is taken before the "already staged" question, which is only a true
+  answer while no other stager is between "started" and "armed", and before
+  anything is downloaded.
+- **`tpi-selfupdate` no longer says "power-cycle the board" for a busy volume**
+  (#127). `ubirmvol: error 16 (Device or resource busy)` now says the volume is
+  busy, that nothing was changed, and not to power-cycle for it; a power cycle
+  hard-cuts all four compute modules. The advice stays for the write errors that
+  switch UBI read-only.
+- **A power cut during the first boot of an update no longer leaves a staged
+  version on the page for ever**
+  ([#131](https://github.com/excavador-turing/BMC-Firmware/issues/131), Adrian
+  Berger). U-Boot deletes `nextboot` before it boots the staged volume, so a cut
+  before the gate decided left the old image running with the notes still on the
+  overlay. On a boot that is not tentative, with `nextboot` unset, `S99postupdate`
+  now removes the notes and logs `tentative boot did not complete; staged vX
+  discarded` to `postupdate.log`. It leaves them alone when `nextboot` cannot be
+  read, and when a stager holds the lock (it has written its notes and not armed
+  yet).
+- **`tpi-selfupdate` says what to do with an update that is already staged**
+  ([#128](https://github.com/excavador-turing/BMC-Firmware/issues/128), Adrian
+  Berger): reboot to take it, or `tpi firmware unstage`, instead of the
+  `fw_setenv nextboot` it used to ask people to type.
+- **The web serial console stays open when the browser falls behind the UART**
+  (bmcd 2.51.1, bmcd#96). At 1500000 baud it ended with `close code 1011: channel
+  lagged by 2`: the read fan-out held 8 chunks. A client that lags now stays
+  attached and the stream carries a line where the output was lost; the fan-out
+  holds 256 chunks, 2 MiB at most per node. Reported by DingoDogz on Discord, from
+  an RK1 running Talos.
+- **The "last power on" time restarts when the BMC reboots and powers the nodes
+  back on** (bmcd 2.51.2, bmcd#98). On a v2.4 board a BMC reboot cuts the power of
+  the nodes and the daemon switches them back on at start, but left the time of
+  the last switch from the UI or the API, so the page showed a stale one. A cold
+  boot stamps every node it powers on; a restart of the daemon under running nodes
+  keeps the stamps. Reported by DingoDogz on Discord, from a v2.4 board.
+- **A node that was running is switched back on after a flash**, and `type=reset`
+  goes through the same path as a power request, so the state the API reports and
+  the rails agree (bmcd 2.51.0, bmcd#88, BMC-Firmware#122 and #129; #122 reported
+  by Daniel Steinhauf, the power-state problem found by Adrian Berger's
+  simulation). See Changed for what a client may notice.
+- **Every request of the web interface has a limit, so a lost board shows within
+  seconds** (BMC-UI 4.9.0, BMC-UI#71, BMC-Firmware#121). Reads time out after 8
+  seconds, state changes after 15, long operations after 2 minutes; a change that
+  got no answer says "The board did not answer. The change may or may not have
+  been applied", and the page never reloads itself during an upload, install,
+  flash or backup. Found by Daniel Steinhauf in Safari 26.6.2.
+- **The serial console shows its last line** (BMC-UI 4.9.0, BMC-UI#72,
+  BMC-Firmware#125). The terminal was fitted one row too tall, so the line with the
+  cursor ran under the clipped edge. Found by Daniel Steinhauf in Safari.
+- **The install dialog no longer allows a second install, and closes when you
+  confirm** (BMC-UI 4.9.1, BMC-UI#76). It stayed open until the board answered and
+  "Continue" stayed enabled, so pressing it twice started a second install while
+  the first was still writing the spare slot. Progress, a failure that stays until
+  dismissed and the "Staged" notice with "Reboot to apply" show on the page.
+  Reported by DingoDogz on Discord.
+
+**Changed**
+
+- **`force=1` means "cancel what is staged, then stage this"**, on both the upload
+  and `firmware_install`
+  ([#128](https://github.com/excavador-turing/BMC-Firmware/issues/128), Adrian
+  Berger). `firmware_install` answered 409 "pass force=1 to replace it" and then
+  refused `force=1`: bmcd skipped its own check and ran `tpi-selfupdate`, which
+  has no force option. The upload path honoured it by writing over the staged
+  volume with `nextboot` still pointing at it. Both now unstage first, under the
+  lock. If the install that follows fails, nothing is staged and the board boots
+  what it runs. The 409 names the three ways out: reboot, unstage, `force=1`.
+- **A firmware transfer is refused while another transfer runs**, instead of
+  replacing it (#127, in bmcd).
+- **The promotion history counts "tentative boot; checking" lines**, not any line
+  with "tentative boot" in it, so the new discard line is not an attempt (bmcd).
+- **The kernel no longer probes the unused display pipeline**
+  ([#143](https://github.com/excavador-turing/BMC-Firmware/pull/143), landed as
+  [#146](https://github.com/excavador-turing/BMC-Firmware/pull/146), Refs #138).
+  The BMC has no panel, but the display mixers and timing controllers were
+  enabled in the kernel's device tree and printed `Fixed dependency cycle(s)`
+  at boot. Five nodes are now disabled for the kernel; U-Boot's device tree is
+  unchanged. Written by Daniel Steinhauf
+  ([@danste22](https://github.com/danste22)).
+- **The kernel mounts the EROFS root without probing every filesystem first**
+  ([#144](https://github.com/excavador-turing/BMC-Firmware/pull/144), landed as
+  [#147](https://github.com/excavador-turing/BMC-Firmware/pull/147), Refs #139).
+  `boot.scr` passed `root=` without `rootfstype`, so the kernel tried each
+  built-in filesystem and logged exFAT and F2FS errors against the root device.
+  It now passes `rootfstype=erofs`; the NAND and the SD root are both EROFS,
+  and an F2FS or exFAT card still mounts. Written by Daniel Steinhauf
+  ([@danste22](https://github.com/danste22)); an SD-card boot is still to be
+  confirmed.
+- **A reset of a node that is off is refused with a 409**, where it used to power
+  the node on, and **a node that was running is switched back on after a flash**
+  (bmcd 2.51.0, bmcd#88). **Behaviour change:** a client that used `type=reset` to
+  switch a node on must use `type=power`, and anyone who relied on a flashed node
+  staying off must switch it off before flashing.
+- **`tpi firmware install --force` cancels what is staged, then installs**
+  (tpi 2.1.0, tpi#36, BMC-Firmware#128, found by Adrian Berger). The flag is
+  unchanged; its help now says what it means.
+- **tpi's AUR workflow is removed and its install instructions point at this
+  fork** (tpi 2.1.0, tpi#35, BMC-Firmware#123, found by Daniel Steinhauf). The
+  workflow never ran, could not have published, and would have built the wrong
+  thing.
+
+##### Tests
+
+`tests/osupdate.sh` (the order, with a trace of every tool and what was on disk
+when `nextboot` was armed; the lock), `tests/osunstage.sh`,
+`tests/selfupdate-failure.sh` (the note is handed over before `osupdate` runs;
+the lock; EBUSY) and `tests/gate.sh` (notes missing, notes stale, the lock held,
+`start()` end to end, the stager's retries). The CI mutation step has a mutation
+for each of these, so a suite that cannot say no fails.
+
+- `tests/hw-validate.sh` is a script to run on a flashed board (it is not
+  installed in the image). It compares `br0` with the EEPROM MAC, fails the USB
+  getty check only when the getty is respawning, and takes `dsa` as the CPU
+  conduit
+  ([#142](https://github.com/excavador-turing/BMC-Firmware/pull/142), by Daniel
+  Steinhauf, [@danste22](https://github.com/danste22)). The three changes above
+  each add a check to it.
+
+</details>
+
+<details class="note">
 <summary>v2.57.0 — 25 November 2026</summary>
 
 v2.56.0 was never published; its changes ship in v2.57.0, together with the
@@ -85,8 +301,9 @@ an API request (no client we know of does) now gets 400.
   BMC-Firmware#93). `rockusb` 0.2.0 to 0.4.0 is the library that puts an RK1
   (RK3588) into USB download mode and loads its SPL loader before the eMMC is
   written; the bytes it sends are the same. Written by Daniel Steinhauf, who
-  flashed an RK1 three times with it on a board (we have no RK1 ourselves). Its
-  new crates (`maybe-async-cfg` and the proc-macro crates it builds with,
+  flashed an RK1 three times with it on a board (our own RK1s all run a live
+  cluster, so we did not reflash one for this). Its new crates
+  (`maybe-async-cfg` and the proc-macro crates it builds with,
   `strum` 0.28) all come from crates.io and passed `cargo deny`. The RK1 flash
   path is tested by him, not by us.
 - **`sha2`, `crc` and `crc32fast` are built at `opt-level = 3`** (bmcd 2.50.0,
@@ -125,8 +342,8 @@ an API request (no client we know of does) now gets 400.
 - Response times did not change with the earlier v2.56.0 pre-release: about
   0.135 s per request on the board.
 - The RK1 flash path (`rockusb` 0.4) was tested by Daniel Steinhauf
-  ([@danste22](https://github.com/danste22)), three flashes on an RK1. We have
-  no RK1, so we did not test it.
+  ([@danste22](https://github.com/danste22)), three flashes on an RK1. Our eight
+  RK1s all run a live cluster, so we did not reflash one to test it.
 - The speed of a node flash's checksums was not measured by us. The three
   checksum crates are built at full speed; everything else is unchanged.
 

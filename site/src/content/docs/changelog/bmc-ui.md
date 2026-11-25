@@ -1,15 +1,126 @@
 ---
 title: BMC-UI
-description: 'Every BMC-UI release and what changed in it: 49 entries, newest v4.8.1, taken from the repository''s own CHANGELOG.md.'
+description: 'Every BMC-UI release and what changed in it: 51 entries, newest v4.9.1, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmc-ui
 tableOfContents: false
 ---
 
 The web interface the board serves.
 
-Newest release **v4.8.1**, 24 November 2026. 49 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **v4.9.1**, 25 November 2026. 51 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/BMC-UI/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>v4.9.1 — 25 November 2026</summary>
+
+A notice when the console looks like the wrong speed, and the install dialog no
+longer lets a second install start. Both come from a report by DingoDogz
+(Discord). Thank you.
+
+**Added**
+
+- **The Console says when its output looks like the wrong speed, and shows each
+  node's speed.** A module whose console runs faster than the node's stored
+  speed shows replacement characters and control bytes, and nothing on the page
+  said why. The speed is a node setting under Power Control, Edit; a node with
+  none stored runs at 115200, which is wrong for an RK1 (1500000). When a high
+  share of the last 4 KiB of output is unreadable, a notice above the terminal
+  says "This looks like the wrong console speed. RK1 uses 1500000, CM4 and most
+  others 115200.", names the speed this node is set to, and links to Power
+  Control. The speed is also shown beside the reader state, with a link to
+  change it. Translated in every locale. Thanks to DingoDogz (Discord) for the
+  report.
+
+**Fixed**
+
+- **A second press of "Continue" no longer starts a second install, and the
+  install dialog closes when it is answered.** The install confirmation stayed
+  open until the board answered, its progress was behind the backdrop, and its
+  "Continue" stayed enabled, so pressing it again was the natural thing to do.
+  The second press sent a second `firmware_install` while the first was still
+  writing the spare slot; a daemon without the staging lock (before bmcd 2.51.0)
+  lets it in, and two updaters on one volume leave nothing staged. A
+  single-flight gate now refuses the second install, the dialog closes at once,
+  and the page shows the progress (with a bar), a failure that stays until
+  dismissed, and the "Staged" notice with "Reboot to apply" in the panel above.
+  The buttons read "Install" and "Do not install". Cancelling a staged update
+  stays its own button with its own confirmation.
+- **The upload dialog can be closed while the image uploads and is written.**
+  The upload runs in the page-wide flash state, so closing the dialog touches
+  nothing; the same progress, or the failure, is shown beside the list. Keep the
+  page open until it is done: reloading or closing the tab ends the upload. The
+  install likewise needs the page open for its answer. Thanks to DingoDogz
+  (Discord) for the report.
+
+</details>
+
+<details class="note">
+<summary>v4.9.0 — 25 November 2026</summary>
+
+A button to cancel a staged firmware update, and two fixes. All three come from
+Daniel Steinhauf ([@danste22](https://github.com/danste22)): he asked for the
+cancel, and found and measured the other two on a board in Safari 26.6.2. Thank
+you, Daniel.
+
+**Added**
+
+- **"Cancel staged update" on the Firmware page**
+  ([BMC-Firmware#124](https://github.com/excavador-turing/BMC-Firmware/issues/124),
+  asked for by Daniel Steinhauf, [@danste22](https://github.com/danste22)).
+  Next to "Reboot to apply" in the notice that an update is staged, with a
+  confirmation that names the version and says what stays: the board keeps
+  running the firmware it runs, and the image already written to the spare slot
+  stays there until the next install replaces it. It posts
+  `opt=set&type=firmware_unstage` (bmcd 2.51.0), shows the board's own words if
+  it is refused (an install still writing, or the new firmware being checked on
+  its first boot), and reads the slots again whatever the answer was.
+  - **The dialog closes when it is answered, not when the board has.** The
+    request carries its own 15 s timeout, and its error lands on the page where
+    it can be read. A dialog that stayed open over a pending request left the
+    error toast behind its backdrop when the board had stopped answering
+    (BMC-Firmware#121 describes it for the power switch).
+
+**Changed**
+
+- The upload dialog's text says what to do when an update is already staged:
+  cancel it first. It used to say only that the board refuses.
+
+**Fixed**
+
+- **Every request has a limit, so a lost board shows within seconds and a
+  change that got no answer says so**
+  ([#71](https://github.com/excavador-turing/BMC-UI/pull/71),
+  [BMC-Firmware#121](https://github.com/excavador-turing/BMC-Firmware/issues/121)).
+  No request had a timeout, so a board that dropped off the network was found
+  when the browser gave up on the connection, 80 seconds in Safari, and a
+  power change sent in that time stayed pending: it could still reach the board
+  later, or never, and the page could not say which. Reads now time out after
+  8 seconds, the reads a page repeats every few seconds after 5, state changes
+  after 15, firmware installs, configuration imports, storage repairs and the
+  backup after 2 minutes, and the update check after 30; uploads have no limit.
+  The "board stopped answering" banner looks at the first request that failed,
+  not the last of its retries, so it appears about ten seconds after the board
+  goes. A change that got no answer is reported as "The board did not answer.
+  The change may or may not have been applied", for 20 seconds, instead of as a
+  failure, and the toast is raised above dialogs: it used to come up behind the
+  blurred backdrop of the confirmation, where it could not be read. A refusal
+  from the board still shows the board's own words. While an upload, a firmware
+  install, a node flash or a backup is running, the page never reloads itself
+  when the board answers again after being flagged lost: the banner shows, and
+  the operation's own result decides.
+- **The serial console shows its last line**
+  ([#72](https://github.com/excavador-turing/BMC-UI/pull/72),
+  [BMC-Firmware#125](https://github.com/excavador-turing/BMC-Firmware/issues/125)).
+  The line with the cursor showed only its top part and the console could not
+  be scrolled further. The terminal's fit addon sizes it from its parent's
+  height and takes off only the terminal's own padding, and the parent carried
+  a border and padding, so one row too many was fitted and the last one ran
+  under the clipped edge. The frame now carries the border and padding and the
+  element the terminal is opened in has none. A browser check in CI measures it
+  at a desktop's width and a phone's.
+
+</details>
+
+<details class="note">
 <summary>v4.8.1 — 24 November 2026</summary>
 
 **Fixed**

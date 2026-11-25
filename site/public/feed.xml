@@ -74,8 +74,9 @@ an API request (no client we know of does) now gets 400.
   BMC-Firmware#93). `rockusb` 0.2.0 to 0.4.0 is the library that puts an RK1
   (RK3588) into USB download mode and loads its SPL loader before the eMMC is
   written; the bytes it sends are the same. Written by Daniel Steinhauf, who
-  flashed an RK1 three times with it on a board (we have no RK1 ourselves). Its
-  new crates (`maybe-async-cfg` and the proc-macro crates it builds with,
+  flashed an RK1 three times with it on a board (our own RK1s all run a live
+  cluster, so we did not reflash one for this). Its new crates
+  (`maybe-async-cfg` and the proc-macro crates it builds with,
   `strum` 0.28) all come from crates.io and passed `cargo deny`. The RK1 flash
   path is tested by him, not by us.
 - **`sha2`, `crc` and `crc32fast` are built at `opt-level = 3`** (bmcd 2.50.0,
@@ -114,8 +115,8 @@ an API request (no client we know of does) now gets 400.
 - Response times did not change with the earlier v2.56.0 pre-release: about
   0.135 s per request on the board.
 - The RK1 flash path (`rockusb` 0.4) was tested by Daniel Steinhauf
-  ([@danste22](https://github.com/danste22)), three flashes on an RK1. We have
-  no RK1, so we did not test it.
+  ([@danste22](https://github.com/danste22)), three flashes on an RK1. Our eight
+  RK1s all run a live cluster, so we did not reflash one to test it.
 - The speed of a node flash's checksums was not measured by us. The three
   checksum crates are built at full speed; everything else is unchanged.</content>
   </entry>

@@ -17,15 +17,15 @@ releases:
     newest: v2.57.0
     count: 54
   bmcd:
-    newest: 2.50.2
-    count: 60
+    newest: 2.51.2
+    count: 63
   ui:
-    newest: v4.8.1
-    count: 49
+    newest: v4.9.1
+    count: 51
   tpi:
-    newest: v2.0.1
-    count: 19
-  total: 182
+    newest: v2.1.0
+    count: 20
+  total: 188
 features:
   source: features/*.mdx -- a feature is a page
   count: 11
