@@ -2,6 +2,15 @@
  "as_of": "2026-11-26",
  "items": [
   {
+   "number": 27,
+   "title": "Remote syslog, and an audit line for every mutating API call",
+   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/27",
+   "votes": 6,
+   "status": "Open",
+   "status_from": "default",
+   "summary": "Ship the board's logs somewhere that survives it, and write one line per call that changes state \u2014 who, what, from where."
+  },
+  {
    "number": 25,
    "title": "VLANs on the board's switch, with apply-then-confirm",
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/25",
@@ -9,15 +18,6 @@
    "status": "Shipped in v2.33.0",
    "status_from": "discussion",
    "summary": "**VLANs on the board's switch \u2014 shipped in firmware v2.33.0, with three ways to use them**"
-  },
-  {
-   "number": 27,
-   "title": "Remote syslog, and an audit line for every mutating API call",
-   "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/27",
-   "votes": 5,
-   "status": "Open",
-   "status_from": "default",
-   "summary": "Ship the board's logs somewhere that survives it, and write one line per call that changes state \u2014 who, what, from where."
   },
   {
    "number": 24,
@@ -32,7 +32,7 @@
    "number": 29,
    "title": "Manage the BMC's SSH keys and change its password from the interface and the fleet",
    "url": "https://github.com/excavador-turing/BMC-Firmware/discussions/29",
-   "votes": 3,
+   "votes": 4,
    "status": "Open",
    "status_from": "default",
    "summary": "The only way to put an SSH key on the BMC, or take one off, is to log in over SSH and edit `/root/.ssh/authorized_keys` by hand."

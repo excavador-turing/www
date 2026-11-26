@@ -1,15 +1,42 @@
 ---
 title: bmcd
-description: 'Every bmcd release and what changed in it: 63 entries, newest 2.51.2, taken from the repository''s own CHANGELOG.md.'
+description: 'Every bmcd release and what changed in it: 64 entries, newest 2.51.3, taken from the repository''s own CHANGELOG.md.'
 slug: changelog/bmcd
 tableOfContents: false
 ---
 
 The daemon: the API, the update logic, the metrics.
 
-Newest release **2.51.2**, 25 November 2026. 63 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
+Newest release **2.51.3**, 26 November 2026. 64 in total. Each entry is this repository's own [CHANGELOG.md](https://github.com/excavador-turing/bmcd/blob/hive/CHANGELOG.md) where it has one, and the release note where it does not — fetched by `just refresh-changelog`, so this page and the repository cannot disagree.
 
 <details class="note" open>
+<summary>2.51.3 — 26 November 2026</summary>
+
+**Fixed**
+
+- **A node's power-on time is no longer inflated, or cut short, by a step of
+  the clock.** The time is a difference, and the daemon took it between two
+  readings of the wall clock. On a v2.4 board the clock has no battery: after a
+  reboot of the BMC the kernel starts from a stale time, the daemon stamps the
+  nodes it powers back on, and chronyd steps the clock forward about two
+  minutes later. We measured it on our own v2.4 board (firmware v2.58.0-rc.2,
+  bmcd 2.51.2): chronyd stepped the clock by 130.4 s, and node 1 reported 139 s
+  and then 153 s when it had been on for about 30 to 45 s. Any other step does
+  the same, in either direction: NTP on any board, or `date` by hand. The
+  stamp now also records the boot clock (`CLOCK_BOOTTIME`, which a step of the
+  wall clock does not move) with the kernel's boot id, and within one boot the
+  time is the difference of the boot clock; a restart of the daemon keeps it
+  exactly. A stamp from an earlier boot, which only a board that keeps its nodes
+  powered through a reboot of the BMC has, is still read by the wall clock, as
+  the boot clock cannot span a reboot. The stamps made by 2.51.2 and earlier
+  have no boot clock and are read by the wall clock until the node is switched
+  on again. The API, `bmcd_node_power_on_seconds` and the stored `node_info` are
+  unchanged; the boot clocks are stored under a key of their own. The original
+  report was DingoDogz's (Discord). Thank you.
+
+</details>
+
+<details class="note">
 <summary>2.51.2 — 25 November 2026</summary>
 
 **Fixed**

@@ -35,7 +35,7 @@ and #131, each with a reproduction; and to Daniel Steinhauf
 This is the firmware's half; the daemon's, `tpi`'s and the interface's are in
 bmcd, tpi and BMC-UI, and ship together with it in v2.58.0.
 
-Pins **bmcd 2.51.2** (v2.57.0 had 2.50.2), **tpi 2.1.0** (2.0.1) and **BMC-UI
+Pins **bmcd 2.51.3** (v2.57.0 had 2.50.2), **tpi 2.1.0** (2.0.1) and **BMC-UI
 4.9.1** (4.8.1). The kernel stays at 6.18.63.
 
 **Not yet tested with real power cuts**, which a simulation cannot replace: the
@@ -87,6 +87,57 @@ or newer, and the new bmcd needs the new scripts.
   Control. Reported by DingoDogz on Discord.
 
 **Fixed**
+
+- **A node in mass-storage mode got no `/dev/disk/by-tpi/nodeN` link on a v2.4
+  board** (Refs #145, #148, #225). Measured on our own v2.4 board with firmware
+  v2.58.0-rc.2: `tpi advanced msd -n 1` on a Raspberry Pi CM4 attached the disk
+  (`/dev/sda`, the Raspberry Pi boot loader's mass-storage device, below
+  `2-1`), and no link appeared. The helper `mdev-tpi-msd-symlink`, written by
+  Daniel Steinhauf ([@danste22](https://github.com/danste22)) and credited under
+  Added, names the node from the hub port, `1-1.N` or `2-1.N`, which is the v2.5
+  layout. v2.4 has no hub: the BMC multiplexes one node at a time onto the root
+  port, so the disk is on `2-1` (or `1-1`), the path says nothing about the node,
+  and the helper ignored it. On a board whose device tree model is
+  `Turing Pi 2 (v2.4)` the helper now takes the node from the USB mux itself:
+  bmcd holds the four select lines (`PG0`..`PG3` of `gpiochip0`) as outputs, and
+  the kernel lists a claimed line with its level in `/sys/kernel/debug/gpio`.
+  The image did not mount debugfs, so a new `S00debugfs` mounts it at boot (the
+  helper mounts it too if it is missing), and the helper reads the header
+  `gpiochip0: 224 GPIOs, ...` this kernel prints. Exactly one enable line low is
+  a route, and the select line of that mux says which of its two nodes. It needs
+  no token and no change in bmcd. When the lines
+  cannot be read or make no sense, there is no link, not a guess. The link goes
+  when the disk does, as on v2.5, and the USB remove of `1-1` or `2-1` also
+  sweeps one whose disk is gone. v2.5 and v2.5.1 behave as before: the hub port
+  names the node and the mux is not read. The new `tests/mdev-tpi-msd-symlink.sh`
+  runs the helper against a scratch tree for both layouts (all four nodes on
+  both root ports, removal, the mux moving between nodes, unreadable states) and
+  runs in CI under dash and busybox ash, with debugfs lines copied from the
+  board. The line levels for nodes 1 to 4 were read on the v2.4 board and match
+  the table; the link itself is not yet checked there with the new image.
+
+- **v2.58.0-rc.1 could not be installed from stock upstream firmware: the gate
+  rejected the missing note** (Refs #126). Found on our own v2.4 board during a
+  migration test, with stock v2.1.0 (bmcd 2.3.4) installing the release through
+  its web interface. The stock installer writes `rootfs_new` and arms `nextboot`
+  and has never heard of our notes, so the tentative boot found no staged note,
+  logged `FAILED: no staged note on a tentative boot`, and the board rolled back
+  to stock. The rule was right for an interrupted fork staging and wrong for
+  any stager of another firmware, a third one this gate cannot ask to change.
+  v2.57.0 and earlier had no such rule, so the migration worked until now.
+  The gate now records, on every normal boot of this firmware and at every
+  promotion, which UBI volume is running (`/mnt/overlay/running-image`: the
+  volume id and `data_bytes` of the volume named `rootfs`). On a tentative boot
+  with no staged note it compares that marker with the volume it replaces. A
+  match means the old image was this firmware and the missing note is still a
+  rejection, as in #126. No marker, or a marker for a volume that is gone (a
+  board that went from this fork to stock and back), means the old image never
+  recorded one: the boot is accepted, the log says why, and the version and
+  gateway comparisons are skipped as they were before #126. Everything else the
+  gate asks (bmcd, switch ports, uplinks, EEPROM, RTC, `/metrics`) still applies.
+  The first update from a fork older than this marker (v2.57.0 and earlier) is
+  read the same way, since those images wrote none; the update after that is
+  protected again. `tests/gate.sh` covers both directions.
 
 - **Every note the promotion gate reads is written, and synced, before
   `nextboot` is armed** ([#126](https://github.com/excavador-turing/BMC-Firmware/issues/126),
@@ -151,6 +202,15 @@ or newer, and the new bmcd needs the new scripts.
   the last switch from the UI or the API, so the page showed a stale one. A cold
   boot stamps every node it powers on; a restart of the daemon under running nodes
   keeps the stamps. Reported by DingoDogz on Discord, from a v2.4 board.
+- **A node's power-on time is no longer inflated, or cut short, by a step of the
+  clock** (bmcd 2.51.3, bmcd#100). The time was the difference of two readings of
+  the wall clock, and a v2.4 board has no battery: after a BMC reboot the kernel
+  starts from a stale time and chronyd steps the clock about two minutes later.
+  On our own v2.4 board (firmware v2.58.0-rc.2, bmcd 2.51.2) chronyd stepped it by
+  130.4 s and node 1 reported 139 s and then 153 s after about 30 to 45 s on. The
+  stamp now also records the boot clock, which a step of the wall clock does not
+  move, and the time within one boot is its difference. The original report was
+  DingoDogz's, on Discord.
 - **A node that was running is switched back on after a flash**, and `type=reset`
   goes through the same path as a power request, so the state the API reports and
   the rails agree (bmcd 2.51.0, bmcd#88, BMC-Firmware#122 and #129; #122 reported

@@ -12,7 +12,7 @@ What changed in each release, taken from each repository's own `CHANGELOG.md`. F
 
 <div class="tp-plates">
 <a class="tp-plate" href="/changelog/firmware/"><b>BMC-Firmware</b><span>The firmware image — what you flash onto the board. It carries a `bmcd`, a `BMC-UI` and a `tpi`, so this is the version to quote when reporting anything.</span><span class="tp-plate__meta">v2.57.0 · 25 November 2026 · 54 releases</span></a>
-<a class="tp-plate" href="/changelog/bmcd/"><b>bmcd</b><span>The daemon: the API, the update logic, the metrics.</span><span class="tp-plate__meta">2.51.2 · 25 November 2026 · 63 releases</span></a>
+<a class="tp-plate" href="/changelog/bmcd/"><b>bmcd</b><span>The daemon: the API, the update logic, the metrics.</span><span class="tp-plate__meta">2.51.3 · 26 November 2026 · 64 releases</span></a>
 <a class="tp-plate" href="/changelog/bmc-ui/"><b>BMC-UI</b><span>The web interface the board serves.</span><span class="tp-plate__meta">v4.9.1 · 25 November 2026 · 51 releases</span></a>
 <a class="tp-plate" href="/changelog/tpi/"><b>tpi</b><span>The command-line client.</span><span class="tp-plate__meta">v2.1.0 · 25 November 2026 · 20 releases</span></a>
 </div>
