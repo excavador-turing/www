@@ -61,9 +61,9 @@ faults:
 roadmap:
   source: data/roadmap.json, written by `just refresh-roadmap` from the Ideas discussions
   as_of: 2026-11-27
-  count: 7
+  count: 9
   shipped: 2
-  votes: 25
+  votes: 31
   top: Remote syslog, and an audit line for every mutating API call
 platform:
   source: reference/comparison.md, measured on a running board
